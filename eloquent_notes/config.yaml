@@ -1,0 +1,16 @@
+obsidian:
+  vault_path: "~/Obsidian"
+  folder: "Dictations"
+  daily_notes: true
+
+ai:
+  ollama_url: "http://localhost:11434"
+  model: "gemma4:12b-it-qat"
+  context_length: null         # If null or not set, the maximum allowed by the model is used.
+
+audio:
+  sample_rate: 16000
+  channels: 1
+  temp_file: "/tmp/eloquent_temp.wav"
+  beep_frequency: 440
+  beep_duration: 0.1

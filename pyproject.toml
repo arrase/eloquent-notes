@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eloquent-notes"
+version = "0.1.0"
+description = "A Linux system tray utility for offline dictation into Obsidian using Gemma 4."
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    { name = "Eloquent Notes Developers" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: POSIX :: Linux",
+]
+dependencies = [
+    "sounddevice",
+    "numpy",
+    "PyQt6",
+    "Pillow",
+    "pyyaml",
+    "requests",
+    "langchain-ollama",
+    "langchain-core",
+]
+
+[project.scripts]
+eloquent-notes = "eloquent_notes.main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["eloquent_notes*"]
+
+[tool.setuptools.package-data]
+eloquent_notes = ["config.yaml", "prompts/*.md"]
