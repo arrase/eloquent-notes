@@ -4,6 +4,23 @@ Eloquent Notes is a lightweight, system-tray-centric utility for Linux inspired 
 
 ---
 
+## ✨ Features
+
+- **System Tray Centric UX:** Control recording easily by clicking the system tray icon (click to start, click again to stop and process).
+- **Context Menu Actions:** Right-click the system tray icon to reveal a menu with options to:
+  - **Start/Stop Recording**
+  - **Reload Configuration** (reloads settings and prompts on-the-fly without restarting the application)
+  - **Quit**
+- **Offline & Private:** Transcribes and refines audio locally on your machine using Gemma 4 via Ollama.
+- **Dynamic Icons:** Status indicators are rendered dynamically in memory:
+  - 🔘 **Idle (Gray):** A gray circle with a white microphone icon.
+  - 🔴 **Recording (Red):** A red circle with a white recording dot.
+  - 🟠 **Processing (Orange):** An orange circle with a white hourglass.
+- **Obsidian Integration:** Appends notes to daily journals or creates new individual files inside your vault, complete with tags and frontmatter metadata.
+- **Customizable Prompts:** Edit custom Markdown system and user prompts loaded directly from your user config directory.
+
+---
+
 ## 🏗️ Architectural Overview
 
 Eloquent Notes is built with a highly responsive, asynchronous, and memory-efficient architecture:
@@ -34,23 +51,6 @@ graph TD
 * **Non-Blocking UI Threads:** Both the model preloading and the Ollama API request processing are offloaded to background threads. This ensures that the PyQt6 system tray UI loop remains entirely responsive without stuttering or freezing.
 * **Dynamic Icon Generation:** Custom state icons are drawn dynamically in-memory using Pillow (`PIL`) and converted to `QIcon` objects at runtime. No external image assets are required.
 * **Structured Model Output:** The transcription is sent to Ollama's `/api/chat` using structured JSON schema format instructions, guaranteeing robust parsing of transcription flags (`empty` and `text`).
-
----
-
-## ✨ Features
-
-- **System Tray Centric UX:** Control recording easily by clicking the system tray icon (click to start, click again to stop and process).
-- **Context Menu Actions:** Right-click the system tray icon to reveal a menu with options to:
-  - **Start/Stop Recording**
-  - **Reload Configuration** (reloads settings and prompts on-the-fly without restarting the application)
-  - **Quit**
-- **Offline & Private:** Transcribes and refines audio locally on your machine using Gemma 4 via Ollama.
-- **Dynamic Icons:** Status indicators are rendered dynamically in memory:
-  - 🔘 **Idle (Gray):** A gray circle with a white microphone icon.
-  - 🔴 **Recording (Red):** A red circle with a white recording dot.
-  - 🟠 **Processing (Orange):** An orange circle with a white hourglass.
-- **Obsidian Integration:** Appends notes to daily journals or creates new individual files inside your vault, complete with tags and frontmatter metadata.
-- **Customizable Prompts:** Edit custom Markdown system and user prompts loaded directly from your user config directory.
 
 ---
 
