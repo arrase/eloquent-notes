@@ -9,7 +9,6 @@ Eloquent Notes is a system tray utility for Linux inspired by [Google Eloquent](
 - **Dynamic Icons:** Status indicators (Idle, Recording, Processing) are rendered dynamically in memory.
 - **Obsidian Integration:** Appends to daily notes or creates new individual notes with tags and frontmatter metadata.
 - **Customizable Prompts:** Custom Markdown system prompts loaded from your user config directory.
-- **Modern Standards:** Pure PEP 621 compliance (`pyproject.toml`) and zero inline imports.
 
 ---
 
