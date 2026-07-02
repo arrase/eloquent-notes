@@ -1,3 +1,4 @@
+import argparse
 import os
 import sys
 import threading
@@ -236,7 +237,19 @@ Categories=Utility;
     print("Eloquent Notes will now start automatically upon login!")
 
 def main():
-    if len(sys.argv) > 1 and sys.argv[1] == "install-autostart":
+    parser = argparse.ArgumentParser(
+        description="Eloquent Notes - Linux system tray utility for offline dictation into Obsidian."
+    )
+    parser.add_argument(
+        "command",
+        nargs="?",
+        choices=["install-autostart"],
+        help="Command to execute (e.g., 'install-autostart' to install autostart desktop entry)."
+    )
+    
+    args = parser.parse_args()
+    
+    if args.command == "install-autostart":
         install_autostart()
         sys.exit(0)
         
