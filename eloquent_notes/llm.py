@@ -1,13 +1,6 @@
 import base64
+import json
 import requests
-from pydantic import BaseModel, Field
-from langchain_core.messages import SystemMessage, HumanMessage
-from langchain_ollama import ChatOllama
-
-class NoteResponse(BaseModel):
-    empty: bool = Field(description="True if the audio contains only silence, background noise, or no spoken words; False otherwise.")
-    text: str = Field(description="Cleaned, polished, and structured Markdown text if audio is not empty; empty string otherwise.")
-
 
 def get_model_max_context(ollama_url, model):
     try:
@@ -43,45 +36,84 @@ def preload_model(ollama_url, model, context_length=None, keep_alive="5m"):
                 "messages": [],
                 "keep_alive": keep_alive,
                 "options": options
-            }
+            },
+            timeout=10
         )
         response.raise_for_status()
         return True
     except requests.RequestException as e:
         raise Exception(f"Failed to preload model: {e}")
 
+def _parse_json(content):
+    cleaned = content.strip()
+    
+    # Strip markdown code block wrapping if present
+    if cleaned.startswith("```json"):
+        cleaned = cleaned[7:]
+    elif cleaned.startswith("```"):
+        cleaned = cleaned[3:]
+    if cleaned.endswith("```"):
+        cleaned = cleaned[:-3]
+        
+    cleaned = cleaned.strip()
+    
+    # Extract JSON substring by finding matching curly braces
+    try:
+        start = cleaned.index('{')
+        end = cleaned.rindex('}') + 1
+        cleaned = cleaned[start:end]
+    except ValueError:
+        pass
+        
+    return json.loads(cleaned)
+
 def send_audio_to_ollama(ollama_url, model, system_prompt, user_prompt, context_length, audio_bytes, keep_alive="5m"):
     audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
-    
     num_ctx = context_length or get_model_max_context(ollama_url, model)
     
-    llm_kwargs = {
-        "base_url": ollama_url,
-        "model": model,
-        "temperature": 0.0,
-        "keep_alive": keep_alive
-    }
+    options = {"temperature": 0.0}
     if num_ctx:
-        llm_kwargs["num_ctx"] = num_ctx
+        options["num_ctx"] = num_ctx
         
-    llm = ChatOllama(**llm_kwargs)
-    structured_llm = llm.with_structured_output(NoteResponse)
-    
-    messages = [
-        SystemMessage(content=system_prompt),
-        HumanMessage(
-            content=[
-                {"type": "text", "text": user_prompt},
-                {
-                    "type": "image_url",
-                    "image_url": {"url": f"data:audio/wav;base64,{audio_base64}"}
+    payload = {
+        "model": model,
+        "messages": [
+            {
+                "role": "system",
+                "content": system_prompt
+            },
+            {
+                "role": "user",
+                "content": user_prompt,
+                "images": [audio_base64]
+            }
+        ],
+        "format": {
+            "type": "object",
+            "properties": {
+                "empty": {
+                    "type": "boolean",
+                    "description": "True if the audio contains only silence, background noise, or no spoken words; False otherwise."
+                },
+                "text": {
+                    "type": "string",
+                    "description": "Cleaned, polished, and structured Markdown text if audio is not empty; empty string otherwise."
                 }
-            ]
-        )
-    ]
-    
-    response = structured_llm.invoke(messages)
-    return {
-        "empty": response.empty,
-        "text": response.text
+            },
+            "required": ["empty", "text"]
+        },
+        "options": options,
+        "keep_alive": keep_alive,
+        "stream": False
     }
+    
+    response = requests.post(f"{ollama_url}/api/chat", json=payload)
+    response.raise_for_status()
+    
+    response_json = response.json()
+    content = response_json["message"]["content"]
+    
+    try:
+        return _parse_json(content)
+    except json.JSONDecodeError as e:
+        raise Exception(f"Failed to parse JSON from model response. Error: {e}. Raw content: {repr(content)}")

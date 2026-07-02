@@ -1,4 +1,3 @@
-import subprocess
 from io import BytesIO
 from PIL import Image, ImageDraw
 from PyQt6.QtGui import QIcon, QPixmap
@@ -29,12 +28,6 @@ def create_icon_image(color):
         draw.line((22, 46, 42, 46), fill=(255, 255, 255, 255), width=3)
         
     return image
-
-def send_notification(title, message):
-    try:
-        subprocess.run(["notify-send", "-a", "Eloquent Notes", title, message], check=True)
-    except Exception:
-        pass
 
 def get_qicon(color):
     pil_img = create_icon_image(color)

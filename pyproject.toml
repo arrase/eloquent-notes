@@ -22,8 +22,6 @@ dependencies = [
     "Pillow",
     "pyyaml",
     "requests",
-    "langchain-ollama",
-    "langchain-core",
 ]
 
 [project.scripts]

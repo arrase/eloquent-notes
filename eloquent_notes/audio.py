@@ -1,6 +1,5 @@
 import io
 import queue
-import threading
 import wave
 import numpy as np
 import sounddevice as sd
@@ -63,10 +62,3 @@ def play_beep(frequency=440, duration=0.1, sample_rate=16000):
         
     sd.play(sine_wave.astype(np.float32), sample_rate)
     sd.wait()
-
-def play_beep_async(frequency=440, duration=0.1, sample_rate=16000):
-    threading.Thread(
-        target=play_beep,
-        args=(frequency, duration, sample_rate),
-        daemon=True
-    ).start()

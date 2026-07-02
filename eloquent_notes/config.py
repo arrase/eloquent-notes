@@ -37,7 +37,7 @@ def merge_configs(dict1, dict2):
 
 def load_config():
     with open(DEFAULT_CONFIG_SRC, "r", encoding="utf-8") as f:
-        default_config = yaml.safe_load(f) or {}
+        default_config = yaml.safe_load(f)
 
     if os.path.exists(CONFIG_PATH):
         with open(CONFIG_PATH, "r", encoding="utf-8") as f:
@@ -46,15 +46,13 @@ def load_config():
         
     return default_config
 
-def load_prompt_template():
-    path = SYSTEM_PROMPT_PATH if os.path.exists(SYSTEM_PROMPT_PATH) else DEFAULT_PROMPT_SRC
+def _load_prompt(user_path, default_path):
+    path = user_path if os.path.exists(user_path) else default_path
     with open(path, "r", encoding="utf-8") as f:
         return f.read()
+
+def load_prompt_template():
+    return _load_prompt(SYSTEM_PROMPT_PATH, DEFAULT_PROMPT_SRC)
 
 def load_user_prompt_template():
-    path = USER_PROMPT_PATH if os.path.exists(USER_PROMPT_PATH) else DEFAULT_USER_PROMPT_SRC
-    with open(path, "r", encoding="utf-8") as f:
-        return f.read()
-
-# Initialize configuration directories and copy defaults upon module import
-init_config_dir()
+    return _load_prompt(USER_PROMPT_PATH, DEFAULT_USER_PROMPT_SRC)

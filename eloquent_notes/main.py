@@ -12,11 +12,12 @@ from eloquent_notes import llm
 from eloquent_notes import obsidian
 from eloquent_notes import ui
 
-class Signaler(QObject):
+class EloquentApp(QObject):
     update_icon_signal = pyqtSignal(str, str)
+    show_message_signal = pyqtSignal(str, str)
 
-class EloquentApp:
     def __init__(self):
+        super().__init__()
         self.state = "IDLE"
         self.recorder = None
         
@@ -24,9 +25,9 @@ class EloquentApp:
         self.app = QApplication(sys.argv)
         self.app.setQuitOnLastWindowClosed(False)
         
-        # Thread-safe UI update signaler
-        self.signaler = Signaler()
-        self.signaler.update_icon_signal.connect(self._update_icon_slot)
+        # Connect thread-safe UI update signals
+        self.update_icon_signal.connect(self._update_icon_slot)
+        self.show_message_signal.connect(self._show_message_slot)
         
         # Tray icon and menu variables
         self.tray = None
@@ -91,8 +92,17 @@ class EloquentApp:
             self.tray.setIcon(ui.get_qicon(color))
             self.tray.setToolTip(tooltip)
 
+    def _show_message_slot(self, title, message):
+        if self.tray:
+            self.tray.showMessage(title, message, QSystemTrayIcon.MessageIcon.Information, 5000)
+        else:
+            print(f"[{title}] {message}")
+
     def update_icon(self, color, tooltip):
-        self.signaler.update_icon_signal.emit(color, tooltip)
+        self.update_icon_signal.emit(color, tooltip)
+
+    def send_notification(self, title, message):
+        self.show_message_signal.emit(title, message)
 
     def toggle_action(self):
         if self.state == "IDLE":
@@ -100,7 +110,7 @@ class EloquentApp:
         elif self.state == "RECORDING":
             self.stop_recording_and_process()
         elif self.state == "PROCESSING":
-            ui.send_notification("Eloquent Notes", "The application is processing the previous dictation. Please wait.")
+            self.send_notification("Eloquent Notes", "The application is processing the previous dictation. Please wait.")
 
     def _preload_model_task(self):
         ai_cfg = self.config["ai"]
@@ -112,14 +122,14 @@ class EloquentApp:
         try:
             llm.preload_model(ollama_url, model, context_length, preload_keep_alive)
         except Exception as e:
-            ui.send_notification("Preload Error", f"Failed to preload model: {str(e)}")
+            self.send_notification("Preload Error", f"Failed to preload model: {str(e)}")
 
     def start_recording(self):
         self.state = "RECORDING"
         self.update_icon("red", "Eloquent Notes (Recording...)")
         
         try:
-            audio.play_beep_async(frequency=self.beep_freq, duration=self.beep_dur, sample_rate=self.sample_rate)
+            audio.play_beep(frequency=self.beep_freq, duration=self.beep_dur, sample_rate=self.sample_rate)
                 
             self.recorder = audio.AudioRecorder(
                 sample_rate=self.sample_rate,
@@ -132,7 +142,7 @@ class EloquentApp:
         except Exception as e:
             self.state = "IDLE"
             self.update_icon("gray", "Eloquent Notes (Idle)")
-            ui.send_notification("Recording Error", f"Could not start recording: {str(e)}")
+            self.send_notification("Recording Error", f"Could not start recording: {str(e)}")
 
     def stop_recording_and_process(self):
         self.state = "PROCESSING"
@@ -141,12 +151,12 @@ class EloquentApp:
         try:
             if self.recorder:
                 self.recorder.stop()
-            audio.play_beep_async(frequency=self.beep_freq, duration=self.beep_dur, sample_rate=self.sample_rate)
+            audio.play_beep(frequency=self.beep_freq, duration=self.beep_dur, sample_rate=self.sample_rate)
             threading.Thread(target=self.process_audio, daemon=True).start()
         except Exception as e:
             self.state = "IDLE"
             self.update_icon("gray", "Eloquent Notes (Idle)")
-            ui.send_notification("Processing Error", f"Failed to stop recording or start processing: {str(e)}")
+            self.send_notification("Processing Error", f"Failed to stop recording or start processing: {str(e)}")
 
     def process_audio(self):
         try:
@@ -174,7 +184,7 @@ class EloquentApp:
             )
             
             if result.get("empty") or not result.get("text", "").strip():
-                ui.send_notification("Dictation Empty", "No note was created because the audio was empty.")
+                self.send_notification("Dictation Empty", "No note was created because the audio was empty.")
                 return
             
             polished_text = result["text"]
@@ -191,10 +201,10 @@ class EloquentApp:
             )
             
             filename = os.path.basename(saved_path)
-            ui.send_notification("Dictation Saved", f"Saved dictation to Obsidian ({filename})")
+            self.send_notification("Dictation Saved", f"Saved dictation to Obsidian ({filename})")
             
         except Exception as e:
-            ui.send_notification("Processing Error", f"An error occurred while processing dictation: {str(e)}")
+            self.send_notification("Processing Error", f"An error occurred while processing dictation: {str(e)}")
             
         finally:
             self.state = "IDLE"
@@ -203,9 +213,9 @@ class EloquentApp:
     def reload_config(self):
         try:
             self._apply_config()
-            ui.send_notification("Eloquent Notes", "Configuration reloaded successfully.")
+            self.send_notification("Eloquent Notes", "Configuration reloaded successfully.")
         except Exception as e:
-            ui.send_notification("Configuration Error", f"Failed to reload configuration: {str(e)}")
+            self.send_notification("Configuration Error", f"Failed to reload configuration: {str(e)}")
 
     def exit_app(self):
         if self.state == "RECORDING" and self.recorder:
@@ -261,6 +271,9 @@ def main():
     if args.command == "install-autostart":
         install_autostart()
         sys.exit(0)
+        
+    # Initialize configuration directories and copy defaults
+    config.init_config_dir()
         
     app = EloquentApp()
     app.run()
