@@ -89,7 +89,8 @@ ai:
   ollama_url: "http://localhost:11434"
   model: "gemma4:12b-it-qat"
   context_length: 10000        # Context length limit (null or not set defaults to model max)
-  keep_alive: "5m"             # Keep model in memory after request (default: "5m")
+  keep_alive: "0"             # Time to keep model loaded after note generation (e.g. "5m", "10m", or "0" to unload immediately)
+  preload_keep_alive: "5m"     # Time to keep model weights loaded in VRAM during recording to reduce note generation time
 
 audio:
   sample_rate: 16000           # Audio sample rate (16kHz is ideal for Gemma 4)
