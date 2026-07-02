@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eloquent Notes - AI-Powered Voice Dictation for Obsidian</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">Eloquent Notes</a>
+                <ul class="nav-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#architecture">Architecture</a></li>
+                    <li><a href="#installation">Installation</a></li>
+                    <li><a href="#configuration">Configuration</a></li>
+                    <li><a href="#usage">Usage</a></li>
+                    <li><a href="https://github.com/arrase/eloquent-notes" target="_blank">GitHub</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="hero">
+            <div class="container">
+                <h1>Eloquent Notes</h1>
+                <p>A lightweight, system-tray-centric utility for Linux inspired by Google Eloquent. Record quick dictations, clean and structure them locally with Gemma 4, and write them directly to Obsidian.</p>
+                <a href="https://github.com/arrase/eloquent-notes" class="btn" target="_blank"><i class="fab fa-github"></i> View on GitHub</a>
+            </div>
+        </div>
+
+        <section id="about">
+            <div class="container">
+                <h2>What is Eloquent Notes?</h2>
+                <p>
+                    <strong>Eloquent Notes</strong> is a system tray daemon designed for Linux desktops that allows you to instantly record dictations without opening a heavy application. It captures your microphone input, runs it through a local LLM via Ollama to perform speech-to-text cleanup and structural formatting, and saves the result directly as Markdown notes inside your Obsidian vault.
+                </p>
+                <p>
+                    With absolute privacy and zero-latency cloud dependencies, your recordings and transcripts never leave your computer.
+                </p>
+            </div>
+        </section>
+
+        <section id="features">
+            <div class="container">
+                <h2>Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-title">🔘 System Tray UX</div>
+                        <p>Minimal tray icon interface. Click once to start recording, click again to finish and process. Zero window clutter.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-title">🔒 100% Offline & Private</div>
+                        <p>No telemetry, no external APIs. Local transcription and text refinement powered by Ollama and Gemma 4.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-title">🎨 Dynamic Indicators</div>
+                        <p>Icon changes color dynamically: Gray (Idle), Red (Recording), Orange (Processing via LLM).</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-title">💎 Obsidian Integration</div>
+                        <p>Appends formatted notes to your daily journals or generates individual files with tags and frontmatter metadata.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-title">⚙️ Hot-Reload Config</div>
+                        <p>Reload your prompts and settings on-the-fly from the system tray menu without restarting the service.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-title">📝 Custom Prompts</div>
+                        <p>Fully customize the system instructions and output schemas using simple Markdown files.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture">
+            <div class="container">
+                <h2>Architectural Overview</h2>
+                <p>Eloquent Notes utilizes PyQt6, sounddevice for in-memory recording, and asynchronous worker threads to ensure your desktop environment remains fast and responsive.</p>
+                
+                <div class="mermaid-container">
+                    <pre class="mermaid">
+graph TD
+    A[PyQt6 System Tray Event Loop] -->|Left Click / Menu| B{Recording State?}
+    B -->|IDLE| C[Start Recording]
+    B -->|RECORDING| D[Stop & Process]
+    
+    C -->|Background Thread| E[Preload Gemma 4 in Ollama]
+    C -->|sounddevice| F[Capture Mic Input to Queue]
+    
+    D -->|sounddevice| G[Stop Capture & Convert to WAV in Memory]
+    D -->|Background Thread| H[Send Base64 Audio to Ollama]
+    
+    H -->|Cleaned JSON Response| I{Empty Note?}
+    I -->|No| J[Save to Obsidian Vault]
+    I -->|Yes| K[Show Notification]
+    
+    J --> L[Show Success Notification]
+    K --> M[Restore Gray Icon]
+    L --> M
+                    </pre>
+                </div>
+
+                <h3>Key Technical Details</h3>
+                <ul>
+                    <li><strong>In-Memory Processing:</strong> Audio is processed directly in memory as 16-bit PCM WAV bytes (using <code>io.BytesIO</code>). No temporary files are written to disk, preserving privacy and hardware lifespan.</li>
+                    <li><strong>Non-Blocking Threads:</strong> Both the model preloading and Ollama requests run in QThreads. The UI never freezes or stutters during execution.</li>
+                    <li><strong>Dynamic Icon Generation:</strong> State icons are drawn dynamically at runtime using Pillow (PIL) and converted to QIcons. No external image assets needed.</li>
+                    <li><strong>Structured JSON Outputs:</strong> Restrictive schema formats ensure Ollama returns clean JSON with <code>empty</code> and <code>text</code> flags for robust parsing.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="prerequisites">
+            <div class="container">
+                <h2>Prerequisites</h2>
+                <p>Before installing, make sure you have the following requirements satisfied:</p>
+                
+                <h3>1. Ollama & Gemma 4 Model</h3>
+                <p>Ensure Ollama is running and download the default model:</p>
+                <pre><code>ollama pull gemma4:12b-it-qat</code></pre>
+
+                <h3>2. System Dependencies</h3>
+                <p>Install PortAudio (required for audio capture) and a desktop notification service:</p>
+                <pre><code># Ubuntu / Debian / Pop!_OS:
+sudo apt install libportaudio2</code></pre>
+            </div>
+        </section>
+
+        <section id="installation">
+            <div class="container">
+                <h2>Installation</h2>
+                
+                <h3>Option A: Using <code>uv</code> or <code>pipx</code> (Recommended)</h3>
+                <p>Install directly from the remote repository:</p>
+                <pre><code># Using uv
+uv tool install git+https://github.com/arrase/eloquent-notes.git
+
+# Or using pipx
+pipx install git+https://github.com/arrase/eloquent-notes.git</code></pre>
+
+                <h3>Option B: Local Development Clone</h3>
+                <pre><code>git clone https://github.com/arrase/eloquent-notes.git
+cd eloquent-notes
+
+# Setup virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .</code></pre>
+            </div>
+        </section>
+
+        <section id="configuration">
+            <div class="container">
+                <h2>Configuration</h2>
+                <p>Upon your first run, Eloquent Notes initializes configuration settings at <code>~/.config/eloquent-notes/</code>.</p>
+                
+                <h3>Config file (<code>config.yaml</code>)</h3>
+                <pre><code>obsidian:
+  vault_path: "~/Obsidian"     # Absolute or relative path to Obsidian Vault
+  folder: "Dictations"         # Folder name inside vault
+  daily_notes: true            # Append dictations to daily note files (YYYY-MM-DD.md)
+
+ai:
+  ollama_url: "http://localhost:11434"
+  model: "gemma4:12b-it-qat"
+  context_length: 10000        # Context length limit
+  keep_alive: "0"              # Model VRAM unload timer
+  preload_keep_alive: "5m"     # Keeps loaded during recording
+
+audio:
+  sample_rate: 16000           # Sample rate (16kHz is ideal)
+  channels: 1                  # Mono channel
+  beep_frequency: 440          # Beep sound cue (Hz)
+  beep_duration: 0.1           # Beep duration (seconds)</code></pre>
+
+                <h3>Customizable Prompts</h3>
+                <p>Tweak how notes are parsed and formatted:</p>
+                <ul>
+                    <li><code>~/.config/eloquent-notes/prompts/system_prompt.md</code> (Controls formatting, cleaning fill words, structuring)</li>
+                    <li><code>~/.config/eloquent-notes/prompts/user_prompt.md</code> (Sends context about date, current vault state)</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="usage">
+            <div class="container">
+                <h2>Usage</h2>
+                <p>Start the daemon in the background:</p>
+                <pre><code>eloquent-notes &</code></pre>
+
+                <h3>Control & Autostart</h3>
+                <ul>
+                    <li><strong>Start/Stop:</strong> Left-click the gray system tray microphone icon to trigger recording.</li>
+                    <li><strong>Autostart on boot:</strong> Run <code>eloquent-notes install-autostart</code> to automatically register the service with your desktop environment.</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Project Eloquent Notes. Built with ❤️ and AI.</p>
+        </div>
+    </footer>
+
+    <!-- Include Mermaid JS for diagram rendering -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+    </script>
+</body>
+</html>
