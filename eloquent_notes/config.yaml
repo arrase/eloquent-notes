@@ -13,6 +13,5 @@ ai:
 audio:
   sample_rate: 16000
   channels: 1
-  temp_file: "/tmp/eloquent_temp.wav"
   beep_frequency: 440
   beep_duration: 0.1

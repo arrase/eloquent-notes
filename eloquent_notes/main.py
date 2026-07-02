@@ -42,7 +42,6 @@ class EloquentApp:
         audio_cfg = self.config["audio"]
         self.sample_rate = audio_cfg["sample_rate"]
         self.channels = audio_cfg["channels"]
-        self.temp_file = audio_cfg["temp_file"]
         self.beep_freq = audio_cfg["beep_frequency"]
         self.beep_dur = audio_cfg["beep_duration"]
 
@@ -123,7 +122,6 @@ class EloquentApp:
             audio.play_beep_async(frequency=self.beep_freq, duration=self.beep_dur, sample_rate=self.sample_rate)
                 
             self.recorder = audio.AudioRecorder(
-                filename=self.temp_file,
                 sample_rate=self.sample_rate,
                 channels=self.channels
             )
@@ -163,13 +161,15 @@ class EloquentApp:
             context_length = ai_cfg["context_length"]
             keep_alive = ai_cfg.get("keep_alive", "5m")
             
+            audio_bytes = self.recorder.wav_bytes if self.recorder else b""
+            
             result = llm.send_audio_to_ollama(
                 ollama_url=ollama_url,
                 model=model,
                 system_prompt=system_prompt,
                 user_prompt=user_prompt,
                 context_length=context_length,
-                wav_file_path=self.temp_file,
+                audio_bytes=audio_bytes,
                 keep_alive=keep_alive
             )
             

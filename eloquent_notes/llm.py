@@ -50,10 +50,7 @@ def preload_model(ollama_url, model, context_length=None, keep_alive="5m"):
     except requests.RequestException as e:
         raise Exception(f"Failed to preload model: {e}")
 
-def send_audio_to_ollama(ollama_url, model, system_prompt, user_prompt, context_length, wav_file_path, keep_alive="5m"):
-    with open(wav_file_path, "rb") as f:
-        audio_bytes = f.read()
-    
+def send_audio_to_ollama(ollama_url, model, system_prompt, user_prompt, context_length, audio_bytes, keep_alive="5m"):
     audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
     
     num_ctx = context_length or get_model_max_context(ollama_url, model)

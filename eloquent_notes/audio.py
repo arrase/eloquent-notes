@@ -1,3 +1,4 @@
+import io
 import queue
 import threading
 import wave
@@ -5,13 +6,13 @@ import numpy as np
 import sounddevice as sd
 
 class AudioRecorder:
-    def __init__(self, filename, sample_rate=16000, channels=1):
-        self.filename = filename
+    def __init__(self, sample_rate=16000, channels=1):
         self.sample_rate = sample_rate
         self.channels = channels
         self.q = queue.Queue()
         self.recording = False
         self.stream = None
+        self.wav_bytes = None
 
     def callback(self, indata, frames, time, status):
         self.q.put(indata.copy())
@@ -35,7 +36,8 @@ class AudioRecorder:
             self.stream.close()
             self.stream = None
         
-        with wave.open(self.filename, 'wb') as wf:
+        wav_buffer = io.BytesIO()
+        with wave.open(wav_buffer, 'wb') as wf:
             wf.setnchannels(self.channels)
             wf.setsampwidth(2)  # 16-bit PCM (2 bytes)
             wf.setframerate(self.sample_rate)
@@ -45,6 +47,7 @@ class AudioRecorder:
                 # Convert float32 [-1.0, 1.0] to int16 PCM
                 pcm_data = (data * 32767.0).clip(-32768, 32767).astype(np.int16)
                 wf.writeframes(pcm_data.tobytes())
+        self.wav_bytes = wav_buffer.getvalue()
 
 def play_beep(frequency=440, duration=0.1, sample_rate=16000):
     t = np.linspace(0, duration, int(sample_rate * duration), False)
