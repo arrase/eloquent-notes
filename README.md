@@ -22,10 +22,10 @@ Eloquent Notes is a system tray utility for Linux (inspired by Google Eloquent) 
    ```
 
 2. **System Dependencies:**
-   Install PortAudio (for audio capture), libnotify (for desktop notifications), and AppIndicator libraries (for system tray support):
+   Install PortAudio (required for audio capture and beep playback) and libnotify (required for desktop notifications):
    ```bash
    # On Ubuntu/Debian/Pop!_OS:
-   sudo apt install libportaudio2 libnotify-bin gir1.2-appindicator3-0.1 gir1.2-ayatanaappindicator3-0.1
+   sudo apt install libportaudio2 libnotify-bin
    ```
 
 ---
@@ -33,14 +33,14 @@ Eloquent Notes is a system tray utility for Linux (inspired by Google Eloquent) 
 ## Installation
 
 ### Option A: Local Installation (from clone)
-For local development, it is highly recommended to create a Python virtual environment with system site packages enabled. This allows the application to inherit precompiled system PyGObject bindings for the GTK/AppIndicator system tray:
+For local development, create a Python virtual environment and install the package in editable mode:
 ```bash
 # Clone the repository and navigate inside
 git clone https://github.com/arrase/eloquent-notes.git
 cd eloquent-notes
 
 # Create virtual environment and install in editable mode
-python3 -m venv --system-site-packages .venv
+python3 -m venv .venv
 source .venv/bin/activate
 pip install -e .
 ```
@@ -72,6 +72,7 @@ obsidian:
 ai:
   ollama_url: "http://localhost:11434"
   model: "gemma4:12b-it-qat"
+  context_length: 10000        # Context length limit (null or not set defaults to model max)
 
 audio:
   sample_rate: 16000           # Audio sample rate (16kHz is ideal for Gemma 4)
@@ -81,9 +82,10 @@ audio:
   beep_duration: 0.1           # Beep duration (seconds)
 ```
 
-### 2. Custom System Prompts
-You can edit the prompt used by Gemma 4 to clean up and structure your notes at:
-`~/.config/eloquent-notes/prompts/system_prompt.md`
+### 2. Custom System and User Prompts
+You can edit the system and user prompts used to clean up and structure your notes:
+- **System Prompt**: `~/.config/eloquent-notes/prompts/system_prompt.md`
+- **User Prompt**: `~/.config/eloquent-notes/prompts/user_prompt.md`
 
 ---
 
@@ -96,9 +98,11 @@ eloquent-notes
 
 ### How to use:
 1. **Idle:** A gray microphone icon is shown in the system tray.
-2. **Start Dictation:** Click the tray icon. A high beep will play, a system notification will appear, and the icon will turn **red** to indicate it is recording.
-3. **Stop & Process:** Click the tray icon again. A beep plays, the icon turns **orange**, and the app starts sending the audio to Gemma 4 via the local Ollama API.
-4. **Finished:** Once processed, the cleaned transcription is appended/saved into your Obsidian vault, a desktop notification is displayed, and the icon returns to **gray**.
+2. **Start Dictation:** Click the tray icon. A beep plays, and the icon turns **red** to indicate it is recording.
+3. **Stop & Process:** Click the tray icon again. A beep plays, the icon turns **orange**, and the app starts processing the audio via the local Ollama API.
+4. **Finished:**
+   - **Success**: Once processed, the cleaned transcription is saved to your Obsidian vault, a desktop notification is displayed, and the icon returns to **gray**.
+   - **Empty Audio**: If the audio contains only silence or background noise, a "Dictation Empty" notification is displayed, and no note is created. The icon returns to **gray**.
 
 ---
 
