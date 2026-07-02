@@ -32,8 +32,18 @@ Eloquent Notes is a system tray utility for Linux (inspired by Google Eloquent) 
 
 ## Installation
 
-### Option A: Local Installation (from clone)
-For local development, create a Python virtual environment and install the package in editable mode:
+### Option A: Install from GitHub (Recommended)
+You can install the utility directly from GitHub using `pipx` or `uv`:
+```bash
+# Using uv
+uv tool install git+https://github.com/arrase/eloquent-notes.git
+
+# Or using pipx
+pipx install git+https://github.com/arrase/eloquent-notes.git
+```
+
+### Option B: Local Installation (For Developers)
+If you want to modify the source code or run in development mode:
 ```bash
 # Clone the repository and navigate inside
 git clone https://github.com/arrase/eloquent-notes.git
@@ -43,16 +53,6 @@ cd eloquent-notes
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e .
-```
-
-### Option B: Global Installation (via pipx or uv)
-Once the repository is pushed to GitHub, you can install it directly without cloning:
-```bash
-# Using uv
-uv tool install git+https://github.com/arrase/eloquent-notes.git
-
-# Or using pipx
-pipx install git+https://github.com/arrase/eloquent-notes.git
 ```
 
 ---
