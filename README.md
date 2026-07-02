@@ -8,7 +8,7 @@ Eloquent Notes is a system tray utility for Linux (inspired by Google Eloquent) 
 - **Offline & Private:** Transcribes and refines audio locally on your machine using Gemma 4 via Ollama.
 - **Dynamic Icons:** Status indicators (Idle, Recording, Processing) are rendered dynamically in memory.
 - **Obsidian Integration:** Appends to daily notes or creates new individual notes with tags and frontmatter metadata.
-- **Customizable Prompts:** Custom Jinja2/Markdown system prompts loaded from your user config directory.
+- **Customizable Prompts:** Custom Markdown system prompts loaded from your user config directory.
 - **Modern Standards:** Pure PEP 621 compliance (`pyproject.toml`) and zero inline imports.
 
 ---
@@ -36,7 +36,7 @@ Eloquent Notes is a system tray utility for Linux (inspired by Google Eloquent) 
 For local development, it is highly recommended to create a Python virtual environment with system site packages enabled. This allows the application to inherit precompiled system PyGObject bindings for the GTK/AppIndicator system tray:
 ```bash
 # Clone the repository and navigate inside
-git clone https://github.com/yourusername/eloquent-notes.git
+git clone https://github.com/arrase/eloquent-notes.git
 cd eloquent-notes
 
 # Create virtual environment and install in editable mode
@@ -49,10 +49,10 @@ pip install -e .
 Once the repository is pushed to GitHub, you can install it directly without cloning:
 ```bash
 # Using uv
-uv tool install git+https://github.com/yourusername/eloquent-notes.git
+uv tool install git+https://github.com/arrase/eloquent-notes.git
 
 # Or using pipx
-pipx install git+https://github.com/yourusername/eloquent-notes.git
+pipx install git+https://github.com/arrase/eloquent-notes.git
 ```
 
 ---
@@ -85,15 +85,13 @@ audio:
 You can edit the prompt used by Gemma 4 to clean up and structure your notes at:
 `~/.config/eloquent-notes/prompts/system_prompt.md`
 
-This file is fully compatible with **Jinja2** templates, allowing dynamic template rendering if needed.
-
 ---
 
 ## Usage
 
 Start the background service by running:
 ```bash
-linux-eloquent
+eloquent-notes
 ```
 
 ### How to use:
@@ -108,6 +106,6 @@ linux-eloquent
 
 To run Eloquent Notes automatically when logging in, execute:
 ```bash
-linux-eloquent install-autostart
+eloquent-notes install-autostart
 ```
-This generates a desktop autostart entry at `~/.config/autostart/linux-eloquent.desktop`.
+This generates a desktop autostart entry at `~/.config/autostart/eloquent-notes.desktop`.
