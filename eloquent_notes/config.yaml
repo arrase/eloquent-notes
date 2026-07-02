@@ -6,7 +6,7 @@ obsidian:
 ai:
   ollama_url: "http://localhost:11434"
   model: "gemma4:12b-it-qat"
-  context_length: null         # If null or not set, the maximum allowed by the model is used.
+  context_length: 10000  # If null or not set, the maximum allowed by the model is used.
 
 audio:
   sample_rate: 16000

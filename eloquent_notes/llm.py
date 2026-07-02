@@ -1,7 +1,13 @@
 import base64
 import requests
+from pydantic import BaseModel, Field
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_ollama import ChatOllama
+
+class NoteResponse(BaseModel):
+    empty: bool = Field(description="True if the audio contains only silence, background noise, or no spoken words; False otherwise.")
+    text: str = Field(description="Cleaned, polished, and structured Markdown text if audio is not empty; empty string otherwise.")
+
 
 def get_model_max_context(ollama_url, model):
     try:
@@ -36,6 +42,7 @@ def send_audio_to_ollama(ollama_url, model, system_prompt, user_prompt, context_
         llm_kwargs["num_ctx"] = num_ctx
         
     llm = ChatOllama(**llm_kwargs)
+    structured_llm = llm.with_structured_output(NoteResponse)
     
     messages = [
         SystemMessage(content=system_prompt),
@@ -50,5 +57,8 @@ def send_audio_to_ollama(ollama_url, model, system_prompt, user_prompt, context_
         )
     ]
     
-    response = llm.invoke(messages)
-    return response.content
+    response = structured_llm.invoke(messages)
+    return {
+        "empty": response.empty,
+        "text": response.text
+    }

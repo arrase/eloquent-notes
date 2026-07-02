@@ -145,7 +145,7 @@ class EloquentApp:
             user_prompt = config.load_user_prompt_template()
             context_length = ai_cfg["context_length"]
             
-            polished_text = llm.send_audio_to_ollama(
+            result = llm.send_audio_to_ollama(
                 ollama_url=ollama_url,
                 model=model,
                 system_prompt=system_prompt,
@@ -153,6 +153,12 @@ class EloquentApp:
                 context_length=context_length,
                 wav_file_path=self.temp_file
             )
+            
+            if result.get("empty") or not result.get("text", "").strip():
+                ui.send_notification("Dictation Empty", "No note was created because the audio was empty.")
+                return
+            
+            polished_text = result["text"]
             
             vault_path = obs_cfg["vault_path"]
             folder = obs_cfg["folder"]
