@@ -13,6 +13,23 @@ Eloquent Notes is a system tray utility for Linux (inspired by Google Eloquent) 
 
 ---
 
+## Usage
+
+Start the background service by running:
+```bash
+eloquent-notes
+```
+
+### How to use:
+1. **Idle:** A gray microphone icon is shown in the system tray.
+2. **Start Dictation:** Click the tray icon. A beep plays, and the icon turns **red** to indicate it is recording.
+3. **Stop & Process:** Click the tray icon again. A beep plays, the icon turns **orange**, and the app starts processing the audio via the local Ollama API.
+4. **Finished:**
+   - **Success**: Once processed, the cleaned transcription is saved to your Obsidian vault, a desktop notification is displayed, and the icon returns to **gray**.
+   - **Empty Audio**: If the audio contains only silence or background noise, a "Dictation Empty" notification is displayed, and no note is created. The icon returns to **gray**.
+
+---
+
 ## Prerequisites
 
 1. **Ollama & Gemma 4 Model:**
@@ -86,23 +103,6 @@ audio:
 You can edit the system and user prompts used to clean up and structure your notes:
 - **System Prompt**: `~/.config/eloquent-notes/prompts/system_prompt.md`
 - **User Prompt**: `~/.config/eloquent-notes/prompts/user_prompt.md`
-
----
-
-## Usage
-
-Start the background service by running:
-```bash
-eloquent-notes
-```
-
-### How to use:
-1. **Idle:** A gray microphone icon is shown in the system tray.
-2. **Start Dictation:** Click the tray icon. A beep plays, and the icon turns **red** to indicate it is recording.
-3. **Stop & Process:** Click the tray icon again. A beep plays, the icon turns **orange**, and the app starts processing the audio via the local Ollama API.
-4. **Finished:**
-   - **Success**: Once processed, the cleaned transcription is saved to your Obsidian vault, a desktop notification is displayed, and the icon returns to **gray**.
-   - **Empty Audio**: If the audio contains only silence or background noise, a "Dictation Empty" notification is displayed, and no note is created. The icon returns to **gray**.
 
 ---
 
