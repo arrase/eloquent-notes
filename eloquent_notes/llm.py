@@ -25,18 +25,24 @@ def get_model_max_context(ollama_url, model):
         pass
     return None
 
-def preload_model(ollama_url, model, keep_alive="5m"):
+def preload_model(ollama_url, model, context_length=None, keep_alive="5m"):
     """
     Sends a request to Ollama to preload the model into memory.
     This reduces the cold start time when the user stops recording and triggers generation.
     """
     try:
+        num_ctx = context_length or get_model_max_context(ollama_url, model)
+        options = {"temperature": 0.0}
+        if num_ctx:
+            options["num_ctx"] = num_ctx
+
         response = requests.post(
             f"{ollama_url}/api/chat",
             json={
                 "model": model,
                 "messages": [],
-                "keep_alive": keep_alive
+                "keep_alive": keep_alive,
+                "options": options
             }
         )
         response.raise_for_status()

@@ -108,9 +108,10 @@ class EloquentApp:
         ollama_url = ai_cfg.get("ollama_url", "http://localhost:11434")
         model = ai_cfg.get("model", "gemma4:12b-it-qat")
         preload_keep_alive = ai_cfg.get("preload_keep_alive", "5m")
+        context_length = ai_cfg.get("context_length")
 
         try:
-            llm.preload_model(ollama_url, model, preload_keep_alive)
+            llm.preload_model(ollama_url, model, context_length, preload_keep_alive)
         except Exception as e:
             ui.send_notification("Preload Error", f"Failed to preload model: {str(e)}")
 
