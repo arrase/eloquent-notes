@@ -1,6 +1,6 @@
 # Eloquent Notes for Linux
 
-Eloquent Notes is a system tray utility for Linux (inspired by Google Eloquent) that operates silently in the background. It allows you to record quick dictations, automatically cleans and formats them using a local Gemma 4 model (via Ollama), and writes the resulting structured Markdown notes directly to your Obsidian vault.
+Eloquent Notes is a system tray utility for Linux inspired by [Google Eloquent](https://developers.google.com/edge/eloquent) that operates silently in the background. It allows you to record quick dictations, automatically cleans and formats them using a local Gemma 4 model (via Ollama), and writes the resulting structured Markdown notes directly to your Obsidian vault.
 
 ## Key Features
 
