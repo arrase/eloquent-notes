@@ -89,6 +89,7 @@ ai:
   ollama_url: "http://localhost:11434"
   model: "gemma4:12b-it-qat"
   context_length: 10000        # Context length limit (null or not set defaults to model max)
+  keep_alive: "5m"             # Keep model in memory after request (default: "5m")
 
 audio:
   sample_rate: 16000           # Audio sample rate (16kHz is ideal for Gemma 4)

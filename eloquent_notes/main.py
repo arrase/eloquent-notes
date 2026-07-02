@@ -101,6 +101,17 @@ class EloquentApp:
         elif self.state == "PROCESSING":
             ui.send_notification("Eloquent Notes", "The application is processing the previous dictation. Please wait.")
 
+    def _preload_model_task(self):
+        ai_cfg = self.config["ai"]
+        ollama_url = ai_cfg.get("ollama_url", "http://localhost:11434")
+        model = ai_cfg.get("model", "gemma4:12b-it-qat")
+        keep_alive = ai_cfg.get("keep_alive", "5m")
+
+        try:
+            llm.preload_model(ollama_url, model, keep_alive)
+        except Exception as e:
+            ui.send_notification("Preload Error", f"Failed to preload model: {str(e)}")
+
     def start_recording(self):
         self.state = "RECORDING"
         self.update_icon("red", "Eloquent Notes (Recording...)")
@@ -114,6 +125,9 @@ class EloquentApp:
                 channels=self.channels
             )
             self.recorder.start()
+
+            # Start preloading the model in the background to reduce cold start time
+            threading.Thread(target=self._preload_model_task, daemon=True).start()
         except Exception as e:
             self.state = "IDLE"
             self.update_icon("gray", "Eloquent Notes (Idle)")
@@ -144,6 +158,7 @@ class EloquentApp:
             system_prompt = config.load_prompt_template()
             user_prompt = config.load_user_prompt_template()
             context_length = ai_cfg["context_length"]
+            keep_alive = ai_cfg.get("keep_alive", "5m")
             
             result = llm.send_audio_to_ollama(
                 ollama_url=ollama_url,
@@ -151,7 +166,8 @@ class EloquentApp:
                 system_prompt=system_prompt,
                 user_prompt=user_prompt,
                 context_length=context_length,
-                wav_file_path=self.temp_file
+                wav_file_path=self.temp_file,
+                keep_alive=keep_alive
             )
             
             if result.get("empty") or not result.get("text", "").strip():

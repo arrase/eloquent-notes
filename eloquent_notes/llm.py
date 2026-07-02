@@ -25,7 +25,26 @@ def get_model_max_context(ollama_url, model):
         pass
     return None
 
-def send_audio_to_ollama(ollama_url, model, system_prompt, user_prompt, context_length, wav_file_path):
+def preload_model(ollama_url, model, keep_alive="5m"):
+    """
+    Sends a request to Ollama to preload the model into memory.
+    This reduces the cold start time when the user stops recording and triggers generation.
+    """
+    try:
+        response = requests.post(
+            f"{ollama_url}/api/chat",
+            json={
+                "model": model,
+                "messages": [],
+                "keep_alive": keep_alive
+            }
+        )
+        response.raise_for_status()
+        return True
+    except requests.RequestException as e:
+        raise Exception(f"Failed to preload model: {e}")
+
+def send_audio_to_ollama(ollama_url, model, system_prompt, user_prompt, context_length, wav_file_path, keep_alive="5m"):
     with open(wav_file_path, "rb") as f:
         audio_bytes = f.read()
     
@@ -36,7 +55,8 @@ def send_audio_to_ollama(ollama_url, model, system_prompt, user_prompt, context_
     llm_kwargs = {
         "base_url": ollama_url,
         "model": model,
-        "temperature": 0.0
+        "temperature": 0.0,
+        "keep_alive": keep_alive
     }
     if num_ctx:
         llm_kwargs["num_ctx"] = num_ctx
