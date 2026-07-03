@@ -6,12 +6,7 @@ def install_autostart():
     autostart_dir = os.path.expanduser("~/.config/autostart")
     desktop_file_path = os.path.join(autostart_dir, "eloquent-notes.desktop")
 
-    exec_path = shutil.which("eloquent-notes")
-    if not exec_path:
-        if os.path.isabs(sys.argv[0]) and os.path.basename(sys.argv[0]) == "eloquent-notes":
-            exec_path = sys.argv[0]
-        else:
-            exec_path = "eloquent-notes"
+    exec_path = shutil.which("eloquent-notes") or (sys.argv[0] if sys.argv[0].endswith("eloquent-notes") else "eloquent-notes")
 
     desktop_entry_content = f"""[Desktop Entry]
 Type=Application

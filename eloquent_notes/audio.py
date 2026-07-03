@@ -30,22 +30,24 @@ class AudioRecorder:
         if not self.recording:
             return
         self.recording = False
-        if self.stream:
-            self.stream.stop()
-            self.stream.close()
-            self.stream = None
+        self.stream.stop()
+        self.stream.close()
+        self.stream = None
         
+        chunks = []
+        while not self.q.empty():
+            chunks.append(self.q.get())
+            
+        all_data = np.concatenate(chunks, axis=0) if chunks else np.zeros((0, self.channels), dtype=np.float32)
+        pcm_data = (all_data * 32767.0).clip(-32768, 32767).astype(np.int16)
+
         wav_buffer = io.BytesIO()
         with wave.open(wav_buffer, 'wb') as wf:
             wf.setnchannels(self.channels)
             wf.setsampwidth(2)  # 16-bit PCM (2 bytes)
             wf.setframerate(self.sample_rate)
+            wf.writeframes(pcm_data.tobytes())
             
-            while not self.q.empty():
-                data = self.q.get()
-                # Convert float32 [-1.0, 1.0] to int16 PCM
-                pcm_data = (data * 32767.0).clip(-32768, 32767).astype(np.int16)
-                wf.writeframes(pcm_data.tobytes())
         self.wav_bytes = wav_buffer.getvalue()
 
 def play_beep(frequency=440, duration=0.1, sample_rate=16000):

@@ -14,9 +14,7 @@ from eloquent_notes import ui
 from eloquent_notes.autostart import install_autostart
 
 class EloquentApp(QObject):
-    update_icon_signal = pyqtSignal(str, str)
-    show_message_signal = pyqtSignal(str, str)
-    toggle_signal = pyqtSignal()
+    processing_completed = pyqtSignal(str, str)
 
     def __init__(self, qapp, start_recording_immediately=False):
         super().__init__()
@@ -25,12 +23,8 @@ class EloquentApp(QObject):
         self.recorder = None
         self.start_recording_immediately = start_recording_immediately
         
-        # Connect thread-safe UI update signals
-        self.update_icon_signal.connect(self._update_icon_slot)
-        self.show_message_signal.connect(self._show_message_slot)
-        self.toggle_signal.connect(self.toggle_action)
+        self.processing_completed.connect(self._on_processing_completed)
         
-        # Tray icon and menu variables
         self.tray = None
         self.menu = None
         self.toggle_action_item = None
@@ -49,20 +43,16 @@ class EloquentApp(QObject):
         self.beep_enabled = audio_cfg["beep_enabled"]
 
     def run(self):
-        # Create tray icon
         self.tray = QSystemTrayIcon()
         
-        # Setup QLocalServer for IPC
         self.server = QLocalServer(self)
         self.server.removeServer("eloquent_notes_ipc")
         if not self.server.listen("eloquent_notes_ipc"):
             print("Failed to start local IPC server.")
         self.server.newConnection.connect(self._handle_ipc_connection)
         
-        # Create context menu
         self.menu = QMenu()
         
-        # Add actions
         self.toggle_action_item = QAction("Start/Stop Recording", self.menu)
         font = self.toggle_action_item.font()
         font.setBold(True)
@@ -81,13 +71,9 @@ class EloquentApp(QObject):
         self.menu.addAction(self.quit_action)
         
         self.tray.setContextMenu(self.menu)
-        
-        # Handle left-click activate event
         self.tray.activated.connect(self.on_tray_activated)
         
-        # Initialise icon and tooltip
-        self._update_icon_slot("gray", "Eloquent Notes (Idle)")
-        
+        self.update_icon("gray", "Eloquent Notes (Idle)")
         self.tray.show()
         
         if self.start_recording_immediately:
@@ -105,30 +91,20 @@ class EloquentApp(QObject):
             if socket.waitForReadyRead(500):
                 message = socket.readAll().data().decode("utf-8")
                 if message == "toggle":
-                    self.toggle_signal.emit()
+                    self.toggle_action()
                 elif message == "notify_running":
-                    self.show_message_signal.emit(
+                    self.send_notification(
                         "Eloquent Notes",
                         "Eloquent Notes is already running in the background."
                     )
             socket.disconnectFromServer()
 
-    def _update_icon_slot(self, color, tooltip):
-        if self.tray:
-            self.tray.setIcon(ui.get_qicon(color))
-            self.tray.setToolTip(tooltip)
-
-    def _show_message_slot(self, title, message):
-        if self.tray:
-            self.tray.showMessage(title, message, QSystemTrayIcon.MessageIcon.Information, 5000)
-        else:
-            print(f"[{title}] {message}")
-
     def update_icon(self, color, tooltip):
-        self.update_icon_signal.emit(color, tooltip)
+        self.tray.setIcon(ui.get_qicon(color))
+        self.tray.setToolTip(tooltip)
 
     def send_notification(self, title, message):
-        self.show_message_signal.emit(title, message)
+        self.tray.showMessage(title, message, QSystemTrayIcon.MessageIcon.Information, 5000)
 
     def toggle_action(self):
         if self.state == "IDLE":
@@ -140,15 +116,15 @@ class EloquentApp(QObject):
 
     def _preload_model_task(self):
         ai_cfg = self.config["ai"]
-        ollama_url = ai_cfg.get("ollama_url", "http://localhost:11434")
-        model = ai_cfg.get("model", "gemma4:12b-it-qat")
-        preload_keep_alive = ai_cfg.get("preload_keep_alive", "5m")
-        context_length = ai_cfg.get("context_length")
-
         try:
-            llm.preload_model(ollama_url, model, context_length, preload_keep_alive)
+            llm.preload_model(
+                ollama_url=ai_cfg["ollama_url"],
+                model=ai_cfg["model"],
+                context_length=ai_cfg["context_length"],
+                keep_alive=ai_cfg["preload_keep_alive"]
+            )
         except Exception as e:
-            self.send_notification("Preload Error", f"Failed to preload model: {str(e)}")
+            print(f"Preload warning: {e}", file=sys.stderr)
 
     def start_recording(self):
         self.state = "RECORDING"
@@ -164,7 +140,6 @@ class EloquentApp(QObject):
             )
             self.recorder.start()
 
-            # Start preloading the model in the background to reduce cold start time
             threading.Thread(target=self._preload_model_task, daemon=True).start()
         except Exception as e:
             self.state = "IDLE"
@@ -176,8 +151,7 @@ class EloquentApp(QObject):
         self.update_icon("orange", "Eloquent Notes (Processing...)")
         
         try:
-            if self.recorder:
-                self.recorder.stop()
+            self.recorder.stop()
             if self.beep_enabled:
                 audio.play_beep(frequency=self.beep_freq, duration=self.beep_dur, sample_rate=self.sample_rate)
             threading.Thread(target=self.process_audio, daemon=True).start()
@@ -191,59 +165,45 @@ class EloquentApp(QObject):
             ai_cfg = self.config["ai"]
             obs_cfg = self.config["obsidian"]
             
-            ollama_url = ai_cfg["ollama_url"]
-            model = ai_cfg["model"]
-            
-            system_prompt = config.load_prompt_template()
-            user_prompt = config.load_user_prompt_template()
-            context_length = ai_cfg["context_length"]
-            keep_alive = ai_cfg.get("keep_alive", "5m")
-            
-            audio_bytes = self.recorder.wav_bytes if self.recorder else b""
-            
             result = llm.send_audio_to_ollama(
-                ollama_url=ollama_url,
-                model=model,
-                system_prompt=system_prompt,
-                user_prompt=user_prompt,
-                context_length=context_length,
-                audio_bytes=audio_bytes,
-                keep_alive=keep_alive
+                ollama_url=ai_cfg["ollama_url"],
+                model=ai_cfg["model"],
+                system_prompt=config.load_prompt_template(),
+                user_prompt=config.load_user_prompt_template(),
+                context_length=ai_cfg["context_length"],
+                audio_bytes=self.recorder.wav_bytes,
+                keep_alive=ai_cfg["keep_alive"]
             )
             
             if result.get("empty") or not result.get("text", "").strip():
-                self.send_notification("Dictation Empty", "No note was created because the audio was empty.")
+                self.processing_completed.emit("empty", "")
                 return
             
-            polished_text = result["text"]
-            
-            vault_path = obs_cfg["vault_path"]
-            folder = obs_cfg["folder"]
-            daily_notes = obs_cfg["daily_notes"]
-            
-            template_standalone = config.load_standalone_template()
-            template_daily_new = config.load_daily_new_template()
-            template_daily_append = config.load_daily_append_template()
-
             saved_path = obsidian.save_note(
-                vault_path=vault_path,
-                folder=folder,
-                daily_notes=daily_notes,
-                text=polished_text,
-                template_standalone=template_standalone,
-                template_daily_new=template_daily_new,
-                template_daily_append=template_daily_append
+                vault_path=obs_cfg["vault_path"],
+                folder=obs_cfg["folder"],
+                daily_notes=obs_cfg["daily_notes"],
+                text=result["text"],
+                template_standalone=config.load_standalone_template(),
+                template_daily_new=config.load_daily_new_template(),
+                template_daily_append=config.load_daily_append_template()
             )
-            
-            filename = os.path.basename(saved_path)
-            self.send_notification("Dictation Saved", f"Saved dictation to Obsidian ({filename})")
+            self.processing_completed.emit("success", saved_path)
             
         except Exception as e:
-            self.send_notification("Processing Error", f"An error occurred while processing dictation: {str(e)}")
-            
-        finally:
-            self.state = "IDLE"
-            self.update_icon("gray", "Eloquent Notes (Idle)")
+            self.processing_completed.emit("error", str(e))
+
+    def _on_processing_completed(self, status, detail):
+        self.state = "IDLE"
+        self.update_icon("gray", "Eloquent Notes (Idle)")
+        
+        if status == "success":
+            filename = os.path.basename(detail)
+            self.send_notification("Dictation Saved", f"Saved dictation to Obsidian ({filename})")
+        elif status == "empty":
+            self.send_notification("Dictation Empty", "No note was created because the audio was empty.")
+        elif status == "error":
+            self.send_notification("Processing Error", f"An error occurred while processing dictation: {detail}")
 
     def reload_config(self):
         try:
@@ -253,13 +213,11 @@ class EloquentApp(QObject):
             self.send_notification("Configuration Error", f"Failed to reload configuration: {str(e)}")
 
     def exit_app(self):
-        if self.state == "RECORDING" and self.recorder:
+        if self.state == "RECORDING":
             self.recorder.stop()
-        if hasattr(self, "server") and self.server:
-            self.server.close()
-            self.server.removeServer("eloquent_notes_ipc")
-        if self.tray:
-            self.tray.hide()
+        self.server.close()
+        self.server.removeServer("eloquent_notes_ipc")
+        self.tray.hide()
         self.app.quit()
         sys.exit(0)
 
