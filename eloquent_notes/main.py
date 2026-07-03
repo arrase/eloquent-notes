@@ -4,7 +4,8 @@ import sys
 import threading
 from PyQt6.QtWidgets import QApplication, QSystemTrayIcon, QMenu
 from PyQt6.QtGui import QAction
-from PyQt6.QtCore import QObject, pyqtSignal
+from PyQt6.QtCore import QObject, pyqtSignal, QTimer
+from PyQt6.QtNetwork import QLocalServer, QLocalSocket
 from eloquent_notes import config
 from eloquent_notes import audio
 from eloquent_notes import llm
@@ -15,19 +16,19 @@ from eloquent_notes.autostart import install_autostart
 class EloquentApp(QObject):
     update_icon_signal = pyqtSignal(str, str)
     show_message_signal = pyqtSignal(str, str)
+    toggle_signal = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, qapp, start_recording_immediately=False):
         super().__init__()
+        self.app = qapp
         self.state = "IDLE"
         self.recorder = None
-        
-        # Initialize PyQt application
-        self.app = QApplication(sys.argv)
-        self.app.setQuitOnLastWindowClosed(False)
+        self.start_recording_immediately = start_recording_immediately
         
         # Connect thread-safe UI update signals
         self.update_icon_signal.connect(self._update_icon_slot)
         self.show_message_signal.connect(self._show_message_slot)
+        self.toggle_signal.connect(self.toggle_action)
         
         # Tray icon and menu variables
         self.tray = None
@@ -50,6 +51,13 @@ class EloquentApp(QObject):
     def run(self):
         # Create tray icon
         self.tray = QSystemTrayIcon()
+        
+        # Setup QLocalServer for IPC
+        self.server = QLocalServer(self)
+        self.server.removeServer("eloquent_notes_ipc")
+        if not self.server.listen("eloquent_notes_ipc"):
+            print("Failed to start local IPC server.")
+        self.server.newConnection.connect(self._handle_ipc_connection)
         
         # Create context menu
         self.menu = QMenu()
@@ -82,11 +90,28 @@ class EloquentApp(QObject):
         
         self.tray.show()
         
+        if self.start_recording_immediately:
+            QTimer.singleShot(100, self.toggle_action)
+        
         sys.exit(self.app.exec())
 
     def on_tray_activated(self, reason):
         if reason == QSystemTrayIcon.ActivationReason.Trigger:
             self.toggle_action()
+
+    def _handle_ipc_connection(self):
+        socket = self.server.nextPendingConnection()
+        if socket:
+            if socket.waitForReadyRead(500):
+                message = socket.readAll().data().decode("utf-8")
+                if message == "toggle":
+                    self.toggle_signal.emit()
+                elif message == "notify_running":
+                    self.show_message_signal.emit(
+                        "Eloquent Notes",
+                        "Eloquent Notes is already running in the background."
+                    )
+            socket.disconnectFromServer()
 
     def _update_icon_slot(self, color, tooltip):
         if self.tray:
@@ -230,6 +255,9 @@ class EloquentApp(QObject):
     def exit_app(self):
         if self.state == "RECORDING" and self.recorder:
             self.recorder.stop()
+        if hasattr(self, "server") and self.server:
+            self.server.close()
+            self.server.removeServer("eloquent_notes_ipc")
         if self.tray:
             self.tray.hide()
         self.app.quit()
@@ -243,8 +271,14 @@ def main():
     parser.add_argument(
         "command",
         nargs="?",
-        choices=["install-autostart"],
-        help="Command to execute (e.g., 'install-autostart' to install autostart desktop entry)."
+        choices=["install-autostart", "toggle"],
+        metavar="command",
+        help="Command to execute: 'install-autostart' (install autostart) or 'toggle' (toggle recording)."
+    )
+    parser.add_argument(
+        "-t", "--toggle",
+        action="store_true",
+        help="Alias for 'toggle' command. Toggle recording on the running instance."
     )
     
     args = parser.parse_args()
@@ -255,9 +289,28 @@ def main():
         
     # Initialize configuration directories and copy defaults
     config.init_config_dir()
+    
+    # We must instantiate QApplication to use QLocalSocket
+    app = QApplication(sys.argv)
+    app.setQuitOnLastWindowClosed(False)
+    
+    # Check if another instance is already running
+    socket = QLocalSocket()
+    socket.connectToServer("eloquent_notes_ipc")
+    if socket.waitForConnected(500):
+        if args.command == "toggle" or args.toggle:
+            socket.write(b"toggle")
+            socket.waitForBytesWritten(500)
+        else:
+            socket.write(b"notify_running")
+            socket.waitForBytesWritten(500)
+        socket.disconnectFromServer()
+        sys.exit(0)
         
-    app = EloquentApp()
-    app.run()
+    # Not running, start application
+    start_recording_immediately = (args.command == "toggle" or args.toggle)
+    eloquent_app = EloquentApp(app, start_recording_immediately)
+    eloquent_app.run()
 
 if __name__ == "__main__":
     main()
