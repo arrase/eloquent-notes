@@ -123,6 +123,7 @@ audio:
   channels: 1                  # Mono channel recording
   beep_frequency: 440          # Audio cue beep frequency (Hz)
   beep_duration: 0.1           # Beep duration (seconds)
+  beep_enabled: true           # Enable/disable audio cues (beeps)
 ```
 
 ### 2. Custom Prompts

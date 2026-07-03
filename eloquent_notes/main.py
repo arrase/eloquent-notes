@@ -45,6 +45,7 @@ class EloquentApp(QObject):
         self.channels = audio_cfg["channels"]
         self.beep_freq = audio_cfg["beep_frequency"]
         self.beep_dur = audio_cfg["beep_duration"]
+        self.beep_enabled = audio_cfg["beep_enabled"]
 
     def run(self):
         # Create tray icon
@@ -129,7 +130,8 @@ class EloquentApp(QObject):
         self.update_icon("red", "Eloquent Notes (Recording...)")
         
         try:
-            audio.play_beep(frequency=self.beep_freq, duration=self.beep_dur, sample_rate=self.sample_rate)
+            if self.beep_enabled:
+                audio.play_beep(frequency=self.beep_freq, duration=self.beep_dur, sample_rate=self.sample_rate)
                 
             self.recorder = audio.AudioRecorder(
                 sample_rate=self.sample_rate,
@@ -151,7 +153,8 @@ class EloquentApp(QObject):
         try:
             if self.recorder:
                 self.recorder.stop()
-            audio.play_beep(frequency=self.beep_freq, duration=self.beep_dur, sample_rate=self.sample_rate)
+            if self.beep_enabled:
+                audio.play_beep(frequency=self.beep_freq, duration=self.beep_dur, sample_rate=self.sample_rate)
             threading.Thread(target=self.process_audio, daemon=True).start()
         except Exception as e:
             self.state = "IDLE"
