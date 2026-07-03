@@ -18,6 +18,7 @@ Eloquent Notes is a lightweight, system-tray-centric utility for Linux inspired 
   - 🟠 **Processing (Orange):** An orange circle with a white hourglass.
 - **Obsidian Integration:** Appends notes to daily journals or creates new individual files inside your vault, complete with tags and frontmatter metadata.
 - **Customizable Prompts:** Edit custom Markdown system and user prompts loaded directly from your user config directory.
+- **Custom Note Templates:** You can customize the Markdown formatting of the generated notes, including frontmatter and headers.
 
 ---
 
