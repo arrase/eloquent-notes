@@ -32,4 +32,4 @@ where = ["."]
 include = ["eloquent_notes*"]
 
 [tool.setuptools.package-data]
-eloquent_notes = ["config.yaml", "prompts/*.md"]
+eloquent_notes = ["config.yaml", "prompts/*.md", "templates/*.md"]
