@@ -196,11 +196,18 @@ class EloquentApp(QObject):
             folder = obs_cfg["folder"]
             daily_notes = obs_cfg["daily_notes"]
             
+            template_standalone = config.load_standalone_template()
+            template_daily_new = config.load_daily_new_template()
+            template_daily_append = config.load_daily_append_template()
+
             saved_path = obsidian.save_note(
                 vault_path=vault_path,
                 folder=folder,
                 daily_notes=daily_notes,
-                text=polished_text
+                text=polished_text,
+                template_standalone=template_standalone,
+                template_daily_new=template_daily_new,
+                template_daily_append=template_daily_append
             )
             
             filename = os.path.basename(saved_path)

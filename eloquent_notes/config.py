@@ -13,9 +13,19 @@ DEFAULT_CONFIG_SRC = os.path.join(PACKAGE_DIR, "config.yaml")
 DEFAULT_PROMPT_SRC = os.path.join(PACKAGE_DIR, "prompts", "system_prompt.md")
 DEFAULT_USER_PROMPT_SRC = os.path.join(PACKAGE_DIR, "prompts", "user_prompt.md")
 
+TEMPLATES_DIR = os.path.join(CONFIG_DIR, "templates")
+STANDALONE_TEMPLATE_PATH = os.path.join(TEMPLATES_DIR, "standalone.md")
+DAILY_NEW_TEMPLATE_PATH = os.path.join(TEMPLATES_DIR, "daily_new.md")
+DAILY_APPEND_TEMPLATE_PATH = os.path.join(TEMPLATES_DIR, "daily_append.md")
+
+DEFAULT_STANDALONE_TEMPLATE_SRC = os.path.join(PACKAGE_DIR, "templates", "standalone.md")
+DEFAULT_DAILY_NEW_TEMPLATE_SRC = os.path.join(PACKAGE_DIR, "templates", "daily_new.md")
+DEFAULT_DAILY_APPEND_TEMPLATE_SRC = os.path.join(PACKAGE_DIR, "templates", "daily_append.md")
+
 def init_config_dir():
     os.makedirs(CONFIG_DIR, exist_ok=True)
     os.makedirs(PROMPTS_DIR, exist_ok=True)
+    os.makedirs(TEMPLATES_DIR, exist_ok=True)
 
     if not os.path.exists(CONFIG_PATH) and os.path.exists(DEFAULT_CONFIG_SRC):
         shutil.copy(DEFAULT_CONFIG_SRC, CONFIG_PATH)
@@ -25,6 +35,15 @@ def init_config_dir():
 
     if not os.path.exists(USER_PROMPT_PATH) and os.path.exists(DEFAULT_USER_PROMPT_SRC):
         shutil.copy(DEFAULT_USER_PROMPT_SRC, USER_PROMPT_PATH)
+
+    if not os.path.exists(STANDALONE_TEMPLATE_PATH) and os.path.exists(DEFAULT_STANDALONE_TEMPLATE_SRC):
+        shutil.copy(DEFAULT_STANDALONE_TEMPLATE_SRC, STANDALONE_TEMPLATE_PATH)
+
+    if not os.path.exists(DAILY_NEW_TEMPLATE_PATH) and os.path.exists(DEFAULT_DAILY_NEW_TEMPLATE_SRC):
+        shutil.copy(DEFAULT_DAILY_NEW_TEMPLATE_SRC, DAILY_NEW_TEMPLATE_PATH)
+
+    if not os.path.exists(DAILY_APPEND_TEMPLATE_PATH) and os.path.exists(DEFAULT_DAILY_APPEND_TEMPLATE_SRC):
+        shutil.copy(DEFAULT_DAILY_APPEND_TEMPLATE_SRC, DAILY_APPEND_TEMPLATE_PATH)
 
 def merge_configs(dict1, dict2):
     result = dict1.copy()
@@ -56,3 +75,12 @@ def load_prompt_template():
 
 def load_user_prompt_template():
     return _load_prompt(USER_PROMPT_PATH, DEFAULT_USER_PROMPT_SRC)
+
+def load_standalone_template():
+    return _load_prompt(STANDALONE_TEMPLATE_PATH, DEFAULT_STANDALONE_TEMPLATE_SRC)
+
+def load_daily_new_template():
+    return _load_prompt(DAILY_NEW_TEMPLATE_PATH, DEFAULT_DAILY_NEW_TEMPLATE_SRC)
+
+def load_daily_append_template():
+    return _load_prompt(DAILY_APPEND_TEMPLATE_PATH, DEFAULT_DAILY_APPEND_TEMPLATE_SRC)
