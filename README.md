@@ -87,6 +87,8 @@ ai:
   keep_alive: "0"              # Time to keep model loaded in VRAM after note generation (e.g. "5m", "10m", or "0" to unload immediately)
   preload_keep_alive: "5m"     # Time to keep model weights loaded in VRAM during recording to minimize note generation cold-start
   max_retries: 3               # Number of times to retry LLM execution if the output is not valid JSON
+  preload_timeout: 180         # Timeout in seconds for preloading the model weights
+  request_timeout: 300         # Timeout in seconds for note generation requests
 
 audio:
   sample_rate: 16000           # Audio sample rate (16kHz is ideal for Gemma 4)
@@ -94,6 +96,9 @@ audio:
   beep_frequency: 440          # Audio cue beep frequency (Hz)
   beep_duration: 0.1           # Beep duration (seconds)
   beep_enabled: true           # Enable/disable audio cues (beeps)
+
+logging:
+  level: "INFO"                # Logger verbosity level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
 ```
 
 ### 2. Custom Prompts
@@ -204,4 +209,5 @@ graph TD
 * **In-Memory Audio Processing:** Audio is captured directly from your microphone using `sounddevice` and loaded into an in-memory queue. When recording stops, it is processed into 16-bit PCM WAV bytes in-memory (using `io.BytesIO`). No temporary audio files are written to the disk, maximizing privacy, speed, and disk lifespan.
 * **Non-Blocking UI Threads:** Both the model preloading and the Ollama API request processing are offloaded to background threads. This ensures that the PyQt6 system tray UI loop remains entirely responsive without stuttering or freezing.
 * **Dynamic Icon Generation:** Custom state icons are drawn dynamically in-memory using Pillow (`PIL`) and converted to `QIcon` objects at runtime. No external image assets are required.
-* **Structured Model Output:** The transcription is sent to Ollama's `/api/chat` using structured JSON schema format instructions, guaranteeing robust parsing of transcription flags (`empty` and `text`).
+* **Structured Model Output & Robust Parsing:** The transcription request is sent to Ollama's `/api/chat` using structured JSON schema format instructions. The response is robustly parsed by finding the first `{` and the last `}` to isolate the JSON, ensuring compatibility even if the model outputs conversational preamble or postscript.
+* **Structured Logging (XDG Compliant):** Logs are stored in accordance with the XDG Base Directory specification at `~/.local/state/eloquent-notes/app.log` (or `$XDG_STATE_HOME/eloquent-notes/app.log`). The logging level is configurable in `config.yaml`, and logs are automatically rotated (max 5MB, up to 3 backups).
