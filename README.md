@@ -11,6 +11,7 @@ Eloquent Notes is a lightweight, system-tray-centric utility for Linux inspired 
   - **Start/Stop Recording**
   - **Reload Configuration** (reloads settings and prompts on-the-fly without restarting the application)
   - **Quit**
+- **CLI & Daemon Decoupling:** The CLI command (`eloquent-notes toggle`) is lightweight and decoupled from the heavy graphical interface (PyQt6). It uses a local Unix socket to immediately signal the running daemon to toggle recording.
 - **Offline & Private:** Transcribes and refines audio locally on your machine using Gemma 4 via Ollama.
 - **Dynamic Icons:** Status indicators are rendered dynamically in memory:
   - 🔘 **Idle (Gray):** A gray circle with a white microphone icon.
@@ -85,7 +86,9 @@ Eloquent Notes is built with a highly responsive, asynchronous, and memory-effic
 
 ```mermaid
 graph TD
-    A[PyQt6 System Tray Event Loop] -->|Left Click / Menu| B{Recording State?}
+    CLI[CLI: eloquent-notes toggle] -->|QLocalSocket / IPC| A[PyQt6 System Tray Event Loop]
+    Tray[Left Click / Tray Menu] --> A
+    A --> B{Recording State?}
     B -->|IDLE| C[Start Recording]
     B -->|RECORDING| D[Stop & Process]
     
@@ -105,6 +108,7 @@ graph TD
 ```
 
 ### Key Technical Details
+* **CLI & GUI Decoupling:** The entry point (`eloquent-notes`) only loads PyQt's lightweight core components (`QCoreApplication` and `QLocalSocket`) when communicating with the running instance. If the daemon is already running, it sends an IPC command and exits immediately, avoiding loading any windows or graphical elements. If it is not running, it replaces the current process with the daemon (`eloquent_notes.app`) via `os.execv`.
 * **In-Memory Audio Processing:** Audio is captured directly from your microphone using `sounddevice` and loaded into an in-memory queue. When recording stops, it is processed into 16-bit PCM WAV bytes in-memory (using `io.BytesIO`). No temporary audio files are written to the disk, maximizing privacy, speed, and disk lifespan.
 * **Non-Blocking UI Threads:** Both the model preloading and the Ollama API request processing are offloaded to background threads. This ensures that the PyQt6 system tray UI loop remains entirely responsive without stuttering or freezing.
 * **Dynamic Icon Generation:** Custom state icons are drawn dynamically in-memory using Pillow (`PIL`) and converted to `QIcon` objects at runtime. No external image assets are required.
