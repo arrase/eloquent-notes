@@ -184,7 +184,7 @@ class EloquentApp(QObject):
                 retry_prompt=config.load_retry_prompt_template(),
                 context_length=ai_cfg["context_length"],
                 audio_bytes=self.recorder.wav_bytes,
-                keep_alive=ai_cfg["keep_alive"],
+                keep_alive=ai_cfg["preload_keep_alive"],
                 max_retries=ai_cfg["max_retries"],
                 timeout=ai_cfg["request_timeout"]
             )
@@ -204,7 +204,7 @@ class EloquentApp(QObject):
                     user_prompt=config.load_obsidian_enrich_user_prompt_template(),
                     text=clean_text,
                     context_length=ai_cfg["context_length"],
-                    keep_alive=ai_cfg["keep_alive"],
+                    keep_alive=ai_cfg["preload_keep_alive"],
                     timeout=ai_cfg["request_timeout"]
                 )
             except Exception as e:
