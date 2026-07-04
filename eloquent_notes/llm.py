@@ -107,7 +107,7 @@ def send_audio_to_ollama(ollama_url, model, system_prompt, user_prompt, retry_pr
             if attempt >= max_retries:
                 raise req_err
 
-def enrich_text_with_ollama(ollama_url, model, system_prompt, user_prompt, text, context_length, keep_alive="5m", timeout=300):
+def enrich_text_with_ollama(ollama_url, model, system_prompt, user_prompt, text, retry_prompt, context_length, keep_alive="5m", max_retries=3, timeout=300):
     num_ctx = context_length or get_model_max_context(ollama_url, model)
     options = {"temperature": 0.0}
     if num_ctx:
@@ -118,22 +118,56 @@ def enrich_text_with_ollama(ollama_url, model, system_prompt, user_prompt, text,
         {"role": "user", "content": user_prompt.format(text=text)}
     ]
 
-    payload = {
-        "model": model,
-        "messages": messages,
-        "options": options,
-        "keep_alive": keep_alive,
-        "stream": False
-    }
+    for attempt in range(max_retries + 1):
+        payload = {
+            "model": model,
+            "messages": messages,
+            "format": {
+                "type": "object",
+                "properties": {
+                    "text": {
+                        "type": "string",
+                        "description": "The enriched Markdown text."
+                    }
+                },
+                "required": ["text"]
+            },
+            "options": options,
+            "keep_alive": keep_alive,
+            "stream": False
+        }
 
-    try:
-        response = requests.post(f"{ollama_url}/api/chat", json=payload, timeout=timeout)
-        response.raise_for_status()
-        content = response.json()["message"]["content"]
-        return content.strip()
-    except requests.RequestException as req_err:
-        logger.error("Ollama request error during text enrichment: %s", req_err)
-        raise req_err
+        try:
+            if attempt > 0:
+                logger.warning("Retrying text enrichment with Ollama (attempt %d/%d)...", attempt, max_retries)
+
+            response = requests.post(f"{ollama_url}/api/chat", json=payload, timeout=timeout)
+            response.raise_for_status()
+
+            content = response.json()["message"]["content"]
+
+            try:
+                json_str = content.strip()
+                start_idx = json_str.find('{')
+                end_idx = json_str.rfind('}')
+                if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+                    json_str = json_str[start_idx:end_idx + 1]
+
+                result = json.loads(json_str)
+                if not (isinstance(result, dict) and "text" in result):
+                    raise ValueError("JSON response is missing required key 'text'")
+                return result["text"]
+            except (json.JSONDecodeError, TypeError, ValueError) as json_err:
+                logger.error("Invalid JSON output on attempt %d for text enrichment: %s. Error: %s", attempt, content, json_err)
+                if attempt >= max_retries:
+                    raise json_err
+                messages.append({"role": "assistant", "content": content})
+                messages.append({"role": "user", "content": retry_prompt})
+
+        except requests.RequestException as req_err:
+            logger.error("Ollama request error during text enrichment on attempt %d: %s", attempt, req_err)
+            if attempt >= max_retries:
+                raise req_err
 
 def extract_tags_with_ollama(ollama_url, model, system_prompt, user_prompt, text, retry_prompt, context_length, keep_alive="5m", max_retries=3, timeout=300):
     num_ctx = context_length or get_model_max_context(ollama_url, model)
@@ -150,7 +184,19 @@ def extract_tags_with_ollama(ollama_url, model, system_prompt, user_prompt, text
         payload = {
             "model": model,
             "messages": messages,
-            "format": "json",
+            "format": {
+                "type": "object",
+                "properties": {
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "An array of relevant tags."
+                    }
+                },
+                "required": ["tags"]
+            },
             "options": options,
             "keep_alive": keep_alive,
             "stream": False
@@ -167,15 +213,15 @@ def extract_tags_with_ollama(ollama_url, model, system_prompt, user_prompt, text
 
             try:
                 json_str = content.strip()
-                start_idx = json_str.find('[')
-                end_idx = json_str.rfind(']')
+                start_idx = json_str.find('{')
+                end_idx = json_str.rfind('}')
                 if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
                     json_str = json_str[start_idx:end_idx + 1]
 
                 result = json.loads(json_str)
-                if not isinstance(result, list):
-                    raise ValueError("JSON response is not a list")
-                return result
+                if not (isinstance(result, dict) and "tags" in result and isinstance(result["tags"], list)):
+                    raise ValueError("JSON response is missing required key 'tags' or it is not a list")
+                return result["tags"]
             except (json.JSONDecodeError, TypeError, ValueError) as json_err:
                 logger.error("Invalid JSON output on attempt %d for tag extraction: %s. Error: %s", attempt, content, json_err)
                 if attempt >= max_retries:

@@ -1,4 +1,4 @@
-Extract tags for the following text. Output only a JSON array of strings.
+Extract tags for the following text. Output a JSON object containing a "tags" array.
 
 Text:
 {text}

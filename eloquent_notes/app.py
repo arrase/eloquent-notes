@@ -202,8 +202,10 @@ class EloquentApp(QObject):
                 system_prompt=config.load_obsidian_enrich_system_prompt_template(),
                 user_prompt=config.load_obsidian_enrich_user_prompt_template(),
                 text=clean_text,
+                retry_prompt=config.load_retry_prompt_template(),
                 context_length=ai_cfg["context_length"],
                 keep_alive=ai_cfg["preload_keep_alive"],
+                max_retries=ai_cfg["max_retries"],
                 timeout=ai_cfg["request_timeout"]
             )
 
