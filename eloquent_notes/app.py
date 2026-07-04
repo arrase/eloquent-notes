@@ -7,11 +7,15 @@ from PyQt6.QtGui import QAction
 from PyQt6.QtCore import QObject, pyqtSignal, QTimer
 from PyQt6.QtNetwork import QLocalServer
 
+import logging
 from eloquent_notes import config
 from eloquent_notes import audio
 from eloquent_notes import llm
 from eloquent_notes import obsidian
 from eloquent_notes import ui
+from eloquent_notes.logging_utils import setup_logging
+
+logger = logging.getLogger("eloquent_notes.app")
 
 class EloquentApp(QObject):
     processing_completed = pyqtSignal(str, str)
@@ -48,7 +52,7 @@ class EloquentApp(QObject):
         self.server = QLocalServer(self)
         self.server.removeServer("eloquent_notes_ipc")
         if not self.server.listen("eloquent_notes_ipc"):
-            print("Failed to start local IPC server.")
+            logger.error("Failed to start local IPC server.")
         self.server.newConnection.connect(self._handle_ipc_connection)
         
         self.menu = QMenu()
@@ -124,11 +128,12 @@ class EloquentApp(QObject):
                 keep_alive=ai_cfg["preload_keep_alive"]
             )
         except Exception as e:
-            print(f"Preload warning: {e}", file=sys.stderr)
+            logger.warning("Preload warning: %s", e, exc_info=True)
 
     def start_recording(self):
         self.state = "RECORDING"
         self.update_icon("red", "Eloquent Notes (Recording...)")
+        logger.info("Starting audio recording...")
         
         try:
             if self.beep_enabled:
@@ -144,11 +149,13 @@ class EloquentApp(QObject):
         except Exception as e:
             self.state = "IDLE"
             self.update_icon("gray", "Eloquent Notes (Idle)")
+            logger.exception("Failed to start recording")
             self.send_notification("Recording Error", f"Could not start recording: {str(e)}")
 
     def stop_recording_and_process(self):
         self.state = "PROCESSING"
         self.update_icon("orange", "Eloquent Notes (Processing...)")
+        logger.info("Stopping recording and starting processing...")
         
         try:
             self.recorder.stop()
@@ -158,9 +165,11 @@ class EloquentApp(QObject):
         except Exception as e:
             self.state = "IDLE"
             self.update_icon("gray", "Eloquent Notes (Idle)")
+            logger.exception("Failed to stop recording or start processing")
             self.send_notification("Processing Error", f"Failed to stop recording or start processing: {str(e)}")
 
     def process_audio(self):
+        logger.info("Processing recorded audio...")
         try:
             ai_cfg = self.config["ai"]
             obs_cfg = self.config["obsidian"]
@@ -193,6 +202,7 @@ class EloquentApp(QObject):
             self.processing_completed.emit("success", saved_path)
             
         except Exception as e:
+            logger.exception("Error during audio processing/saving")
             self.processing_completed.emit("error", str(e))
 
     def _on_processing_completed(self, status, detail):
@@ -201,20 +211,26 @@ class EloquentApp(QObject):
         
         if status == "success":
             filename = os.path.basename(detail)
+            logger.info("Dictation saved successfully: %s", filename)
             self.send_notification("Dictation Saved", f"Saved dictation to Obsidian ({filename})")
         elif status == "empty":
+            logger.info("Dictation processing finished: Audio was empty")
             self.send_notification("Dictation Empty", "No note was created because the audio was empty.")
         elif status == "error":
+            logger.error("Dictation processing failed: %s", detail)
             self.send_notification("Processing Error", f"An error occurred while processing dictation: {detail}")
 
     def reload_config(self):
         try:
             self._apply_config()
+            logger.info("Configuration reloaded successfully")
             self.send_notification("Eloquent Notes", "Configuration reloaded successfully.")
         except Exception as e:
+            logger.exception("Failed to reload configuration")
             self.send_notification("Configuration Error", f"Failed to reload configuration: {str(e)}")
 
     def exit_app(self):
+        logger.info("Exiting application...")
         if self.state == "RECORDING":
             self.recorder.stop()
         self.server.close()
@@ -240,6 +256,11 @@ def main():
     args = parser.parse_args()
 
     config.init_config_dir()
+    
+    cfg = config.load_config()
+    log_level = cfg.get("logging", {}).get("level", "INFO")
+    setup_logging(log_level)
+    logger.info("Starting Eloquent Notes daemon...")
     
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)

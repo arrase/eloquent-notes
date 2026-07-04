@@ -18,3 +18,7 @@ audio:
   beep_frequency: 440
   beep_duration: 0.1
   beep_enabled: true
+
+logging:
+  level: "INFO"
+
