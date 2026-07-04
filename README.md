@@ -1,6 +1,6 @@
 # Eloquent Notes for Linux
 
-Eloquent Notes is a lightweight, system-tray-centric utility for Linux inspired by [Google Eloquent](https://developers.google.com/edge/eloquent) that runs silently in the background. It allows you to record quick dictations, automatically cleans them, enriches them with Obsidian Markdown features, extracts relevant tags using a multi-step local **Gemma 4** model pipeline (via Ollama), and writes the resulting notes directly to your Obsidian vault.
+Eloquent Notes is a lightweight, system-tray-centric utility for Linux inspired by [Google Eloquent](https://developers.google.com/edge/eloquent) that runs silently in the background. It allows you to record quick dictations, automatically cleans them, enriches them with Obsidian Markdown features, extracts relevant tags using a single-step local **Gemma 4** model request (via Ollama), and writes the resulting notes directly to your Obsidian vault.
 
 ---
 
@@ -22,7 +22,7 @@ Eloquent Notes is a lightweight, system-tray-centric utility for Linux inspired 
   - Automatically analyzes dictations to generate relevant tags.
   - Appends notes to daily journals or creates new individual files inside your vault.
   - Intelligently parses, merges, and updates YAML frontmatter metadata when appending to existing notes without breaking formatting.
-- **Customizable Multi-Step Prompts:** Edit custom Markdown prompts for every stage of the pipeline (Cleaning, Enriching, Tag Extraction) loaded directly from your user config directory.
+- **Customizable Prompts:** Edit custom Markdown prompts (System, User, Retry) loaded directly from your user config directory.
 - **Custom Note Templates:** You can customize the Markdown formatting of the generated notes, including dynamic `{tags}` injection.
 
 ---
@@ -106,22 +106,11 @@ logging:
 ```
 
 ### 2. Custom Prompts
-The application relies on a multi-step pipeline to guarantee high-quality generation from smaller local models. You can edit the system, user, and retry prompts for each step in `~/.config/eloquent-notes/prompts/`:
+You can edit the system, user, and retry prompts in `~/.config/eloquent-notes/prompts/` to customize the transcription, enrichment, and tag extraction behavior:
 
-**Step 1: Audio Transcription & Cleaning**
-- `system_prompt.md`: Instructs the model on how to format, structure, and clean filler words.
-- `user_prompt.md`: Sends execution context for the specific audio file.
-
-**Step 2: Obsidian Markdown Enrichment**
-- `obsidian_enrich_system_prompt.md`: Instructs the model to add Callouts, Wikilinks, etc.
-- `obsidian_enrich_user_prompt.md`: Context for the enrichment step.
-
-**Step 3: Tag Extraction**
-- `obsidian_tags_system_prompt.md`: Rules for identifying and formatting document tags.
-- `obsidian_tags_user_prompt.md`: Context for tag extraction.
-
-**Error Recovery**
-- `retry_prompt.md`: Universal prompt to correct the model's output if it fails to generate valid JSON across any of the steps.
+- **`system_prompt.md`**: Contains instructions for transcription cleaning, Markdown formatting (callouts, wikilinks), and tag extraction.
+- **`user_prompt.md`**: Provides execution context for the audio processing request.
+- **`retry_prompt.md`**: Instructs the model how to correct its response if it outputs invalid JSON.
 
 ### 3. Custom Note Templates
 You can customize the Markdown formatting of the generated notes, including frontmatter and headers. Eloquent Notes provides three template files in `~/.config/eloquent-notes/templates/`:
@@ -212,10 +201,8 @@ graph TD
     D -->|sounddevice| G[Stop Capture & Convert to WAV in Memory]
     D -->|Background Thread| H[Send Base64 Audio to Ollama]
     
-    H -->|Cleaned JSON Response| I{Empty Note?}
-    I -->|No| J[Enrich Text with Obsidian MD]
-    J --> N[Extract Tags]
-    N --> O[Merge Frontmatter & Save to Vault]
+    H -->|JSON Response| I{Empty Note?}
+    I -->|No| O[Merge Frontmatter & Save to Vault]
     I -->|Yes| K[Show Notification]
     
     O --> L[Show Success Notification]
