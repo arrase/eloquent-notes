@@ -23,4 +23,6 @@ audio:
 
 logging:
   level: "INFO"
+  max_mb: 5
+  backup_count: 3
 

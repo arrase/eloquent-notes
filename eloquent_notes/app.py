@@ -260,8 +260,12 @@ def main():
     config.init_config_dir()
     
     cfg = config.load_config()
-    log_level = cfg["logging"]["level"]
-    setup_logging(log_level)
+    log_cfg = cfg["logging"]
+    setup_logging(
+        log_level_str=log_cfg["level"],
+        max_mb=log_cfg["max_mb"],
+        backup_count=log_cfg["backup_count"]
+    )
     logger.info("Starting Eloquent Notes daemon...")
     
     app = QApplication(sys.argv)
