@@ -10,6 +10,8 @@ ai:
   keep_alive: "0"       # Time to keep model loaded after note generation (e.g. "5m", "10m", or "0" to unload immediately).
   preload_keep_alive: "5m" # Time to keep model weights loaded in VRAM during recording to reduce note generation time.
   max_retries: 3        # Number of times to retry LLM execution if the output is not valid JSON.
+  preload_timeout: 180  # Timeout in seconds for preloading the model weights.
+  request_timeout: 300  # Timeout in seconds for note generation requests.
 
 
 audio:

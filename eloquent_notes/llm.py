@@ -22,7 +22,7 @@ def get_model_max_context(ollama_url, model):
         pass
     return None
 
-def preload_model(ollama_url, model, context_length=None, keep_alive="5m"):
+def preload_model(ollama_url, model, context_length=None, keep_alive="5m", timeout=180):
     """
     Sends a request to Ollama to preload the model into memory.
     This reduces the cold start time when the user stops recording and triggers generation.
@@ -40,11 +40,11 @@ def preload_model(ollama_url, model, context_length=None, keep_alive="5m"):
             "keep_alive": keep_alive,
             "options": options
         },
-        timeout=10
+        timeout=timeout
     )
     response.raise_for_status()
 
-def send_audio_to_ollama(ollama_url, model, system_prompt, user_prompt, retry_prompt, context_length, audio_bytes, keep_alive="5m", max_retries=3):
+def send_audio_to_ollama(ollama_url, model, system_prompt, user_prompt, retry_prompt, context_length, audio_bytes, keep_alive="5m", max_retries=3, timeout=300):
     audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
     num_ctx = context_length or get_model_max_context(ollama_url, model)
     
@@ -94,13 +94,19 @@ def send_audio_to_ollama(ollama_url, model, system_prompt, user_prompt, retry_pr
             if attempt > 0:
                 logger.warning("Retrying audio processing with Ollama (attempt %d/%d)...", attempt, max_retries)
                 
-            response = requests.post(f"{ollama_url}/api/chat", json=payload)
+            response = requests.post(f"{ollama_url}/api/chat", json=payload, timeout=timeout)
             response.raise_for_status()
             
             content = response.json()["message"]["content"]
             
             try:
-                result = json.loads(content)
+                json_str = content.strip()
+                start_idx = json_str.find('{')
+                end_idx = json_str.rfind('}')
+                if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+                    json_str = json_str[start_idx:end_idx + 1]
+                
+                result = json.loads(json_str)
                 if isinstance(result, dict) and "empty" in result and "text" in result:
                     return result
                 else:
