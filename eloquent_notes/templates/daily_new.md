@@ -1,5 +1,7 @@
 ---
-tags: [dictation, unprocessed]
+tags:
+  - dictation
+{tags}
 date: {date}
 ---
 # Dictations of {date}

@@ -191,12 +191,13 @@ class EloquentApp(QObject):
             if result["empty"] or not result["text"].strip():
                 self.processing_completed.emit("empty", "")
                 return
-            
+
             saved_path = obsidian.save_note(
                 vault_path=obs_cfg["vault_path"],
                 folder=obs_cfg["folder"],
                 daily_notes=obs_cfg["daily_notes"],
                 text=result["text"],
+                tags=result["tags"],
                 template_standalone=config.load_standalone_template(),
                 template_daily_new=config.load_daily_new_template(),
                 template_daily_append=config.load_daily_append_template()
@@ -206,6 +207,7 @@ class EloquentApp(QObject):
         except Exception as e:
             logger.exception("Error during audio processing/saving")
             self.processing_completed.emit("error", str(e))
+
 
     def _on_processing_completed(self, status, detail):
         self.state = "IDLE"
