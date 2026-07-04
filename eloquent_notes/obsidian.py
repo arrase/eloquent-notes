@@ -40,7 +40,15 @@ def save_note(vault_path, folder, daily_notes, text, tags, template_standalone, 
 
                     yaml.SafeDumper.ignore_aliases = lambda self, data: True
                     new_frontmatter_str = yaml.safe_dump(frontmatter, default_flow_style=False, sort_keys=False)
-                    new_content = f"---\n{new_frontmatter_str}---\n{existing_content[end_frontmatter+3:].lstrip()}"
+
+                    # Splice it back perfectly without stripping the entire right side whitespace/newlines
+                    # `end_frontmatter + 3` gives us the exact position after the `---`
+                    remainder = existing_content[end_frontmatter+3:]
+                    # If it starts with a single newline, eat it because we provide one with `\n` below
+                    if remainder.startswith('\n'):
+                        remainder = remainder[1:]
+
+                    new_content = f"---\n{new_frontmatter_str}---\n{remainder}"
 
             content = template_daily_append.format(date=date_str, time=time_str, text=text)
 
