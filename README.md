@@ -86,6 +86,7 @@ ai:
   context_length: 10000        # Context length limit (null defaults to model maximum)
   keep_alive: "0"              # Time to keep model loaded in VRAM after note generation (e.g. "5m", "10m", or "0" to unload immediately)
   preload_keep_alive: "5m"     # Time to keep model weights loaded in VRAM during recording to minimize note generation cold-start
+  max_retries: 3               # Number of times to retry LLM execution if the output is not valid JSON
 
 audio:
   sample_rate: 16000           # Audio sample rate (16kHz is ideal for Gemma 4)
@@ -96,9 +97,10 @@ audio:
 ```
 
 ### 2. Custom Prompts
-You can edit the system and user prompts used to clean up and structure your notes:
+You can edit the system, user, and retry prompts used to clean up and structure your notes:
 - **System Prompt:** `~/.config/eloquent-notes/prompts/system_prompt.md` (Instructs the model on how to format, structure, clean filler words, and output JSON)
 - **User Prompt:** `~/.config/eloquent-notes/prompts/user_prompt.md` (Sends execution context for the specific audio file)
+- **Retry Prompt:** `~/.config/eloquent-notes/prompts/retry_prompt.md` (Sends feedback to the model to correct its output if it fails to generate valid JSON)
 
 ### 3. Custom Note Templates
 You can customize the Markdown formatting of the generated notes, including frontmatter and headers. Eloquent Notes provides three template files in `~/.config/eloquent-notes/templates/`:
