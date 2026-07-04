@@ -170,9 +170,11 @@ class EloquentApp(QObject):
                 model=ai_cfg["model"],
                 system_prompt=config.load_prompt_template(),
                 user_prompt=config.load_user_prompt_template(),
+                retry_prompt=config.load_retry_prompt_template(),
                 context_length=ai_cfg["context_length"],
                 audio_bytes=self.recorder.wav_bytes,
-                keep_alive=ai_cfg["keep_alive"]
+                keep_alive=ai_cfg["keep_alive"],
+                max_retries=ai_cfg.get("max_retries", 3)
             )
             
             if result.get("empty") or not result.get("text", "").strip():
