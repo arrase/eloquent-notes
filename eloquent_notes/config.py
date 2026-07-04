@@ -8,12 +8,20 @@ PROMPTS_DIR = os.path.join(CONFIG_DIR, "prompts")
 SYSTEM_PROMPT_PATH = os.path.join(PROMPTS_DIR, "system_prompt.md")
 USER_PROMPT_PATH = os.path.join(PROMPTS_DIR, "user_prompt.md")
 RETRY_PROMPT_PATH = os.path.join(PROMPTS_DIR, "retry_prompt.md")
+OBSIDIAN_ENRICH_SYSTEM_PROMPT_PATH = os.path.join(PROMPTS_DIR, "obsidian_enrich_system_prompt.md")
+OBSIDIAN_ENRICH_USER_PROMPT_PATH = os.path.join(PROMPTS_DIR, "obsidian_enrich_user_prompt.md")
+OBSIDIAN_TAGS_SYSTEM_PROMPT_PATH = os.path.join(PROMPTS_DIR, "obsidian_tags_system_prompt.md")
+OBSIDIAN_TAGS_USER_PROMPT_PATH = os.path.join(PROMPTS_DIR, "obsidian_tags_user_prompt.md")
 
 PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_CONFIG_SRC = os.path.join(PACKAGE_DIR, "config.yaml")
 DEFAULT_PROMPT_SRC = os.path.join(PACKAGE_DIR, "prompts", "system_prompt.md")
 DEFAULT_USER_PROMPT_SRC = os.path.join(PACKAGE_DIR, "prompts", "user_prompt.md")
 DEFAULT_RETRY_PROMPT_SRC = os.path.join(PACKAGE_DIR, "prompts", "retry_prompt.md")
+DEFAULT_OBSIDIAN_ENRICH_SYSTEM_PROMPT_SRC = os.path.join(PACKAGE_DIR, "prompts", "obsidian_enrich_system_prompt.md")
+DEFAULT_OBSIDIAN_ENRICH_USER_PROMPT_SRC = os.path.join(PACKAGE_DIR, "prompts", "obsidian_enrich_user_prompt.md")
+DEFAULT_OBSIDIAN_TAGS_SYSTEM_PROMPT_SRC = os.path.join(PACKAGE_DIR, "prompts", "obsidian_tags_system_prompt.md")
+DEFAULT_OBSIDIAN_TAGS_USER_PROMPT_SRC = os.path.join(PACKAGE_DIR, "prompts", "obsidian_tags_user_prompt.md")
 
 TEMPLATES_DIR = os.path.join(CONFIG_DIR, "templates")
 STANDALONE_TEMPLATE_PATH = os.path.join(TEMPLATES_DIR, "standalone.md")
@@ -34,6 +42,10 @@ def init_config_dir():
         (DEFAULT_PROMPT_SRC, SYSTEM_PROMPT_PATH),
         (DEFAULT_USER_PROMPT_SRC, USER_PROMPT_PATH),
         (DEFAULT_RETRY_PROMPT_SRC, RETRY_PROMPT_PATH),
+        (DEFAULT_OBSIDIAN_ENRICH_SYSTEM_PROMPT_SRC, OBSIDIAN_ENRICH_SYSTEM_PROMPT_PATH),
+        (DEFAULT_OBSIDIAN_ENRICH_USER_PROMPT_SRC, OBSIDIAN_ENRICH_USER_PROMPT_PATH),
+        (DEFAULT_OBSIDIAN_TAGS_SYSTEM_PROMPT_SRC, OBSIDIAN_TAGS_SYSTEM_PROMPT_PATH),
+        (DEFAULT_OBSIDIAN_TAGS_USER_PROMPT_SRC, OBSIDIAN_TAGS_USER_PROMPT_PATH),
         (DEFAULT_STANDALONE_TEMPLATE_SRC, STANDALONE_TEMPLATE_PATH),
         (DEFAULT_DAILY_NEW_TEMPLATE_SRC, DAILY_NEW_TEMPLATE_PATH),
         (DEFAULT_DAILY_APPEND_TEMPLATE_SRC, DAILY_APPEND_TEMPLATE_PATH)
@@ -72,6 +84,18 @@ def load_user_prompt_template():
 
 def load_retry_prompt_template():
     return _load_file(RETRY_PROMPT_PATH)
+
+def load_obsidian_enrich_system_prompt_template():
+    return _load_file(OBSIDIAN_ENRICH_SYSTEM_PROMPT_PATH)
+
+def load_obsidian_enrich_user_prompt_template():
+    return _load_file(OBSIDIAN_ENRICH_USER_PROMPT_PATH)
+
+def load_obsidian_tags_system_prompt_template():
+    return _load_file(OBSIDIAN_TAGS_SYSTEM_PROMPT_PATH)
+
+def load_obsidian_tags_user_prompt_template():
+    return _load_file(OBSIDIAN_TAGS_USER_PROMPT_PATH)
 
 def load_standalone_template():
     return _load_file(STANDALONE_TEMPLATE_PATH)

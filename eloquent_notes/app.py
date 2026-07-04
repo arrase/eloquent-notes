@@ -175,6 +175,7 @@ class EloquentApp(QObject):
             ai_cfg = self.config["ai"]
             obs_cfg = self.config["obsidian"]
             
+            # Step 1: Transcribe and clean audio
             result = llm.send_audio_to_ollama(
                 ollama_url=ai_cfg["ollama_url"],
                 model=ai_cfg["model"],
@@ -191,12 +192,49 @@ class EloquentApp(QObject):
             if result["empty"] or not result["text"].strip():
                 self.processing_completed.emit("empty", "")
                 return
+
+            clean_text = result["text"]
+
+            # Step 2: Enrich with Obsidian features
+            try:
+                enriched_text = llm.enrich_text_with_ollama(
+                    ollama_url=ai_cfg["ollama_url"],
+                    model=ai_cfg["model"],
+                    system_prompt=config.load_obsidian_enrich_system_prompt_template(),
+                    user_prompt=config.load_obsidian_enrich_user_prompt_template(),
+                    text=clean_text,
+                    context_length=ai_cfg["context_length"],
+                    keep_alive=ai_cfg["keep_alive"],
+                    timeout=ai_cfg["request_timeout"]
+                )
+            except Exception as e:
+                logger.warning("Failed to enrich text, falling back to clean text: %s", e)
+                enriched_text = clean_text
+
+            # Step 3: Extract Tags
+            try:
+                tags = llm.extract_tags_with_ollama(
+                    ollama_url=ai_cfg["ollama_url"],
+                    model=ai_cfg["model"],
+                    system_prompt=config.load_obsidian_tags_system_prompt_template(),
+                    user_prompt=config.load_obsidian_tags_user_prompt_template(),
+                    text=enriched_text,
+                    retry_prompt=config.load_retry_prompt_template(),
+                    context_length=ai_cfg["context_length"],
+                    keep_alive=ai_cfg["keep_alive"],
+                    max_retries=ai_cfg["max_retries"],
+                    timeout=ai_cfg["request_timeout"]
+                )
+            except Exception as e:
+                logger.warning("Failed to extract tags, continuing without tags: %s", e)
+                tags = []
             
             saved_path = obsidian.save_note(
                 vault_path=obs_cfg["vault_path"],
                 folder=obs_cfg["folder"],
                 daily_notes=obs_cfg["daily_notes"],
-                text=result["text"],
+                text=enriched_text,
+                tags=tags,
                 template_standalone=config.load_standalone_template(),
                 template_daily_new=config.load_daily_new_template(),
                 template_daily_append=config.load_daily_append_template()
