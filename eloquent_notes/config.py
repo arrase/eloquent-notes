@@ -45,7 +45,7 @@ def init_config_dir():
 def merge_configs(dict1, dict2):
     result = dict1.copy()
     for key, value in dict2.items():
-        if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+        if isinstance(result.get(key), dict) and isinstance(value, dict):
             result[key] = merge_configs(result[key], value)
         else:
             result[key] = value
