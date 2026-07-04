@@ -1,31 +1,18 @@
 import base64
 import json
 import logging
-import sys
 import requests
 
 logger = logging.getLogger("eloquent_notes.llm")
-
-def get_model_max_context(ollama_url, model):
-    try:
-        response = requests.post(f"{ollama_url}/api/show", json={"name": model}, timeout=5)
-        response.raise_for_status()
-        for k, v in response.json().get("model_info", {}).items():
-            if k.endswith(".context_length"):
-                return int(v)
-    except (requests.RequestException, ValueError, KeyError):
-        pass
-    return None
 
 def preload_model(ollama_url, model, context_length=None, keep_alive="5m", timeout=180):
     """
     Sends a request to Ollama to preload the model into memory.
     This reduces the cold start time when the user stops recording and triggers generation.
     """
-    num_ctx = context_length or get_model_max_context(ollama_url, model)
     options = {"temperature": 0.0}
-    if num_ctx:
-        options["num_ctx"] = num_ctx
+    if context_length:
+        options["num_ctx"] = context_length
 
     response = requests.post(
         f"{ollama_url}/api/chat",
@@ -40,10 +27,9 @@ def preload_model(ollama_url, model, context_length=None, keep_alive="5m", timeo
     response.raise_for_status()
 
 def _execute_ollama_json_request(ollama_url, model, messages, format_schema, required_keys, retry_prompt, context_length, keep_alive, max_retries, timeout, task_name):
-    num_ctx = context_length or get_model_max_context(ollama_url, model)
     options = {"temperature": 0.0}
-    if num_ctx:
-        options["num_ctx"] = num_ctx
+    if context_length:
+        options["num_ctx"] = context_length
 
     for attempt in range(max_retries + 1):
         payload = {
@@ -74,8 +60,6 @@ def _execute_ollama_json_request(ollama_url, model, messages, format_schema, req
                 result = json.loads(json_str)
                 if not isinstance(result, dict) or not all(k in result for k in required_keys):
                     raise ValueError(f"JSON response is missing required keys: {required_keys}")
-
-                # Check for array type for tags if required, etc, but basic dictionary key check handles our cases
                 return result
             except (json.JSONDecodeError, TypeError, ValueError) as json_err:
                 logger.error("Invalid JSON output on attempt %d for %s: %s. Error: %s", attempt, task_name, content, json_err)
@@ -104,65 +88,19 @@ def send_audio_to_ollama(ollama_url, model, system_prompt, user_prompt, retry_pr
             },
             "text": {
                 "type": "string",
-                "description": "Cleaned, polished, and structured Markdown text if audio is not empty; empty string otherwise."
+                "description": "Cleaned, enriched Obsidian Markdown text if audio is not empty; empty string otherwise."
+            },
+            "tags": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "An array of 2 to 5 relevant tags if audio is not empty; empty array otherwise."
             }
         },
-        "required": ["empty", "text"]
+        "required": ["empty", "text", "tags"]
     }
 
     return _execute_ollama_json_request(
         ollama_url=ollama_url, model=model, messages=messages, format_schema=format_schema,
-        required_keys=["empty", "text"], retry_prompt=retry_prompt, context_length=context_length,
+        required_keys=["empty", "text", "tags"], retry_prompt=retry_prompt, context_length=context_length,
         keep_alive=keep_alive, max_retries=max_retries, timeout=timeout, task_name="audio processing"
     )
-
-def enrich_text_with_ollama(ollama_url, model, system_prompt, user_prompt, text, retry_prompt, context_length, keep_alive="5m", max_retries=3, timeout=300):
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": user_prompt.format(text=text)}
-    ]
-    format_schema = {
-        "type": "object",
-        "properties": {
-            "text": {
-                "type": "string",
-                "description": "The enriched Markdown text."
-            }
-        },
-        "required": ["text"]
-    }
-
-    result = _execute_ollama_json_request(
-        ollama_url=ollama_url, model=model, messages=messages, format_schema=format_schema,
-        required_keys=["text"], retry_prompt=retry_prompt, context_length=context_length,
-        keep_alive=keep_alive, max_retries=max_retries, timeout=timeout, task_name="text enrichment"
-    )
-    return result["text"]
-
-def extract_tags_with_ollama(ollama_url, model, system_prompt, user_prompt, text, retry_prompt, context_length, keep_alive="5m", max_retries=3, timeout=300):
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": user_prompt.format(text=text)}
-    ]
-    format_schema = {
-        "type": "object",
-        "properties": {
-            "tags": {
-                "type": "array",
-                "items": {"type": "string"},
-                "description": "An array of relevant tags."
-            }
-        },
-        "required": ["tags"]
-    }
-
-    result = _execute_ollama_json_request(
-        ollama_url=ollama_url, model=model, messages=messages, format_schema=format_schema,
-        required_keys=["tags"], retry_prompt=retry_prompt, context_length=context_length,
-        keep_alive=keep_alive, max_retries=max_retries, timeout=timeout, task_name="tag extraction"
-    )
-
-    tags = result["tags"]
-    if not isinstance(tags, list):
-        tags = []
-    return tags
