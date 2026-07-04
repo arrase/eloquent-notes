@@ -7,7 +7,7 @@ def get_log_dir() -> str:
     xdg_state = os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state")
     return os.path.join(xdg_state, "eloquent-notes")
 
-def setup_logging(log_level_str: str = "INFO") -> logging.Logger:
+def setup_logging(log_level_str: str, max_mb: int, backup_count: int) -> logging.Logger:
     level = getattr(logging, log_level_str.upper(), logging.INFO)
     
     logger = logging.getLogger("eloquent_notes")
@@ -33,8 +33,8 @@ def setup_logging(log_level_str: str = "INFO") -> logging.Logger:
         
         file_handler = RotatingFileHandler(
             log_file_path, 
-            maxBytes=5 * 1024 * 1024,  # 5 MB
-            backupCount=3,
+            maxBytes=max_mb * 1024 * 1024,
+            backupCount=backup_count,
             encoding="utf-8"
         )
         file_handler.setLevel(level)
