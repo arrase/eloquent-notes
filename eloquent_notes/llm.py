@@ -1,7 +1,10 @@
 import base64
 import json
+import logging
 import sys
 import requests
+
+logger = logging.getLogger("eloquent_notes.llm")
 
 def get_model_max_context(ollama_url, model):
     try:
@@ -89,7 +92,7 @@ def send_audio_to_ollama(ollama_url, model, system_prompt, user_prompt, retry_pr
         
         try:
             if attempt > 0:
-                print(f"Retrying audio processing with Ollama (attempt {attempt}/{max_retries})...", file=sys.stderr)
+                logger.warning("Retrying audio processing with Ollama (attempt %d/%d)...", attempt, max_retries)
                 
             response = requests.post(f"{ollama_url}/api/chat", json=payload)
             response.raise_for_status()
@@ -103,7 +106,7 @@ def send_audio_to_ollama(ollama_url, model, system_prompt, user_prompt, retry_pr
                 else:
                     raise ValueError("JSON response is missing required keys 'empty' or 'text'")
             except (json.JSONDecodeError, TypeError, ValueError) as json_err:
-                print(f"Invalid JSON output on attempt {attempt}: {content}. Error: {json_err}", file=sys.stderr)
+                logger.error("Invalid JSON output on attempt %d: %s. Error: %s", attempt, content, json_err)
                 if attempt < max_retries:
                     messages.append({
                         "role": "assistant",
@@ -119,7 +122,7 @@ def send_audio_to_ollama(ollama_url, model, system_prompt, user_prompt, retry_pr
                     raise json_err
                     
         except requests.RequestException as req_err:
-            print(f"Ollama request error on attempt {attempt}: {req_err}", file=sys.stderr)
+            logger.error("Ollama request error on attempt %d: %s", attempt, req_err)
             last_error = req_err
             if attempt >= max_retries:
                 raise req_err
