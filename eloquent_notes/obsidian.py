@@ -29,31 +29,18 @@ def save_note(vault_path, folder, daily_notes, text, tags, template_standalone, 
                 end_frontmatter = existing_content.find("---", 3)
                 if end_frontmatter != -1:
                     frontmatter_str = existing_content[3:end_frontmatter]
-                    try:
-                        frontmatter = yaml.safe_load(frontmatter_str) or {}
-                        existing_tags = frontmatter.get("tags", [])
-                        if isinstance(existing_tags, str):
-                            existing_tags = [existing_tags]
-                        elif not isinstance(existing_tags, list):
-                            existing_tags = []
+                    frontmatter = yaml.safe_load(frontmatter_str) or {}
 
-                        # merge tags
-                        for tag in tags:
-                            if tag not in existing_tags:
-                                existing_tags.append(tag)
+                    if "tags" not in frontmatter or not isinstance(frontmatter["tags"], list):
+                        frontmatter["tags"] = []
 
-                        frontmatter["tags"] = existing_tags
+                    for tag in tags:
+                        if tag not in frontmatter["tags"]:
+                            frontmatter["tags"].append(tag)
 
-                        class CustomDumper(yaml.SafeDumper):
-                            def ignore_aliases(self, data):
-                                return True
-
-                        new_frontmatter_str = yaml.dump(frontmatter, Dumper=CustomDumper, default_flow_style=False, sort_keys=False)
-
-                        new_content = "---\n" + new_frontmatter_str + "---\n" + existing_content[end_frontmatter+3:].lstrip()
-
-                    except yaml.YAMLError:
-                        pass # if it fails to parse, just append to the end
+                    yaml.SafeDumper.ignore_aliases = lambda self, data: True
+                    new_frontmatter_str = yaml.safe_dump(frontmatter, default_flow_style=False, sort_keys=False)
+                    new_content = f"---\n{new_frontmatter_str}---\n{existing_content[end_frontmatter+3:].lstrip()}"
 
             content = template_daily_append.format(date=date_str, time=time_str, text=text)
 
