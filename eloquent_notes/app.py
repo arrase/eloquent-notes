@@ -125,7 +125,8 @@ class EloquentApp(QObject):
                 ollama_url=ai_cfg["ollama_url"],
                 model=ai_cfg["model"],
                 context_length=ai_cfg["context_length"],
-                keep_alive=ai_cfg["preload_keep_alive"]
+                keep_alive=ai_cfg["preload_keep_alive"],
+                timeout=ai_cfg.get("preload_timeout", 180)
             )
         except Exception as e:
             logger.warning("Preload warning: %s", e, exc_info=True)
@@ -183,7 +184,8 @@ class EloquentApp(QObject):
                 context_length=ai_cfg["context_length"],
                 audio_bytes=self.recorder.wav_bytes,
                 keep_alive=ai_cfg["keep_alive"],
-                max_retries=ai_cfg.get("max_retries", 3)
+                max_retries=ai_cfg.get("max_retries", 3),
+                timeout=ai_cfg.get("request_timeout", 300)
             )
             
             if result.get("empty") or not result.get("text", "").strip():
