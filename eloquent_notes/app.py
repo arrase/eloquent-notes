@@ -126,7 +126,7 @@ class EloquentApp(QObject):
                 model=ai_cfg["model"],
                 context_length=ai_cfg["context_length"],
                 keep_alive=ai_cfg["preload_keep_alive"],
-                timeout=ai_cfg.get("preload_timeout", 180)
+                timeout=ai_cfg["preload_timeout"]
             )
         except Exception as e:
             logger.warning("Preload warning: %s", e, exc_info=True)
@@ -184,11 +184,11 @@ class EloquentApp(QObject):
                 context_length=ai_cfg["context_length"],
                 audio_bytes=self.recorder.wav_bytes,
                 keep_alive=ai_cfg["keep_alive"],
-                max_retries=ai_cfg.get("max_retries", 3),
-                timeout=ai_cfg.get("request_timeout", 300)
+                max_retries=ai_cfg["max_retries"],
+                timeout=ai_cfg["request_timeout"]
             )
             
-            if result.get("empty") or not result.get("text", "").strip():
+            if result["empty"] or not result["text"].strip():
                 self.processing_completed.emit("empty", "")
                 return
             
@@ -260,7 +260,7 @@ def main():
     config.init_config_dir()
     
     cfg = config.load_config()
-    log_level = cfg.get("logging", {}).get("level", "INFO")
+    log_level = cfg["logging"]["level"]
     setup_logging(log_level)
     logger.info("Starting Eloquent Notes daemon...")
     

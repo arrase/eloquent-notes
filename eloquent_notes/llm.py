@@ -8,14 +8,9 @@ logger = logging.getLogger("eloquent_notes.llm")
 
 def get_model_max_context(ollama_url, model):
     try:
-        response = requests.post(
-            f"{ollama_url}/api/show",
-            json={"name": model},
-            timeout=5
-        )
+        response = requests.post(f"{ollama_url}/api/show", json={"name": model}, timeout=5)
         response.raise_for_status()
-        info = response.json().get("model_info", {})
-        for k, v in info.items():
+        for k, v in response.json().get("model_info", {}).items():
             if k.endswith(".context_length"):
                 return int(v)
     except (requests.RequestException, ValueError, KeyError):
@@ -48,25 +43,15 @@ def send_audio_to_ollama(ollama_url, model, system_prompt, user_prompt, retry_pr
     audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
     num_ctx = context_length or get_model_max_context(ollama_url, model)
     
-    max_retries = max(0, int(max_retries))
-    
     options = {"temperature": 0.0}
     if num_ctx:
         options["num_ctx"] = num_ctx
         
     messages = [
-        {
-            "role": "system",
-            "content": system_prompt
-        },
-        {
-            "role": "user",
-            "content": user_prompt,
-            "images": [audio_base64]
-        }
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt, "images": [audio_base64]}
     ]
     
-    last_error = None
     for attempt in range(max_retries + 1):
         payload = {
             "model": model,
@@ -107,33 +92,17 @@ def send_audio_to_ollama(ollama_url, model, system_prompt, user_prompt, retry_pr
                     json_str = json_str[start_idx:end_idx + 1]
                 
                 result = json.loads(json_str)
-                if isinstance(result, dict) and "empty" in result and "text" in result:
-                    return result
-                else:
+                if not (isinstance(result, dict) and "empty" in result and "text" in result):
                     raise ValueError("JSON response is missing required keys 'empty' or 'text'")
+                return result
             except (json.JSONDecodeError, TypeError, ValueError) as json_err:
                 logger.error("Invalid JSON output on attempt %d: %s. Error: %s", attempt, content, json_err)
-                if attempt < max_retries:
-                    messages.append({
-                        "role": "assistant",
-                        "content": content
-                    })
-                    messages.append({
-                        "role": "user",
-                        "content": retry_prompt
-                    })
-                    last_error = json_err
-                    continue
-                else:
+                if attempt >= max_retries:
                     raise json_err
+                messages.append({"role": "assistant", "content": content})
+                messages.append({"role": "user", "content": retry_prompt})
                     
         except requests.RequestException as req_err:
             logger.error("Ollama request error on attempt %d: %s", attempt, req_err)
-            last_error = req_err
             if attempt >= max_retries:
                 raise req_err
-                
-    if last_error:
-        raise last_error
-    else:
-        raise ValueError("Unknown error during Ollama processing")

@@ -4,12 +4,8 @@ import sys
 from logging.handlers import RotatingFileHandler
 
 def get_log_dir() -> str:
-    xdg_state = os.environ.get("XDG_STATE_HOME")
-    if not xdg_state:
-        xdg_state = os.path.expanduser("~/.local/state")
-    
-    log_dir = os.path.join(xdg_state, "eloquent-notes")
-    return log_dir
+    xdg_state = os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state")
+    return os.path.join(xdg_state, "eloquent-notes")
 
 def setup_logging(log_level_str: str = "INFO") -> logging.Logger:
     level = getattr(logging, log_level_str.upper(), logging.INFO)
