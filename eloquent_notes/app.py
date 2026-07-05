@@ -2,7 +2,7 @@
 
 Manages the recording lifecycle (IDLE → RECORDING → PROCESSING → IDLE),
 IPC for single-instance communication, and Obsidian note generation
-through Ollama.
+through a two-phase Ollama pipeline (transcription → interpretation).
 """
 
 import argparse
@@ -174,8 +174,29 @@ class EloquentApp(QObject):
             )
         threading.Thread(target=self._process_audio, daemon=True).start()
 
+    def _build_vault_context(self):
+        """Build the vault context string for the interpretation prompt."""
+        obs_cfg = self.config["obsidian"]
+        if not obs_cfg.get("vault_context", True):
+            return ""
+
+        topics = obsidian.scan_vault_topics(obs_cfg["vault_path"])
+        if not topics:
+            return ""
+
+        topics_str = ", ".join(topics)
+        return (
+            f"Known topics in the vault (use as [[WikiLink]] if"
+            f" mentioned): {topics_str}\n\n"
+        )
+
     def _process_audio(self):
-        """Process recorded audio via LLM and save to Obsidian.
+        """Process recorded audio via the three-phase LLM pipeline.
+
+        Phase 1: Transcribe audio to clean text.
+        Phase 2: Rewrite transcription to a structured clean note.
+        Phase 3: Classify transcription and extract metadata.
+        Then format and save as an Obsidian note.
 
         Runs in a background thread. Emits processing_completed signal
         to communicate results back to the GUI thread.
@@ -184,30 +205,108 @@ class EloquentApp(QObject):
         try:
             ai_cfg = self.config["ai"]
             obs_cfg = self.config["obsidian"]
+            retry_prompt = config.load_file(config.RETRY_PROMPT_PATH)
 
-            result = llm.send_audio_to_ollama(
+            # --- Phase 1: Transcription ---
+            logger.info("Phase 1: Transcribing audio...")
+            transcription_result = llm.transcribe_audio(
                 ollama_url=ai_cfg["ollama_url"],
                 model=ai_cfg["model"],
-                system_prompt=config.load_file(config.SYSTEM_PROMPT_PATH),
-                user_prompt=config.load_file(config.USER_PROMPT_PATH),
-                retry_prompt=config.load_file(config.RETRY_PROMPT_PATH),
+                system_prompt=config.load_file(
+                    config.TRANSCRIPTION_SYSTEM_PROMPT_PATH,
+                ),
+                user_prompt=config.load_file(
+                    config.TRANSCRIPTION_USER_PROMPT_PATH,
+                ),
+                retry_prompt=retry_prompt,
                 context_length=ai_cfg["context_length"],
                 audio_bytes=self.recorder.wav_bytes,
+                keep_alive=ai_cfg["preload_keep_alive"],
+                max_retries=ai_cfg["max_retries"],
+                timeout=ai_cfg["request_timeout"],
+            )
+
+            if (
+                transcription_result["empty"]
+                or not transcription_result["transcription"].strip()
+            ):
+                self.processing_completed.emit("empty", "")
+                return
+
+            transcription = transcription_result["transcription"]
+            logger.info("Transcription: %s", transcription)
+
+            # --- Phase 2: Rewriting ---
+            logger.info("Phase 2: Rewriting transcription...")
+            rewriting_user_template = config.load_file(
+                config.REWRITING_USER_PROMPT_PATH,
+            )
+            rewriting_user_prompt = rewriting_user_template.format(
+                transcription=transcription,
+            )
+
+            rewrite_result = llm.rewrite_transcription(
+                ollama_url=ai_cfg["ollama_url"],
+                model=ai_cfg["model"],
+                system_prompt=config.load_file(
+                    config.REWRITING_SYSTEM_PROMPT_PATH,
+                ),
+                user_prompt=rewriting_user_prompt,
+                retry_prompt=retry_prompt,
+                context_length=ai_cfg["context_length"],
+                keep_alive=ai_cfg["preload_keep_alive"],
+                max_retries=ai_cfg["max_retries"],
+                timeout=ai_cfg["request_timeout"],
+            )
+
+            logger.info("Rewriting: title=%s", rewrite_result["title"])
+
+            # --- Phase 3: Classification ---
+            logger.info("Phase 3: Classifying transcription...")
+            vault_context = self._build_vault_context()
+            classification_user_template = config.load_file(
+                config.CLASSIFICATION_USER_PROMPT_PATH,
+            )
+            classification_user_prompt = classification_user_template.format(
+                transcription=transcription,
+                vault_context=vault_context,
+            )
+
+            classification_result = llm.classify_transcription(
+                ollama_url=ai_cfg["ollama_url"],
+                model=ai_cfg["model"],
+                system_prompt=config.load_file(
+                    config.CLASSIFICATION_SYSTEM_PROMPT_PATH,
+                ),
+                user_prompt=classification_user_prompt,
+                retry_prompt=retry_prompt,
+                context_length=ai_cfg["context_length"],
                 keep_alive=ai_cfg["keep_alive"],
                 max_retries=ai_cfg["max_retries"],
                 timeout=ai_cfg["request_timeout"],
             )
 
-            if result["empty"] or not result["text"].strip():
-                self.processing_completed.emit("empty", "")
-                return
+            logger.info(
+                "Classification: type=%s, wikilinks=%s, tags=%s",
+                classification_result["type"],
+                classification_result["wikilinks"],
+                classification_result["tags"],
+            )
+
+            # --- Assemble and save ---
+            formatted_text = obsidian.format_note_content(
+                note_type=classification_result["type"],
+                content=rewrite_result["content"],
+                wikilinks=classification_result["wikilinks"],
+            )
 
             saved_path = obsidian.save_note(
                 vault_path=obs_cfg["vault_path"],
                 folder=obs_cfg["folder"],
                 daily_notes=obs_cfg["daily_notes"],
-                text=result["text"],
-                tags=result["tags"],
+                title=rewrite_result["title"],
+                text=formatted_text,
+                tags=classification_result["tags"],
                 template_standalone=config.load_file(
                     config.STANDALONE_TEMPLATE_PATH,
                 ),

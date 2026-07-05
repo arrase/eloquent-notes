@@ -2,6 +2,7 @@ obsidian:
   vault_path: "~/Obsidian"
   folder: "Dictations"
   daily_notes: true
+  vault_context: true   # Scan vault for existing note names to suggest as wikilinks in the interpretation prompt.
 
 ai:
   ollama_url: "http://localhost:11434"

@@ -4,6 +4,6 @@ tags:
 {tags}
 date: {date} {time}
 ---
-# Dictation - {date} {time}
+# {title}
 
 {text}

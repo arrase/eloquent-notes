@@ -1,7 +1,11 @@
 """LLM interaction module for Ollama API.
 
-Handles audio transcription requests to the Ollama API with structured
-JSON output, including retry logic for malformed responses.
+Implements a two-phase pipeline for audio-to-note conversion:
+  Phase 1 (transcription): Multimodal audio → clean text.
+  Phase 2 (interpretation): Text → structured note data (title, type,
+  content, wikilinks, tags).
+
+Includes retry logic for malformed JSON responses.
 """
 
 import base64
@@ -13,7 +17,7 @@ import requests
 
 logger = logging.getLogger("eloquent_notes.llm")
 
-_CODE_FENCE_RE = re.compile(r"^```(?:\w*)\n(.*)\n```$", re.DOTALL)
+_CODE_FENCE_RE = re.compile(r"^```\w*\s*\n(.*?)\n\s*```\s*$", re.DOTALL)
 
 
 def _strip_code_fences(text):
@@ -93,18 +97,22 @@ def _execute_ollama_json_request(
             )
             if attempt >= max_retries:
                 raise json_err
+            full_retry = (
+                f"{retry_prompt}\n\n"
+                f"Expected fields: {', '.join(required_keys)}."
+            )
             messages.append({"role": "assistant", "content": content})
-            messages.append({"role": "user", "content": retry_prompt})
+            messages.append({"role": "user", "content": full_retry})
 
 
-def send_audio_to_ollama(
+def transcribe_audio(
     ollama_url, model, system_prompt, user_prompt, retry_prompt,
     context_length, audio_bytes, keep_alive="5m", max_retries=3,
     timeout=300,
 ):
-    """Transcribe and process audio through Ollama, returning structured JSON.
+    """Transcribe audio through Ollama (Phase 1).
 
-    Returns a dict with keys: 'empty' (bool), 'text' (str), 'tags' (list).
+    Returns a dict with keys: 'empty' (bool) and 'transcription' (str).
     """
     audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
     messages = [
@@ -121,29 +129,113 @@ def send_audio_to_ollama(
                     " noise, or no spoken words; False otherwise."
                 ),
             },
-            "text": {
+            "transcription": {
                 "type": "string",
                 "description": (
-                    "Cleaned, enriched Obsidian Markdown text if audio"
-                    " is not empty; empty string otherwise."
+                    "Clean transcription of the spoken words, or empty"
+                    " string if audio is empty."
+                ),
+            },
+        },
+        "required": ["empty", "transcription"],
+    }
+
+    return _execute_ollama_json_request(
+        ollama_url=ollama_url, model=model, messages=messages,
+        format_schema=format_schema,
+        required_keys=["empty", "transcription"],
+        retry_prompt=retry_prompt, context_length=context_length,
+        keep_alive=keep_alive, max_retries=max_retries, timeout=timeout,
+        task_name="audio transcription",
+    )
+
+
+def rewrite_transcription(
+    ollama_url, model, system_prompt, user_prompt, retry_prompt,
+    context_length, keep_alive="5m", max_retries=3, timeout=300,
+):
+    """Rewrite a transcription into a structured clean note (Phase 2).
+
+    Returns a dict with keys: 'title' and 'content'.
+    """
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
+    ]
+    format_schema = {
+        "type": "object",
+        "properties": {
+            "title": {
+                "type": "string",
+                "description": (
+                    "Concise title (max 8 words) capturing the main topic."
+                ),
+            },
+            "content": {
+                "type": "string",
+                "description": (
+                    "Clean, direct note prose. Basic formatting allowed."
+                ),
+            },
+        },
+        "required": ["title", "content"],
+    }
+
+    return _execute_ollama_json_request(
+        ollama_url=ollama_url, model=model, messages=messages,
+        format_schema=format_schema,
+        required_keys=["title", "content"],
+        retry_prompt=retry_prompt, context_length=context_length,
+        keep_alive=keep_alive, max_retries=max_retries, timeout=timeout,
+        task_name="note rewriting",
+    )
+
+
+def classify_transcription(
+    ollama_url, model, system_prompt, user_prompt, retry_prompt,
+    context_length, keep_alive="0", max_retries=3, timeout=300,
+):
+    """Classify and extract metadata from the transcription (Phase 3).
+
+    Returns a dict with keys: 'type', 'wikilinks', and 'tags'.
+    """
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
+    ]
+    format_schema = {
+        "type": "object",
+        "properties": {
+            "type": {
+                "type": "string",
+                "enum": [
+                    "task", "idea", "note", "reminder",
+                    "question", "decision",
+                ],
+                "description": "Classification of the note content.",
+            },
+            "wikilinks": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": (
+                    "Key concepts, tools, or proper nouns that deserve"
+                    " linked notes."
                 ),
             },
             "tags": {
                 "type": "array",
                 "items": {"type": "string"},
-                "description": (
-                    "An array of 2 to 5 relevant tags if audio is not"
-                    " empty; empty array otherwise."
-                ),
+                "description": "2 to 5 relevant tags, lowercase, in English.",
             },
         },
-        "required": ["empty", "text", "tags"],
+        "required": ["type", "wikilinks", "tags"],
     }
 
     return _execute_ollama_json_request(
         ollama_url=ollama_url, model=model, messages=messages,
-        format_schema=format_schema, required_keys=["empty", "text", "tags"],
+        format_schema=format_schema,
+        required_keys=["type", "wikilinks", "tags"],
         retry_prompt=retry_prompt, context_length=context_length,
         keep_alive=keep_alive, max_retries=max_retries, timeout=timeout,
-        task_name="audio processing",
+        task_name="note classification",
     )

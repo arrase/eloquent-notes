@@ -1,1 +1,1 @@
-Invalid JSON. Please output ONLY the JSON matching the required schema. No other text.
+Your previous response was not valid JSON. Reply with ONLY the raw JSON object matching the required schema. Do not wrap it in markdown code fences (```). Do not add any text before or after the JSON.
