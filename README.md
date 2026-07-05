@@ -191,37 +191,123 @@ bindsym $mod+Ctrl+n exec --no-startup-id eloquent-notes toggle
 Eloquent Notes is built with a highly responsive, asynchronous, and memory-efficient architecture:
 
 ```mermaid
-graph TD
-    CLI[CLI: eloquent-notes toggle] -->|QLocalSocket / IPC| A[PyQt6 System Tray Event Loop]
-    Tray[Left Click / Tray Menu] --> A
-    A --> B{Recording State?}
-    B -->|IDLE| C[Start Recording]
-    B -->|RECORDING| D[Stop & Process]
+flowchart TB
+    %% Subgraphs
+    subgraph CLI ["CLI Interface"]
+        C1["eloquent-notes (toggle | install-autostart)"]
+        C2{"Is Daemon Running?"}
+        C3["Send IPC via QLocalSocket"]
+        C4["os.execv (Launch Daemon)"]
+        
+        C1 --> C2
+        C2 -- Yes --> C3
+        C2 -- No --> C4
+    end
+
+    subgraph Daemon ["Daemon Main Thread (PyQt6 Event Loop)"]
+        D1["QSystemTrayIcon (IPC Server: QLocalServer)"]
+        D2{"State?"}
+        D3["Transition: IDLE -> RECORDING\nTray Icon: Gray -> Red"]
+        D4["Transition: RECORDING -> PROCESSING\nTray Icon: Red -> Orange"]
+        D5["Transition: PROCESSING -> IDLE\nTray Icon: Orange -> Gray"]
+        D6["Desktop Notification\n(Success, Empty, or Error)"]
+        
+        D1 -->|User Action or IPC Signal| D2
+        D2 -- "IDLE" --> D3
+        D2 -- "RECORDING" --> D4
+        D2 -- "PROCESSING" -->|Ignore / Alert| D1
+        
+        D5 --> D6
+    end
+
+    subgraph BG_Record ["Background Recording Thread & Audio I/O"]
+        R1["Play Beep (sounddevice)"]
+        R2["AudioRecorder (sounddevice.InputStream)"]
+        R3["Record into Queue (Memory)"]
+        R4["Preload Model Thread (Keep-Alive Chat API)"]
+        
+        D3 --> R1
+        R1 --> R2
+        R2 -->|Enqueue Chunks| R3
+        D3 -->|Concurrent Preload| R4
+    end
+
+    subgraph BG_Process ["Background Worker Thread (3-Phase Pipeline)"]
+        P1["Stop Stream & Read Queue"]
+        P2["Convert to WAV bytes (io.BytesIO)"]
+        
+        subgraph Pipeline ["Three-Phase LLM Pipeline (Ollama Chat API)"]
+            T1["Phase 1: Transcription\n(Multimodal WAV -> Text)"]
+            T2{"Is Transcription Empty?"}
+            T3["Phase 2: Rewriting\n(Clean Note Prose + Title)"]
+            T4["Scan Vault for Wikilink Context"]
+            T5["Phase 3: Classification\n(Type, Wikilinks, English Tags)"]
+            
+            T1 --> T2
+            T2 -- No --> T3
+            T3 --> T4
+            T4 --> T5
+        end
+
+        subgraph SaveObsidian ["Obsidian Formatting & Saving"]
+            S1["Inject WikiLinks (Regex replacement)"]
+            S2["Wrap in Callouts by Type\n(todo, tip, warning, etc.)"]
+            S3["Load templates from disk"]
+            S4{"daily_notes?"}
+            S5["Save Standalone\n(Dictation-YYYY-MM-DD-HHMMSS.md)"]
+            S6["Read existing daily note"]
+            S7["Merge & De-duplicate YAML tags"]
+            S8["Append entry (daily_append.md)"]
+            
+            T5 --> S1
+            S1 --> S2
+            S2 --> S3
+            S3 --> S4
+            S4 -- No --> S5
+            S4 -- Yes --> S6
+            S6 --> S7
+            S7 --> S8
+        end
+        
+        D4 --> P1
+        P1 --> P2
+        P2 --> T1
+        
+        T2 -- Yes (Early Exit) --> D5
+        S5 -->|Emit Signal| D5
+        S8 -->|Emit Signal| D5
+    end
+
+    %% External Services
+    Ollama["Local Ollama API\n(gemma4:12b-it-qat)"]
+    Vault[("Obsidian Vault\n(Markdown Files)")]
     
-    C -->|Background Thread| E[Preload Gemma 4 in Ollama]
-    C -->|sounddevice| F[Capture Mic Input to Queue]
-    
-    D -->|sounddevice| G[Stop Capture & Convert to WAV in Memory]
-    D -->|Background Thread| H["Three-Phase LLM Pipeline (Ollama)"]
-    
-    H -->|1. Transcription| H1[Audio to Text]
-    H -->|2. Rewriting| H2[Text to Note + Title]
-    H -->|3. Classification| H3[Text to Type + Wikilinks + Tags]
-    
-    H2 & H3 -->|Python Formatting| I[Assemble Obsidian Note]
-    I --> J{Empty Note?}
-    J -->|No| O[Merge Frontmatter & Save to Vault]
-    J -->|Yes| K[Show Notification]
-    
-    O --> L[Show Success Notification]
-    K --> M[Restore Gray Icon]
-    L --> M
+    R4 -->|POST /api/chat| Ollama
+    T1 -->|POST /api/chat (base64 audio)| Ollama
+    T3 -->|POST /api/chat| Ollama
+    T5 -->|POST /api/chat| Ollama
+    T4 -.->|Scan Directory| Vault
+    S5 -.->|Write File| Vault
+    S6 -.->|Read/Write File| Vault
 ```
 
 ### Key Technical Details
+
 * **CLI & GUI Decoupling:** The entry point (`eloquent-notes`) only loads PyQt's lightweight core components (`QCoreApplication` and `QLocalSocket`) when communicating with the running instance. If the daemon is already running, it sends an IPC command and exits immediately, avoiding loading any windows or graphical elements. If it is not running, it replaces the current process with the daemon (`eloquent_notes.app`) via `os.execv`.
 * **In-Memory Audio Processing:** Audio is captured directly from your microphone using `sounddevice` and loaded into an in-memory queue. When recording stops, it is processed into 16-bit PCM WAV bytes in-memory (using `io.BytesIO`). No temporary audio files are written to the disk, maximizing privacy, speed, and disk lifespan.
 * **Non-Blocking UI Threads:** Both the model preloading and the Ollama API request processing are offloaded to background threads. This ensures that the PyQt6 system tray UI loop remains entirely responsive without stuttering or freezing.
 * **Dynamic Icon Generation:** Custom state icons are drawn dynamically in-memory using Pillow (`PIL`) and converted to `QIcon` objects at runtime. No external image assets are required.
-* **Three-Phase LLM Pipeline:** The request is split into three phases to reduce the cognitive load on small models (~15B). The transcription phase is multimodal; the rewriting and classification phases are text-to-text. Python programmatically manages formatting (callouts by type, wikilink formatting, and frontmatter updating) to ensure high reliability.
+  - 🔘 **Idle (Gray):** A gray circle with a white microphone icon.
+  - 🔴 **Recording (Red):** A red circle with a white recording dot.
+  - 🟠 **Processing (Orange):** An orange circle with a white hourglass.
+* **Three-Phase LLM Pipeline:** The request is split into three phases to reduce the cognitive load on small models (~15B):
+  1. **Transcription (Phase 1):** Sends base64-encoded WAV bytes to the multimodal LLM to generate a transcription. Returns a JSON object with `{"empty": bool, "transcription": string}`.
+  2. **Rewriting (Phase 2):** Sends the transcription text to the LLM to rewrite it into clean, direct, first-person note prose and generate a concise title. Returns `{"title": string, "content": string}`.
+  3. **Classification (Phase 3):** Scans the vault for note names to build a context list of known topics, and sends the transcription + vault context to the LLM. Returns metadata `{"type": string, "wikilinks": list, "tags": list}` where type is one of: `task`, `idea`, `note`, `reminder`, `question`, or `decision`.
+* **Retry and Validation Logic:** If the Ollama model returns invalid JSON or fails to include the required keys, the application automatically appends a custom retry instruction (`retry_prompt.md`) to the chat history and retries up to `max_retries` (default: 3) to ensure robust structured output.
+* **Obsidian Integration & YAML Merging:**
+  - **WikiLink Injection:** Identified wikilink terms are injected into the note prose using case-insensitive regex word-boundary matching. Longer terms are processed first to avoid substring conflicts (e.g., "Postgres" won't match inside "Postgresql").
+  - **Callout Formatting:** Based on the note's classification type, the prose is wrapped in standard Obsidian callouts (`> [!todo]`, `> [!tip]`, `> [!warning]`, etc.). Note type `note` is kept as plain text.
+  - **YAML Metadata Merging:** If appending to an existing daily note, Eloquent Notes reads the note, uses PyYAML to parse the frontmatter, merges any new tags without duplication, and writes back the updated frontmatter before appending the new dictation under a timestamp header.
+* **Audible Cues & Anti-Click Fades:** Audio recording start and stop actions are accompanied by custom sine-wave beep tones. The beep audio generation applies a linear fade-in and fade-out to the first and last 10ms of the waveform to prevent annoying speaker clicks.
 * **Structured Logging (XDG Compliant):** Logs are stored in accordance with the XDG Base Directory specification at `~/.local/state/eloquent-notes/app.log` (or `$XDG_STATE_HOME/eloquent-notes/app.log`). The logging level is configurable in `config.yaml`, and logs are automatically rotated (max 5MB, up to 3 backups).

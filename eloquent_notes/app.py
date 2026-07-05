@@ -2,7 +2,7 @@
 
 Manages the recording lifecycle (IDLE → RECORDING → PROCESSING → IDLE),
 IPC for single-instance communication, and Obsidian note generation
-through a two-phase Ollama pipeline (transcription → interpretation).
+through a three-phase Ollama pipeline (transcription → rewriting → classification).
 """
 
 import argparse

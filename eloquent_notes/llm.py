@@ -1,9 +1,9 @@
 """LLM interaction module for Ollama API.
 
-Implements a two-phase pipeline for audio-to-note conversion:
+Implements a three-phase pipeline for audio-to-note conversion:
   Phase 1 (transcription): Multimodal audio → clean text.
-  Phase 2 (interpretation): Text → structured note data (title, type,
-  content, wikilinks, tags).
+  Phase 2 (rewriting): Text → rewritten note prose and title.
+  Phase 3 (classification): Text → metadata (note type, wikilinks, tags).
 
 Includes retry logic for malformed JSON responses.
 """
