@@ -1,8 +1,17 @@
+"""System tray icon generation.
+
+Renders colored circle icons with state indicators (microphone, recording
+dot, hourglass) using Pillow and converts them to Qt QIcon objects.
+"""
+
 from io import BytesIO
+
 from PIL import Image, ImageDraw
 from PyQt6.QtGui import QIcon, QPixmap
 
+
 def create_icon_image(color):
+    """Create a 64x64 RGBA icon image for the given state color."""
     # Create a 64x64 transparent RGBA image
     image = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     draw = ImageDraw.Draw(image)
@@ -30,6 +39,7 @@ def create_icon_image(color):
     return image
 
 def get_qicon(color):
+    """Convert a Pillow icon image to a Qt QIcon."""
     pil_img = create_icon_image(color)
     byte_arr = BytesIO()
     pil_img.save(byte_arr, format='PNG')

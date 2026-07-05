@@ -1,5 +1,12 @@
+"""Configuration management for Eloquent Notes.
+
+Handles loading and merging of default and user configuration files,
+prompt templates, and note templates from ~/.config/eloquent-notes/.
+"""
+
 import os
 import shutil
+
 import yaml
 
 CONFIG_DIR = os.path.expanduser("~/.config/eloquent-notes")
@@ -24,60 +31,51 @@ DEFAULT_STANDALONE_TEMPLATE_SRC = os.path.join(PACKAGE_DIR, "templates", "standa
 DEFAULT_DAILY_NEW_TEMPLATE_SRC = os.path.join(PACKAGE_DIR, "templates", "daily_new.md")
 DEFAULT_DAILY_APPEND_TEMPLATE_SRC = os.path.join(PACKAGE_DIR, "templates", "daily_append.md")
 
+_FILES_TO_COPY = [
+    (DEFAULT_CONFIG_SRC, CONFIG_PATH),
+    (DEFAULT_PROMPT_SRC, SYSTEM_PROMPT_PATH),
+    (DEFAULT_USER_PROMPT_SRC, USER_PROMPT_PATH),
+    (DEFAULT_RETRY_PROMPT_SRC, RETRY_PROMPT_PATH),
+    (DEFAULT_STANDALONE_TEMPLATE_SRC, STANDALONE_TEMPLATE_PATH),
+    (DEFAULT_DAILY_NEW_TEMPLATE_SRC, DAILY_NEW_TEMPLATE_PATH),
+    (DEFAULT_DAILY_APPEND_TEMPLATE_SRC, DAILY_APPEND_TEMPLATE_PATH),
+]
+
+
 def init_config_dir():
+    """Create config directories and copy default files if they don't exist."""
     os.makedirs(CONFIG_DIR, exist_ok=True)
     os.makedirs(PROMPTS_DIR, exist_ok=True)
     os.makedirs(TEMPLATES_DIR, exist_ok=True)
 
-    files_to_copy = [
-        (DEFAULT_CONFIG_SRC, CONFIG_PATH),
-        (DEFAULT_PROMPT_SRC, SYSTEM_PROMPT_PATH),
-        (DEFAULT_USER_PROMPT_SRC, USER_PROMPT_PATH),
-        (DEFAULT_RETRY_PROMPT_SRC, RETRY_PROMPT_PATH),
-        (DEFAULT_STANDALONE_TEMPLATE_SRC, STANDALONE_TEMPLATE_PATH),
-        (DEFAULT_DAILY_NEW_TEMPLATE_SRC, DAILY_NEW_TEMPLATE_PATH),
-        (DEFAULT_DAILY_APPEND_TEMPLATE_SRC, DAILY_APPEND_TEMPLATE_PATH)
-    ]
-    for src, dst in files_to_copy:
+    for src, dst in _FILES_TO_COPY:
         if not os.path.exists(dst) and os.path.exists(src):
             shutil.copy(src, dst)
 
-def merge_configs(dict1, dict2):
-    result = dict1.copy()
-    for key, value in dict2.items():
+
+def _merge_configs(base, overrides):
+    """Recursively merge overrides into base config dict."""
+    result = base.copy()
+    for key, value in overrides.items():
         if isinstance(result.get(key), dict) and isinstance(value, dict):
-            result[key] = merge_configs(result[key], value)
+            result[key] = _merge_configs(result[key], value)
         else:
             result[key] = value
     return result
 
+
 def load_config():
+    """Load and merge default config with user overrides."""
     with open(DEFAULT_CONFIG_SRC, "r", encoding="utf-8") as f:
         default_config = yaml.safe_load(f)
 
     with open(CONFIG_PATH, "r", encoding="utf-8") as f:
         user_config = yaml.safe_load(f) or {}
 
-    return merge_configs(default_config, user_config)
+    return _merge_configs(default_config, user_config)
 
-def _load_file(path):
+
+def load_file(path):
+    """Load and return the text content of a file."""
     with open(path, "r", encoding="utf-8") as f:
         return f.read()
-
-def load_prompt_template():
-    return _load_file(SYSTEM_PROMPT_PATH)
-
-def load_user_prompt_template():
-    return _load_file(USER_PROMPT_PATH)
-
-def load_retry_prompt_template():
-    return _load_file(RETRY_PROMPT_PATH)
-
-def load_standalone_template():
-    return _load_file(STANDALONE_TEMPLATE_PATH)
-
-def load_daily_new_template():
-    return _load_file(DAILY_NEW_TEMPLATE_PATH)
-
-def load_daily_append_template():
-    return _load_file(DAILY_APPEND_TEMPLATE_PATH)
