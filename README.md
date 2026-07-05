@@ -273,7 +273,7 @@ flowchart TB
         P1 --> P2
         P2 --> T1
         
-        T2 -- Yes (Early Exit) --> D5
+        T2 -->|"Yes (Early Exit)"| D5
         S5 -->|Emit Signal| D5
         S8 -->|Emit Signal| D5
     end
@@ -282,10 +282,10 @@ flowchart TB
     Ollama["Local Ollama API\n(gemma4:12b-it-qat)"]
     Vault[("Obsidian Vault\n(Markdown Files)")]
     
-    R4 -->|POST /api/chat| Ollama
-    T1 -->|POST /api/chat (base64 audio)| Ollama
-    T3 -->|POST /api/chat| Ollama
-    T5 -->|POST /api/chat| Ollama
+    R4 -->|"POST /api/chat"| Ollama
+    T1 -->|"POST /api/chat (base64 audio)"| Ollama
+    T3 -->|"POST /api/chat"| Ollama
+    T5 -->|"POST /api/chat"| Ollama
     T4 -.->|Scan Directory| Vault
     S5 -.->|Write File| Vault
     S6 -.->|Read/Write File| Vault
