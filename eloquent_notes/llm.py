@@ -7,10 +7,19 @@ JSON output, including retry logic for malformed responses.
 import base64
 import json
 import logging
+import re
 
 import requests
 
 logger = logging.getLogger("eloquent_notes.llm")
+
+_CODE_FENCE_RE = re.compile(r"^```(?:\w*)\n(.*)\n```$", re.DOTALL)
+
+
+def _strip_code_fences(text):
+    """Remove markdown code fences (```json ... ```) if present."""
+    match = _CODE_FENCE_RE.match(text.strip())
+    return match.group(1) if match else text
 
 
 def preload_model(ollama_url, model, context_length, keep_alive="5m", timeout=180):
@@ -66,6 +75,7 @@ def _execute_ollama_json_request(
         response.raise_for_status()
 
         content = response.json()["message"]["content"]
+        content = _strip_code_fences(content)
 
         try:
             result = json.loads(content)
