@@ -19,7 +19,7 @@ Eloquent Notes is a lightweight, system-tray-centric utility for Linux inspired 
   - 🟠 **Processing (Orange):** An orange circle with a white hourglass.
 - **Advanced Obsidian Integration:**
   - Automatically enriches your spoken notes with Obsidian callouts based on classified type (`> [!todo]`, `> [!tip]`, etc.) and wikilinks (`[[topics]]`).
-  - Automatically analyzes dictations to generate relevant tags in English.
+  - Automatically analyzes dictations to generate relevant tags.
   - Appends notes to daily journals or creates new individual files inside your vault.
   - Intelligently parses, merges, and updates YAML frontmatter metadata when appending to existing notes without breaking formatting.
 - **Customizable Prompts:** Edit custom Markdown prompts for each phase (Transcription, Rewriting, Classification, and Retry) loaded directly from your user config directory.

@@ -9,7 +9,7 @@ Extract:
    - question: Things to investigate or research.
    - decision: Choices made, conclusions reached.
 2. **wikilinks**: Key concepts, tools, technologies, or proper nouns that could be linked to other notes. Only include specific, notable terms (not generic words).
-3. **tags**: 2 to 5 tags categorizing the topics. Tags must ALWAYS be in English, lowercase, single words or hyphenated, regardless of the transcription language.
+3. **tags**: 2 to 5 tags categorizing the topics. Tags must ALWAYS be lowercase, single words or hyphenated.
 
 ## Examples
 
