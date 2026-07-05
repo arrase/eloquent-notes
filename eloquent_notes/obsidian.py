@@ -2,12 +2,83 @@
 
 Handles creating and appending dictation notes in an Obsidian vault,
 supporting both standalone notes and daily-aggregated notes.
+
+Includes Python-side Obsidian Markdown formatting: callout wrapping
+based on note type, wikilink injection, and vault topic scanning
+for contextual wikilink suggestions.
 """
 
 import os
+import re
 from datetime import datetime
 
 import yaml
+
+_CALLOUT_MAP = {
+    "task": "todo",
+    "idea": "tip",
+    "reminder": "warning",
+    "question": "question",
+    "decision": "important",
+}
+
+_DATE_FILENAME_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def scan_vault_topics(vault_path, max_topics=200):
+    """Scan the Obsidian vault for note basenames usable as wikilinks.
+
+    Skips date-named files (e.g., 2024-01-15.md) and caps results
+    to max_topics entries to limit prompt size.
+    """
+    vault_path = os.path.expanduser(vault_path)
+    if not os.path.isdir(vault_path):
+        return []
+
+    topics = set()
+    for root, _dirs, files in os.walk(vault_path):
+        for filename in files:
+            if filename.endswith(".md"):
+                name = os.path.splitext(filename)[0]
+                if not _DATE_FILENAME_RE.match(name):
+                    topics.add(name)
+
+    return sorted(topics)[:max_topics]
+
+
+def _inject_wikilinks(text, wikilinks):
+    """Replace mentions of wikilink terms with [[WikiLink]] syntax.
+
+    Processes longer terms first to avoid substring conflicts (e.g.,
+    "Go" matching inside "Google"). Uses word boundaries and skips
+    terms already wrapped in [[ ]].
+    """
+    sorted_links = sorted(wikilinks, key=len, reverse=True)
+    for link in sorted_links:
+        pattern = re.compile(
+            r"(?<!\[\[)\b" + re.escape(link) + r"\b(?!\]\])",
+            re.IGNORECASE,
+        )
+        text = pattern.sub(f"[[{link}]]", text)
+    return text
+
+
+def format_note_content(note_type, content, wikilinks):
+    """Assemble Obsidian Markdown from structured LLM output.
+
+    Injects wikilinks into content and wraps it in the appropriate
+    Obsidian callout based on note_type. Notes of type 'note' are
+    left as plain prose without a callout wrapper.
+    """
+    text = _inject_wikilinks(content, wikilinks)
+
+    callout_type = _CALLOUT_MAP.get(note_type)
+    if callout_type:
+        lines = text.split("\n")
+        quoted = "\n".join(f"> {line}" if line.strip() else ">" for line in lines)
+        return f"> [!{callout_type}]\n{quoted}"
+
+    return text
 
 
 def _update_frontmatter_tags(content, new_tags):
@@ -44,7 +115,7 @@ def _update_frontmatter_tags(content, new_tags):
     return f"---\n{new_frontmatter}---\n{remainder}"
 
 
-def _save_daily(target_dir, date_str, time_str, text, tags,
+def _save_daily(target_dir, date_str, time_str, title, text, tags,
                 template_new, template_append):
     """Save a dictation entry to a daily-aggregated note.
 
@@ -56,7 +127,8 @@ def _save_daily(target_dir, date_str, time_str, text, tags,
 
     if not os.path.exists(note_path):
         content = template_new.format(
-            date=date_str, time=time_str, text=text, tags=tags_formatted,
+            date=date_str, time=time_str, title=title,
+            text=text, tags=tags_formatted,
         )
         with open(note_path, "w", encoding="utf-8") as f:
             f.write(content)
@@ -67,7 +139,7 @@ def _save_daily(target_dir, date_str, time_str, text, tags,
 
     updated_content = _update_frontmatter_tags(existing_content, tags)
     append_content = template_append.format(
-        date=date_str, time=time_str, text=text,
+        date=date_str, time=time_str, title=title, text=text,
     )
 
     with open(note_path, "w", encoding="utf-8") as f:
@@ -77,7 +149,7 @@ def _save_daily(target_dir, date_str, time_str, text, tags,
     return note_path
 
 
-def _save_standalone(target_dir, date_str, time_str, text, tags,
+def _save_standalone(target_dir, date_str, time_str, title, text, tags,
                      template):
     """Save a dictation as a standalone timestamped note."""
     timestamp = datetime.now().strftime("%Y-%m-%d-%H%M%S")
@@ -85,7 +157,8 @@ def _save_standalone(target_dir, date_str, time_str, text, tags,
     tags_formatted = "\n".join(f"  - {tag}" for tag in tags) if tags else ""
 
     content = template.format(
-        date=date_str, time=time_str, text=text, tags=tags_formatted,
+        date=date_str, time=time_str, title=title,
+        text=text, tags=tags_formatted,
     )
     with open(note_path, "w", encoding="utf-8") as f:
         f.write(content)
@@ -93,7 +166,7 @@ def _save_standalone(target_dir, date_str, time_str, text, tags,
     return note_path
 
 
-def save_note(vault_path, folder, daily_notes, text, tags,
+def save_note(vault_path, folder, daily_notes, title, text, tags,
               template_standalone, template_daily_new,
               template_daily_append):
     """Save a dictation note to the Obsidian vault.
@@ -110,10 +183,11 @@ def save_note(vault_path, folder, daily_notes, text, tags,
 
     if daily_notes:
         return _save_daily(
-            target_dir, date_str, time_str, text, tags,
+            target_dir, date_str, time_str, title, text, tags,
             template_daily_new, template_daily_append,
         )
 
     return _save_standalone(
-        target_dir, date_str, time_str, text, tags, template_standalone,
+        target_dir, date_str, time_str, title, text, tags,
+        template_standalone,
     )

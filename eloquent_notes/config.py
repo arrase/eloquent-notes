@@ -11,15 +11,36 @@ import yaml
 
 CONFIG_DIR = os.path.expanduser("~/.config/eloquent-notes")
 CONFIG_PATH = os.path.join(CONFIG_DIR, "config.yaml")
+
 PROMPTS_DIR = os.path.join(CONFIG_DIR, "prompts")
-SYSTEM_PROMPT_PATH = os.path.join(PROMPTS_DIR, "system_prompt.md")
-USER_PROMPT_PATH = os.path.join(PROMPTS_DIR, "user_prompt.md")
+TRANSCRIPTION_SYSTEM_PROMPT_PATH = os.path.join(PROMPTS_DIR, "transcription_system.md")
+TRANSCRIPTION_USER_PROMPT_PATH = os.path.join(PROMPTS_DIR, "transcription_user.md")
+REWRITING_SYSTEM_PROMPT_PATH = os.path.join(PROMPTS_DIR, "rewriting_system.md")
+REWRITING_USER_PROMPT_PATH = os.path.join(PROMPTS_DIR, "rewriting_user.md")
+CLASSIFICATION_SYSTEM_PROMPT_PATH = os.path.join(PROMPTS_DIR, "classification_system.md")
+CLASSIFICATION_USER_PROMPT_PATH = os.path.join(PROMPTS_DIR, "classification_user.md")
 RETRY_PROMPT_PATH = os.path.join(PROMPTS_DIR, "retry_prompt.md")
 
 PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_CONFIG_SRC = os.path.join(PACKAGE_DIR, "config.yaml")
-DEFAULT_PROMPT_SRC = os.path.join(PACKAGE_DIR, "prompts", "system_prompt.md")
-DEFAULT_USER_PROMPT_SRC = os.path.join(PACKAGE_DIR, "prompts", "user_prompt.md")
+DEFAULT_TRANSCRIPTION_SYSTEM_SRC = os.path.join(
+    PACKAGE_DIR, "prompts", "transcription_system.md",
+)
+DEFAULT_TRANSCRIPTION_USER_SRC = os.path.join(
+    PACKAGE_DIR, "prompts", "transcription_user.md",
+)
+DEFAULT_REWRITING_SYSTEM_SRC = os.path.join(
+    PACKAGE_DIR, "prompts", "rewriting_system.md",
+)
+DEFAULT_REWRITING_USER_SRC = os.path.join(
+    PACKAGE_DIR, "prompts", "rewriting_user.md",
+)
+DEFAULT_CLASSIFICATION_SYSTEM_SRC = os.path.join(
+    PACKAGE_DIR, "prompts", "classification_system.md",
+)
+DEFAULT_CLASSIFICATION_USER_SRC = os.path.join(
+    PACKAGE_DIR, "prompts", "classification_user.md",
+)
 DEFAULT_RETRY_PROMPT_SRC = os.path.join(PACKAGE_DIR, "prompts", "retry_prompt.md")
 
 TEMPLATES_DIR = os.path.join(CONFIG_DIR, "templates")
@@ -29,12 +50,18 @@ DAILY_APPEND_TEMPLATE_PATH = os.path.join(TEMPLATES_DIR, "daily_append.md")
 
 DEFAULT_STANDALONE_TEMPLATE_SRC = os.path.join(PACKAGE_DIR, "templates", "standalone.md")
 DEFAULT_DAILY_NEW_TEMPLATE_SRC = os.path.join(PACKAGE_DIR, "templates", "daily_new.md")
-DEFAULT_DAILY_APPEND_TEMPLATE_SRC = os.path.join(PACKAGE_DIR, "templates", "daily_append.md")
+DEFAULT_DAILY_APPEND_TEMPLATE_SRC = os.path.join(
+    PACKAGE_DIR, "templates", "daily_append.md",
+)
 
 _FILES_TO_COPY = [
     (DEFAULT_CONFIG_SRC, CONFIG_PATH),
-    (DEFAULT_PROMPT_SRC, SYSTEM_PROMPT_PATH),
-    (DEFAULT_USER_PROMPT_SRC, USER_PROMPT_PATH),
+    (DEFAULT_TRANSCRIPTION_SYSTEM_SRC, TRANSCRIPTION_SYSTEM_PROMPT_PATH),
+    (DEFAULT_TRANSCRIPTION_USER_SRC, TRANSCRIPTION_USER_PROMPT_PATH),
+    (DEFAULT_REWRITING_SYSTEM_SRC, REWRITING_SYSTEM_PROMPT_PATH),
+    (DEFAULT_REWRITING_USER_SRC, REWRITING_USER_PROMPT_PATH),
+    (DEFAULT_CLASSIFICATION_SYSTEM_SRC, CLASSIFICATION_SYSTEM_PROMPT_PATH),
+    (DEFAULT_CLASSIFICATION_USER_SRC, CLASSIFICATION_USER_PROMPT_PATH),
     (DEFAULT_RETRY_PROMPT_SRC, RETRY_PROMPT_PATH),
     (DEFAULT_STANDALONE_TEMPLATE_SRC, STANDALONE_TEMPLATE_PATH),
     (DEFAULT_DAILY_NEW_TEMPLATE_SRC, DAILY_NEW_TEMPLATE_PATH),

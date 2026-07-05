@@ -6,5 +6,5 @@ date: {date}
 ---
 # Dictations of {date}
 
-## {time}
+## {time} — {title}
 {text}

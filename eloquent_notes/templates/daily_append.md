@@ -1,3 +1,3 @@
 
-## {time}
+## {time} — {title}
 {text}
