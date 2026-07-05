@@ -212,10 +212,10 @@ flowchart TB
         D5["Transition: PROCESSING -> IDLE\nTray Icon: Orange -> Gray"]
         D6["Desktop Notification\n(Success, Empty, or Error)"]
         
-        D1 -->|User Action or IPC Signal| D2
-        D2 -- "IDLE" --> D3
-        D2 -- "RECORDING" --> D4
-        D2 -- "PROCESSING" -->|Ignore / Alert| D1
+        D1 -->|"User Action / IPC Signal"| D2
+        D2 -->|IDLE| D3
+        D2 -->|RECORDING| D4
+        D2 -->|"PROCESSING (Ignore/Alert)"| D1
         
         D5 --> D6
     end
