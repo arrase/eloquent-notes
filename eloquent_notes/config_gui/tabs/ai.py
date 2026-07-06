@@ -1,5 +1,6 @@
 """AI settings tab for configuration."""
 
+from PyQt6.QtCore import QCoreApplication
 from PyQt6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -137,10 +138,11 @@ class AITab(ConfigTab):
         if self._model_loader is not None and self._model_loader.isRunning():
             self._model_loader.is_cancelled = True
 
-        loader = OllamaModelLoader(url)
+        loader = OllamaModelLoader(url, QCoreApplication.instance())
         self._model_loader = loader
         self._running_loaders.add(loader)
 
+        loader.finished.connect(loader.deleteLater)
         loader.finished.connect(self._on_loader_finished)
         loader.models_fetched.connect(self._on_models_fetched)
         loader.error_occurred.connect(self._on_models_fetch_failed)
@@ -150,9 +152,13 @@ class AITab(ConfigTab):
         loader = self.sender()
         if loader:
             self._running_loaders.discard(loader)
-        self.btn_refresh_models.setEnabled(True)
+        if loader is self._model_loader:
+            self.btn_refresh_models.setEnabled(True)
 
     def _on_models_fetched(self, models):
+        if self.sender() is not self._model_loader:
+            return
+
         current_text = self.cmb_model.currentText()
         self.cmb_model.clear()
 
@@ -175,15 +181,23 @@ class AITab(ConfigTab):
         self.lbl_model_status.setStyleSheet("color: #a6e3a1; font-size: 11px;")
 
     def _on_models_fetch_failed(self, error_msg):
+        if self.sender() is not self._model_loader:
+            return
         self.lbl_model_status.setText(f"Connection failed: {error_msg}")
         self.lbl_model_status.setStyleSheet("color: #f38ba8; font-size: 11px;")
 
     def cleanup(self):
-        """Cancel and wait for background threads."""
+        """Asynchronously cancel active loaders without blocking the GUI thread."""
         for loader in list(self._running_loaders):
             loader.is_cancelled = True
-            loader.wait()
+            try:
+                loader.finished.disconnect(self._on_loader_finished)
+                loader.models_fetched.disconnect(self._on_models_fetched)
+                loader.error_occurred.disconnect(self._on_models_fetch_failed)
+            except TypeError:
+                pass
         self._running_loaders.clear()
+        self._model_loader = None
 
     def load_settings(self, config_data: dict) -> None:
         ai_cfg = config_data["ai"]

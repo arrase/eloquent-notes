@@ -125,14 +125,14 @@ class ConfigurationDialog(QDialog):
 
     def save_settings_from_ui(self):
         """Gather settings from widgets and persist them to files on disk."""
-        # Collect from all tabs
-        for tab_widget, title in self._tabs:
-            if not tab_widget.save_settings(self.config_data):
-                # A tab returned False, meaning validation failed
-                self.tab_widget.setCurrentWidget(tab_widget)
-                return False
-
         try:
+            # Collect from all tabs inside try-except to catch OS/File errors
+            for tab_widget, title in self._tabs:
+                if not tab_widget.save_settings(self.config_data):
+                    # A tab returned False, meaning validation failed
+                    self.tab_widget.setCurrentWidget(tab_widget)
+                    return False
+
             with open(config.DEFAULT_CONFIG_SRC, "r", encoding="utf-8") as f:
                 default_config = yaml.safe_load(f) or {}
 
@@ -142,7 +142,7 @@ class ConfigurationDialog(QDialog):
             return True
         except Exception as e:
             QMessageBox.critical(
-                self, "Save Error", f"Failed to save settings to disk: {e}"
+                self, "Save Error", f"Failed to save settings: {e}"
             )
             return False
 

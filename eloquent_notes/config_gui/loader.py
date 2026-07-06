@@ -10,8 +10,8 @@ class OllamaModelLoader(QThread):
     models_fetched = pyqtSignal(list)
     error_occurred = pyqtSignal(str)
 
-    def __init__(self, url):
-        super().__init__()
+    def __init__(self, url, parent=None):
+        super().__init__(parent)
         self.url = url
         self.is_cancelled = False
 

@@ -20,7 +20,7 @@ class AudioRecorder:
         self.channels = channels
         self.q = queue.Queue()
         self.stream = None
-        self.wav_bytes = None
+        self._wav_bytes = None
 
     def callback(self, indata, frames, time, status):
         """Sounddevice stream callback — enqueues audio chunks."""
@@ -37,30 +37,36 @@ class AudioRecorder:
         self.stream.start()
 
     def stop(self):
-        """Stop recording and convert captured audio to WAV bytes."""
-        self.stream.stop()
-        self.stream.close()
-        self.stream = None
+        """Stop the recording stream. Non-blocking."""
+        if self.stream is not None:
+            self.stream.stop()
+            self.stream.close()
+            self.stream = None
 
-        chunks = []
-        while not self.q.empty():
-            chunks.append(self.q.get())
+    @property
+    def wav_bytes(self):
+        """Compile captured audio to WAV bytes on demand (lazy loading)."""
+        if self._wav_bytes is None:
+            chunks = []
+            while not self.q.empty():
+                chunks.append(self.q.get())
 
-        if chunks:
-            all_data = np.concatenate(chunks, axis=0)
-        else:
-            all_data = np.zeros((0, self.channels), dtype=np.float32)
+            if chunks:
+                all_data = np.concatenate(chunks, axis=0)
+            else:
+                all_data = np.zeros((0, self.channels), dtype=np.float32)
 
-        pcm_data = (all_data * 32767.0).clip(-32768, 32767).astype(np.int16)
+            pcm_data = (all_data * 32767.0).clip(-32768, 32767).astype(np.int16)
 
-        wav_buffer = io.BytesIO()
-        with wave.open(wav_buffer, 'wb') as wf:
-            wf.setnchannels(self.channels)
-            wf.setsampwidth(2)  # 16-bit PCM
-            wf.setframerate(self.sample_rate)
-            wf.writeframes(pcm_data.tobytes())
+            wav_buffer = io.BytesIO()
+            with wave.open(wav_buffer, 'wb') as wf:
+                wf.setnchannels(self.channels)
+                wf.setsampwidth(2)  # 16-bit PCM
+                wf.setframerate(self.sample_rate)
+                wf.writeframes(pcm_data.tobytes())
 
-        self.wav_bytes = wav_buffer.getvalue()
+            self._wav_bytes = wav_buffer.getvalue()
+        return self._wav_bytes
 
 
 def play_beep(frequency=440, duration=0.1, sample_rate=16000):

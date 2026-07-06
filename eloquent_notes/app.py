@@ -90,7 +90,7 @@ class EloquentApp(QObject):
 
     def _handle_ipc_connection(self):
         socket = self.server.nextPendingConnection()
-        if socket and socket.waitForReadyRead(500):
+        if socket and socket.waitForReadyRead(50):
             message = socket.readAll().data().decode("utf-8")
             if message == "toggle":
                 self.toggle_action()
@@ -118,10 +118,10 @@ class EloquentApp(QObject):
             self._start_recording()
         elif self.state == "RECORDING":
             self._stop_recording_and_process()
-        elif self.state == "PROCESSING":
+        elif self.state in ("STARTING_RECORDING", "PROCESSING"):
             self._notify(
                 "Eloquent Notes",
-                "Processing the previous dictation. Please wait.",
+                "System is busy. Please wait.",
             )
 
     def _preload_model(self):
@@ -138,49 +138,67 @@ class EloquentApp(QObject):
             logger.warning("Preload warning: %s", e, exc_info=True)
 
     def _start_recording(self):
-        self.state = "RECORDING"
+        self.state = "STARTING_RECORDING"
         self._update_icon("red", "Eloquent Notes (Recording...)")
         logger.info("Starting audio recording...")
 
         self.active_config = copy.deepcopy(self.config)
+        
+        # Preload prompts and templates on the main thread to avoid concurrent read/write race conditions
+        loaded_files = {}
+        for path in [
+            config.RETRY_PROMPT_PATH,
+            config.TRANSCRIPTION_SYSTEM_PROMPT_PATH,
+            config.TRANSCRIPTION_USER_PROMPT_PATH,
+            config.REWRITING_SYSTEM_PROMPT_PATH,
+            config.REWRITING_USER_PROMPT_PATH,
+            config.CLASSIFICATION_SYSTEM_PROMPT_PATH,
+            config.CLASSIFICATION_USER_PROMPT_PATH,
+            config.STANDALONE_TEMPLATE_PATH,
+            config.DAILY_NEW_TEMPLATE_PATH,
+            config.DAILY_APPEND_TEMPLATE_PATH,
+        ]:
+            loaded_files[path] = config.load_file(path)
+        self.active_config["_loaded_files"] = loaded_files
+
         audio_cfg = self.active_config["audio"]
-        try:
-            if audio_cfg["beep_enabled"]:
-                audio.play_beep(
-                    frequency=audio_cfg["beep_frequency"],
-                    duration=audio_cfg["beep_duration"],
-                    sample_rate=audio_cfg["sample_rate"],
-                )
 
-            self.recorder = audio.AudioRecorder(
-                sample_rate=audio_cfg["sample_rate"],
-                channels=audio_cfg["channels"],
-            )
-            self.recorder.start()
+        def run():
+            try:
+                if audio_cfg["beep_enabled"]:
+                    audio.play_beep(
+                        frequency=audio_cfg["beep_frequency"],
+                        duration=audio_cfg["beep_duration"],
+                        sample_rate=audio_cfg["sample_rate"],
+                    )
+                if self.state == "STARTING_RECORDING":
+                    self.recorder = audio.AudioRecorder(
+                        sample_rate=audio_cfg["sample_rate"],
+                        channels=audio_cfg["channels"],
+                    )
+                    self.recorder.start()
+                    self.state = "RECORDING"
+                    threading.Thread(
+                        target=self._preload_model, daemon=True,
+                    ).start()
+            except Exception as e:
+                logger.exception("Failed to start recording")
+                self.state = "IDLE"
+                self._update_icon("gray", "Eloquent Notes (Idle)")
+                self.processing_completed.emit("error", f"Could not start recording: {e}")
 
-            threading.Thread(
-                target=self._preload_model, daemon=True,
-            ).start()
-        except Exception as e:
-            self.state = "IDLE"
-            self._update_icon("gray", "Eloquent Notes (Idle)")
-            logger.exception("Failed to start recording")
-            self._notify("Recording Error", f"Could not start recording: {e}")
+        threading.Thread(target=run, daemon=True).start()
 
     def _stop_recording_and_process(self):
         self.state = "PROCESSING"
         self._update_icon("orange", "Eloquent Notes (Processing...)")
         logger.info("Stopping recording and starting processing...")
 
-        audio_cfg = self.active_config["audio"]
-        self.recorder.stop()
-        if audio_cfg["beep_enabled"]:
-            audio.play_beep(
-                frequency=audio_cfg["beep_frequency"],
-                duration=audio_cfg["beep_duration"],
-                sample_rate=audio_cfg["sample_rate"],
-            )
-        threading.Thread(target=self._process_audio, daemon=True).start()
+        if self.recorder is not None:
+            self.recorder.stop()
+
+        self._processing_thread = threading.Thread(target=self._process_audio, daemon=True)
+        self._processing_thread.start()
 
     def _build_vault_context(self):
         """Build the vault context string for the interpretation prompt."""
@@ -213,22 +231,40 @@ class EloquentApp(QObject):
         try:
             ai_cfg = self.active_config["ai"]
             obs_cfg = self.active_config["obsidian"]
-            retry_prompt = config.load_file(config.RETRY_PROMPT_PATH)
+            audio_cfg = self.active_config["audio"]
+
+            if audio_cfg["beep_enabled"]:
+                audio.play_beep(
+                    frequency=audio_cfg["beep_frequency"],
+                    duration=audio_cfg["beep_duration"],
+                    sample_rate=audio_cfg["sample_rate"],
+                )
+
+            if self.recorder is None:
+                self.processing_completed.emit("empty", "")
+                return
+
+            wav_bytes = self.recorder.wav_bytes
+            if not wav_bytes:
+                self.processing_completed.emit("empty", "")
+                return
+
+            retry_prompt = self.active_config["_loaded_files"][config.RETRY_PROMPT_PATH]
 
             # --- Phase 1: Transcription ---
             logger.info("Phase 1: Transcribing audio...")
             transcription_result = llm.transcribe_audio(
                 ollama_url=ai_cfg["ollama_url"],
                 model=ai_cfg["model"],
-                system_prompt=config.load_file(
-                    config.TRANSCRIPTION_SYSTEM_PROMPT_PATH,
-                ),
-                user_prompt=config.load_file(
-                    config.TRANSCRIPTION_USER_PROMPT_PATH,
-                ),
+                system_prompt=self.active_config["_loaded_files"][
+                    config.TRANSCRIPTION_SYSTEM_PROMPT_PATH
+                ],
+                user_prompt=self.active_config["_loaded_files"][
+                    config.TRANSCRIPTION_USER_PROMPT_PATH
+                ],
                 retry_prompt=retry_prompt,
                 context_length=ai_cfg["context_length"],
-                audio_bytes=self.recorder.wav_bytes,
+                audio_bytes=wav_bytes,
                 keep_alive=ai_cfg["preload_keep_alive"],
                 max_retries=ai_cfg["max_retries"],
                 timeout=ai_cfg["request_timeout"],
@@ -246,9 +282,9 @@ class EloquentApp(QObject):
 
             # --- Phase 2: Rewriting ---
             logger.info("Phase 2: Rewriting transcription...")
-            rewriting_user_template = config.load_file(
-                config.REWRITING_USER_PROMPT_PATH,
-            )
+            rewriting_user_template = self.active_config["_loaded_files"][
+                config.REWRITING_USER_PROMPT_PATH
+            ]
             rewriting_user_prompt = rewriting_user_template.format(
                 transcription=transcription,
             )
@@ -256,9 +292,9 @@ class EloquentApp(QObject):
             rewrite_result = llm.rewrite_transcription(
                 ollama_url=ai_cfg["ollama_url"],
                 model=ai_cfg["model"],
-                system_prompt=config.load_file(
-                    config.REWRITING_SYSTEM_PROMPT_PATH,
-                ),
+                system_prompt=self.active_config["_loaded_files"][
+                    config.REWRITING_SYSTEM_PROMPT_PATH
+                ],
                 user_prompt=rewriting_user_prompt,
                 retry_prompt=retry_prompt,
                 context_length=ai_cfg["context_length"],
@@ -272,9 +308,9 @@ class EloquentApp(QObject):
             # --- Phase 3: Classification ---
             logger.info("Phase 3: Classifying transcription...")
             vault_context = self._build_vault_context()
-            classification_user_template = config.load_file(
-                config.CLASSIFICATION_USER_PROMPT_PATH,
-            )
+            classification_user_template = self.active_config["_loaded_files"][
+                config.CLASSIFICATION_USER_PROMPT_PATH
+            ]
             classification_user_prompt = classification_user_template.format(
                 transcription=transcription,
                 vault_context=vault_context,
@@ -283,9 +319,9 @@ class EloquentApp(QObject):
             classification_result = llm.classify_transcription(
                 ollama_url=ai_cfg["ollama_url"],
                 model=ai_cfg["model"],
-                system_prompt=config.load_file(
-                    config.CLASSIFICATION_SYSTEM_PROMPT_PATH,
-                ),
+                system_prompt=self.active_config["_loaded_files"][
+                    config.CLASSIFICATION_SYSTEM_PROMPT_PATH
+                ],
                 user_prompt=classification_user_prompt,
                 retry_prompt=retry_prompt,
                 context_length=ai_cfg["context_length"],
@@ -315,15 +351,15 @@ class EloquentApp(QObject):
                 title=rewrite_result["title"],
                 text=formatted_text,
                 tags=classification_result["tags"],
-                template_standalone=config.load_file(
-                    config.STANDALONE_TEMPLATE_PATH,
-                ),
-                template_daily_new=config.load_file(
-                    config.DAILY_NEW_TEMPLATE_PATH,
-                ),
-                template_daily_append=config.load_file(
-                    config.DAILY_APPEND_TEMPLATE_PATH,
-                ),
+                template_standalone=self.active_config["_loaded_files"][
+                    config.STANDALONE_TEMPLATE_PATH
+                ],
+                template_daily_new=self.active_config["_loaded_files"][
+                    config.DAILY_NEW_TEMPLATE_PATH
+                ],
+                template_daily_append=self.active_config["_loaded_files"][
+                    config.DAILY_APPEND_TEMPLATE_PATH
+                ],
             )
             self.processing_completed.emit("success", saved_path)
 
@@ -390,13 +426,22 @@ class EloquentApp(QObject):
         self._config_dialog.show()
 
     def _on_config_dialog_closed(self, _result):
+        if self._config_dialog is not None:
+            self._config_dialog.deleteLater()
+            QTimer.singleShot(0, self._clear_config_dialog_reference)
+
+    def _clear_config_dialog_reference(self):
         self._config_dialog = None
 
     def exit_app(self):
         """Clean up and exit the application."""
         logger.info("Exiting application...")
         if self.state == "RECORDING":
-            self.recorder.stop()
+            if self.recorder is not None:
+                self.recorder.stop()
+        elif self.state == "PROCESSING" and hasattr(self, "_processing_thread"):
+            self._processing_thread.join(timeout=5.0)
+
         if self._config_dialog is not None:
             self._config_dialog.close()
         self.server.close()
