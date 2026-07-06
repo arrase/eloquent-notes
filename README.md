@@ -80,7 +80,7 @@ Upon the first execution, Eloquent Notes will automatically initialize a configu
 
 Eloquent Notes features a built-in graphical settings editor to modify your configuration, prompts, and templates directly from a clean UI.
 
-![Configuration GUI](screenshots/config.png)
+![Configuration GUI](screenshots/configuration.png)
 
 #### Launching the GUI
 - **Via the System Tray:** Right-click the tray icon and select **Configuration**.
