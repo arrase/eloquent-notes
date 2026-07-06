@@ -6,6 +6,7 @@ through a three-phase Ollama pipeline (transcription → rewriting → classific
 """
 
 import argparse
+import copy
 import logging
 import os
 import sys
@@ -16,7 +17,7 @@ from PyQt6.QtGui import QAction
 from PyQt6.QtNetwork import QLocalServer
 from PyQt6.QtWidgets import QApplication, QMenu, QSystemTrayIcon
 
-from eloquent_notes import audio, config, llm, obsidian, ui
+from eloquent_notes import audio, config, config_gui, llm, obsidian, ui
 from eloquent_notes.logging_utils import setup_logging
 
 logger = logging.getLogger("eloquent_notes.app")
@@ -33,6 +34,8 @@ class EloquentApp(QObject):
         self.state = "IDLE"
         self.recorder = None
         self.config = config.load_config()
+        self.active_config = self.config
+        self._config_dialog = None
         self.start_recording_immediately = start_recording_immediately
 
         self.processing_completed.connect(self._on_processing_completed)
@@ -55,6 +58,10 @@ class EloquentApp(QObject):
         toggle_action.setFont(font)
         toggle_action.triggered.connect(self.toggle_action)
         self.menu.addAction(toggle_action)
+
+        config_action = QAction("Configuration", self.menu)
+        config_action.triggered.connect(self.show_config_dialog)
+        self.menu.addAction(config_action)
 
         reload_action = QAction("Reload Configuration", self.menu)
         reload_action.triggered.connect(self.reload_config)
@@ -118,7 +125,7 @@ class EloquentApp(QObject):
             )
 
     def _preload_model(self):
-        ai_cfg = self.config["ai"]
+        ai_cfg = self.active_config["ai"]
         try:
             llm.preload_model(
                 ollama_url=ai_cfg["ollama_url"],
@@ -135,7 +142,8 @@ class EloquentApp(QObject):
         self._update_icon("red", "Eloquent Notes (Recording...)")
         logger.info("Starting audio recording...")
 
-        audio_cfg = self.config["audio"]
+        self.active_config = copy.deepcopy(self.config)
+        audio_cfg = self.active_config["audio"]
         try:
             if audio_cfg["beep_enabled"]:
                 audio.play_beep(
@@ -164,7 +172,7 @@ class EloquentApp(QObject):
         self._update_icon("orange", "Eloquent Notes (Processing...)")
         logger.info("Stopping recording and starting processing...")
 
-        audio_cfg = self.config["audio"]
+        audio_cfg = self.active_config["audio"]
         self.recorder.stop()
         if audio_cfg["beep_enabled"]:
             audio.play_beep(
@@ -176,8 +184,8 @@ class EloquentApp(QObject):
 
     def _build_vault_context(self):
         """Build the vault context string for the interpretation prompt."""
-        obs_cfg = self.config["obsidian"]
-        if not obs_cfg.get("vault_context", True):
+        obs_cfg = self.active_config["obsidian"]
+        if not obs_cfg["vault_context"]:
             return ""
 
         topics = obsidian.scan_vault_topics(obs_cfg["vault_path"])
@@ -203,8 +211,8 @@ class EloquentApp(QObject):
         """
         logger.info("Processing recorded audio...")
         try:
-            ai_cfg = self.config["ai"]
-            obs_cfg = self.config["obsidian"]
+            ai_cfg = self.active_config["ai"]
+            obs_cfg = self.active_config["obsidian"]
             retry_prompt = config.load_file(config.RETRY_PROMPT_PATH)
 
             # --- Phase 1: Transcription ---
@@ -351,6 +359,12 @@ class EloquentApp(QObject):
         """Reload configuration from disk."""
         try:
             self.config = config.load_config()
+            log_cfg = self.config["logging"]
+            setup_logging(
+                log_level_str=log_cfg["level"],
+                max_mb=log_cfg["max_mb"],
+                backup_count=log_cfg["backup_count"],
+            )
             logger.info("Configuration reloaded successfully")
             self._notify(
                 "Eloquent Notes",
@@ -363,11 +377,28 @@ class EloquentApp(QObject):
                 f"Failed to reload configuration: {e}",
             )
 
+    def show_config_dialog(self):
+        """Show the configuration dialog, creating it if necessary."""
+        if self._config_dialog is not None:
+            self._config_dialog.raise_()
+            self._config_dialog.activateWindow()
+            return
+
+        self._config_dialog = config_gui.ConfigurationDialog()
+        self._config_dialog.accepted.connect(self.reload_config)
+        self._config_dialog.finished.connect(self._on_config_dialog_closed)
+        self._config_dialog.show()
+
+    def _on_config_dialog_closed(self, _result):
+        self._config_dialog = None
+
     def exit_app(self):
         """Clean up and exit the application."""
         logger.info("Exiting application...")
         if self.state == "RECORDING":
             self.recorder.stop()
+        if self._config_dialog is not None:
+            self._config_dialog.close()
         self.server.close()
         self.server.removeServer("eloquent_notes_ipc")
         self.tray.hide()

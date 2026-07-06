@@ -106,3 +106,18 @@ def load_file(path):
     """Load and return the text content of a file."""
     with open(path, "r", encoding="utf-8") as f:
         return f.read()
+
+
+def save_config(config_data):
+    """Save configuration data to user config file."""
+    os.makedirs(CONFIG_DIR, exist_ok=True)
+    with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+        yaml.safe_dump(config_data, f, default_flow_style=False, sort_keys=False)
+
+
+def save_file(path, content):
+    """Save text content to a file."""
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(content)
+

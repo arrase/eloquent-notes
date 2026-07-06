@@ -11,12 +11,15 @@ import sys
 
 from PyQt6.QtCore import QCoreApplication
 from PyQt6.QtNetwork import QLocalSocket
+from PyQt6.QtWidgets import QApplication
 
+from eloquent_notes import config
 from eloquent_notes.autostart import install_autostart
+from eloquent_notes.config_gui import ConfigurationDialog
 
 
 def main():
-    """Parse CLI arguments and either send IPC or launch the daemon."""
+    """Parse CLI arguments and either send IPC, show config, or launch daemon."""
     parser = argparse.ArgumentParser(
         description=(
             "Eloquent Notes - Linux system tray utility"
@@ -26,11 +29,11 @@ def main():
     parser.add_argument(
         "command",
         nargs="?",
-        choices=["install-autostart", "toggle"],
+        choices=["install-autostart", "toggle", "config"],
         metavar="command",
         help=(
-            "Command to execute: 'install-autostart' or"
-            " 'toggle' (toggle recording)."
+            "Command to execute: 'install-autostart', 'toggle',"
+            " or 'config' (open configuration GUI)."
         ),
     )
     parser.add_argument(
@@ -44,6 +47,13 @@ def main():
 
     if args.command == "install-autostart":
         install_autostart()
+        sys.exit(0)
+
+    if args.command == "config":
+        config.init_config_dir()
+        app = QApplication(sys.argv)
+        dialog = ConfigurationDialog()
+        dialog.exec()
         sys.exit(0)
 
     # QCoreApplication needed for QLocalSocket

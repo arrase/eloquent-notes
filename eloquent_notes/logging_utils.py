@@ -27,6 +27,8 @@ def setup_logging(log_level_str, max_mb, backup_count):
     logger.setLevel(level)
 
     if logger.handlers:
+        for handler in logger.handlers:
+            handler.setLevel(level)
         return
 
     formatter = logging.Formatter(
