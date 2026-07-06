@@ -142,10 +142,10 @@ class AITab(ConfigTab):
         self._model_loader = loader
         self._running_loaders.add(loader)
 
-        loader.finished.connect(loader.deleteLater)
         loader.finished.connect(self._on_loader_finished)
         loader.models_fetched.connect(self._on_models_fetched)
         loader.error_occurred.connect(self._on_models_fetch_failed)
+        loader.finished.connect(loader.deleteLater)
         loader.start()
 
     def _on_loader_finished(self):
@@ -153,6 +153,7 @@ class AITab(ConfigTab):
         if loader:
             self._running_loaders.discard(loader)
         if loader is self._model_loader:
+            self._model_loader = None
             self.btn_refresh_models.setEnabled(True)
 
     def _on_models_fetched(self, models):
