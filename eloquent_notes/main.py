@@ -11,7 +11,7 @@ import sys
 
 from PyQt6.QtCore import QCoreApplication
 from PyQt6.QtNetwork import QLocalSocket
-from PyQt6.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication, QDialog
 
 from eloquent_notes import config
 from eloquent_notes.autostart import install_autostart
@@ -53,7 +53,14 @@ def main():
         config.init_config_dir()
         app = QApplication(sys.argv)
         dialog = ConfigurationDialog()
-        dialog.exec()
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            # If the daemon is running, notify it to reload config
+            socket = QLocalSocket()
+            socket.connectToServer("eloquent_notes_ipc")
+            if socket.waitForConnected(200):
+                socket.write(b"reload")
+                socket.waitForBytesWritten(200)
+                socket.disconnectFromServer()
         sys.exit(0)
 
     # QCoreApplication needed for QLocalSocket

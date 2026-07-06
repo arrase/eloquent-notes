@@ -1,5 +1,7 @@
 """AI settings tab for configuration."""
 
+import re
+
 from PyQt6.QtCore import QCoreApplication
 from PyQt6.QtWidgets import (
     QCheckBox,
@@ -9,6 +11,7 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QMessageBox,
     QPushButton,
     QSpinBox,
     QVBoxLayout,
@@ -136,7 +139,7 @@ class AITab(ConfigTab):
         self.btn_refresh_models.setEnabled(False)
 
         if self._model_loader is not None and self._model_loader.isRunning():
-            self._model_loader.is_cancelled = True
+            self._model_loader.requestInterruption()
 
         loader = OllamaModelLoader(url, QCoreApplication.instance())
         self._model_loader = loader
@@ -188,15 +191,10 @@ class AITab(ConfigTab):
         self.lbl_model_status.setStyleSheet("color: #f38ba8; font-size: 11px;")
 
     def cleanup(self):
-        """Asynchronously cancel active loaders without blocking the GUI thread."""
+        """Asynchronously cancel active loaders and wait with a timeout."""
         for loader in list(self._running_loaders):
-            loader.is_cancelled = True
-            try:
-                loader.finished.disconnect(self._on_loader_finished)
-                loader.models_fetched.disconnect(self._on_models_fetched)
-                loader.error_occurred.disconnect(self._on_models_fetch_failed)
-            except TypeError:
-                pass
+            loader.requestInterruption()
+            loader.wait(500)
         self._running_loaders.clear()
         self._model_loader = None
 
@@ -229,14 +227,44 @@ class AITab(ConfigTab):
         self._fetch_models()
 
     def save_settings(self, config_data: dict) -> bool:
+        url = self.txt_ollama_url.text().strip()
+        if url.endswith("/"):
+            url = url.rstrip("/")
+            self.txt_ollama_url.setText(url)
+
+        if not url:
+            QMessageBox.warning(self, "Validation Error", "Ollama URL cannot be empty.")
+            return False
+
+        keep_alive = self.txt_keep_alive.text().strip()
+        preload_keep_alive = self.txt_preload_keep_alive.text().strip()
+
+        duration_pat = re.compile(r"^-?\d+[smh]?$")
+        if not duration_pat.match(keep_alive):
+            QMessageBox.warning(
+                self,
+                "Validation Error",
+                f"Invalid Keep Alive format: '{keep_alive}'. "
+                "Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+            )
+            return False
+        if not duration_pat.match(preload_keep_alive):
+            QMessageBox.warning(
+                self,
+                "Validation Error",
+                f"Invalid Preload Keep Alive format: '{preload_keep_alive}'. "
+                "Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+            )
+            return False
+
         context_len = None if self.chk_context_default.isChecked() else self.spn_context_length.value()
 
         config_data["ai"].update({
-            "ollama_url": self.txt_ollama_url.text().strip(),
+            "ollama_url": url,
             "model": self.cmb_model.currentText().strip(),
             "context_length": context_len,
-            "keep_alive": self.txt_keep_alive.text().strip(),
-            "preload_keep_alive": self.txt_preload_keep_alive.text().strip(),
+            "keep_alive": keep_alive,
+            "preload_keep_alive": preload_keep_alive,
             "max_retries": self.spn_max_retries.value(),
             "preload_timeout": self.spn_preload_timeout.value(),
             "request_timeout": self.spn_request_timeout.value(),

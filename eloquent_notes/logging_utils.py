@@ -29,6 +29,9 @@ def setup_logging(log_level_str, max_mb, backup_count):
     if logger.handlers:
         for handler in logger.handlers:
             handler.setLevel(level)
+            if isinstance(handler, RotatingFileHandler):
+                handler.maxBytes = max_mb * 1024 * 1024
+                handler.backupCount = backup_count
         return
 
     formatter = logging.Formatter(

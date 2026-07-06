@@ -36,6 +36,7 @@ class EloquentApp(QObject):
         self.config = config.load_config()
         self.active_config = self.config
         self._config_dialog = None
+        self._processing_thread = None
         self.start_recording_immediately = start_recording_immediately
 
         self.processing_completed.connect(self._on_processing_completed)
@@ -94,6 +95,8 @@ class EloquentApp(QObject):
             message = socket.readAll().data().decode("utf-8")
             if message == "toggle":
                 self.toggle_action()
+            elif message == "reload":
+                self.reload_config()
             elif message == "notify_running":
                 self._notify(
                     "Eloquent Notes",
@@ -177,10 +180,13 @@ class EloquentApp(QObject):
                         channels=audio_cfg["channels"],
                     )
                     self.recorder.start()
-                    self.state = "RECORDING"
-                    threading.Thread(
-                        target=self._preload_model, daemon=True,
-                    ).start()
+                    if self.state == "STARTING_RECORDING":
+                        self.state = "RECORDING"
+                        threading.Thread(
+                            target=self._preload_model, daemon=True,
+                        ).start()
+                    else:
+                        self.recorder.stop()
             except Exception as e:
                 logger.exception("Failed to start recording")
                 self.state = "IDLE"
@@ -240,12 +246,8 @@ class EloquentApp(QObject):
                     sample_rate=audio_cfg["sample_rate"],
                 )
 
-            if self.recorder is None:
-                self.processing_completed.emit("empty", "")
-                return
-
-            wav_bytes = self.recorder.wav_bytes
-            if not wav_bytes:
+            wav_bytes = self.recorder.wav_bytes if self.recorder is not None else None
+            if not wav_bytes or len(wav_bytes) <= 44:
                 self.processing_completed.emit("empty", "")
                 return
 
@@ -436,10 +438,13 @@ class EloquentApp(QObject):
     def exit_app(self):
         """Clean up and exit the application."""
         logger.info("Exiting application...")
-        if self.state == "RECORDING":
+        prev_state = self.state
+        self.state = "IDLE"
+
+        if prev_state in ("RECORDING", "STARTING_RECORDING"):
             if self.recorder is not None:
                 self.recorder.stop()
-        elif self.state == "PROCESSING" and hasattr(self, "_processing_thread"):
+        elif prev_state == "PROCESSING" and self._processing_thread is not None:
             self._processing_thread.join(timeout=5.0)
 
         if self._config_dialog is not None:

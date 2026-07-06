@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QMessageBox,
     QPushButton,
     QVBoxLayout,
     QWidget,
@@ -92,8 +93,24 @@ class ObsidianTab(ConfigTab):
         self.chk_vault_context.setChecked(obs_cfg["vault_context"])
 
     def save_settings(self, config_data: dict) -> bool:
+        vault = self.txt_vault_path.text().strip()
+        if not vault:
+            QMessageBox.warning(self, "Validation Error", "Obsidian Vault Path cannot be empty.")
+            return False
+
+        vault_abs = os.path.abspath(os.path.expanduser(vault))
+        if not os.path.exists(vault_abs):
+            confirm = QMessageBox.question(
+                self,
+                "Directory Does Not Exist",
+                f"The vault path '{vault}' does not exist on disk.\n\nDo you want to use this path anyway?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            )
+            if confirm != QMessageBox.StandardButton.Yes:
+                return False
+
         config_data["obsidian"].update({
-            "vault_path": self.txt_vault_path.text().strip(),
+            "vault_path": vault,
             "folder": self.txt_obs_folder.text().strip(),
             "daily_notes": self.chk_daily_notes.isChecked(),
             "vault_context": self.chk_vault_context.isChecked(),
