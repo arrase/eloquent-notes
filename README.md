@@ -9,9 +9,10 @@ Eloquent Notes is a lightweight, system-tray-centric utility for Linux inspired 
 - **System Tray Centric UX:** Control recording easily by clicking the system tray icon (click to start, click again to stop and process).
 - **Context Menu Actions:** Right-click the system tray icon to reveal a menu with options to:
   - **Start/Stop Recording**
+  - **Configuration** (opens the graphical configuration editor)
   - **Reload Configuration** (reloads settings and prompts on-the-fly without restarting the application)
   - **Quit**
-- **CLI & Daemon Decoupling:** The CLI command (`eloquent-notes toggle`) is lightweight and decoupled from the heavy graphical interface (PyQt6). It uses a local Unix socket to immediately signal the running daemon to toggle recording.
+- **CLI Command Suite:** Use `eloquent-notes toggle` to control recording remotely, or `eloquent-notes config` to open the settings interface. The toggle command is lightweight and decoupled from the running daemon, using a local Unix socket for zero-latency control signals.
 - **Offline & Private:** Transcribes and refines audio locally on your machine using Gemma 4 via Ollama.
 - **Dynamic Icons:** Status indicators are rendered dynamically in memory:
   - 🔘 **Idle (Gray):** A gray circle with a white microphone icon.
@@ -75,7 +76,32 @@ pip install -e .
 
 Upon the first execution, Eloquent Notes will automatically initialize a configuration directory at `~/.config/eloquent-notes/`.
 
-### 1. `config.yaml`
+### 🖥️ Configuration GUI
+
+Eloquent Notes features a built-in graphical settings editor to modify your configuration, prompts, and templates directly from a clean UI.
+
+#### Launching the GUI
+- **Via the System Tray:** Right-click the tray icon and select **Configuration**.
+- **Via the CLI:** Run the following command:
+  ```bash
+  eloquent-notes config
+  ```
+
+#### Tab Breakdown
+- **General:** Enable or disable automatic login startup, set logging levels, configure log file size limits, and view log files directly.
+- **Obsidian:** Browse for your Obsidian vault path, specify the target destination folder, toggle Daily Notes appending, and toggle vault-wide scanning to auto-generate Wikilink recommendations.
+- **AI Settings:** Configure the Ollama API endpoint, dynamically fetch and select local LLM models, set custom context lengths, adjust keep-alive limits to optimize GPU memory usage, and customize timeout/retry values.
+- **Audio:** Configure microphone sample rate and recording channel mode, and adjust acoustic feedback beeps (frequency, duration, or disable completely).
+- **Prompts:** Edit custom Markdown prompt definitions (system and user instructions) for all three pipeline stages plus retry rules.
+- **Templates:** Edit and customize the layout files (`standalone.md`, `daily_new.md`, and `daily_append.md`) for note generation.
+
+---
+
+### 🛠️ Manual File Configuration
+
+If you prefer to edit configuration files directly, you can access them inside `~/.config/eloquent-notes/`.
+
+#### 1. `config.yaml`
 Edit `~/.config/eloquent-notes/config.yaml` to specify your Obsidian vault path and adjust system parameters. Below is the default configuration:
 
 ```yaml
@@ -106,7 +132,7 @@ logging:
   level: "INFO"                # Logger verbosity level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
 ```
 
-### 2. Custom Prompts
+#### 2. Custom Prompts
 You can edit the prompts in `~/.config/eloquent-notes/prompts/` to customize the behavior of the three-phase pipeline:
 
 - **`transcription_system.md`** & **`transcription_user.md`** (Phase 1): Instructions for pure audio transcription, removing stutters and filler words.
@@ -114,7 +140,7 @@ You can edit the prompts in `~/.config/eloquent-notes/prompts/` to customize the
 - **`classification_system.md`** & **`classification_user.md`** (Phase 3): Instructions for classifying the note's type, identifying wikilinks, and generating English tags.
 - **`retry_prompt.md`**: Instructs the model how to correct its response if it outputs invalid JSON (specifically preventing markdown code fences).
 
-### 3. Custom Note Templates
+#### 3. Custom Note Templates
 You can customize the Markdown formatting of the generated notes, including frontmatter and headers. Eloquent Notes provides three template files in `~/.config/eloquent-notes/templates/`:
 - **`standalone.md`:** Used when `daily_notes: false` (creates an individual file per dictation).
 - **`daily_new.md`:** Used when `daily_notes: true` and a new daily note is being created.
