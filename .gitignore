@@ -145,6 +145,15 @@ cython_debug/
 ehthumbs.db
 Thumbs.db
 
+**/*.egg-info
+dist
+build
+.pytest_cache
+
+
 # Project specific ignores
 /tmp/
 /eloquent_temp.wav
+
+# Code-Reducer Lockfile
+.code-reducer.lock
