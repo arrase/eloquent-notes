@@ -1,185 +1,68 @@
-# Eloquent Notes — Architecture Overview
+# Eloquent Notes — Global Architecture Overview
 
-```
-wiki/architecture.md
-```
+## System Boundaries
 
----
+Eloquent Notes is a voice-dictation note-taking system that bridges three external concerns: Obsidian vaults, Qt-based configuration management, and Markdown template rendering. The public surface area exposes exactly three subsystems:
 
-## 1. System Boundaries & Interaction Model
+| Subsystem | Module Path | Responsibility |
+|---|---|---|
+| Vault & Dictation Pipeline | `eloquent_notes.obsidian` | Vault filesystem scanning, wikilink injection, dictation-to-note persistence (standalone or daily-aggregated) |
+| System Tray Icon Generation | `eloquent_notes.ui` | System-tray icon generation for application state visualization (idle / recording / processing) |
+| Configuration Dialog & Tabs | `eloquent_notes.config_gui` | Qt configuration dialog aggregating six domain tabs, Ollama model loader running in a QThread, diff-based YAML persistence |
 
-**Eloquent Notes** is a Qt-based desktop application that captures microphone input as WAV bytes, transcribes audio via an Ollama-hosted LLM through a three-phase pipeline (transcription → rewriting → classification), and persists the output into an Obsidian vault with wikilinks and callouts.
+A fourth concern exists as pure format contract: **`eloquent_notes.templates`**, which provides Markdown templates consumed by external rendering engines (Go `text/template`, Jinja2, or equivalent placeholder substitution). This module contains no executable code, no mutable state, and no error handling paths.
 
-### Core Boundary: Application Layer
+## Module Interaction Map
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    Eloquent Notes App                     │
-│  Entry → main() │ Lifecycle → app.py │ Config → config.py │
-│  Audio     → audio.py │ LLM    → llm.py │ Obsidian → obsidian.py │
-│  Tray/IPC → ui.py │ Logging   → logging_utils.py         │
-├─────────────────────────────────────────────────────────┤
-│                  Configuration GUI Subsystem              │
-│  Dialog (Qt) → config_gui/ │ Tabs: general, audio, ai, obsidian, text_files │
-│  Background Threads → QThread subclasses                 │
-├─────────────────────────────────────────────────────────┤
-│                   External Dependencies                   │
-│  Ollama API │ Obsidian Vault │ System Tray │ Microphone │ XDG │
-└─────────────────────────────────────────────────────────┘
-```
+### Vault Pipeline → Dictation Persistence
 
-### Data Flow: Recording → Processing → Persist
+The primary persistence path flows through `obsidian.scan_vault_topics()` into topic basenames, then into `save_note()`. The entry point delegates to either `_save_daily` or `_save_standalone` based on the `daily_notes` flag. `_update_frontmatter_tags()` merges new tags into existing frontmatter YAML in-memory; `_inject_wikilinks()` wraps vault topic basenames matching content terms with `[[wikilink]]` syntax.
 
-```
-User (Mic) ──► AudioRecorder (queue buffer) ──► WAV bytes
-                                                      │
-                                              play_beep() feedback tone
-                                                      ▼
-                                       app.py: _stop_recording_and_process()
-                                                      │
-                                          llm.py three-phase pipeline (daemon thread)
-                                                      │
-                                       Phase 1: transcribe_audio() → dict with 'empty' bool + text
-                                       Phase 2: rewrite_transcription() → structured note prose (title + content)
-                                       Phase 3: classify_transcription() → type, wikilinks, tags
-                                                      │
-                                          obsidian.py save_note()
-                                                      │
-                                              _save_daily / _save_standalone
-                                                      ▼
-                                           Obsidian vault (markdown + frontmatter)
-```
+### Configuration GUI → Vault Pipeline
 
-### Configuration Flow
+The configuration subsystem exposes a shared dictionary (`config_data`) across six tab widgets. The caller owns this reference without copy semantics. When the user saves, each tab's `save_settings()` is called for validation; if any return `False`, the dialog rejects without writing. On full success, `diff_configs(default, current)` computes an override set and writes only differing keys to YAML.
 
-```
-main.py ──► config_gui.dialog.ConfigurationDialog.accept()
-                              │
-              ┌──────────────┘
-              ▼
-config_gui/tabs/* load_settings(config_data)  ← populate from disk
-config_gui/tabs/* save_settings(config_data)  → persist to YAML
-         │
-         ▼
-config.py: load_config() / save_config()  (recursive merge, fallback defaults)
-```
+### Configuration GUI → Ollama Loader
 
-### IPC & Tray Communication
+`OllamaModelLoader(QThread)` runs in a dedicated QThread to discover audio-capable models from `/api/tags`. It communicates results back via PyQt6 signals: `models_fetched(list)` and `error_occurred(str)`. The AITab consumes these signals to populate or clear its model combo box.
 
-```
-System tray icon (64×64 RGBA via Pillow) ──► QIcon ──► QSystemTrayIcon
-    │                                         │
-    ▼                                         ▼
-_click_                                    _update_icon(state)
-    │                                         │
-    ▼                                         ▼
-app.py: toggle_action()               app.py: _on_tray_activated(reason)
-    │                                         │
-    ▼                                         ▼
-IPC socket "eloquent_notes_ipc" ──► _handle_ipc_connection()
-    │
-    ▼
-_dispatch { toggle | reload | notify_running }
-```
+### Configuration GUI → Templates
 
----
+Templates are resolved externally by whichever runtime reads the files (`daily_append.md`, `daily_new.md`, `standalone.md`). Placeholders (`{time}`, `{title}`, `{text}`, `{tags}`, `{date}`) are bare strings awaiting resolution. No template engine is defined within the project itself.
 
-## 2. Module Responsibility Matrix
+## Concurrency Model
 
-| Module | Path | Role |
-|--------|------|------|
-| **Entry Point** | `main.py` | CLI parsing, IPC dispatch, autostart registration |
-| **Lifecycle Controller** | `app.py` | State machine (IDLE→RECORDING→PROCESSING→IDLE), tray/IPC orchestration, three-phase pipeline invocation |
-| **Audio Capture** | `audio.py`, `config_gui/tabs/audio.py` | Mic → WAV queue buffer, lazy encoding, feedback beep synthesis |
-| **Configuration Persistence** | `config.py`, `templates/`, `config_gui/` | YAML load/save with recursive merge, default fallbacks, path constants |
-| **LLM Orchestration** | `llm.py` | Model preload, three-phase pipeline (transcribe → rewrite → classify), JSON response parsing with code-fence stripping |
-| **Obsidian Integration** | `obsidian.py` | Vault topic scanning, wikilink injection, daily/standalone note saving, callout wrapping |
-| **System Tray / IPC** | `ui.py`, implicit in `app.py` | Pillow icon generation, Qt QIcon conversion, local socket server on "eloquent_notes_ipc" |
-| **Logging** | `logging_utils.py` | XDG-compliant log directory, console + rotating file handler setup |
-| **Autostart** | `autostart.py` (re-exported) | `.desktop` file writing to `~/.config/autostart/` |
-| **Configuration Dialog** | `config_gui/dialog.py` | Multi-tab PyQt6 dialog aggregating domain tabs, async background jobs via QThread |
-| **Background Threads** | `OllamaModelLoader` (QThread subclass) | Async Ollama model fetch/validate; signals: `models_fetched`, `error_occurred` |
+| Concern | Mechanism | Notes |
+|---|---|---|
+| Ollama loader | QThread with signals | Communicates via `models_fetched(list)` and `error_occurred(str)`. No locks or mutexes; signal emission handles thread-safe delivery. |
+| Vault pipeline | Standard library I/O only | Concurrent callers see results undefined by this code; no synchronization exists. |
+| Configuration tabs | Caller-owned shared dict | No copy semantics; all six domain tabs read/write the same `config_data` reference. |
 
----
+## Error Handling Summary
 
-## 3. Key Architectural Patterns
+Across subsystems, four distinct patterns exist:
 
-### State Machine in app.py
+1. **Swallowed with user notification** — `restore_defaults` and `save_settings_from_ui` wrap entire pipelines in bare `try/except Exception`; on failure shows a critical message and returns normally (or sentinel `False`).
+2. **Per-tab validation gate** — All tabs implement `save_settings()` returning a boolean; the caller decides commit/reject.
+3. **Silent swallow on per-model failure** — Per-model exceptions in the Ollama loader are caught and ignored; only top-level or connection errors surface as `error_occurred`.
+4. **No wrapping, no sentinels** — File I/O failures in obsidian and general tabs propagate uncaught up through the call chain unless Qt event loop catches them at a higher level.
 
-```
-IDLE ──► RECORDING ──► PROCESSING ──► IDLE
- │        │              │             │
- toggle  stop + process  signal       reload / tray event
- ```
+## Side Effects Summary
 
-### Lazy Encoding for Audio Capture
+| Function | Operation | Details |
+|---|---|---|
+| `scan_vault_topics` | Read (`os.walk`) | Reads filenames only; returns sorted list capped at 200 entries |
+| `_save_daily`, `_save_standalone` | Write (`open("w")`) | Creates/overwrites note files; no merge for standalone mode |
+| `_update_frontmatter_tags` | None (string-only) | Parses frontmatter in-memory; mutates global `yaml.SafeDumper.ignore_aliases` on every call |
+| `_browse_vault_path` | Read + optional write | Calls `QFileDialog.getExistingDirectory()`. If current text is non-empty, calls `os.path.expanduser()` + `os.path.exists()`. Non-existent path falls back to `~/` silently. Empty vault path triggers a warning returning `False`. Path that does not exist on disk prompts via `QMessageBox.question()` with Yes/No; if **Yes**, validation passes anyway. |
 
-Audio bytes accumulate in a queue buffer; WAV encoding happens at `_stop_recording_and_process()`, preventing main-thread blocking during capture.
+## Styling
 
-### Model Preload Pattern (llm.py)
+A single module-level constant (`eloquent_notes.config_gui.styles.QSS_STYLESHEET`) holds the raw Qt Style Sheet string defining visual appearance for every widget type in the configuration GUI: QDialog, QWidget, QTabWidget, QTabBar, QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox, QTextEdit, QListWidget, QPushButton, QGroupBox, QCheckBox, QScrollBar. Catppuccin Mocha palette (#1e1e2e background, #89b4fa accent). No runtime behavior beyond string literal definition; no imports or function calls.
 
-`preload_model()` sends an empty chat request to warm model weights into VRAM before first real inference, reducing cold-start latency for the three-phase pipeline.
+## Notes on Unhandled Paths
 
-### Vault Context Building
-
-`_build_vault_context()` scans Obsidian vault for known topics → returns formatted context string usable as WikiLink references in interpretation prompts. Enables LLM output to reference existing notes.
-
-### Wikilink Injection (obsidian.py)
-
-`_inject_wikilinks(text, wikilinks)` processes longer terms first with word boundaries to avoid substring collisions. `format_note_content()` wraps based on note type using `_CALLOUT_MAP`.
-
-### Template Interpolation Pipeline
-
-Templates are loaded as-is from filesystem; placeholders delimited by `{...}` substituted in document order via string replacement. No compilation or caching at runtime. Context map built from caller-supplied values with missing keys defaulting to empty strings.
-
----
-
-## 4. Configuration Schema (`config.yaml`)
-
-```yaml
-obsidian:   # vault path, folder, daily notes flag, vault context
-ai:         # Ollama URL, model name, context length, keep-alive durations, retry/timeout
-audio:      # sample rate, channels, beep frequency/duration/enabled
-logging:    # level, max file size (MB), backup count
-```
-
-### Path Constants (`config.py`)
-
-| Constant | Description |
-|----------|-------------|
-| `CONFIG_DIR` | Base user config directory: `~/.config/eloquent-notes` |
-| `CONFIG_PATH` | Absolute path to main YAML configuration within `CONFIG_DIR` |
-| `PROMPTS_DIR`, `TEMPLATES_DIR` | Subdirectories under `CONFIG_DIR` for prompt templates and note templates |
-
----
-
-## 5. Background Thread Infrastructure
-
-`OllamaModelLoader` (QThread subclass) runs fetch-and-validate logic in worker thread:
-
-- **Signal**: `models_fetched` — list of audio-capable model names
-- **Signal**: `error_occurred` — error message string
-- Connected to `AITab._fetch_models()` which tracks loader instances and updates UI state based on signal payloads.
-
----
-
-## 6. Template Registry (`templates/`)
-
-| Template | File | Placeholder Contract |
-|----------|------|---------------------|
-| `daily_append.md` | `eloquent_notes/templates/daily_append.md` | Appends to existing day's entry; omits frontmatter date/time metadata. Placeholders: `{time}`, `{title}`, `{text}` |
-| `daily_new.md` | `eloquent_notes/templates/daily_new.md` | Full-featured template for initializing new daily dictation note with YAML frontmatter and structured body sections. Placeholders: `{tags}`, `{date}`, `{time}`, `{title}`, `{text}` |
-| `standalone.md` | `eloquent_notes/templates/standalone.md` | Independent note documents detached from daily-entry lifecycle; suitable for ad-hoc notes, reminders. Placeholders: `{title}`, `{text}`, `{date}`, `{time}` (optional) |
-
----
-
-## 7. Dependency Map
-
-```
-main.py ──► app.py │ config_gui/ │ autostart.py
-app.py ──► audio.py │ llm.py │ obsidian.py │ ui.py │ logging_utils.py
-config_gui/dialog.py ──► config_gui/tabs/* (general, audio, ai, obsidian, text_files)
-config_gui/tabs/ai.py ──► OllamaModelLoader (QThread)
-```
-
-All modules are importable from the `eloquent_notes` package; CLI entry point re-exports autostart functionality for convenience.
+- If frontmatter parsing fails (malformed YAML, encoding issues), exceptions propagate uncaught from `_update_frontmatter_tags`.
+- If `default` or `current` is not iterable/dict-like at top level in `diff_configs`, `.items()` raises a Python exception (`TypeError`, `AttributeError`). No try/except blocks; all exceptions propagate to callers.
+- If a template engine fails to resolve any placeholder, the template file contains no mechanism to catch or report the failure.
+- Non-atomic autostart update in `general.py`: logging config updated first, then `.desktop` file created/removed separately. If write fails after logging config was committed, dict holds inconsistent state.

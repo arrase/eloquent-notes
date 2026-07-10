@@ -1,178 +1,222 @@
-# `eloquent_notes.config_gui` — Module Architecture
+# Configuration GUI — `eloquent_notes.config_gui`
 
-## 1. Responsibility & Data Flow
+## Module Responsibility
 
-The **config_gui** subsystem provides the full-stack configuration management surface for Eloquent Notes: a multi-tab PyQt6 dialog (`ConfigurationDialog`) that aggregates domain-specific tab widgets, persists state to an application-wide configuration dictionary, and dispatches asynchronous background jobs (Ollama model fetching) via `QThread` subclasses.
+This package exposes a Qt-based configuration UI for Eloquent Notes. It provides:
 
-### Data Flow Diagram
+- A **dialog** (`ConfigurationDialog`) that loads settings from disk, presents them across six tab widgets, and persists only divergent values back to the YAML config file on save.
+- An **async Ollama model loader** (`OllamaModelLoader`) that runs in a `QThread` to discover audio-capable models from the remote `/api/tags` endpoint without blocking the UI.
+- A **tab subsystem** (`eloquent_notes.config_gui.tabs`) aggregating six domain-specific tab widgets under one namespace, each inheriting from an abstract base class and communicating through a caller-owned shared dictionary.
+
+---
+
+## Data Flow Overview
 
 ```
-User Interaction ──► ConfigurationDialog.accept() / reject()
-    │                         │
-    ▼                         ▼
-┌──────────────┐      ┌──────────────────┐
-│  Per-Tab Tab │      │   save_settings  │
-│  Widget Tree │◄────►│ config_data:dict │
-└──────────────┘      └──────────────────┘
-    │                         │
-    ▼                         ▼
-┌──────────────┐      ┌──────────────────┐
-│  cleanup()   │      │ diff_configs     │
-│ stop threads │      │ (optional)       │
-└──────────────┘      └──────────────────┘
+Disk (YAML)  ──config.load_config()──►  config_data: dict  ──load_settings()──►  Tab widgets
+                                                              │
+                                                              ▼
+User edits ──save_settings_from_ui()──►  Per-tab save_settings()  ◄── validation gates
+                                                              │
+                                                              ▼
+                                              diff_configs(default, current)
+                                                              │
+                                                              ▼
+Disk (YAML)  ◄──config.save_config(overrides)────
+
+OllamaModelLoader ──QThread.run()──►  GET /api/tags  ──►  model names
+                                                              │
+                                                              ├── POST /api/show per name ──►  capabilities check ──► "audio" filter
+                                                              │
+                                                              ▼
+                                              models_fetched(list)  ◄── main thread signal
+
+Tabs  ◄── shared config_data dict (caller-owned reference, no copy semantics)
 ```
 
-1. **Initialize** — `ConfigurationDialog` is constructed; each tab subclass (`GeneralTab`, `AudioTab`, `AITab`, `ObsidianTab`, `TextFilesTab`/`PromptsTab`/`TemplatesTab`) runs `_init_ui()` to build its internal widget hierarchy.
-2. **Load State** — On dialog open or restore, `load_settings_to_ui(config_data)` is invoked; the base class delegates to each tab's `load_settings(config_data)`, which reads key-value pairs from a standardized configuration dictionary and populates corresponding UI widgets.
-3. **User Modification** — Widgets accept input; tabs capture state via their own `save_settings()`.
-4. **Persist** — On dialog acceptance (`accept()`), `save_settings_from_ui` aggregates per-tab states, validates inputs (e.g., regex-normalizes keep-alive durations in the AI tab), and writes resolved values back into the config dictionary before returning success status.
-5. **Cleanup** — `cleanup_tabs` iterates all tabs to release resources; the dialog's `reject()` path cancels pending changes and stops background threads without persisting state.
+---
 
-### Constants & Styles
+## Public Surface Area
 
-- **`constants.py`** exports `PROMPTS` (display-name → file-path + default-source string mappings for transcription, rewriting, classification, retry) and `TEMPLATES` (label → path + source mappings for note templates).
-- **`styles.py`** — `QSS_STYLESHEET`: a raw Qt Style Sheets string covering all dialog controls (`QDialog`, `QWidget`, `QTabWidget`, `QLineEdit`, `QPushButton`, `QListWidget`, `QGroupBox`, `QScrollBar`).
+### `eloquent_notes.config_gui.__init__`
+
+- **Exports:** `ConfigurationDialog`, `OllamaModelLoader`.
+- No logic; purely declarative. Bare imports from `.dialog` and `.loader`; failures propagate as raw `ImportError` / `ModuleNotFoundError`.
 
 ---
 
-## 2. Base Infrastructure
+## Configuration Dialog — `eloquent_notes.config_gui.dialog`
 
-### `base.py` — `ConfigTab` (Abstract Contract)
+### `ConfigurationDialog(QDialog)`
 
-```python
-class ConfigTab(QWidget):
-    """Enforces a common interface for all configuration tabs."""
+| Method | Signature | Notes |
+|--------|-----------|-------|
+| `__init__(self, parent=None)` | Optional[QDialog] | Loads factory defaults from YAML once; populates six tabs. |
+| `load_settings_to_ui(self)` | — | Populates tabs from current disk state (called externally). |
+| `restore_defaults(self)` | — | Bare `try/except Exception`; on failure shows `QMessageBox.critical` with `"Failed to restore defaults: {e}"`, returns normally. On success reloads factory YAML into all tabs and emits info message. |
+| `save_settings_from_ui(self)` | — | Iterates each tab's `save_settings()` for validation; if any return `False`, rejects without writing. On full success computes diff between loaded defaults (`self.config_data`) and current UI state, writes only differing keys via `config.save_config(overrides)`. Wraps entire pipeline in bare `try/except Exception`; on failure shows critical message with `"Failed to save settings: {e}"` and returns `False`. |
+| `cleanup_tabs(self)` | — | Releases tab resources; called unconditionally in `reject()` and conditionally (only when save succeeded) in `accept()`. |
+| `reject(self)` | — | Calls cleanup, then `super().reject()`. No error wrapping. |
+| `accept(self)` | — | Calls `save_settings_from_ui()`. If it returns `True`, calls `cleanup_tabs()` then `super().accept()` (Qt event loop shutdown). On failure the outer except in `save_settings_from_ui` swallows the exception before this method is reached. |
 
-    def load_settings(self, config_data: dict) -> None: ...
-    def save_settings(self, config_data: dict) -> bool: ...
-    def restore_defaults(self) -> None: ...
-    def cleanup(self) -> None: pass  # no-op default
-```
+### Business Rules
 
-- **`load_settings(config_data)`** — Populates UI widgets from the provided configuration dictionary; overridden by every tab subclass.
-- **`save_settings(config_data)` → bool** — Collects current widget state, validates inputs (e.g., regex pattern matching on keep-alive durations in `AITab`), writes resolved values into `config_data`, returns `True` only when all persisted data is valid.
-- **`restore_defaults()`** — Resets interface to factory state without raising exceptions.
-- **`cleanup()`** — Releases background threads and resources prior to destruction; no-op by default, overridden in tabs running async jobs (`AITab`).
-
----
-
-## 3. Tab Implementations
-
-### 3.1 General Application Settings — `general.py`
-
-| Class | File | Responsibility |
-|-------|------|---------------|
-| `GeneralTab` | `config_gui/tabs/general.py` | Manages startup options and logging settings. |
-
-**Widget Hierarchy**: Vertical layout containing `QGroupBox` controls for:
-- Autostart checkboxes (desktop entry creation/deletion)
-- Logging level, size, backup spinboxes
-- Log file viewer button (`_view_log_file`)
-
-**Behavior**:
-- `_init_ui()` — Constructs the vertical layout.
-- `_view_log_file()` — Opens the background daemon log file in the system editor if it exists; otherwise displays an informational message indicating dictations must run first.
-- `load_settings(config_data)` — Populates UI widgets from `config_data` and checks for existing autostart entries on disk.
-- `save_settings(config_data)` → bool — Updates `config_data["logging"]`; manages creation/deletion of the desktop autostart entry based on user input.
+1. **Diff-based persistence.** Only values that differ from factory defaults are written to disk on save. Unchanged settings retain their defaults without rewriting.
+2. **Per-tab validation gates.** Each tab implements its own `save_settings()` returning a boolean. If any fails, the dialog rejects and highlights the offending tab.
+3. **Defaults restoration is opt-in.** A confirmation prompt must be accepted before overwriting current edits with factory defaults. If cancelled, no state change occurs.
+4. **Thread cleanup on both exit paths.** Regardless of Accept/Reject/Save/Cancel outcome, tab resources are cleaned up and running threads stopped before the dialog closes.
 
 ---
 
-### 3.2 Audio Capture — `audio.py`
+## Ollama Model Loader — `eloquent_notes.config_gui.loader`
 
-| Class | File | Responsibility |
-|-------|------|---------------|
-| `AudioTab` | `config_gui/tabs/audio.py` | Manages audio capture settings (sample rate, feedback beep). |
+### `OllamaModelLoader(QThread)`
 
-**Behavior**:
-- `load_settings(config_data)` — Reads from the config dictionary and populates internal UI widgets.
-- `save_settings(config_data)` → bool — Collects current values from all audio UI widgets and writes them into `config_data` before returning success status.
-- Implements the standard `ConfigTab` contract with dedicated persistence methods.
+| Method | Signature | Notes |
+|--------|-----------|-------|
+| `__init__(self, url, parent=None)` | None | Sets `self.url`; no return. |
+| `run(self)` | — (signals) | Async worker: GET `/api/tags` (2s timeout), extracts model names from `data["models"]`. For each name, POST to `/api/show` with `{"name": <model>}`; inspects `capabilities` array for `"audio"`. Per-model exceptions are silently swallowed. If any HTTP call fails with non-200 status or a top-level exception occurs (and interruption not requested), emits `error_occurred(str)`. On success, accumulates audio-capable model names and emits `models_fetched(list)`. |
 
----
+### Concurrency Model
 
-### 3.3 AI Pipeline Integration — `ai.py`
-
-| Class | File | Responsibility |
-|-------|------|---------------|
-| `AITab` | `config_gui/tabs/ai.py` | Manages Ollama connection details and AI pipeline settings; runs background model loading via `OllamaModelLoader`. |
-
-**Widget Hierarchy**: Form layouts, text inputs, spin boxes, group boxes for AI settings.
-
-**Methods**:
-- `_init_ui()` — Builds the internal widget hierarchy: form layouts, text inputs, spin boxes, group boxes for AI settings interface.
-- `_toggle_context_default()` — Disables/enables the context length spin box based on whether default context length is selected.
-- `_fetch_models()` — Constructs `OllamaModelLoader` instance; connects signal handlers (`models_fetched`, `error_occurred`) to update UI state.
-- `_on_loader_finished()` — Removes finished loader instances from tracking sets; re-enables refresh button if that specific loader was active during fetch.
-- `_on_models_fetched()` — Populates the model combo box with available audio models; updates status label.
-- `_on_models_fetch_failed()` — Updates status label with connection failure message when Ollama model fetch encounters an error.
-- `load_settings(config_data)` — Reads AI-specific configuration values from dictionary and populates UI widgets on initialization or restore.
-- `save_settings(config_data)` → bool — Validates user inputs; formats keep-alive durations via regex pattern matching; writes resolved AI configuration back into dictionary before returning success status.
-- `cleanup()` — Asynchronously cancels all active background loaders and clears internal state to prevent orphaned processes during tab disposal or destruction.
+- Runs in a dedicated `QThread` (`run()` is called via `start()`).
+- Communicates results to the main thread via PyQt6 signals: `models_fetched(list)`, `error_occurred(str)`.
+- No locks or mutexes; signal emission handles thread-safe delivery.
 
 ---
 
-### 3.4 Obsidian Integration — `obsidian.py`
+## Tab Subsystem — `eloquent_notes.config_gui.tabs`
 
-| Class | File | Responsibility |
-|-------|------|---------------|
-| `ObsidianTab` | `config_gui/tabs/obsidian.py` | Manages Obsidian integration settings (vault path, target folder, daily notes appending, wikilink suggestions). |
+### Base Class — `ConfigTab(QWidget)` (abstract)
 
-**Widget Hierarchy**: Group box with line edits, check boxes, and buttons.
+All six domain tabs inherit from this abstract anchor, which enforces two interface contracts:
 
-**Methods**:
-- `_init_ui(self)` — Constructs the Qt widget layout: group box with line edits, check boxes, and buttons to configure vault directory, note output folder, daily-note appending, and wikilink suggestions.
-- `_browse_vault_path(self)` — Opens a system file dialog prompting user selection of an existing Obsidian vault directory on disk.
-- `load_settings(config_data: dict) → None` — Reads stored configuration from `config_data["obsidian"]` dictionary and populates all form widgets with their previously saved values.
-- `save_settings(config_data: dict) → bool` — Collects current widget state into `config_data["obsidian"]`; validates vault path existence on disk (with optional confirmation dialog); returns boolean success indicator.
+| Method | Returns | Notes |
+|--------|---------|-------|
+| `load_settings(config_data: dict)` | `None` | Subclasses must read nested keys and hydrate widgets. Base raises `NotImplementedError`. |
+| `save_settings(config_data: dict) -> bool` | `bool` | Must return `True` for valid state, `False` on validation failure (empty fields, invalid formats, cancellation). |
+| `restore_defaults(self)` | `None` | Resets widgets to initial values. Base is no-op; subclasses override. Unimplemented raises `NotImplementedError`. |
+| `cleanup(self)` | `None` | Releases background resources. Base is no-op; subclasses override when owning long-running operations. |
+
+The base class itself performs zero I/O and mutates nothing beyond the caller-provided dict reference.
+
+### Domain Tabs
+
+#### `ai.py` — `AITab` (Ollama Integration)
+
+Manages connection parameters, model selection, context length tuning, keep-alive durations, and retry logic for Ollama-based LLM voice-to-text dictation tasks.
+
+| Method | Notes |
+|--------|-------|
+| `_fetch_models(self)` | Constructs `OllamaModelLoader` from `.eloquent_notes.config_gui.loader`, connects three signals (`finished`, `models_fetched`, `error_occurred`), calls `loader.start()`. Signal handlers populate or clear the combo box; stale sender check returns silently. |
+| `_on_loader_finished(self)` | Discards current loader reference. |
+| `_on_models_fetched(self, models)` | Populates combo box from returned list while preserving any previously selected text. |
+| `_on_models_fetch_failed(self, error_msg)` | Writes error string to a status label in red; no user prompt. |
+| `cleanup(self)` | Cancels in-flight loaders via `loader.requestInterruption()`, waits 500ms per loader synchronously (no timeout enforcement), clears references. |
+
+**Validation:** `save_settings()` returns `False` if URL is empty or keep-alive duration formats are invalid. Two regex checks enforce `^-?\d+[smh]?$`.
+
+#### `audio.py` — `AudioTab` (Microphone Capture Settings)
+
+Manages sample rate selection, channel mode, and recording feedback control via an optional audible beep at start/stop events.
+
+| Widget | Type | Notes |
+|--------|------|-------|
+| `spn_sample_rate` | QSpinBox | 8000–96000 Hz in steps of 8000; tooltip calls out 16000 Hz as recommended for speech recognition. |
+| `cmb_channels` | QComboBox | Mono (single) vs Stereo (two). |
+| `chk_beep_enabled` | QCheckBox | When checked, exposes beep frequency and duration fields below. |
+| `spn_beep_freq` | QSpinBox | 100–5000 Hz. |
+| `spn_beep_duration` | QDoubleSpinBox | 0.01–2.0 sec. |
+
+Always returns `True` from `save_settings()`. No external I/O; no try/except blocks in this file.
+
+#### `general.py` — `GeneralTab` (Autostart + Logging)
+
+Manages three configuration domains: autostart behavior on desktop session login, logging verbosity and retention policy, and log inspection via system editor.
+
+| Method | Notes |
+|--------|-------|
+| `_view_log_file` | Reads `~/.config/autostart/eloquent-notes.desktop` via `os.path.exists()` to check autostart state; calls `QDesktopServices.openUrl(...)` to open the log file in user's default editor. Swallowed by Qt if unavailable. |
+
+**Non-atomic save:** Logging config is updated first, then the `.desktop` entry is created or removed separately via `install_autostart()` (imported from `.eloquent_notes.autostart`). If autostart write fails after logging config was committed to `config_data`, the dict holds inconsistent state. Broad `try/except` wraps autostart logic; on any failure displays `QMessageBox.critical` and returns `False`. Missing log file case handled silently with `QMessageBox.information`.
+
+#### `obsidian.py` — `ObsidianTab` (Vault Routing)
+
+Manages vault root path, target subfolder, daily note vs standalone file routing, and optional vault-aware wikilink suggestions during classification.
+
+| Operation | Notes |
+|-----------|-------|
+| `_browse_vault_path()` | Calls `QFileDialog.getExistingDirectory(self, ...)`. If current text is non-empty, calls `os.path.expanduser()` + `os.path.exists()`. Non-existent path falls back to `~/` silently (not an error). |
+
+**Validation:** Empty vault path after `.strip()` triggers `QMessageBox.warning(...)` returning `False`. Path that does not exist on disk prompts via `QMessageBox.question(...)` with Yes/No; if **Yes**, validation passes anyway. No exceptions are caught anywhere in this file—`os.path.expanduser()`, `QFileDialog.getExistingDirectory()`, and `.text()` all propagate uncaught up to the caller.
+
+#### `text_files.py` — `TextFilesTab` (Generic Text Files Framework)
+
+Framework for managing multiple named text files as configuration entries. Each entry has a display label, primary storage path, and optional fallback/default path. All six tabs (`prompts`, `templates`) are thin subclasses delegating to this base with different constants.
+
+| Method | Notes |
+|--------|-------|
+| `_init_ui(self)` | Renders horizontal splitter: `QListWidget` on left (entries by label), monospace-text editor on right for currently selected entry's content. |
+| `_on_item_changed(self, current, previous)` | Caches previous item's in-memory content back into `loaded_contents`. New item's path is looked up; if cached text exists it loads into the editor, otherwise starts empty. Editor disabled when no item selected and cleared on deselection. |
+| `commit_active_editor(self)` | No-op when nothing selected. |
+
+**Cache-first persistence:** All edits go through in-memory dictionary (`loaded_contents`) before being flushed to disk. Ensures atomicity—changes are never partially persisted. Write-blocking during restore/defaults: cache is locked during `load_settings` and `restore_defaults`, preventing writes while rehydrating state from files. Graceful degradation if primary file missing: fallback path tried; if that fails, empty string stored as entry content.
+
+#### Thin Facades — `prompts.py` / `templates.py`
+
+- **`PromptsTab`**: Subclass of `TextFilesTab`. Delegates to parent by supplying `items=PROMPTS`, `editor_label="Prompt Content:"`, `placeholder="Select a prompt to edit..."`. No instance attributes or mutable state defined in this file.
+- **`TemplatesTab`**: Same delegation pattern with `items=TEMPLATES`, `editor_label="Template Content:"`, `placeholder="Select a template to edit..."`.
+
+Both depend entirely on constants imported from `.eloquent_notes.config_gui.constants`. If those constants are undefined or raise errors during instantiation, exceptions propagate uncaught.
+
+#### `__init__.py` — Package Entry Point
+
+Re-exports six tab classes (`AITab`, `AudioTab`, `GeneralTab`, `ObsidianTab`, `PromptsTab`, `TemplatesTab`) from their submodules into a single namespace so callers can instantiate tabs via one import rather than per-submodule. Defines `__all__` listing all six class names. Bare imports; any submodule failure propagates as raw exception.
 
 ---
 
-### 3.5 Text File Management — `text_files.py`, `prompts.py`, `templates.py`
+## Constants — `eloquent_notes.config_gui.constants`
 
-#### Shared Base: `TextFilesTab`
+### Module-Level Data Layer
 
-| Class | File | Responsibility |
-|-------|------|---------------|
-| `TextFilesTab` | `config_gui/tabs/text_files.py` | Base class for prompt and template tabs; provides a list-view interface for editing/managing multiple text files. |
+| Constant | Type (Inferred) | Purpose |
+|----------|------------------|---------|
+| `PROMPTS` | `List[Tuple[str, str, str]]` | 3-tuples of label + config source path for prompt definitions. |
+| `TEMPLATES` | `List[Tuple[str, str, str]]` | 3-tuples of label + config source path for note template types (Standalone Note, Daily Note - New, Daily Note - Append). |
 
-**Behavior**: Implements the `ConfigTab` contract, serving as the base class for both prompt and template management tabs. Subclasses extend this interface by initializing with predefined item lists and specialized editor labels.
-
-#### Prompt & Template Extensions
-
-| Class | File | Responsibility |
-|-------|------|---------------|
-| `PromptsTab` | `config_gui/tabs/prompts.py` | Manages prompt content editing; maintains predefined items + associated editor labels per configurable prompt entry. |
-| `TemplatesTab` | `config_gui/tabs/templates.py` | Manages template-specific settings; initializes with predefined items and specialized UI labels for template content editing. |
-
-**Inheritance Pattern**: Both `PromptsTab` and `TemplatesTab` extend `TextFilesTab`, inheriting the list-view structure while adding domain-specific initialization logic. Persistence contract remains delegated to the base class.
+No runtime logic; no mutable state beyond these module-level constants. Import-time side effect: bare import of parent package `eloquent_notes.config_gui`; if absent, raises unhandled `ImportError`.
 
 ---
 
-## 4. Orchestration Layer
+## Utilities — `eloquent_notes.config_gui.utils`
 
-### `dialog.py` — `ConfigurationDialog` (Main GUI Dialog)
+### `diff_configs(default, current) -> dict`
 
-| Method | Responsibility |
-|--------|---------------|
-| `__init__(self)` | Constructs and wires all tab instances; registers signal/slot connections for accept/reject/cleanup lifecycle. |
-| `load_settings_to_ui(config_data: dict)` | Populates all tab widget states by reading values from a previously loaded configuration dictionary. Delegates to each tab's `load_settings()`. |
-| `restore_defaults()` | Resets the dialog UI to factory defaults after prompting the user for confirmation via a modal message box (`QMessageBox.question`). |
-| `save_settings_from_ui(config_data: dict) → bool` | Validates and persists all current widget states back to disk by calculating overrides against the default configuration file. Returns boolean success indicator. |
-| `cleanup_tabs()` | Iterates through all tab widgets to release resources before the dialog window closes; invokes each tab's `cleanup()`. |
-| `reject(self)` | Cancels any pending changes and ensures background threads are stopped when the dialog is dismissed without saving. |
-| `accept(self)` | Triggers the save process if validation passes and guarantees thread cleanup upon successful acceptance of the dialog. |
+Recursively compares two nested configuration dictionaries. For each key in `current`:
+- If absent from `default` → new override; include it.
+- If both values are dicts → recurse into nested comparison.
+- If either value differs → mark as override; include it.
+- Discard branches with no differences (prune empty results).
+
+Returns only non-empty overrides—what changed between default and current. Pure in-memory dict traversal; zero external communication. Unhandled: if `default` or `current` is not iterable/dict-like at top level, `.items()` raises a Python exception (`TypeError`, `AttributeError`). If `k` is missing from `default`, `default[k]` raises `KeyError`. No try/except blocks; all exceptions propagate to callers.
 
 ---
 
-## 5. Background Thread Infrastructure
+## Styling — `eloquent_notes.config_gui.styles`
 
-### `loader.py` — `OllamaModelLoader` (`QThread` Subclass)
+### `QSS_STYLESHEET` (constant)
 
-**Responsibility**: Executes asynchronous background jobs to fetch and validate Ollama models for audio pipeline integration.
+A single module-level constant holding the raw Qt Style Sheet string defining visual appearance for every widget type in the configuration GUI: `QDialog`, `QWidget`, `QTabWidget`, `QTabBar`, `QLineEdit`, `QSpinBox`, `QDoubleSpinBox`, `QComboBox`, `QTextEdit`, `QListWidget`, `QPushButton`, `QGroupBox`, `QCheckBox`, `QScrollBar`. Catppuccin Mocha palette (#1e1e2e background, #89b4fa accent). No runtime behavior beyond string literal definition; no imports or function calls.
 
-| Signal | Emitted When | Payload |
-|--------|-------------|---------|
-| `models_fetched` | Loading process finishes without interruption | List of audio-capable model names (str) |
-| `error_occurred` | Exception occurs during API interaction or processing | Error message string (str) |
+---
 
-**Behavior**: Subclasses `QThread`; runs fetch-and-validate logic in the worker thread; emits signals on completion/failure; connected to `AITab._fetch_models()` which tracks loader instances and updates UI state based on signal payloads.
+## Error Handling Summary
+
+| Pattern | Where | Mechanism |
+|---------|-------|-----------|
+| **Swallowed with user notification** | `dialog.py` — `restore_defaults`, `save_settings_from_ui` | Bare `try/except Exception`; shows `QMessageBox.critical`, returns normally (or sentinel `False`). |
+| **Per-tab validation gate** | All tabs — `save_settings()` | Returns boolean; caller (`ConfigurationDialog`) decides commit/reject. |
+| **Silent swallow on per-model failure** | `loader.py` — inner loop | Per-model exception caught and ignored; only top-level or connection errors surface as `error_occurred`. |
+| **Signal-based async pipeline with silent state swallows** | `ai.py` | Three distinct patterns: empty URL (silent), invalid duration formats (`QMessageBox.warning` + return False), signal propagation to red status label. No exception handling anywhere in this file. |
+| **No wrapping, no sentinels** | `text_files`, `general`, `obsidian` | File I/O failures surface as unhandled exceptions unless Qt event loop catches them at higher level. No try/except blocks; all propagate up to callers. |
+| **Non-atomic autostart update** | `general.py` | Logging config updated first, then `.desktop` file created/removed separately. If write fails after logging config was committed, dict holds inconsistent state. |

@@ -1,85 +1,99 @@
+# eloquent_notes/templates — Architecture Documentation
+
+## Module Overview
+
+The `eloquent_notes/templates` module is a collection of Markdown templates designed for structured note capture across multiple use cases: daily journaling, dictation sessions, and standalone entries. The module contains no executable code, no mutable state, and no error handling paths. It exists purely as a format contract consumed by external rendering engines (Go `text/template`, Jinja2, or equivalent placeholder substitution).
+
+All templates follow a consistent pattern: YAML frontmatter for metadata (where applicable), followed by interpolated body content using named placeholders. The module's data flow is entirely downstream-dependent — behavior is defined exclusively by whichever runtime reads and substitutes into the templates.
+
+---
+
+## Template Inventory
+
+### daily_append.md — Daily Journal Appender
+
+**Responsibility:** Generate individual daily journal entries where each entry is stored as an independent Markdown document. New entries accumulate over time rather than being overwritten (append pattern).
+
+**Data Model:**
+| Placeholder | Description |
+|---|---|
+| `{time}` | Timestamp when the note was created |
+| `{title}` | Human-readable label for the entry |
+| `{text}` | Body content of the note |
+
+**Template Shape:**
+
 ```markdown
-# `eloquent_notes/templates` — Template Registry
+## {time} — {title}
+{text}
+```
 
-## Module Responsibility & Data Flow
-
-The `templates` module maintains a static collection of Markdown/YAML frontmatter templates consumed by the note-generation engine at render time. Each template defines a document schema via YAML metadata followed by interpolation placeholders delimited by `{...}`. At runtime, the rendering pipeline substitutes each placeholder with the corresponding context value supplied by the originating service (e.g., dictation client, CLI flag, or REST payload). Templates are not compiled; they are loaded as-is and interpolated on demand.
-
-**Data flow:**
-1. Renderer resolves `template_name` from user input or default configuration.
-2. Template file is read from this module's filesystem directory.
-3. Context map `{title, text, date, time, tags}` is constructed by the upstream caller.
-4. String interpolation substitutes all `{...}` placeholders in a single pass.
-5. Resulting Markdown document is returned to the caller for persistence or streaming.
-
-Templates are intentionally unexported and stateless—no runtime functions, classes, or interfaces exist within any of the three files. They serve as data-only artifacts consumed by the rendering layer.
+**Algorithmic Flow:**
+1. User creates a new daily note → fresh Markdown file generated using this template
+2. System captures three values: timestamp, title, body text
+3. Formatted content written to disk as an independent document
+4. Storage grows with each entry (append pattern)
 
 ---
 
-## `daily_append.md` — Append-to-Daily Template
+### daily_new.md — Dictation Session Tracker
 
-**File:** `eloquent_notes/templates/daily_append.md`
+**Responsibility:** Capture dictation practice sessions organized by date and time periods for language learners. Supports multiple practice sessions per day through time-period segmentation.
 
-Used when a new daily note is being appended to an existing day's entry rather than creating a fresh record. The template omits frontmatter date/time metadata, relying on the caller to inject those values via context substitution only if needed by downstream consumers.
+**Data Model:**
+| Placeholder | Description |
+|---|---|
+| `{tags}` | List of tags applied to the note (defaults to `dictation`) |
+| `{date}` | Date of the dictation session |
+| `{time}` | Time slot label for the entry |
+| `{title}` | Title/headline of the entry |
+| `{text}` | Body text / content of the dictation |
 
-**Placeholder contract:**
+**Frontmatter:**
 
-| Placeholder | Type     | Interpolation Source                          |
-|-------------|----------|-----------------------------------------------|
-| `{time}`    | string   | Current wall-clock time at render invocation  |
-| `{title}`   | string   | Note title supplied by the caller             |
-| `{text}`    | string   | Main body content to be appended              |
+```yaml
+tags: [dictation]
+date: {date}
+```
 
-**Usage pattern:** The rendering engine binds `daily_append.md` when the operation flag is set to *append*. The resulting document merges with any prior daily entry stored under the same date key, producing a single consolidated note per day.
+**Algorithmic Flow:**
+1. Session initiation → user selects a date and assigns entries to specific time periods during that day
+2. Entry capture → for each period: record `{time}` label, assign descriptive `{title}`, then capture raw `{text}` content
+3. Daily compilation → all period-level entries aggregated under `# Dictations of {date}` heading and rendered sequentially
 
----
-
-## `daily_new.md` — New Daily Dictation Template
-
-**File:** `eloquent_notes/templates/daily_new.md`
-
-Full-featured template for initializing a new daily dictation note complete with YAML frontmatter metadata and structured body sections. This is the canonical entry point when starting a fresh day's recording session.
-
-**Placeholder contract:**
-
-| Placeholder | Type     | Interpolation Source                          |
-|-------------|----------|-----------------------------------------------|
-| `{tags}`    | string   | Comma-separated tag list for categorization   |
-| `{date}`    | string   | ISO-8601 formatted date of the new entry      |
-| `{time}`    | string   | Render-time wall-clock timestamp              |
-| `{title}`   | string   | Note title from caller context                |
-| `{text}`    | string   | Dictation body content to be recorded         |
-
-**Usage pattern:** The renderer loads `daily_new.md` when the operation flag is set to *new*. All five placeholders are substituted in a single pass, producing a self-contained Markdown document with frontmatter headers and body sections ready for immediate persistence.
+**Business Rule:** A dictation entry is scoped to a single day; cross-day organization relies on date navigation rather than temporal reordering within the file.
 
 ---
 
-## `standalone.md` — Standalone Document Template
+### standalone.md — Standalone Note Template
 
-**File:** `eloquent_notes/templates/standalone.md`
+**Responsibility:** Generate structured, timestamped notes with metadata frontmatter and body content for general use cases outside daily or dictation workflows.
 
-Template for generating independent note documents that do not participate in the daily-entry lifecycle. Suitable for ad-hoc notes, reminders, or reference entries detached from any date-based aggregation scheme.
+**Data Model:**
+| Placeholder | Description |
+|---|---|
+| `{tags}` | Array of tag strings (YAML list) |
+| `{date}` | Date string |
+| `{time}` | Time string |
+| `{title}` | Markdown heading level 1 |
+| `{text}` | Main body content (paragraph) |
 
-**Placeholder contract:**
-
-| Placeholder | Type     | Interpolation Source                          |
-|-------------|----------|-----------------------------------------------|
-| `{title}`   | string   | Note title supplied by the caller             |
-| `{text}`    | string   | Full document body content                   |
-| `{date}`    | string   | Render-time date (optional, may remain empty) |
-| `{time}`    | string   | Render-time timestamp (optional, may remain empty) |
-
-**Usage pattern:** The rendering engine binds `standalone.md` when the operation flag is set to *standalone*. Only title and text are required; `date` and `time` may be left as empty strings if the caller does not supply them. The resulting document carries no frontmatter constraints beyond those defined by the template's YAML header.
+**Algorithmic Flow:**
+1. Generate YAML frontmatter emitting `tags`, `date`, and `time` as key-value pairs
+2. Render markdown body outputting a title heading followed by text content
 
 ---
 
-## Rendering Engine Integration
+## Cross-Template Patterns
 
-All three templates share an identical interpolation pipeline:
-1. Filesystem loader resolves the requested template path within this module's directory.
-2. Template content is read as a raw string without compilation or caching.
-3. Context map is built from caller-supplied values; missing keys default to empty strings unless overridden by configuration.
-4. String replacement iterates over all `{...}` placeholders in document order, substituting each with its corresponding context value.
-5. Rendered Markdown is returned to the caller for downstream persistence (local disk, remote API, or internal store).
+All three templates share structural characteristics:
 
-No runtime state, functions, classes, interfaces, or data structures are exported from any of these files. The module operates entirely as a template data registry consumed by the upstream rendering layer.
+| Characteristic | Observation |
+|---|---|
+| **State** | None — no global variables, struct fields, or mutable state defined in any file |
+| **Concurrency** | None — no locks, channels, synchronization primitives present |
+| **I/O** | None — no disk writes, network calls, database queries, subprocess invocations |
+| **Error Handling** | None — no try/except blocks, sentinel values, panic handling, logging, or fallback logic |
+| **Return Values** | N/A across all files — templates are passive definitions consumed externally |
+
+All three communicate only through placeholder substitution. The placeholders (`{time}`, `{title}`, `{text}`, `{tags}`, `{date}`) are bare strings awaiting resolution by an external rendering engine. If a template engine fails to resolve any placeholder, this file contains no mechanism to catch or report the failure.
