@@ -1,46 +1,52 @@
 model_id: ornith:9b
 ollama_base_url: http://localhost:11434
 ollama_num_ctx: 20000
-ignore:
-    - .git
-    - node_modules
-    - bower_components
-    - dist
-    - build
-    - cache
-    - __pycache__
-    - .pytest_cache
-    - .mypy_cache
-    - .tox
-    - venv
-    - .venv
-    - code-reducer
-    - .gemini
-    - .code-reducer.yaml
-    - .code-reducer.lock
-    - docs
-    - README.md
-    - screenshots
-    - eloquent_notes/prompts
-ignore_extensions:
-    - .png
-    - .jpg
-    - .jpeg
-    - .gif
-    - .pdf
-    - .exe
-    - .dll
-    - .so
-    - .o
-    - .a
-    - .zip
-    - .gz
-    - .tar
-    - .lock
-    - .pyc
-    - .pyo
-    - .pyd
-    - -lock.json
-    - .lock.yaml
-    - pnpm-lock.yaml
 docs_dir: wiki
+
+system_prompt: |
+    You are Code-Reducer, an expert technical writer and code analyzer. Your job is to strictly follow instructions. You do not yap, you do not write filler.
+    DEFENSIVE RULES: 1. Do NOT use absolute terms ('always', 'never', 'zero') unless explicitly proven. 2. Do NOT guess downstream consequences or invent unhandled paths. If an error is swallowed, just say it is swallowed. 3. Do NOT name standard library packages unless explicitly stated in the source text. 4. Only report facts you are 100% sure about.
+
+module_synthesis_prompt: |-
+    Task: Write a technical documentation page for a code module based on the provided list of its internal components.
+    Rule 1: Group related functions and classes under appropriate Markdown headings.
+    Rule 2: Explain the responsibility of the module and the data flow.
+    Rule 3: Keep it highly technical and dense.
+
+architecture_prompt: |-
+    Task: Write a global architecture or quickstart document based on the module summaries.
+    Rule 1: Explain the system boundaries and how the modules interact.
+    Rule 2: Provide a dense, developer-friendly overview.
+
+file_fact_consolidation_prompt: |-
+    You are a specialized code documentation assistant.
+    Consolidate, deduplicate and merge the following facts extracted from different chunks of the same file into a single, cohesive summary.
+
+extraction_steps:
+    - name: API_SIGNATURES
+      prompt: |-
+        Task: Extract the public API surface.
+        Output: A strict Markdown list of all exported or public elements (classes, functions, methods, types). Include parameters and return types. Do not explain internal execution logic.
+    - name: BUSINESS_LOGIC
+      prompt: |-
+        Task: Extract the core purpose and domain rules.
+        Output: Explain the primary domain problem this code solves. List the high-level algorithm steps. Ignore syntax, standard library usage, and basic implementation details.
+    - name: STATE_AND_CONCURRENCY
+      prompt: |-
+        Task: Identify mutable state and thread safety.
+        Output: List global variables, shared states, or class-level properties that are modified. Identify synchronization mechanisms (locks, mutexes, async/await, atomic types). If entirely stateless, output exactly: 'No mutable state'.
+    - name: ERRORS_AND_SIDE_EFFECTS
+      prompt: |-
+        Task: Analyze external I/O and error propagation.
+        Output: Detail interactions with external systems (network, disk, databases, APIs). Explain how errors are propagated (exceptions, error return codes, crash/panic). If no I/O exists, state 'No external side effects'.
+
+ignore:
+  - dist
+  - build
+  - __pycache__
+  - docs
+  - README.md
+  - screenshots
+  - eloquent_notes/prompts
+  - AGENTS.md
+  - pyproject.toml
