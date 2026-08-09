@@ -103,6 +103,13 @@ class TextFilesTab(ConfigTab):
         if self.lst_items.count() > 0:
             self.lst_items.setCurrentRow(0)
 
+        current = self.lst_items.currentItem()
+        if current:
+            path = current.data(Qt.ItemDataRole.UserRole)
+            self.editor.setPlainText(self.loaded_contents.get(path, ""))
+            self.editor.setEnabled(True)
+            self.current_item = current
+
         self._block_cache = False
 
     def restore_defaults(self) -> None:

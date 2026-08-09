@@ -6,11 +6,14 @@ launches automatically on login.
 
 import os
 import shutil
-import sys
 
 
 def install_autostart():
-    """Install the autostart desktop entry for Eloquent Notes."""
+    """Install the autostart desktop entry for Eloquent Notes.
+
+    Returns:
+        str: Path to the installed desktop entry file.
+    """
     autostart_dir = os.path.expanduser("~/.config/autostart")
     desktop_file_path = os.path.join(autostart_dir, "eloquent-notes.desktop")
 
@@ -36,3 +39,5 @@ Categories=Utility;
     os.chmod(desktop_file_path, 0o644)
     print(f"Autostart entry created at: {desktop_file_path}")
     print("Eloquent Notes will now start automatically upon login!")
+    return desktop_file_path
+

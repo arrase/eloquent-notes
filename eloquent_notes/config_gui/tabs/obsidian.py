@@ -86,11 +86,13 @@ class ObsidianTab(ConfigTab):
             self.txt_vault_path.setText(dir_path)
 
     def load_settings(self, config_data: dict) -> None:
-        obs_cfg = config_data["obsidian"]
-        self.txt_vault_path.setText(obs_cfg["vault_path"])
-        self.txt_obs_folder.setText(obs_cfg["folder"])
-        self.chk_daily_notes.setChecked(obs_cfg["daily_notes"])
-        self.chk_vault_context.setChecked(obs_cfg["vault_context"])
+        obs_cfg = config_data.get("obsidian") if isinstance(config_data, dict) else None
+        if not isinstance(obs_cfg, dict):
+            obs_cfg = {}
+        self.txt_vault_path.setText(str(obs_cfg.get("vault_path", "")))
+        self.txt_obs_folder.setText(str(obs_cfg.get("folder", "Dictations")))
+        self.chk_daily_notes.setChecked(bool(obs_cfg.get("daily_notes", False)))
+        self.chk_vault_context.setChecked(bool(obs_cfg.get("vault_context", False)))
 
     def save_settings(self, config_data: dict) -> bool:
         vault = self.txt_vault_path.text().strip()
@@ -109,6 +111,9 @@ class ObsidianTab(ConfigTab):
             if confirm != QMessageBox.StandardButton.Yes:
                 return False
 
+        if not isinstance(config_data.get("obsidian"), dict):
+            config_data["obsidian"] = {}
+
         config_data["obsidian"].update({
             "vault_path": vault,
             "folder": self.txt_obs_folder.text().strip(),
@@ -116,3 +121,4 @@ class ObsidianTab(ConfigTab):
             "vault_context": self.chk_vault_context.isChecked(),
         })
         return True
+

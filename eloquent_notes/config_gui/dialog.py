@@ -30,7 +30,7 @@ class ConfigurationDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Eloquent Notes Configuration")
         self.setMinimumSize(850, 650)
-        self.config_data = config.load_config()
+        self.config_data = config.load_config() or {}
 
         self._tabs = []
         self._init_ui()
@@ -151,6 +151,11 @@ class ConfigurationDialog(QDialog):
         for tab_widget, _ in self._tabs:
             tab_widget.cleanup()
 
+    def closeEvent(self, event):
+        """Ensure background threads and resources are cleaned up on window close."""
+        self.cleanup_tabs()
+        super().closeEvent(event)
+
     def reject(self):
         """Cancel changes and close, ensuring threads are stopped."""
         self.cleanup_tabs()
@@ -161,3 +166,4 @@ class ConfigurationDialog(QDialog):
         if self.save_settings_from_ui():
             self.cleanup_tabs()
             super().accept()
+

@@ -89,12 +89,27 @@ class GeneralTab(ConfigTab):
         autostart_path = os.path.expanduser("~/.config/autostart/eloquent-notes.desktop")
         self.chk_autostart.setChecked(os.path.exists(autostart_path))
 
-        log_cfg = config_data["logging"]
-        self.cmb_log_level.setCurrentText(log_cfg["level"])
-        self.spn_log_max_mb.setValue(log_cfg["max_mb"])
-        self.spn_log_backups.setValue(log_cfg["backup_count"])
+        log_cfg = config_data.get("logging") if isinstance(config_data, dict) else None
+        if not isinstance(log_cfg, dict):
+            log_cfg = {}
+
+        level_str = str(log_cfg.get("level", "INFO")).upper()
+        self.cmb_log_level.setCurrentText(level_str)
+
+        try:
+            self.spn_log_max_mb.setValue(int(log_cfg.get("max_mb", 10)))
+        except (ValueError, TypeError):
+            self.spn_log_max_mb.setValue(10)
+
+        try:
+            self.spn_log_backups.setValue(int(log_cfg.get("backup_count", 5)))
+        except (ValueError, TypeError):
+            self.spn_log_backups.setValue(5)
 
     def save_settings(self, config_data: dict) -> bool:
+        if not isinstance(config_data.get("logging"), dict):
+            config_data["logging"] = {}
+
         config_data["logging"].update({
             "level": self.cmb_log_level.currentText(),
             "max_mb": self.spn_log_max_mb.value(),
@@ -114,3 +129,4 @@ class GeneralTab(ConfigTab):
                 self, "Error", f"Failed to update autostart setting: {e}"
             )
             return False
+
