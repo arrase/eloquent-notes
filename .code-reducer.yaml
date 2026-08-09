@@ -50,3 +50,4 @@ ignore:
   - eloquent_notes/prompts
   - AGENTS.md
   - pyproject.toml
+  - mkdocs.yml
