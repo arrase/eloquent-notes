@@ -4,6 +4,7 @@ Handles loading and merging of default and user configuration files,
 prompt templates, and note templates from ~/.config/eloquent-notes/.
 """
 
+import copy
 import os
 import shutil
 
@@ -82,22 +83,30 @@ def init_config_dir():
 
 def _merge_configs(base, overrides):
     """Recursively merge overrides into base config dict."""
-    result = base.copy()
+    result = copy.deepcopy(base)
     for key, value in overrides.items():
         if isinstance(result.get(key), dict) and isinstance(value, dict):
             result[key] = _merge_configs(result[key], value)
         else:
-            result[key] = value
+            result[key] = copy.deepcopy(value)
     return result
 
 
 def load_config():
     """Load and merge default config with user overrides."""
+    init_config_dir()
+
     with open(DEFAULT_CONFIG_SRC, "r", encoding="utf-8") as f:
-        default_config = yaml.safe_load(f)
+        default_config = yaml.safe_load(f) or {}
 
     with open(CONFIG_PATH, "r", encoding="utf-8") as f:
         user_config = yaml.safe_load(f) or {}
+
+    if not isinstance(default_config, dict):
+        raise ValueError(f"Default config at {DEFAULT_CONFIG_SRC} is not a valid YAML mapping")
+
+    if not isinstance(user_config, dict):
+        raise ValueError(f"User config at {CONFIG_PATH} is not a valid YAML mapping")
 
     return _merge_configs(default_config, user_config)
 
@@ -111,13 +120,21 @@ def load_file(path):
 def save_config(config_data):
     """Save configuration data to user config file."""
     os.makedirs(CONFIG_DIR, exist_ok=True)
-    with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+    tmp_path = f"{CONFIG_PATH}.tmp"
+    with open(tmp_path, "w", encoding="utf-8") as f:
         yaml.safe_dump(config_data, f, default_flow_style=False, sort_keys=False)
+    os.replace(tmp_path, CONFIG_PATH)
 
 
 def save_file(path, content):
     """Save text content to a file."""
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w", encoding="utf-8") as f:
+    dir_path = os.path.dirname(path)
+    if dir_path:
+        os.makedirs(dir_path, exist_ok=True)
+    tmp_path = f"{path}.tmp"
+    with open(tmp_path, "w", encoding="utf-8") as f:
         f.write(content)
+    os.replace(tmp_path, path)
+
+
 

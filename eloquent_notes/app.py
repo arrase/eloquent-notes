@@ -31,15 +31,38 @@ class EloquentApp(QObject):
     def __init__(self, qapp, start_recording_immediately=False):
         super().__init__()
         self.app = qapp
-        self.state = "IDLE"
-        self.recorder = None
+        self._lock = threading.Lock()
+        self._state = "IDLE"
+        self._recorder = None
         self.config = config.load_config()
         self.active_config = self.config
         self._config_dialog = None
         self._processing_thread = None
         self.start_recording_immediately = start_recording_immediately
+        self.server = None
+        self.tray = None
 
         self.processing_completed.connect(self._on_processing_completed)
+
+    @property
+    def state(self):
+        with self._lock:
+            return self._state
+
+    @state.setter
+    def state(self, value):
+        with self._lock:
+            self._state = value
+
+    @property
+    def recorder(self):
+        with self._lock:
+            return self._recorder
+
+    @recorder.setter
+    def recorder(self, value):
+        with self._lock:
+            self._recorder = value
 
     def run(self):
         """Set up the system tray, IPC server, and enter the event loop."""
@@ -90,38 +113,48 @@ class EloquentApp(QObject):
             self.toggle_action()
 
     def _handle_ipc_connection(self):
-        socket = self.server.nextPendingConnection()
-        if socket and socket.waitForReadyRead(50):
-            message = socket.readAll().data().decode("utf-8")
-            if message == "toggle":
-                self.toggle_action()
-            elif message == "reload":
-                self.reload_config()
-            elif message == "notify_running":
-                self._notify(
-                    "Eloquent Notes",
-                    "Eloquent Notes is already running in the background.",
-                )
-        if socket:
-            socket.disconnectFromServer()
+        if self.server is None:
+            return
+        while self.server.hasPendingConnections():
+            socket = self.server.nextPendingConnection()
+            if socket is None:
+                break
+            try:
+                if socket.bytesAvailable() > 0 or socket.waitForReadyRead(50):
+                    message = bytes(socket.readAll()).decode("utf-8")
+                    if message == "toggle":
+                        self.toggle_action()
+                    elif message == "reload":
+                        self.reload_config()
+                    elif message == "notify_running":
+                        self._notify(
+                            "Eloquent Notes",
+                            "Eloquent Notes is already running in the background.",
+                        )
+            finally:
+                socket.disconnectFromServer()
+                socket.deleteLater()
 
     def _update_icon(self, color, tooltip):
-        self.tray.setIcon(ui.get_qicon(color))
-        self.tray.setToolTip(tooltip)
+        if self.tray is not None:
+            self.tray.setIcon(ui.get_qicon(color))
+            self.tray.setToolTip(tooltip)
 
     def _notify(self, title, message):
-        self.tray.showMessage(
-            title, message,
-            QSystemTrayIcon.MessageIcon.Information, 5000,
-        )
+        if self.tray is not None:
+            self.tray.showMessage(
+                title, message,
+                QSystemTrayIcon.MessageIcon.Information, 5000,
+            )
 
     def toggle_action(self):
         """Handle toggle: start, stop, or notify if already processing."""
-        if self.state == "IDLE":
+        current_state = self.state
+        if current_state == "IDLE":
             self._start_recording()
-        elif self.state == "RECORDING":
+        elif current_state == "RECORDING":
             self._stop_recording_and_process()
-        elif self.state in ("STARTING_RECORDING", "PROCESSING"):
+        elif current_state in ("STARTING_RECORDING", "PROCESSING"):
             self._notify(
                 "Eloquent Notes",
                 "System is busy. Please wait.",
@@ -141,7 +174,11 @@ class EloquentApp(QObject):
             logger.warning("Preload warning: %s", e, exc_info=True)
 
     def _start_recording(self):
-        self.state = "STARTING_RECORDING"
+        with self._lock:
+            if self._state != "IDLE":
+                return
+            self._state = "STARTING_RECORDING"
+
         self._update_icon("red", "Eloquent Notes (Recording...)")
         logger.info("Starting audio recording...")
 
@@ -174,34 +211,47 @@ class EloquentApp(QObject):
                         duration=audio_cfg["beep_duration"],
                         sample_rate=audio_cfg["sample_rate"],
                     )
-                if self.state == "STARTING_RECORDING":
-                    self.recorder = audio.AudioRecorder(
-                        sample_rate=audio_cfg["sample_rate"],
-                        channels=audio_cfg["channels"],
-                    )
-                    self.recorder.start()
-                    if self.state == "STARTING_RECORDING":
-                        self.state = "RECORDING"
+                with self._lock:
+                    if self._state == "STARTING_RECORDING":
+                        rec = audio.AudioRecorder(
+                            sample_rate=audio_cfg["sample_rate"],
+                            channels=audio_cfg["channels"],
+                        )
+                        self._recorder = rec
+                    else:
+                        rec = None
+
+                if rec is not None:
+                    rec.start()
+                    with self._lock:
+                        if self._state == "STARTING_RECORDING":
+                            self._state = "RECORDING"
+                            should_preload = True
+                        else:
+                            should_preload = False
+                            rec.stop()
+                    if should_preload:
                         threading.Thread(
                             target=self._preload_model, daemon=True,
                         ).start()
-                    else:
-                        self.recorder.stop()
             except Exception as e:
                 logger.exception("Failed to start recording")
-                self.state = "IDLE"
-                self._update_icon("gray", "Eloquent Notes (Idle)")
                 self.processing_completed.emit("error", f"Could not start recording: {e}")
 
         threading.Thread(target=run, daemon=True).start()
 
     def _stop_recording_and_process(self):
-        self.state = "PROCESSING"
+        with self._lock:
+            if self._state != "RECORDING":
+                return
+            self._state = "PROCESSING"
+            rec = self._recorder
+
         self._update_icon("orange", "Eloquent Notes (Processing...)")
         logger.info("Stopping recording and starting processing...")
 
-        if self.recorder is not None:
-            self.recorder.stop()
+        if rec is not None:
+            rec.stop()
 
         self._processing_thread = threading.Thread(target=self._process_audio, daemon=True)
         self._processing_thread.start()
@@ -246,7 +296,9 @@ class EloquentApp(QObject):
                     sample_rate=audio_cfg["sample_rate"],
                 )
 
-            wav_bytes = self.recorder.wav_bytes if self.recorder is not None else None
+            with self._lock:
+                rec = self._recorder
+            wav_bytes = rec.wav_bytes if rec is not None else None
             if not wav_bytes or len(wav_bytes) <= 44:
                 self.processing_completed.emit("empty", "")
                 return
@@ -282,6 +334,12 @@ class EloquentApp(QObject):
             transcription = transcription_result["transcription"]
             logger.info("Transcription: %s", transcription)
 
+            target_language = ai_cfg.get("output_language", "English")
+            language_instruction = (
+                f"IMPORTANT: You MUST write the title, content, wikilinks, and tags in {target_language}. "
+                f"DO NOT translate to any other language."
+            )
+
             # --- Phase 2: Rewriting ---
             logger.info("Phase 2: Rewriting transcription...")
             rewriting_user_template = self.active_config["_loaded_files"][
@@ -289,6 +347,7 @@ class EloquentApp(QObject):
             ]
             rewriting_user_prompt = rewriting_user_template.format(
                 transcription=transcription,
+                language_instruction=language_instruction,
             )
 
             rewrite_result = llm.rewrite_transcription(
@@ -316,6 +375,7 @@ class EloquentApp(QObject):
             classification_user_prompt = classification_user_template.format(
                 transcription=transcription,
                 vault_context=vault_context,
+                language_instruction=language_instruction,
             )
 
             classification_result = llm.classify_transcription(
@@ -371,6 +431,7 @@ class EloquentApp(QObject):
 
     def _on_processing_completed(self, status, detail):
         self.state = "IDLE"
+        self.recorder = None
         self._update_icon("gray", "Eloquent Notes (Idle)")
 
         if status == "success":
@@ -429,29 +490,31 @@ class EloquentApp(QObject):
 
     def _on_config_dialog_closed(self, _result):
         if self._config_dialog is not None:
-            self._config_dialog.deleteLater()
-            QTimer.singleShot(0, self._clear_config_dialog_reference)
-
-    def _clear_config_dialog_reference(self):
-        self._config_dialog = None
+            dialog = self._config_dialog
+            self._config_dialog = None
+            dialog.deleteLater()
 
     def exit_app(self):
         """Clean up and exit the application."""
         logger.info("Exiting application...")
-        prev_state = self.state
-        self.state = "IDLE"
+        with self._lock:
+            prev_state = self._state
+            self._state = "IDLE"
+            rec = self._recorder
+            self._recorder = None
 
-        if prev_state in ("RECORDING", "STARTING_RECORDING"):
-            if self.recorder is not None:
-                self.recorder.stop()
+        if prev_state in ("RECORDING", "STARTING_RECORDING") and rec is not None:
+            rec.stop()
         elif prev_state == "PROCESSING" and self._processing_thread is not None:
             self._processing_thread.join(timeout=5.0)
 
         if self._config_dialog is not None:
             self._config_dialog.close()
-        self.server.close()
-        self.server.removeServer("eloquent_notes_ipc")
-        self.tray.hide()
+        if self.server is not None:
+            self.server.close()
+            QLocalServer.removeServer("eloquent_notes_ipc")
+        if self.tray is not None:
+            self.tray.hide()
         self.app.quit()
         sys.exit(0)
 

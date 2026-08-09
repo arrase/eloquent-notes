@@ -32,7 +32,7 @@ def setup_logging(log_level_str, max_mb, backup_count):
             if isinstance(handler, RotatingFileHandler):
                 handler.maxBytes = max_mb * 1024 * 1024
                 handler.backupCount = backup_count
-        return
+        return logger
 
     formatter = logging.Formatter(
         fmt=(
@@ -66,3 +66,6 @@ def setup_logging(log_level_str, max_mb, backup_count):
             f"Warning: Could not initialize file logging: {e}",
             file=sys.stderr,
         )
+
+    return logger
+

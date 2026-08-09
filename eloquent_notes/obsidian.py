@@ -25,20 +25,37 @@ _CALLOUT_MAP = {
 _DATE_FILENAME_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
+class _NoAliasDumper(yaml.SafeDumper):
+    """YAML SafeDumper that disables aliases without modifying global SafeDumper state."""
+
+    def ignore_aliases(self, data):
+        return True
+
+
+class SafeDict(dict):
+    """Dictionary subclass that retains missing format placeholders during string formatting."""
+
+    def __missing__(self, key):
+        return f"{{{key}}}"
+
+
 def scan_vault_topics(vault_path, max_topics=200):
     """Scan the Obsidian vault for note basenames usable as wikilinks.
 
-    Skips date-named files (e.g., 2024-01-15.md) and caps results
-    to max_topics entries to limit prompt size.
+    Skips date-named files (e.g., 2024-01-15.md) and hidden directories starting with '.',
+    and caps results to max_topics entries to limit prompt size.
     """
+    if not vault_path:
+        return []
     vault_path = os.path.expanduser(vault_path)
     if not os.path.isdir(vault_path):
         return []
 
     topics = set()
-    for root, _dirs, files in os.walk(vault_path):
+    for root, dirs, files in os.walk(vault_path):
+        dirs[:] = [d for d in dirs if not d.startswith(".")]
         for filename in files:
-            if filename.endswith(".md"):
+            if filename.endswith(".md") and not filename.startswith("."):
                 name = os.path.splitext(filename)[0]
                 if not _DATE_FILENAME_RE.match(name):
                     topics.add(name)
@@ -49,17 +66,31 @@ def scan_vault_topics(vault_path, max_topics=200):
 def _inject_wikilinks(text, wikilinks):
     """Replace mentions of wikilink terms with [[WikiLink]] syntax.
 
-    Processes longer terms first to avoid substring conflicts (e.g.,
-    "Go" matching inside "Google"). Uses word boundaries and skips
-    terms already wrapped in [[ ]].
+    Processes longer terms first to avoid substring conflicts.
+    Skips code blocks, inline code, and existing links.
     """
-    sorted_links = sorted(wikilinks, key=len, reverse=True)
+    if not wikilinks or not text:
+        return text
+
+    unique_links = {link for link in wikilinks if link}
+    sorted_links = sorted(unique_links, key=len, reverse=True)
     for link in sorted_links:
+        start_b = r"(?<!\w)" if re.match(r"\w", link[0]) else r""
+        end_b = r"(?!\w)" if re.match(r"\w", link[-1]) else r""
+
         pattern = re.compile(
-            r"(?<!\[\[)\b" + re.escape(link) + r"\b(?!\]\])",
+            r"(```[\s\S]*?```|`[^`\n]+`|\[\[[\s\S]*?\]\]|\[[^\]]*\]\([^)]*\))|"
+            + f"({start_b}{re.escape(link)}{end_b})",
             re.IGNORECASE,
         )
-        text = pattern.sub(f"[[{link}]]", text)
+
+        def replace_match(match):
+            if match.group(1):
+                return match.group(1)
+            return f"[[{link}]]"
+
+        text = pattern.sub(replace_match, text)
+
     return text
 
 
@@ -70,6 +101,9 @@ def format_note_content(note_type, content, wikilinks):
     Obsidian callout based on note_type. Notes of type 'note' are
     left as plain prose without a callout wrapper.
     """
+    if not content:
+        return ""
+
     text = _inject_wikilinks(content, wikilinks)
 
     callout_type = _CALLOUT_MAP.get(note_type)
@@ -87,7 +121,7 @@ def _update_frontmatter_tags(content, new_tags):
     Returns the full note content with updated frontmatter.
     If the note has no valid frontmatter, returns it unchanged.
     """
-    if not content.startswith("---"):
+    if not (content.startswith("---\n") or content.startswith("---\r\n") or content == "---"):
         return content
 
     end_frontmatter = content.find("---", 3)
@@ -95,21 +129,33 @@ def _update_frontmatter_tags(content, new_tags):
         return content
 
     frontmatter_str = content[3:end_frontmatter]
-    frontmatter = yaml.safe_load(frontmatter_str) or {}
+    try:
+        frontmatter = yaml.safe_load(frontmatter_str)
+    except yaml.YAMLError:
+        return content
+
+    if frontmatter is None:
+        frontmatter = {}
+    elif not isinstance(frontmatter, dict):
+        return content
 
     existing_tags = frontmatter.get("tags", [])
+    if not isinstance(existing_tags, list):
+        existing_tags = [existing_tags] if existing_tags else []
+
     for tag in new_tags:
         if tag not in existing_tags:
             existing_tags.append(tag)
     frontmatter["tags"] = existing_tags
 
-    yaml.SafeDumper.ignore_aliases = lambda self, data: True
-    new_frontmatter = yaml.safe_dump(
-        frontmatter, default_flow_style=False, sort_keys=False,
+    new_frontmatter = yaml.dump(
+        frontmatter, Dumper=_NoAliasDumper, default_flow_style=False, sort_keys=False
     )
 
     remainder = content[end_frontmatter + 3:]
-    if remainder.startswith('\n'):
+    if remainder.startswith("\r\n"):
+        remainder = remainder[2:]
+    elif remainder.startswith("\n"):
         remainder = remainder[1:]
 
     return f"---\n{new_frontmatter}---\n{remainder}"
@@ -124,27 +170,35 @@ def _save_daily(target_dir, date_str, time_str, title, text, tags,
     """
     note_path = os.path.join(target_dir, f"{date_str}.md")
     tags_formatted = "\n".join(f"  - {tag}" for tag in tags) if tags else ""
+    format_kwargs = SafeDict(
+        date=date_str,
+        time=time_str,
+        title=title,
+        text=text,
+        tags=tags_formatted,
+    )
 
     if not os.path.exists(note_path):
-        content = template_new.format(
-            date=date_str, time=time_str, title=title,
-            text=text, tags=tags_formatted,
-        )
-        with open(note_path, "w", encoding="utf-8") as f:
+        content = template_new.format_map(format_kwargs)
+        tmp_path = f"{note_path}.tmp"
+        with open(tmp_path, "w", encoding="utf-8") as f:
             f.write(content)
+        os.replace(tmp_path, note_path)
         return note_path
 
     with open(note_path, "r", encoding="utf-8") as f:
         existing_content = f.read()
 
     updated_content = _update_frontmatter_tags(existing_content, tags)
-    append_content = template_append.format(
-        date=date_str, time=time_str, title=title, text=text,
-    )
+    append_content = template_append.format_map(format_kwargs)
 
-    with open(note_path, "w", encoding="utf-8") as f:
+    tmp_path = f"{note_path}.tmp"
+    with open(tmp_path, "w", encoding="utf-8") as f:
         f.write(updated_content)
+        if not updated_content.endswith("\n"):
+            f.write("\n")
         f.write("\n" + append_content)
+    os.replace(tmp_path, note_path)
 
     return note_path
 
@@ -153,15 +207,27 @@ def _save_standalone(target_dir, date_str, time_str, title, text, tags,
                      template):
     """Save a dictation as a standalone timestamped note."""
     timestamp = datetime.now().strftime("%Y-%m-%d-%H%M%S")
-    note_path = os.path.join(target_dir, f"Dictation-{timestamp}.md")
-    tags_formatted = "\n".join(f"  - {tag}" for tag in tags) if tags else ""
+    base_name = f"Dictation-{timestamp}"
+    note_path = os.path.join(target_dir, f"{base_name}.md")
+    counter = 1
+    while os.path.exists(note_path):
+        note_path = os.path.join(target_dir, f"{base_name}_{counter}.md")
+        counter += 1
 
-    content = template.format(
-        date=date_str, time=time_str, title=title,
-        text=text, tags=tags_formatted,
+    tags_formatted = "\n".join(f"  - {tag}" for tag in tags) if tags else ""
+    format_kwargs = SafeDict(
+        date=date_str,
+        time=time_str,
+        title=title,
+        text=text,
+        tags=tags_formatted,
     )
-    with open(note_path, "w", encoding="utf-8") as f:
+
+    content = template.format_map(format_kwargs)
+    tmp_path = f"{note_path}.tmp"
+    with open(tmp_path, "w", encoding="utf-8") as f:
         f.write(content)
+    os.replace(tmp_path, note_path)
 
     return note_path
 
@@ -191,3 +257,4 @@ def save_note(vault_path, folder, daily_notes, title, text, tags,
         target_dir, date_str, time_str, title, text, tags,
         template_standalone,
     )
+

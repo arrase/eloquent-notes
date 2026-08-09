@@ -120,7 +120,13 @@ class AITab(ConfigTab):
         self.spn_request_timeout = QSpinBox()
         self.spn_request_timeout.setRange(10, 1000)
         self.spn_request_timeout.setSuffix(" sec")
-        form_layout.addRow(QLabel("Request Timeout:"), self.spn_request_timeout)
+        self.cmb_language = QComboBox()
+        self.cmb_language.setEditable(True)
+        self.cmb_language.addItems(["English", "Spanish", "French", "German", "Italian", "Portuguese"])
+        self.cmb_language.setToolTip(
+            "Target language for rewritten notes, titles, wikilinks, and tags (e.g. English, Spanish)."
+        )
+        form_layout.addRow(QLabel("Output Language:"), self.cmb_language)
 
         layout.addWidget(grp_ai)
         layout.addStretch()
@@ -194,20 +200,22 @@ class AITab(ConfigTab):
         """Asynchronously cancel active loaders and wait with a timeout."""
         for loader in list(self._running_loaders):
             loader.requestInterruption()
-            loader.wait(500)
+            loader.wait(2500)
         self._running_loaders.clear()
         self._model_loader = None
 
     def load_settings(self, config_data: dict) -> None:
-        ai_cfg = config_data["ai"]
-        self.txt_ollama_url.setText(ai_cfg["ollama_url"])
+        ai_cfg = config_data.get("ai") if isinstance(config_data, dict) else None
+        if not isinstance(ai_cfg, dict):
+            ai_cfg = {}
+        self.txt_ollama_url.setText(str(ai_cfg.get("ollama_url", "http://localhost:11434")))
 
-        curr_model = ai_cfg["model"]
+        curr_model = str(ai_cfg.get("model", "gemma4:12b-it-qat"))
         if self.cmb_model.findText(curr_model) == -1:
             self.cmb_model.addItem(curr_model)
         self.cmb_model.setCurrentText(curr_model)
 
-        context_len = ai_cfg["context_length"]
+        context_len = ai_cfg.get("context_length", 10000)
         if context_len is None:
             self.chk_context_default.setChecked(True)
             self.spn_context_length.setEnabled(False)
@@ -215,22 +223,40 @@ class AITab(ConfigTab):
         else:
             self.chk_context_default.setChecked(False)
             self.spn_context_length.setEnabled(True)
-            self.spn_context_length.setValue(context_len)
+            try:
+                self.spn_context_length.setValue(int(context_len))
+            except (ValueError, TypeError):
+                self.spn_context_length.setValue(10000)
 
-        self.txt_keep_alive.setText(str(ai_cfg["keep_alive"]))
-        self.txt_preload_keep_alive.setText(str(ai_cfg["preload_keep_alive"]))
-        self.spn_max_retries.setValue(ai_cfg["max_retries"])
-        self.spn_preload_timeout.setValue(ai_cfg["preload_timeout"])
-        self.spn_request_timeout.setValue(ai_cfg["request_timeout"])
+        self.txt_keep_alive.setText(str(ai_cfg.get("keep_alive", "5m")))
+        self.txt_preload_keep_alive.setText(str(ai_cfg.get("preload_keep_alive", "5m")))
+
+        try:
+            self.spn_max_retries.setValue(int(ai_cfg.get("max_retries", 3)))
+        except (ValueError, TypeError):
+            self.spn_max_retries.setValue(3)
+
+        try:
+            self.spn_preload_timeout.setValue(int(ai_cfg.get("preload_timeout", 60)))
+        except (ValueError, TypeError):
+            self.spn_preload_timeout.setValue(60)
+
+        try:
+            self.spn_request_timeout.setValue(int(ai_cfg.get("request_timeout", 120)))
+        except (ValueError, TypeError):
+            self.spn_request_timeout.setValue(120)
+
+        curr_lang = str(ai_cfg.get("output_language", "English"))
+        if self.cmb_language.findText(curr_lang) == -1:
+            self.cmb_language.addItem(curr_lang)
+        self.cmb_language.setCurrentText(curr_lang)
 
         # Trigger an initial fetch
         self._fetch_models()
 
     def save_settings(self, config_data: dict) -> bool:
-        url = self.txt_ollama_url.text().strip()
-        if url.endswith("/"):
-            url = url.rstrip("/")
-            self.txt_ollama_url.setText(url)
+        url = self.txt_ollama_url.text().strip().rstrip("/")
+        self.txt_ollama_url.setText(url)
 
         if not url:
             QMessageBox.warning(self, "Validation Error", "Ollama URL cannot be empty.")
@@ -259,9 +285,15 @@ class AITab(ConfigTab):
 
         context_len = None if self.chk_context_default.isChecked() else self.spn_context_length.value()
 
+        output_lang = self.cmb_language.currentText().strip() or "English"
+
+        if not isinstance(config_data.get("ai"), dict):
+            config_data["ai"] = {}
+
         config_data["ai"].update({
             "ollama_url": url,
             "model": self.cmb_model.currentText().strip(),
+            "output_language": output_lang,
             "context_length": context_len,
             "keep_alive": keep_alive,
             "preload_keep_alive": preload_keep_alive,
@@ -270,3 +302,4 @@ class AITab(ConfigTab):
             "request_timeout": self.spn_request_timeout.value(),
         })
         return True
+

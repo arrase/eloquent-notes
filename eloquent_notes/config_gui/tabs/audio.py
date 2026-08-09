@@ -64,17 +64,34 @@ class AudioTab(ConfigTab):
         layout.addStretch()
 
     def load_settings(self, config_data: dict) -> None:
-        audio_cfg = config_data["audio"]
-        self.spn_sample_rate.setValue(audio_cfg["sample_rate"])
+        audio_cfg = config_data.get("audio") if isinstance(config_data, dict) else None
+        if not isinstance(audio_cfg, dict):
+            audio_cfg = {}
 
-        channels = audio_cfg["channels"]
+        try:
+            self.spn_sample_rate.setValue(int(audio_cfg.get("sample_rate", 16000)))
+        except (ValueError, TypeError):
+            self.spn_sample_rate.setValue(16000)
+
+        channels = audio_cfg.get("channels", 1)
         self.cmb_channels.setCurrentIndex(0 if channels == 1 else 1)
 
-        self.chk_beep_enabled.setChecked(audio_cfg["beep_enabled"])
-        self.spn_beep_freq.setValue(audio_cfg["beep_frequency"])
-        self.spn_beep_duration.setValue(audio_cfg["beep_duration"])
+        self.chk_beep_enabled.setChecked(bool(audio_cfg.get("beep_enabled", True)))
+
+        try:
+            self.spn_beep_freq.setValue(int(audio_cfg.get("beep_frequency", 1000)))
+        except (ValueError, TypeError):
+            self.spn_beep_freq.setValue(1000)
+
+        try:
+            self.spn_beep_duration.setValue(float(audio_cfg.get("beep_duration", 0.1)))
+        except (ValueError, TypeError):
+            self.spn_beep_duration.setValue(0.1)
 
     def save_settings(self, config_data: dict) -> bool:
+        if not isinstance(config_data.get("audio"), dict):
+            config_data["audio"] = {}
+
         config_data["audio"].update({
             "sample_rate": self.spn_sample_rate.value(),
             "channels": 1 if self.cmb_channels.currentIndex() == 0 else 2,
@@ -83,3 +100,4 @@ class AudioTab(ConfigTab):
             "beep_duration": self.spn_beep_duration.value(),
         })
         return True
+

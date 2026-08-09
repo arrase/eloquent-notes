@@ -23,6 +23,7 @@ Eloquent Notes is a lightweight, system-tray-centric utility for Linux inspired 
   - Automatically analyzes dictations to generate relevant tags.
   - Appends notes to daily journals or creates new individual files inside your vault.
   - Intelligently parses, merges, and updates YAML frontmatter metadata when appending to existing notes without breaking formatting.
+- **Multilingual Support & Output Language Control:** Dictate in any language and configure your desired `output_language` (e.g., English, Spanish, French, German, etc.). The AI pipeline automatically generates titles, rewritten prose, wikilinks, and tags in your chosen language without extra LLM passes or latency overhead.
 - **Customizable Prompts:** Edit custom Markdown prompts for each phase (Transcription, Rewriting, Classification, and Retry) loaded directly from your user config directory.
 - **Custom Note Templates:** You can customize the Markdown formatting of the generated notes, including dynamic `{title}`, `{text}`, and `{tags}` injection.
 
@@ -92,7 +93,7 @@ Eloquent Notes features a built-in graphical settings editor to modify your conf
 #### Tab Breakdown
 - **General:** Enable or disable automatic login startup, set logging levels, configure log file size limits, and view log files directly.
 - **Obsidian:** Browse for your Obsidian vault path, specify the target destination folder, toggle Daily Notes appending, and toggle vault-wide scanning to auto-generate Wikilink recommendations.
-- **AI Settings:** Configure the Ollama API endpoint, dynamically fetch and select local LLM models, set custom context lengths, adjust keep-alive limits to optimize GPU memory usage, and customize timeout/retry values.
+- **AI Settings:** Configure the Ollama API endpoint, select local LLM models, set the target **Output Language** (e.g. English, Spanish), set custom context lengths, adjust keep-alive limits to optimize GPU memory usage, and customize timeout/retry values.
 - **Audio:** Configure microphone sample rate and recording channel mode, and adjust acoustic feedback beeps (frequency, duration, or disable completely).
 - **Prompts:** Edit custom Markdown prompt definitions (system and user instructions) for all three pipeline stages plus retry rules.
 - **Templates:** Edit and customize the layout files (`standalone.md`, `daily_new.md`, and `daily_append.md`) for note generation.
@@ -116,6 +117,7 @@ obsidian:
 ai:
   ollama_url: "http://localhost:11434"
   model: "gemma4:12b-it-qat"
+  output_language: "English"   # Output language for rewritten notes, titles, wikilinks, and tags (e.g. English, Spanish)
   context_length: 10000        # Context length limit (null defaults to model maximum)
   keep_alive: "0"              # Time to keep model loaded in VRAM after note generation (e.g. "5m", "10m", or "0" to unload immediately)
   preload_keep_alive: "5m"     # Time to keep model weights loaded in VRAM during recording to minimize note generation cold-start
@@ -139,7 +141,7 @@ You can edit the prompts in `~/.config/eloquent-notes/prompts/` to customize the
 
 - **`transcription_system.md`** & **`transcription_user.md`** (Phase 1): Instructions for pure audio transcription, removing stutters and filler words.
 - **`rewriting_system.md`** & **`rewriting_user.md`** (Phase 2): Instructions for rewriting the transcription into a direct, first-person note and generating a short title.
-- **`classification_system.md`** & **`classification_user.md`** (Phase 3): Instructions for classifying the note's type, identifying wikilinks, and generating English tags.
+- **`classification_system.md`** & **`classification_user.md`** (Phase 3): Instructions for classifying the note's type, identifying wikilinks, and generating tags in the configured output language.
 - **`retry_prompt.md`**: Instructs the model how to correct its response if it outputs invalid JSON (specifically preventing markdown code fences).
 
 #### 3. Custom Note Templates

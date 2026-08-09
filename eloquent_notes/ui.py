@@ -35,14 +35,16 @@ def create_icon_image(color):
         draw.arc((20, 24, 44, 38), 0, 180, fill=(255, 255, 255, 255), width=3)
         draw.line((32, 38, 32, 46), fill=(255, 255, 255, 255), width=3)
         draw.line((22, 46, 42, 46), fill=(255, 255, 255, 255), width=3)
-        
+
     return image
+
 
 def get_qicon(color):
     """Convert a Pillow icon image to a Qt QIcon."""
     pil_img = create_icon_image(color)
     byte_arr = BytesIO()
-    pil_img.save(byte_arr, format='PNG')
+    pil_img.save(byte_arr, format="PNG")
     pixmap = QPixmap()
-    pixmap.loadFromData(byte_arr.getvalue(), 'PNG')
+    pixmap.loadFromData(byte_arr.getvalue(), "PNG")
     return QIcon(pixmap)
+
