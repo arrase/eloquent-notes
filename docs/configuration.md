@@ -38,7 +38,7 @@ Controls how generated dictations are integrated into your Obsidian vault:
 #### 3. AI Settings
 Configures connection parameters and behavior for the local Ollama inference server:
 * **Ollama Server URL**: Endpoint URL of your running Ollama service (default: `http://localhost:11434`).
-* **Model Name**: Large language / multimodal model tag (default: `gemma4:12b-it-qat`).
+* **Model Name**: Large language / multimodal model tag (default: `gemma4:e4b-it-qat`).
 * **Context Length (`num_ctx`)**: Context window limit for LLM requests (default: `10000` tokens).
 * **Keep-Alive Duration**: Time duration to keep model weights loaded in VRAM after note generation (e.g., `0` for immediate unload, `5m`, `10m`).
 * **Preload Keep-Alive**: VRAM persistence duration while actively recording audio to minimize latency during generation (default: `5m`).
@@ -79,7 +79,7 @@ obsidian:
 
 ai:
   ollama_url: "http://localhost:11434"
-  model: "gemma4:12b-it-qat"
+  model: "gemma4:e4b-it-qat"
   context_length: 10000  # Context window size in tokens
   keep_alive: "0"       # VRAM retention after note completion ("0" unloads immediately)
   preload_keep_alive: "5m" # VRAM retention during active recording

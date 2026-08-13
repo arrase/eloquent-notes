@@ -6,7 +6,7 @@ obsidian:
 
 ai:
   ollama_url: "http://localhost:11434"
-  model: "gemma4:12b-it-qat"
+  model: "gemma4:e4b-it-qat"
   output_language: "English" # Output language for rewritten notes, titles, wikilinks, and tags.
   context_length: 10000 # If null or not set, the maximum allowed by the model is used.
   keep_alive: "0"       # Time to keep model loaded after note generation (e.g. "5m", "10m", or "0" to unload immediately).

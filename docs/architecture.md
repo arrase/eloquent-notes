@@ -197,7 +197,7 @@ flowchart TB
     end
 
     %% External Services
-    Ollama["Local Ollama API\n(gemma4:12b-it-qat)"]
+    Ollama["Local Ollama API\n(gemma4:e4b-it-qat)"]
     Vault[("Obsidian Vault\n(Markdown Files)")]
     
     R4 -->|"POST /api/chat"| Ollama
