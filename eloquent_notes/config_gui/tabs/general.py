@@ -120,9 +120,8 @@ class GeneralTab(ConfigTab):
             autostart_path = os.path.expanduser("~/.config/autostart/eloquent-notes.desktop")
             if self.chk_autostart.isChecked():
                 install_autostart()
-            else:
-                if os.path.exists(autostart_path):
-                    os.remove(autostart_path)
+            elif os.path.exists(autostart_path):
+                os.remove(autostart_path)
             return True
         except Exception as e:
             QMessageBox.critical(

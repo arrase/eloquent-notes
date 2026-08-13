@@ -67,46 +67,53 @@ class EloquentApp(QObject):
     def run(self):
         """Set up the system tray, IPC server, and enter the event loop."""
         self.tray = QSystemTrayIcon()
+        self._init_ipc_server()
+        self._init_tray_ui()
 
+        if self.start_recording_immediately:
+            QTimer.singleShot(100, self.toggle_action)
+
+        sys.exit(self.app.exec())
+
+    def _init_ipc_server(self):
         self.server = QLocalServer(self)
         self.server.removeServer("eloquent_notes_ipc")
         if not self.server.listen("eloquent_notes_ipc"):
             logger.error("Failed to start local IPC server.")
         self.server.newConnection.connect(self._handle_ipc_connection)
 
-        self.menu = QMenu()
+    def _init_tray_ui(self):
+        self.menu = self._create_tray_menu()
+        self.tray.setContextMenu(self.menu)
+        self.tray.activated.connect(self._on_tray_activated)
+        self._update_icon("gray", "Eloquent Notes (Idle)")
+        self.tray.show()
 
-        toggle_action = QAction("Start/Stop Recording", self.menu)
+    def _create_tray_menu(self):
+        menu = QMenu()
+
+        toggle_action = QAction("Start/Stop Recording", menu)
         font = toggle_action.font()
         font.setBold(True)
         toggle_action.setFont(font)
         toggle_action.triggered.connect(self.toggle_action)
-        self.menu.addAction(toggle_action)
+        menu.addAction(toggle_action)
 
-        config_action = QAction("Configuration", self.menu)
+        config_action = QAction("Configuration", menu)
         config_action.triggered.connect(self.show_config_dialog)
-        self.menu.addAction(config_action)
+        menu.addAction(config_action)
 
-        reload_action = QAction("Reload Configuration", self.menu)
+        reload_action = QAction("Reload Configuration", menu)
         reload_action.triggered.connect(self.reload_config)
-        self.menu.addAction(reload_action)
+        menu.addAction(reload_action)
 
-        self.menu.addSeparator()
+        menu.addSeparator()
 
-        quit_action = QAction("Quit", self.menu)
+        quit_action = QAction("Quit", menu)
         quit_action.triggered.connect(self.exit_app)
-        self.menu.addAction(quit_action)
+        menu.addAction(quit_action)
 
-        self.tray.setContextMenu(self.menu)
-        self.tray.activated.connect(self._on_tray_activated)
-
-        self._update_icon("gray", "Eloquent Notes (Idle)")
-        self.tray.show()
-
-        if self.start_recording_immediately:
-            QTimer.singleShot(100, self.toggle_action)
-
-        sys.exit(self.app.exec())
+        return menu
 
     def _on_tray_activated(self, reason):
         if reason == QSystemTrayIcon.ActivationReason.Trigger:
@@ -183,23 +190,10 @@ class EloquentApp(QObject):
         logger.info("Starting audio recording...")
 
         self.active_config = copy.deepcopy(self.config)
-        
-        # Preload prompts and templates on the main thread to avoid concurrent read/write race conditions
-        loaded_files = {}
-        for path in [
-            config.RETRY_PROMPT_PATH,
-            config.TRANSCRIPTION_SYSTEM_PROMPT_PATH,
-            config.TRANSCRIPTION_USER_PROMPT_PATH,
-            config.REWRITING_SYSTEM_PROMPT_PATH,
-            config.REWRITING_USER_PROMPT_PATH,
-            config.CLASSIFICATION_SYSTEM_PROMPT_PATH,
-            config.CLASSIFICATION_USER_PROMPT_PATH,
-            config.STANDALONE_TEMPLATE_PATH,
-            config.DAILY_NEW_TEMPLATE_PATH,
-            config.DAILY_APPEND_TEMPLATE_PATH,
-        ]:
-            loaded_files[path] = config.load_file(path)
-        self.active_config["_loaded_files"] = loaded_files
+        self.active_config["_loaded_files"] = {
+            path: config.load_file(path)
+            for path in config.PROMPT_AND_TEMPLATE_PATHS
+        }
 
         audio_cfg = self.active_config["audio"]
 
@@ -272,6 +266,105 @@ class EloquentApp(QObject):
             f" mentioned): {topics_str}\n\n"
         )
 
+    def _get_recorded_wav_bytes(self):
+        with self._lock:
+            rec = self._recorder
+        return rec.wav_bytes if rec is not None else None
+
+    def _format_language_instruction(self, target_language):
+        return (
+            f"IMPORTANT: You MUST write the title, content, wikilinks, and tags in {target_language}. "
+            f"DO NOT translate to any other language."
+        )
+
+    def _transcribe(self, ai_cfg, wav_bytes, retry_prompt):
+        return llm.transcribe_audio(
+            ollama_url=ai_cfg["ollama_url"],
+            model=ai_cfg["model"],
+            system_prompt=self.active_config["_loaded_files"][
+                config.TRANSCRIPTION_SYSTEM_PROMPT_PATH
+            ],
+            user_prompt=self.active_config["_loaded_files"][
+                config.TRANSCRIPTION_USER_PROMPT_PATH
+            ],
+            retry_prompt=retry_prompt,
+            context_length=ai_cfg["context_length"],
+            audio_bytes=wav_bytes,
+            keep_alive=ai_cfg["preload_keep_alive"],
+            max_retries=ai_cfg["max_retries"],
+            timeout=ai_cfg["request_timeout"],
+        )
+
+    def _rewrite(self, ai_cfg, transcription, language_instruction, retry_prompt):
+        rewriting_user_template = self.active_config["_loaded_files"][
+            config.REWRITING_USER_PROMPT_PATH
+        ]
+        rewriting_user_prompt = rewriting_user_template.format(
+            transcription=transcription,
+            language_instruction=language_instruction,
+        )
+        return llm.rewrite_transcription(
+            ollama_url=ai_cfg["ollama_url"],
+            model=ai_cfg["model"],
+            system_prompt=self.active_config["_loaded_files"][
+                config.REWRITING_SYSTEM_PROMPT_PATH
+            ],
+            user_prompt=rewriting_user_prompt,
+            retry_prompt=retry_prompt,
+            context_length=ai_cfg["context_length"],
+            keep_alive=ai_cfg["preload_keep_alive"],
+            max_retries=ai_cfg["max_retries"],
+            timeout=ai_cfg["request_timeout"],
+        )
+
+    def _classify(self, ai_cfg, transcription, language_instruction, retry_prompt):
+        vault_context = self._build_vault_context()
+        classification_user_template = self.active_config["_loaded_files"][
+            config.CLASSIFICATION_USER_PROMPT_PATH
+        ]
+        classification_user_prompt = classification_user_template.format(
+            transcription=transcription,
+            vault_context=vault_context,
+            language_instruction=language_instruction,
+        )
+        return llm.classify_transcription(
+            ollama_url=ai_cfg["ollama_url"],
+            model=ai_cfg["model"],
+            system_prompt=self.active_config["_loaded_files"][
+                config.CLASSIFICATION_SYSTEM_PROMPT_PATH
+            ],
+            user_prompt=classification_user_prompt,
+            retry_prompt=retry_prompt,
+            context_length=ai_cfg["context_length"],
+            keep_alive=ai_cfg["keep_alive"],
+            max_retries=ai_cfg["max_retries"],
+            timeout=ai_cfg["request_timeout"],
+        )
+
+    def _save_formatted_note(self, obs_cfg, rewrite_result, classification_result):
+        formatted_text = obsidian.format_note_content(
+            note_type=classification_result["type"],
+            content=rewrite_result["content"],
+            wikilinks=classification_result["wikilinks"],
+        )
+        return obsidian.save_note(
+            vault_path=obs_cfg["vault_path"],
+            folder=obs_cfg["folder"],
+            daily_notes=obs_cfg["daily_notes"],
+            title=rewrite_result["title"],
+            text=formatted_text,
+            tags=classification_result["tags"],
+            template_standalone=self.active_config["_loaded_files"][
+                config.STANDALONE_TEMPLATE_PATH
+            ],
+            template_daily_new=self.active_config["_loaded_files"][
+                config.DAILY_NEW_TEMPLATE_PATH
+            ],
+            template_daily_append=self.active_config["_loaded_files"][
+                config.DAILY_APPEND_TEMPLATE_PATH
+            ],
+        )
+
     def _process_audio(self):
         """Process recorded audio via the three-phase LLM pipeline.
 
@@ -296,9 +389,7 @@ class EloquentApp(QObject):
                     sample_rate=audio_cfg["sample_rate"],
                 )
 
-            with self._lock:
-                rec = self._recorder
-            wav_bytes = rec.wav_bytes if rec is not None else None
+            wav_bytes = self._get_recorded_wav_bytes()
             if not wav_bytes or len(wav_bytes) <= 44:
                 self.processing_completed.emit("empty", "")
                 return
@@ -307,91 +398,29 @@ class EloquentApp(QObject):
 
             # --- Phase 1: Transcription ---
             logger.info("Phase 1: Transcribing audio...")
-            transcription_result = llm.transcribe_audio(
-                ollama_url=ai_cfg["ollama_url"],
-                model=ai_cfg["model"],
-                system_prompt=self.active_config["_loaded_files"][
-                    config.TRANSCRIPTION_SYSTEM_PROMPT_PATH
-                ],
-                user_prompt=self.active_config["_loaded_files"][
-                    config.TRANSCRIPTION_USER_PROMPT_PATH
-                ],
-                retry_prompt=retry_prompt,
-                context_length=ai_cfg["context_length"],
-                audio_bytes=wav_bytes,
-                keep_alive=ai_cfg["preload_keep_alive"],
-                max_retries=ai_cfg["max_retries"],
-                timeout=ai_cfg["request_timeout"],
-            )
-
-            if (
-                transcription_result["empty"]
-                or not transcription_result["transcription"].strip()
-            ):
+            transcription_result = self._transcribe(ai_cfg, wav_bytes, retry_prompt)
+            transcription = transcription_result["transcription"].strip()
+            if transcription_result["empty"] or not transcription:
                 self.processing_completed.emit("empty", "")
                 return
 
-            transcription = transcription_result["transcription"]
             logger.info("Transcription: %s", transcription)
 
             target_language = ai_cfg.get("output_language", "English")
-            language_instruction = (
-                f"IMPORTANT: You MUST write the title, content, wikilinks, and tags in {target_language}. "
-                f"DO NOT translate to any other language."
-            )
+            language_instruction = self._format_language_instruction(target_language)
 
             # --- Phase 2: Rewriting ---
             logger.info("Phase 2: Rewriting transcription...")
-            rewriting_user_template = self.active_config["_loaded_files"][
-                config.REWRITING_USER_PROMPT_PATH
-            ]
-            rewriting_user_prompt = rewriting_user_template.format(
-                transcription=transcription,
-                language_instruction=language_instruction,
+            rewrite_result = self._rewrite(
+                ai_cfg, transcription, language_instruction, retry_prompt,
             )
-
-            rewrite_result = llm.rewrite_transcription(
-                ollama_url=ai_cfg["ollama_url"],
-                model=ai_cfg["model"],
-                system_prompt=self.active_config["_loaded_files"][
-                    config.REWRITING_SYSTEM_PROMPT_PATH
-                ],
-                user_prompt=rewriting_user_prompt,
-                retry_prompt=retry_prompt,
-                context_length=ai_cfg["context_length"],
-                keep_alive=ai_cfg["preload_keep_alive"],
-                max_retries=ai_cfg["max_retries"],
-                timeout=ai_cfg["request_timeout"],
-            )
-
             logger.info("Rewriting: title=%s", rewrite_result["title"])
 
             # --- Phase 3: Classification ---
             logger.info("Phase 3: Classifying transcription...")
-            vault_context = self._build_vault_context()
-            classification_user_template = self.active_config["_loaded_files"][
-                config.CLASSIFICATION_USER_PROMPT_PATH
-            ]
-            classification_user_prompt = classification_user_template.format(
-                transcription=transcription,
-                vault_context=vault_context,
-                language_instruction=language_instruction,
+            classification_result = self._classify(
+                ai_cfg, transcription, language_instruction, retry_prompt,
             )
-
-            classification_result = llm.classify_transcription(
-                ollama_url=ai_cfg["ollama_url"],
-                model=ai_cfg["model"],
-                system_prompt=self.active_config["_loaded_files"][
-                    config.CLASSIFICATION_SYSTEM_PROMPT_PATH
-                ],
-                user_prompt=classification_user_prompt,
-                retry_prompt=retry_prompt,
-                context_length=ai_cfg["context_length"],
-                keep_alive=ai_cfg["keep_alive"],
-                max_retries=ai_cfg["max_retries"],
-                timeout=ai_cfg["request_timeout"],
-            )
-
             logger.info(
                 "Classification: type=%s, wikilinks=%s, tags=%s",
                 classification_result["type"],
@@ -400,34 +429,15 @@ class EloquentApp(QObject):
             )
 
             # --- Assemble and save ---
-            formatted_text = obsidian.format_note_content(
-                note_type=classification_result["type"],
-                content=rewrite_result["content"],
-                wikilinks=classification_result["wikilinks"],
-            )
-
-            saved_path = obsidian.save_note(
-                vault_path=obs_cfg["vault_path"],
-                folder=obs_cfg["folder"],
-                daily_notes=obs_cfg["daily_notes"],
-                title=rewrite_result["title"],
-                text=formatted_text,
-                tags=classification_result["tags"],
-                template_standalone=self.active_config["_loaded_files"][
-                    config.STANDALONE_TEMPLATE_PATH
-                ],
-                template_daily_new=self.active_config["_loaded_files"][
-                    config.DAILY_NEW_TEMPLATE_PATH
-                ],
-                template_daily_append=self.active_config["_loaded_files"][
-                    config.DAILY_APPEND_TEMPLATE_PATH
-                ],
+            saved_path = self._save_formatted_note(
+                obs_cfg, rewrite_result, classification_result,
             )
             self.processing_completed.emit("success", saved_path)
 
         except Exception as e:
             logger.exception("Error during audio processing/saving")
             self.processing_completed.emit("error", str(e))
+
 
     def _on_processing_completed(self, status, detail):
         self.state = "IDLE"
