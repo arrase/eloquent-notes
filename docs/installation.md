@@ -67,10 +67,10 @@ systemctl status ollama
 
 ### 2. Download Gemma 4 Model
 
-Download the recommended quantized Gemma 4 model (`gemma4:12b-it-qat`):
+Download the recommended quantized Gemma 4 model (`gemma4:e4b-it-qat`):
 
 ```bash
-ollama pull gemma4:12b-it-qat
+ollama pull gemma4:e4b-it-qat
 ```
 
 *(Note: You can also use other multimodal models compatible with audio dictation by updating the model name in your `config.yaml` or through the **AI Settings** tab in the GUI).*

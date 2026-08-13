@@ -55,7 +55,7 @@ class AITab(ConfigTab):
         self.cmb_model = QComboBox()
         self.cmb_model.setEditable(True)
         self.cmb_model.setToolTip(
-            "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:12b-it-qat)."
+            "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
         )
         self.btn_refresh_models = QPushButton("Refresh")
         self.btn_refresh_models.clicked.connect(self._fetch_models)
@@ -210,7 +210,7 @@ class AITab(ConfigTab):
             ai_cfg = {}
         self.txt_ollama_url.setText(str(ai_cfg.get("ollama_url", "http://localhost:11434")))
 
-        curr_model = str(ai_cfg.get("model", "gemma4:12b-it-qat"))
+        curr_model = str(ai_cfg.get("model", "gemma4:e4b-it-qat"))
         if self.cmb_model.findText(curr_model) == -1:
             self.cmb_model.addItem(curr_model)
         self.cmb_model.setCurrentText(curr_model)

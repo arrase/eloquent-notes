@@ -32,9 +32,9 @@ Eloquent Notes is a lightweight, system-tray-centric utility for Linux inspired 
 ## 📋 Prerequisites
 
 1. **Ollama & Gemma 4 Model:**
-   Ensure you have Ollama running locally and have pulled a Gemma 4 model (the default model configured is `gemma4:12b-it-qat`):
+   Ensure you have Ollama running locally and have pulled a Gemma 4 model (the default model configured is `gemma4:e4b-it-qat`):
    ```bash
-   ollama pull gemma4:12b-it-qat
+   ollama pull gemma4:e4b-it-qat
    ```
 
 2. **System Dependencies:**
@@ -116,7 +116,7 @@ obsidian:
 
 ai:
   ollama_url: "http://localhost:11434"
-  model: "gemma4:12b-it-qat"
+  model: "gemma4:e4b-it-qat"
   output_language: "English"   # Output language for rewritten notes, titles, wikilinks, and tags (e.g. English, Spanish)
   context_length: 10000        # Context length limit (null defaults to model maximum)
   keep_alive: "0"              # Time to keep model loaded in VRAM after note generation (e.g. "5m", "10m", or "0" to unload immediately)
@@ -309,7 +309,7 @@ flowchart TB
     end
 
     %% External Services
-    Ollama["Local Ollama API\n(gemma4:12b-it-qat)"]
+    Ollama["Local Ollama API\n(gemma4:e4b-it-qat)"]
     Vault[("Obsidian Vault\n(Markdown Files)")]
     
     R4 -->|"POST /api/chat"| Ollama

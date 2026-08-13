@@ -1,6 +1,6 @@
 # Three-Phase AI Pipeline
 
-Eloquent Notes utilizes a modular three-phase LLM processing pipeline powered by local models via the Ollama REST API (default model: `gemma4:12b-it-qat`).
+Eloquent Notes utilizes a modular three-phase LLM processing pipeline powered by local models via the Ollama REST API (default model: `gemma4:e4b-it-qat`).
 
 Rather than attempting to force a single small LLM call to simultaneously transcribe multimodal audio, clean up prose, generate titles, analyze Obsidian vault context, and classify metadata, Eloquent Notes breaks down note processing into three specialized sequential phases.
 
