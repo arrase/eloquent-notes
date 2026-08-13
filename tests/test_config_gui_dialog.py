@@ -1,12 +1,8 @@
-import os
 from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
 from PyQt6.QtGui import QCloseEvent
 from PyQt6.QtWidgets import QMessageBox
-
-os.environ["QT_QPA_PLATFORM"] = "offscreen"
-
 
 from eloquent_notes.config_gui.dialog import ConfigurationDialog
 from eloquent_notes.config_gui.tabs.ai import AITab

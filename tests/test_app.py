@@ -1,25 +1,12 @@
 """Unit tests for eloquent_notes.app module."""
 
-import os
-import sys
 import threading
 from unittest.mock import MagicMock, patch
 
 import pytest
-from PyQt6.QtWidgets import QApplication
 
 from eloquent_notes import config
 from eloquent_notes.app import EloquentApp
-
-os.environ["QT_QPA_PLATFORM"] = "offscreen"
-
-
-@pytest.fixture(scope="session")
-def qapp():
-    app = QApplication.instance()
-    if app is None:
-        app = QApplication(sys.argv)
-    return app
 
 
 @pytest.fixture

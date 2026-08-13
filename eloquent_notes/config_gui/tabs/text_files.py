@@ -88,17 +88,20 @@ class TextFilesTab(ConfigTab):
             path = self.current_item.data(Qt.ItemDataRole.UserRole)
             self.loaded_contents[path] = self.editor.toPlainText()
 
+    @staticmethod
+    def _read_file_or_default(path, default_path):
+        if os.path.exists(path):
+            return config.load_file(path)
+        if os.path.exists(default_path):
+            return config.load_file(default_path)
+        return ""
+
     def load_settings(self, config_data: dict) -> None:
         self._block_cache = True
         self.loaded_contents.clear()
 
         for _, path, default_path in self.items:
-            if os.path.exists(path):
-                self.loaded_contents[path] = config.load_file(path)
-            elif os.path.exists(default_path):
-                self.loaded_contents[path] = config.load_file(default_path)
-            else:
-                self.loaded_contents[path] = ""
+            self.loaded_contents[path] = self._read_file_or_default(path, default_path)
 
         if self.lst_items.count() > 0:
             self.lst_items.setCurrentRow(0)

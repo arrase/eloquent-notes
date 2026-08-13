@@ -1,23 +1,8 @@
-"""Unit tests for eloquent_notes.ui."""
-
-import sys
 from PIL import Image
-from PyQt6.QtCore import QCoreApplication
 from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QApplication
-
 import pytest
 
 from eloquent_notes import ui
-
-
-@pytest.fixture(scope="module")
-def qapp():
-    """Ensure a QApplication instance exists for QIcon testing."""
-    app = QApplication.instance()
-    if app is None:
-        app = QApplication(sys.argv)
-    yield app
 
 
 @pytest.mark.parametrize("color", ["red", "orange", "gray", "unknown"])

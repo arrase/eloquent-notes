@@ -1,1 +1,1 @@
-# linux-eloquent package
+"""Eloquent Notes package."""
