@@ -27,6 +27,19 @@ def _strip_code_fences(text):
     return match.group(1).strip() if match else text.strip()
 
 
+def _extract_message_content(resp_data):
+    """Extract the 'message.content' string from an Ollama API response dict.
+
+    Returns None if the response structure is invalid.
+    """
+    if not isinstance(resp_data, dict):
+        return None
+    message = resp_data.get("message")
+    if not isinstance(message, dict):
+        return None
+    return message.get("content")
+
+
 def preload_model(ollama_url, model, context_length, keep_alive="5m", timeout=180):
     """Send an empty request to Ollama to preload model weights into VRAM.
 
@@ -87,12 +100,12 @@ def _execute_ollama_json_request(
             )
             raise
 
-        raw_content = ""
+        raw_content = None
         try:
             resp_data = response.json()
-            if not isinstance(resp_data, dict) or "message" not in resp_data or not isinstance(resp_data["message"], dict) or "content" not in resp_data["message"]:
+            raw_content = _extract_message_content(resp_data)
+            if raw_content is None:
                 raise ValueError(f"Ollama API response missing 'message.content': {resp_data}")
-            raw_content = resp_data["message"]["content"]
             content = _strip_code_fences(raw_content)
             result = json.loads(content)
             if not isinstance(result, dict) or not all(

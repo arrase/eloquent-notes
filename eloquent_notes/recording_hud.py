@@ -6,7 +6,7 @@ visual recording status, and progress bar during audio dictation.
 
 import math
 
-from PyQt6.QtCore import QPoint, QRectF, Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import QRectF, Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import (
     QColor,
     QCursor,
@@ -29,6 +29,21 @@ class RecordingHUD(QWidget):
     """Minimalist floating recording indicator and countdown HUD."""
 
     clicked = pyqtSignal()
+
+    _TIMER_LABEL_QSS = "color: {}; font-size: 12px; font-weight: bold; font-family: monospace;"
+
+    def _progress_bar_qss(self, chunk_color: str) -> str:
+        return f"""
+            QProgressBar {{
+                background-color: rgba(255, 255, 255, 0.15);
+                border: none;
+                border-radius: 1px;
+            }}
+            QProgressBar::chunk {{
+                background-color: {chunk_color};
+                border-radius: 1px;
+            }}
+            """
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -70,7 +85,7 @@ class RecordingHUD(QWidget):
         header_layout.addStretch()
 
         self.lbl_timer = QLabel("00:30")
-        self.lbl_timer.setStyleSheet("color: #FFFFFF; font-size: 12px; font-weight: bold; font-family: monospace;")
+        self.lbl_timer.setStyleSheet(self._TIMER_LABEL_QSS.format("#FFFFFF"))
         header_layout.addWidget(self.lbl_timer)
 
         layout.addLayout(header_layout)
@@ -81,19 +96,7 @@ class RecordingHUD(QWidget):
         self.progress_bar.setTextVisible(False)
         self.progress_bar.setRange(0, 1000)
         self.progress_bar.setValue(0)
-        self.progress_bar.setStyleSheet(
-            """
-            QProgressBar {
-                background-color: rgba(255, 255, 255, 0.15);
-                border: none;
-                border-radius: 1px;
-            }
-            QProgressBar::chunk {
-                background-color: #E5E7EB;
-                border-radius: 1px;
-            }
-            """
-        )
+        self.progress_bar.setStyleSheet(self._progress_bar_qss("#E5E7EB"))
         layout.addWidget(self.progress_bar)
 
     def paintEvent(self, event: QPaintEvent | None) -> None:
@@ -126,19 +129,7 @@ class RecordingHUD(QWidget):
         self.lbl_dot.setStyleSheet("color: #EF4444; font-size: 14px; font-weight: bold;")
         self.lbl_status.setText("Recording Note...")
         self.progress_bar.setValue(0)
-        self.progress_bar.setStyleSheet(
-            """
-            QProgressBar {
-                background-color: rgba(255, 255, 255, 0.15);
-                border: none;
-                border-radius: 1px;
-            }
-            QProgressBar::chunk {
-                background-color: #E5E7EB;
-                border-radius: 1px;
-            }
-            """
-        )
+        self.progress_bar.setStyleSheet(self._progress_bar_qss("#E5E7EB"))
 
         if total_duration > 0:
             secs = int(total_duration)
@@ -146,7 +137,7 @@ class RecordingHUD(QWidget):
         else:
             self.lbl_timer.setText("00:00")
 
-        self.lbl_timer.setStyleSheet("color: #FFFFFF; font-size: 12px; font-weight: bold; font-family: monospace;")
+        self.lbl_timer.setStyleSheet(self._TIMER_LABEL_QSS.format("#FFFFFF"))
         self.reposition()
         self.show()
         self.raise_()
@@ -176,22 +167,8 @@ class RecordingHUD(QWidget):
                 timer_color = "#FFFFFF"
                 chunk_color = "#E5E7EB"
 
-            self.lbl_timer.setStyleSheet(
-                f"color: {timer_color}; font-size: 12px; font-weight: bold; font-family: monospace;"
-            )
-            self.progress_bar.setStyleSheet(
-                f"""
-                QProgressBar {{
-                    background-color: rgba(255, 255, 255, 0.15);
-                    border: none;
-                    border-radius: 1px;
-                }}
-                QProgressBar::chunk {{
-                    background-color: {chunk_color};
-                    border-radius: 1px;
-                }}
-                """
-            )
+            self.lbl_timer.setStyleSheet(self._TIMER_LABEL_QSS.format(timer_color))
+            self.progress_bar.setStyleSheet(self._progress_bar_qss(chunk_color))
         else:
             secs = int(elapsed_seconds)
             self.lbl_timer.setText(f"{secs // 60:02d}:{secs % 60:02d}")
@@ -203,21 +180,9 @@ class RecordingHUD(QWidget):
         self.lbl_dot.setStyleSheet("color: #F59E0B; font-size: 12px;")
         self.lbl_status.setText("Processing Note...")
         self.lbl_timer.setText("LLM")
-        self.lbl_timer.setStyleSheet("color: #F59E0B; font-size: 12px; font-weight: bold;")
+        self.lbl_timer.setStyleSheet(self._TIMER_LABEL_QSS.format("#F59E0B"))
         self.progress_bar.setValue(1000)
-        self.progress_bar.setStyleSheet(
-            """
-            QProgressBar {
-                background-color: rgba(255, 255, 255, 0.15);
-                border: none;
-                border-radius: 1px;
-            }
-            QProgressBar::chunk {
-                background-color: #F59E0B;
-                border-radius: 1px;
-            }
-            """
-        )
+        self.progress_bar.setStyleSheet(self._progress_bar_qss("#F59E0B"))
         self.update()
         QTimer.singleShot(1200, self.hide_hud)
 

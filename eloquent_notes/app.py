@@ -8,7 +8,6 @@ through a three-phase Ollama pipeline (transcription → rewriting → classific
 import argparse
 import copy
 import logging
-import math
 import os
 import sys
 import threading
@@ -100,9 +99,6 @@ class EloquentApp(QObject):
         self.tray.activated.connect(self._on_tray_activated)
         self._update_icon("gray", "Eloquent Notes (Idle)")
         self.tray.show()
-        if self._hud is None:
-            self._hud = recording_hud.RecordingHUD()
-            self._hud.clicked.connect(self.toggle_action)
 
     def _create_tray_menu(self):
         menu = QMenu()
@@ -212,10 +208,6 @@ class EloquentApp(QObject):
 
         audio_cfg = self.active_config["audio"]
 
-        hud_enabled = audio_cfg.get("recording_hud_enabled", True)
-        if hud_enabled and self._hud is not None:
-            self._hud.show_recording(float(audio_cfg.get("capture_duration", 30)))
-
         def run():
             try:
                 if audio_cfg["beep_enabled"]:
@@ -259,7 +251,7 @@ class EloquentApp(QObject):
         self._recording_start_time = time.monotonic()
         self._recording_max_duration = float(duration)
 
-        hud_enabled = self.active_config.get("audio", {}).get("recording_hud_enabled", True)
+        hud_enabled = self.active_config["audio"]["recording_hud_enabled"]
         if hud_enabled and self._hud is not None:
             self._hud.show_recording(self._recording_max_duration)
 

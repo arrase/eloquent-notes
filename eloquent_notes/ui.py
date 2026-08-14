@@ -45,6 +45,3 @@ def get_qicon(color: str) -> QIcon:
     pixmap = QPixmap()
     pixmap.loadFromData(byte_arr.getvalue(), "PNG")
     return QIcon(pixmap)
-
-
-

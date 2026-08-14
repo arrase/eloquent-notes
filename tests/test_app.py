@@ -32,6 +32,7 @@ def mock_config(tmp_path):
             "beep_enabled": False,
             "beep_frequency": 440,
             "beep_duration": 0.1,
+            "recording_hud_enabled": True,
         },
         "obsidian": {
             "vault_path": str(vault_dir),
