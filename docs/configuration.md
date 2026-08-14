@@ -39,7 +39,7 @@ Controls how generated dictations are integrated into your Obsidian vault:
 Configures connection parameters and behavior for the local Ollama inference server:
 * **Ollama Server URL**: Endpoint URL of your running Ollama service (default: `http://localhost:11434`).
 * **Model Name**: Large language / multimodal model tag (default: `gemma4:e4b-it-qat`).
-* **Context Length (`num_ctx`)**: Context window limit for LLM requests (default: `1200` tokens).
+* **Context Length (`num_ctx`)**: Context window limit for LLM requests (default: `8192` tokens).
 * **Keep-Alive Duration**: Time duration to keep model weights loaded in VRAM after note generation (e.g., `0` for immediate unload, `5m`, `10m`).
 * **Preload Keep-Alive**: VRAM persistence duration while actively recording audio to minimize latency during generation (default: `5m`).
 * **Max Retries**: Retry count for JSON schema validation failures during prompt execution (default: `3`).
@@ -47,9 +47,11 @@ Configures connection parameters and behavior for the local Ollama inference ser
 * **Request Timeout**: Maximum wait time in seconds for inference generation to complete (default: `300` seconds).
 
 #### 4. Audio
-Controls input recording settings and audible status notifications:
+Controls input recording settings, duration limits, and visual/audible status notifications:
 * **Sample Rate**: Recording sample frequency in Hertz (default: `16000` Hz / 16 kHz).
 * **Channels**: Audio channels captured (`1` for Mono, `2` for Stereo).
+* **Capture Duration**: Maximum recording duration in seconds before automatically stopping and sending to LLM (default: `30` seconds).
+* **Show Recording HUD**: Displays a floating pill overlay with real-time countdown timer and progress bar while dictating (default: `true`).
 * **Enable Audio Feedback**: Toggle sound effects played upon starting and stopping recording.
 * **Beep Frequency**: Pitch of the audio tone in Hertz (default: `440` Hz, musical note A4).
 * **Beep Duration**: Length of tone playback in seconds (default: `0.1` seconds).
@@ -80,7 +82,7 @@ obsidian:
 ai:
   ollama_url: "http://localhost:11434"
   model: "gemma4:e4b-it-qat"
-  context_length: 1200  # Context window size in tokens
+  context_length: 8192  # Context window size in tokens
   keep_alive: "0"       # VRAM retention after note completion ("0" unloads immediately)
   preload_keep_alive: "5m" # VRAM retention during active recording
   max_retries: 3        # Retries on JSON parsing failure
@@ -90,6 +92,8 @@ ai:
 audio:
   sample_rate: 16000
   channels: 1
+  capture_duration: 30  # Maximum audio capture duration in seconds
+  recording_hud_enabled: true # Floating countdown HUD overlay during recording
   beep_frequency: 440
   beep_duration: 0.1
   beep_enabled: true

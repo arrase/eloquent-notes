@@ -11,13 +11,14 @@ import logging
 import os
 import sys
 import threading
+import time
 
 from PyQt6.QtCore import QObject, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction
 from PyQt6.QtNetwork import QLocalServer
 from PyQt6.QtWidgets import QApplication, QMenu, QSystemTrayIcon
 
-from eloquent_notes import audio, config, config_gui, llm, obsidian, ui
+from eloquent_notes import audio, config, config_gui, llm, obsidian, recording_hud, ui
 from eloquent_notes.logging_utils import setup_logging
 
 logger = logging.getLogger("eloquent_notes.app")
@@ -27,6 +28,8 @@ class EloquentApp(QObject):
     """Main application controller for the system tray dictation tool."""
 
     processing_completed = pyqtSignal(str, str)
+    capture_timeout = pyqtSignal()
+    recording_started = pyqtSignal(int)
 
     def __init__(self, qapp, start_recording_immediately=False):
         super().__init__()
@@ -34,6 +37,10 @@ class EloquentApp(QObject):
         self._lock = threading.Lock()
         self._state = "IDLE"
         self._recorder = None
+        self._recording_tick_timer = QTimer(self)
+        self._recording_tick_timer.timeout.connect(self._on_recording_tick)
+        self._recording_start_time = 0.0
+        self._recording_max_duration = 0.0
         self.config = config.load_config()
         self.active_config = self.config
         self._config_dialog = None
@@ -41,8 +48,12 @@ class EloquentApp(QObject):
         self.start_recording_immediately = start_recording_immediately
         self.server = None
         self.tray = None
+        self._hud = recording_hud.RecordingHUD()
+        self._hud.clicked.connect(self.toggle_action)
 
         self.processing_completed.connect(self._on_processing_completed)
+        self.capture_timeout.connect(self._stop_recording_and_process)
+        self.recording_started.connect(self._on_recording_started)
 
     @property
     def state(self):
@@ -225,6 +236,7 @@ class EloquentApp(QObject):
                             should_preload = False
                             rec.stop()
                     if should_preload:
+                        self.recording_started.emit(int(audio_cfg["capture_duration"]))
                         threading.Thread(
                             target=self._preload_model, daemon=True,
                         ).start()
@@ -234,12 +246,53 @@ class EloquentApp(QObject):
 
         threading.Thread(target=run, daemon=True).start()
 
+    def _on_recording_started(self, duration: int) -> None:
+        """Initialize UI countdown indicators and start periodic tick timer."""
+        self._recording_start_time = time.monotonic()
+        self._recording_max_duration = float(duration)
+
+        hud_enabled = self.active_config["audio"]["recording_hud_enabled"]
+        if hud_enabled and self._hud is not None:
+            self._hud.show_recording(self._recording_max_duration)
+
+        self._recording_tick_timer.start(100)
+
+    def _on_recording_tick(self) -> None:
+        """Update live countdown in HUD overlay on timer tick."""
+        if self.state != "RECORDING":
+            self._recording_tick_timer.stop()
+            return
+
+        elapsed = time.monotonic() - self._recording_start_time
+        max_dur = self._recording_max_duration
+
+        if max_dur > 0:
+            remaining = max(0.0, max_dur - elapsed)
+            if self._hud is not None and self._hud.isVisible():
+                self._hud.update_progress(elapsed, remaining, max_dur)
+
+            if elapsed >= max_dur:
+                self._recording_tick_timer.stop()
+                self._on_capture_timeout()
+        else:
+            if self._hud is not None and self._hud.isVisible():
+                self._hud.update_progress(elapsed, 0.0, 0.0)
+
+    def _on_capture_timeout(self):
+        """Handle maximum capture duration timeout."""
+        logger.info("Maximum capture duration reached, stopping recording...")
+        self.capture_timeout.emit()
+
     def _stop_recording_and_process(self):
+        self._recording_tick_timer.stop()
         with self._lock:
             if self._state != "RECORDING":
                 return
             self._state = "PROCESSING"
             rec = self._recorder
+
+        if self._hud is not None and self._hud.isVisible():
+            self._hud.show_processing()
 
         self._update_icon("orange", "Eloquent Notes (Processing...)")
         logger.info("Stopping recording and starting processing...")
@@ -440,6 +493,9 @@ class EloquentApp(QObject):
 
 
     def _on_processing_completed(self, status, detail):
+        self._recording_tick_timer.stop()
+        if self._hud is not None:
+            self._hud.hide_hud()
         self.state = "IDLE"
         self.recorder = None
         self._update_icon("gray", "Eloquent Notes (Idle)")
@@ -507,6 +563,10 @@ class EloquentApp(QObject):
     def exit_app(self):
         """Clean up and exit the application."""
         logger.info("Exiting application...")
+        self._recording_tick_timer.stop()
+        if self._hud is not None:
+            self._hud.hide_hud()
+            self._hud.close()
         with self._lock:
             prev_state = self._state
             self._state = "IDLE"

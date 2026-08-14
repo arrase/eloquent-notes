@@ -96,7 +96,7 @@ Eloquent Notes features a built-in graphical settings editor to modify your conf
 - **General:** Enable or disable automatic login startup, set logging levels, configure log file size limits, and view log files directly.
 - **Obsidian:** Browse for your Obsidian vault path, specify the target destination folder, toggle Daily Notes appending, and toggle vault-wide scanning to auto-generate Wikilink recommendations.
 - **AI Settings:** Configure the Ollama API endpoint, select local LLM models, set the target **Output Language** (e.g. English, Spanish), set custom context lengths, adjust keep-alive limits to optimize GPU memory usage, and customize timeout/retry values.
-- **Audio:** Configure microphone sample rate and recording channel mode, and adjust acoustic feedback beeps (frequency, duration, or disable completely).
+- **Audio:** Configure microphone sample rate, recording channels, maximum capture duration, and adjust acoustic feedback beeps (frequency, duration, or disable completely).
 - **Prompts:** Edit custom Markdown prompt definitions (system and user instructions) for all three pipeline stages plus retry rules.
 - **Templates:** Edit and customize the layout files (`standalone.md`, `daily_new.md`, and `daily_append.md`) for note generation.
 
@@ -120,7 +120,7 @@ ai:
   ollama_url: "http://localhost:11434"
   model: "gemma4:e4b-it-qat"
   output_language: "English"   # Output language for rewritten notes, titles, wikilinks, and tags (e.g. English, Spanish)
-  context_length: 1200         # Context length limit (null defaults to model maximum)
+  context_length: 8192         # Context length limit (null defaults to model maximum)
   keep_alive: "0"              # Time to keep model loaded in VRAM after note generation (e.g. "5m", "10m", or "0" to unload immediately)
   preload_keep_alive: "5m"     # Time to keep model weights loaded in VRAM during recording to minimize note generation cold-start
   max_retries: 3               # Number of times to retry LLM execution if the output is not valid JSON
@@ -130,6 +130,7 @@ ai:
 audio:
   sample_rate: 16000           # Audio sample rate (16kHz is ideal for Gemma 4)
   channels: 1                  # Mono channel recording
+  capture_duration: 30         # Maximum audio capture duration in seconds
   beep_frequency: 440          # Audio cue beep frequency (Hz)
   beep_duration: 0.1           # Beep duration (seconds)
   beep_enabled: true           # Enable/disable audio cues (beeps)

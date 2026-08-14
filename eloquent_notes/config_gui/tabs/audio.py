@@ -44,6 +44,21 @@ class AudioTab(ConfigTab):
         self.cmb_channels.setToolTip("Number of audio input channels.")
         form_layout.addRow(QLabel("Audio Channels:"), self.cmb_channels)
 
+        self.spn_capture_duration = QSpinBox()
+        self.spn_capture_duration.setRange(1, 3600)
+        self.spn_capture_duration.setSingleStep(5)
+        self.spn_capture_duration.setSuffix(" sec")
+        self.spn_capture_duration.setToolTip(
+            "Maximum duration in seconds for audio recording before automatically processing."
+        )
+        form_layout.addRow(QLabel("Capture Duration:"), self.spn_capture_duration)
+
+        self.chk_recording_hud_enabled = QCheckBox("Show floating countdown HUD overlay during recording")
+        self.chk_recording_hud_enabled.setToolTip(
+            "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+        )
+        form_layout.addRow(self.chk_recording_hud_enabled)
+
         self.chk_beep_enabled = QCheckBox("Play beep on recording start and stop")
         self.chk_beep_enabled.setToolTip("Audible feedback beeps when starting/stopping recording.")
         form_layout.addRow(self.chk_beep_enabled)
@@ -76,6 +91,12 @@ class AudioTab(ConfigTab):
         channels = audio_cfg.get("channels", 1)
         self.cmb_channels.setCurrentIndex(0 if channels == 1 else 1)
 
+        try:
+            self.spn_capture_duration.setValue(int(audio_cfg.get("capture_duration", 30)))
+        except (ValueError, TypeError):
+            self.spn_capture_duration.setValue(30)
+
+        self.chk_recording_hud_enabled.setChecked(bool(audio_cfg.get("recording_hud_enabled", True)))
         self.chk_beep_enabled.setChecked(bool(audio_cfg.get("beep_enabled", True)))
 
         try:
@@ -95,6 +116,8 @@ class AudioTab(ConfigTab):
         config_data["audio"].update({
             "sample_rate": self.spn_sample_rate.value(),
             "channels": 1 if self.cmb_channels.currentIndex() == 0 else 2,
+            "capture_duration": self.spn_capture_duration.value(),
+            "recording_hud_enabled": self.chk_recording_hud_enabled.isChecked(),
             "beep_enabled": self.chk_beep_enabled.isChecked(),
             "beep_frequency": self.spn_beep_freq.value(),
             "beep_duration": self.spn_beep_duration.value(),

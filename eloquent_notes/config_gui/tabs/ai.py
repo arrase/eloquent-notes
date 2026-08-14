@@ -78,7 +78,7 @@ class AITab(ConfigTab):
         self.spn_context_length = QSpinBox()
         self.spn_context_length.setRange(512, 262144)
         self.spn_context_length.setSingleStep(1024)
-        self.spn_context_length.setValue(1200)
+        self.spn_context_length.setValue(8192)
         self.spn_context_length.setToolTip(
             "Context length in tokens to pass to Ollama. "
             "Larger values allow more vault context but use more memory."
@@ -215,18 +215,18 @@ class AITab(ConfigTab):
             self.cmb_model.addItem(curr_model)
         self.cmb_model.setCurrentText(curr_model)
 
-        context_len = ai_cfg.get("context_length", 1200)
+        context_len = ai_cfg.get("context_length", 8192)
         if context_len is None:
             self.chk_context_default.setChecked(True)
             self.spn_context_length.setEnabled(False)
-            self.spn_context_length.setValue(1200)
+            self.spn_context_length.setValue(8192)
         else:
             self.chk_context_default.setChecked(False)
             self.spn_context_length.setEnabled(True)
             try:
                 self.spn_context_length.setValue(int(context_len))
             except (ValueError, TypeError):
-                self.spn_context_length.setValue(1200)
+                self.spn_context_length.setValue(8192)
 
         self.txt_keep_alive.setText(str(ai_cfg.get("keep_alive", "5m")))
         self.txt_preload_keep_alive.setText(str(ai_cfg.get("preload_keep_alive", "5m")))

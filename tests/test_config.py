@@ -168,3 +168,13 @@ def test_save_config(tmp_config_dir, monkeypatch):
 
     assert loaded_data == data
 
+
+def test_default_config_audio_capture_duration():
+    """Verify that the packaged default config.yaml specifies capture_duration as 30."""
+    with open(config.DEFAULT_CONFIG_SRC, "r", encoding="utf-8") as f:
+        default_config = yaml.safe_load(f)
+    assert "audio" in default_config
+    assert default_config["audio"]["capture_duration"] == 30
+    assert default_config["audio"]["recording_hud_enabled"] is True
+
+
