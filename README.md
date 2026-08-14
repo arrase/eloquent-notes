@@ -36,6 +36,8 @@ Eloquent Notes is a lightweight, system-tray-centric utility for Linux inspired 
    ```bash
    ollama pull gemma4:e4b-it-qat
    ```
+   > [!NOTE]
+   > **Audio Duration Limit:** Gemma 4 audio models support audio clips of up to **30 seconds**. Eloquent Notes is designed and optimized for quick voice dictations within this 30-second limit.
 
 2. **System Dependencies:**
    Install PortAudio (required for audio capture and beep playback) and a notification server (PyQt6 uses DBus/System notification services to display desktop alerts):
@@ -118,7 +120,7 @@ ai:
   ollama_url: "http://localhost:11434"
   model: "gemma4:e4b-it-qat"
   output_language: "English"   # Output language for rewritten notes, titles, wikilinks, and tags (e.g. English, Spanish)
-  context_length: 10000        # Context length limit (null defaults to model maximum)
+  context_length: 1200         # Context length limit (null defaults to model maximum)
   keep_alive: "0"              # Time to keep model loaded in VRAM after note generation (e.g. "5m", "10m", or "0" to unload immediately)
   preload_keep_alive: "5m"     # Time to keep model weights loaded in VRAM during recording to minimize note generation cold-start
   max_retries: 3               # Number of times to retry LLM execution if the output is not valid JSON
@@ -208,7 +210,7 @@ bindsym $mod+Ctrl+n exec --no-startup-id eloquent-notes toggle
 ### 🔘 3. Interaction Flow
 1. **Idle State:** The gray microphone icon is shown in the system tray.
 2. **Start Dictation:** Click the tray icon, trigger your custom global shortcut, or run `eloquent-notes toggle`. A beep plays, and the icon turns **red** to indicate it is recording.
-   * *Note: The model starts preloading into VRAM in the background during recording to speed up processing.*
+   * *Note: The model starts preloading into VRAM in the background during recording to speed up processing. Gemma 4 audio models support up to 30 seconds of audio per dictation.*
 3. **Stop & Process:** Click the tray icon, trigger the shortcut, or run `eloquent-notes toggle` again. A beep plays, the icon turns **orange**, and the application starts processing the audio via the local Ollama API.
 4. **Completion:**
    * **Success:** The cleaned transcription is saved to your Obsidian vault, a desktop notification is displayed, and the icon returns to **gray**.
@@ -331,7 +333,7 @@ flowchart TB
   - 🔴 **Recording (Red):** A red circle with a white recording dot.
   - 🟠 **Processing (Orange):** An orange circle with a white hourglass.
 * **Three-Phase LLM Pipeline:** The request is split into three phases to reduce the cognitive load on small models (~15B):
-  1. **Transcription (Phase 1):** Sends base64-encoded WAV bytes to the multimodal LLM to generate a transcription. Returns a JSON object with `{"empty": bool, "transcription": string}`.
+  1. **Transcription (Phase 1):** Sends base64-encoded WAV bytes to the multimodal LLM to generate a transcription (Gemma 4 models support audio inputs up to 30 seconds). Returns a JSON object with `{"empty": bool, "transcription": string}`.
   2. **Rewriting (Phase 2):** Sends the transcription text to the LLM to rewrite it into clean, direct, first-person note prose and generate a concise title. Returns `{"title": string, "content": string}`.
   3. **Classification (Phase 3):** Scans the vault for note names to build a context list of known topics, and sends the transcription + vault context to the LLM. Returns metadata `{"type": string, "wikilinks": list, "tags": list}` where type is one of: `task`, `idea`, `note`, `reminder`, `question`, or `decision`.
 * **Retry and Validation Logic:** If the Ollama model returns invalid JSON or fails to include the required keys, the application automatically appends a custom retry instruction (`retry_prompt.md`) to the chat history and retries up to `max_retries` (default: 3) to ensure robust structured output.

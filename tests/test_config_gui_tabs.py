@@ -68,7 +68,7 @@ def test_ai_tab_load_missing_or_invalid_fields(qapp):
     with patch.object(AITab, "_fetch_models"):
         tab.load_settings(config_data)
 
-    assert tab.spn_context_length.value() == 10000
+    assert tab.spn_context_length.value() == 1200
     assert tab.spn_max_retries.value() == 3
     assert tab.spn_preload_timeout.value() == 60
     assert tab.spn_request_timeout.value() == 120
