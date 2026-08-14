@@ -53,6 +53,12 @@ class AudioTab(ConfigTab):
         )
         form_layout.addRow(QLabel("Capture Duration:"), self.spn_capture_duration)
 
+        self.chk_recording_hud_enabled = QCheckBox("Show floating countdown HUD overlay during recording")
+        self.chk_recording_hud_enabled.setToolTip(
+            "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+        )
+        form_layout.addRow(self.chk_recording_hud_enabled)
+
         self.chk_beep_enabled = QCheckBox("Play beep on recording start and stop")
         self.chk_beep_enabled.setToolTip("Audible feedback beeps when starting/stopping recording.")
         form_layout.addRow(self.chk_beep_enabled)
@@ -90,6 +96,7 @@ class AudioTab(ConfigTab):
         except (ValueError, TypeError):
             self.spn_capture_duration.setValue(30)
 
+        self.chk_recording_hud_enabled.setChecked(bool(audio_cfg.get("recording_hud_enabled", True)))
         self.chk_beep_enabled.setChecked(bool(audio_cfg.get("beep_enabled", True)))
 
         try:
@@ -110,6 +117,7 @@ class AudioTab(ConfigTab):
             "sample_rate": self.spn_sample_rate.value(),
             "channels": 1 if self.cmb_channels.currentIndex() == 0 else 2,
             "capture_duration": self.spn_capture_duration.value(),
+            "recording_hud_enabled": self.chk_recording_hud_enabled.isChecked(),
             "beep_enabled": self.chk_beep_enabled.isChecked(),
             "beep_frequency": self.spn_beep_freq.value(),
             "beep_duration": self.spn_beep_duration.value(),

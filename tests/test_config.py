@@ -175,4 +175,6 @@ def test_default_config_audio_capture_duration():
         default_config = yaml.safe_load(f)
     assert "audio" in default_config
     assert default_config["audio"]["capture_duration"] == 30
+    assert default_config["audio"]["recording_hud_enabled"] is True
+
 

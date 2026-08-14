@@ -272,25 +272,21 @@ def test_exit_app_when_tray_is_none(mock_load_cfg, qapp, mock_config):
 
 
 @patch("eloquent_notes.app.config.load_config")
-def test_start_recording_starts_capture_timer(mock_load_cfg, qapp, mock_config):
+def test_start_recording_emits_recording_started(mock_load_cfg, qapp, mock_config):
     mock_config["audio"]["capture_duration"] = 45
     mock_load_cfg.return_value = mock_config
 
     eloquent_app = EloquentApp(qapp)
     eloquent_app._update_icon = MagicMock()
+    mock_started_slot = MagicMock()
+    eloquent_app.recording_started.connect(mock_started_slot)
 
     with patch("eloquent_notes.app.config.load_file", return_value="prompt"), \
          patch("eloquent_notes.app.audio.AudioRecorder") as mock_recorder_cls, \
-         patch("eloquent_notes.app.threading.Timer") as mock_timer_cls, \
          patch("eloquent_notes.app.threading.Thread") as mock_thread_cls:
 
         mock_rec = MagicMock()
         mock_recorder_cls.return_value = mock_rec
-        mock_timer = MagicMock()
-        mock_timer_cls.return_value = mock_timer
-
-        # Capture the background thread's target
-        created_targets = []
 
         def fake_thread_init(target=None, daemon=None):
             t = MagicMock()
@@ -301,64 +297,106 @@ def test_start_recording_starts_capture_timer(mock_load_cfg, qapp, mock_config):
 
         eloquent_app._start_recording()
 
-        mock_timer_cls.assert_called_with(45, eloquent_app._on_capture_timeout)
-        mock_timer.start.assert_called_once()
-        assert eloquent_app._capture_timer == mock_timer
+        mock_started_slot.assert_called_with(45)
 
 
 @patch("eloquent_notes.app.config.load_config")
-def test_capture_timeout_signal_triggers_stop_and_process(mock_load_cfg, qapp, mock_config):
+def test_on_recording_started_initializes_timer_and_hud(mock_load_cfg, qapp, mock_config):
+    mock_load_cfg.return_value = mock_config
+
+    eloquent_app = EloquentApp(qapp)
+    eloquent_app._hud = MagicMock()
+
+    eloquent_app._on_recording_started(30)
+
+    assert eloquent_app._recording_max_duration == 30.0
+    assert eloquent_app._recording_tick_timer.isActive()
+    eloquent_app._hud.show_recording.assert_called_with(30.0)
+    eloquent_app._recording_tick_timer.stop()
+
+
+@patch("eloquent_notes.app.config.load_config")
+def test_on_recording_tick_updates_hud_progress(mock_load_cfg, qapp, mock_config):
+    mock_load_cfg.return_value = mock_config
+
+    eloquent_app = EloquentApp(qapp)
+    eloquent_app.state = "RECORDING"
+    eloquent_app._hud = MagicMock()
+    eloquent_app._hud.isVisible.return_value = True
+
+    eloquent_app._recording_max_duration = 30.0
+    # Simulate 10 seconds elapsed
+    with patch("eloquent_notes.app.time.monotonic", return_value=100.0):
+        eloquent_app._recording_start_time = 90.0
+        eloquent_app._on_recording_tick()
+
+    eloquent_app._hud.update_progress.assert_called_with(10.0, 20.0, 30.0)
+
+
+@patch("eloquent_notes.app.config.load_config")
+def test_on_recording_tick_triggers_timeout_when_expired(mock_load_cfg, qapp, mock_config):
+    mock_load_cfg.return_value = mock_config
+
+    eloquent_app = EloquentApp(qapp)
+    eloquent_app.state = "RECORDING"
+    eloquent_app._update_icon = MagicMock()
+    eloquent_app._on_capture_timeout = MagicMock()
+
+    eloquent_app._recording_max_duration = 30.0
+    # Simulate 30.1 seconds elapsed (expired)
+    with patch("eloquent_notes.app.time.monotonic", return_value=130.1):
+        eloquent_app._recording_start_time = 100.0
+        eloquent_app._on_recording_tick()
+
+    eloquent_app._on_capture_timeout.assert_called_once()
+    assert not eloquent_app._recording_tick_timer.isActive()
+
+
+@patch("eloquent_notes.app.config.load_config")
+def test_manual_stop_stops_tick_timer_and_shows_processing(mock_load_cfg, qapp, mock_config):
     mock_load_cfg.return_value = mock_config
 
     eloquent_app = EloquentApp(qapp)
     eloquent_app.state = "RECORDING"
     mock_rec = MagicMock()
     eloquent_app.recorder = mock_rec
-    mock_timer = MagicMock()
-    eloquent_app._capture_timer = mock_timer
+    eloquent_app._recording_tick_timer.start(100)
     eloquent_app._update_icon = MagicMock()
-
-    with patch("threading.Thread") as mock_thread_cls:
-        # Trigger timeout callback directly
-        eloquent_app._on_capture_timeout()
-
-        assert eloquent_app.state == "PROCESSING"
-        mock_rec.stop.assert_called_once()
-        mock_timer.cancel.assert_called_once()
-        assert eloquent_app._capture_timer is None
-        mock_thread_cls.assert_called()
-
-
-@patch("eloquent_notes.app.config.load_config")
-def test_manual_stop_cancels_capture_timer(mock_load_cfg, qapp, mock_config):
-    mock_load_cfg.return_value = mock_config
-
-    eloquent_app = EloquentApp(qapp)
-    eloquent_app.state = "RECORDING"
-    mock_rec = MagicMock()
-    eloquent_app.recorder = mock_rec
-    mock_timer = MagicMock()
-    eloquent_app._capture_timer = mock_timer
-    eloquent_app._update_icon = MagicMock()
+    eloquent_app._hud = MagicMock()
+    eloquent_app._hud.isVisible.return_value = True
 
     with patch("threading.Thread"):
         eloquent_app._stop_recording_and_process()
 
-        mock_timer.cancel.assert_called_once()
-        assert eloquent_app._capture_timer is None
+        assert not eloquent_app._recording_tick_timer.isActive()
+        eloquent_app._hud.show_processing.assert_called_once()
         assert eloquent_app.state == "PROCESSING"
 
 
 @patch("eloquent_notes.app.config.load_config")
-def test_start_capture_timer_zero_or_negative_duration(mock_load_cfg, qapp, mock_config):
+def test_on_processing_completed_hides_hud(mock_load_cfg, qapp, mock_config):
     mock_load_cfg.return_value = mock_config
 
     eloquent_app = EloquentApp(qapp)
-    with patch("eloquent_notes.app.threading.Timer") as mock_timer_cls:
-        eloquent_app._start_capture_timer(0)
-        mock_timer_cls.assert_not_called()
-        assert eloquent_app._capture_timer is None
+    eloquent_app.state = "PROCESSING"
+    eloquent_app._hud = MagicMock()
+    eloquent_app._update_icon = MagicMock()
+    eloquent_app._notify = MagicMock()
 
-        eloquent_app._start_capture_timer(-5)
-        mock_timer_cls.assert_not_called()
-        assert eloquent_app._capture_timer is None
+    eloquent_app._on_processing_completed("success", "/path/to/note.md")
+
+    assert eloquent_app.state == "IDLE"
+    eloquent_app._hud.hide_hud.assert_called_once()
+    eloquent_app._update_icon.assert_called_with("gray", "Eloquent Notes (Idle)")
+
+
+@patch("eloquent_notes.app.config.load_config")
+def test_on_recording_started_zero_or_negative_duration(mock_load_cfg, qapp, mock_config):
+    mock_load_cfg.return_value = mock_config
+
+    eloquent_app = EloquentApp(qapp)
+    eloquent_app._on_recording_started(0)
+    assert eloquent_app._recording_max_duration == 0.0
+    assert eloquent_app._recording_tick_timer.isActive()
+    eloquent_app._recording_tick_timer.stop()
+

@@ -160,6 +160,7 @@ def test_audio_tab_load_and_save(qapp):
             "sample_rate": 48000,
             "channels": 2,
             "capture_duration": 45,
+            "recording_hud_enabled": False,
             "beep_enabled": False,
             "beep_frequency": 1200,
             "beep_duration": 0.25,
@@ -170,6 +171,7 @@ def test_audio_tab_load_and_save(qapp):
     assert tab.spn_sample_rate.value() == 48000
     assert tab.cmb_channels.currentIndex() == 1
     assert tab.spn_capture_duration.value() == 45
+    assert not tab.chk_recording_hud_enabled.isChecked()
     assert not tab.chk_beep_enabled.isChecked()
     assert tab.spn_beep_freq.value() == 1200
     assert tab.spn_beep_duration.value() == 0.25
@@ -178,6 +180,7 @@ def test_audio_tab_load_and_save(qapp):
     assert res is True
     assert config_data["audio"]["channels"] == 2
     assert config_data["audio"]["capture_duration"] == 45
+    assert config_data["audio"]["recording_hud_enabled"] is False
     assert config_data["audio"]["beep_enabled"] is False
 
 
@@ -194,6 +197,7 @@ def test_audio_tab_invalid_config_fallback(qapp):
     tab.load_settings(config_data)
     assert tab.spn_sample_rate.value() == 16000
     assert tab.spn_capture_duration.value() == 30
+    assert tab.chk_recording_hud_enabled.isChecked()
     assert tab.spn_beep_freq.value() == 1000
     assert tab.spn_beep_duration.value() == 0.1
 

@@ -24,3 +24,5 @@ def test_get_qicon(qapp, color):
     qicon = ui.get_qicon(color)
     assert isinstance(qicon, QIcon)
     assert not qicon.isNull()
+
+

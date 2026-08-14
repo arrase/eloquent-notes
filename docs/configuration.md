@@ -47,10 +47,11 @@ Configures connection parameters and behavior for the local Ollama inference ser
 * **Request Timeout**: Maximum wait time in seconds for inference generation to complete (default: `300` seconds).
 
 #### 4. Audio
-Controls input recording settings and audible status notifications:
+Controls input recording settings, duration limits, and visual/audible status notifications:
 * **Sample Rate**: Recording sample frequency in Hertz (default: `16000` Hz / 16 kHz).
 * **Channels**: Audio channels captured (`1` for Mono, `2` for Stereo).
 * **Capture Duration**: Maximum recording duration in seconds before automatically stopping and sending to LLM (default: `30` seconds).
+* **Show Recording HUD**: Displays a floating pill overlay with real-time countdown timer and progress bar while dictating (default: `true`).
 * **Enable Audio Feedback**: Toggle sound effects played upon starting and stopping recording.
 * **Beep Frequency**: Pitch of the audio tone in Hertz (default: `440` Hz, musical note A4).
 * **Beep Duration**: Length of tone playback in seconds (default: `0.1` seconds).
@@ -92,6 +93,7 @@ audio:
   sample_rate: 16000
   channels: 1
   capture_duration: 30  # Maximum audio capture duration in seconds
+  recording_hud_enabled: true # Floating countdown HUD overlay during recording
   beep_frequency: 440
   beep_duration: 0.1
   beep_enabled: true
