@@ -50,6 +50,7 @@ Configures connection parameters and behavior for the local Ollama inference ser
 Controls input recording settings and audible status notifications:
 * **Sample Rate**: Recording sample frequency in Hertz (default: `16000` Hz / 16 kHz).
 * **Channels**: Audio channels captured (`1` for Mono, `2` for Stereo).
+* **Capture Duration**: Maximum recording duration in seconds before automatically stopping and sending to LLM (default: `30` seconds).
 * **Enable Audio Feedback**: Toggle sound effects played upon starting and stopping recording.
 * **Beep Frequency**: Pitch of the audio tone in Hertz (default: `440` Hz, musical note A4).
 * **Beep Duration**: Length of tone playback in seconds (default: `0.1` seconds).
@@ -90,6 +91,7 @@ ai:
 audio:
   sample_rate: 16000
   channels: 1
+  capture_duration: 30  # Maximum audio capture duration in seconds
   beep_frequency: 440
   beep_duration: 0.1
   beep_enabled: true

@@ -27,6 +27,7 @@ class EloquentApp(QObject):
     """Main application controller for the system tray dictation tool."""
 
     processing_completed = pyqtSignal(str, str)
+    capture_timeout = pyqtSignal()
 
     def __init__(self, qapp, start_recording_immediately=False):
         super().__init__()
@@ -34,6 +35,7 @@ class EloquentApp(QObject):
         self._lock = threading.Lock()
         self._state = "IDLE"
         self._recorder = None
+        self._capture_timer = None
         self.config = config.load_config()
         self.active_config = self.config
         self._config_dialog = None
@@ -43,6 +45,7 @@ class EloquentApp(QObject):
         self.tray = None
 
         self.processing_completed.connect(self._on_processing_completed)
+        self.capture_timeout.connect(self._stop_recording_and_process)
 
     @property
     def state(self):
@@ -225,6 +228,7 @@ class EloquentApp(QObject):
                             should_preload = False
                             rec.stop()
                     if should_preload:
+                        self._start_capture_timer(audio_cfg["capture_duration"])
                         threading.Thread(
                             target=self._preload_model, daemon=True,
                         ).start()
@@ -234,7 +238,33 @@ class EloquentApp(QObject):
 
         threading.Thread(target=run, daemon=True).start()
 
+    def _start_capture_timer(self, duration):
+        """Start timer to automatically stop recording after max duration."""
+        with self._lock:
+            if self._capture_timer is not None:
+                self._capture_timer.cancel()
+            if duration > 0:
+                self._capture_timer = threading.Timer(duration, self._on_capture_timeout)
+                self._capture_timer.daemon = True
+                self._capture_timer.start()
+            else:
+                self._capture_timer = None
+
+    def _cancel_capture_timer(self):
+        """Cancel active capture timer if any."""
+        with self._lock:
+            timer = self._capture_timer
+            self._capture_timer = None
+        if timer is not None:
+            timer.cancel()
+
+    def _on_capture_timeout(self):
+        """Handle maximum capture duration timeout."""
+        logger.info("Maximum capture duration reached, stopping recording...")
+        self.capture_timeout.emit()
+
     def _stop_recording_and_process(self):
+        self._cancel_capture_timer()
         with self._lock:
             if self._state != "RECORDING":
                 return
@@ -440,6 +470,7 @@ class EloquentApp(QObject):
 
 
     def _on_processing_completed(self, status, detail):
+        self._cancel_capture_timer()
         self.state = "IDLE"
         self.recorder = None
         self._update_icon("gray", "Eloquent Notes (Idle)")
@@ -507,6 +538,7 @@ class EloquentApp(QObject):
     def exit_app(self):
         """Clean up and exit the application."""
         logger.info("Exiting application...")
+        self._cancel_capture_timer()
         with self._lock:
             prev_state = self._state
             self._state = "IDLE"

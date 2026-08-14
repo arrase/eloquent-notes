@@ -19,6 +19,7 @@ ai:
 audio:
   sample_rate: 16000
   channels: 1
+  capture_duration: 30
   beep_frequency: 440
   beep_duration: 0.1
   beep_enabled: true
