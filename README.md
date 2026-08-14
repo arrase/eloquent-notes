@@ -120,7 +120,7 @@ ai:
   ollama_url: "http://localhost:11434"
   model: "gemma4:e4b-it-qat"
   output_language: "English"   # Output language for rewritten notes, titles, wikilinks, and tags (e.g. English, Spanish)
-  context_length: 1200         # Context length limit (null defaults to model maximum)
+  context_length: 8192         # Context length limit (null defaults to model maximum)
   keep_alive: "0"              # Time to keep model loaded in VRAM after note generation (e.g. "5m", "10m", or "0" to unload immediately)
   preload_keep_alive: "5m"     # Time to keep model weights loaded in VRAM during recording to minimize note generation cold-start
   max_retries: 3               # Number of times to retry LLM execution if the output is not valid JSON

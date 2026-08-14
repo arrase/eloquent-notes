@@ -75,10 +75,17 @@ def _execute_ollama_json_request(
                 task_name, attempt, max_retries,
             )
 
-        response = requests.post(
-            f"{ollama_url}/api/chat", json=payload, timeout=timeout,
-        )
-        response.raise_for_status()
+        try:
+            response = requests.post(
+                f"{ollama_url}/api/chat", json=payload, timeout=timeout,
+            )
+            response.raise_for_status()
+        except requests.HTTPError:
+            logger.error(
+                "Ollama API HTTP error for %s on attempt %d: %s (response: %s)",
+                task_name, attempt, response.status_code, response.text,
+            )
+            raise
 
         raw_content = ""
         try:
