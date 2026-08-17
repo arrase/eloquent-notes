@@ -174,17 +174,6 @@ class RecordingHUD(QWidget):
             self.lbl_timer.setText(f"{secs // 60:02d}:{secs % 60:02d}")
             self.progress_bar.setValue(0)
 
-    def show_processing(self) -> None:
-        """Update HUD state to indicate processing."""
-        self.lbl_dot.setText("⏳")
-        self.lbl_dot.setStyleSheet("color: #F59E0B; font-size: 12px;")
-        self.lbl_status.setText("Processing Note...")
-        self.lbl_timer.setText("LLM")
-        self.lbl_timer.setStyleSheet(self._TIMER_LABEL_QSS.format("#F59E0B"))
-        self.progress_bar.setValue(1000)
-        self.progress_bar.setStyleSheet(self._progress_bar_qss("#F59E0B"))
-        self.update()
-
     def hide_hud(self) -> None:
         """Hide and reset HUD display."""
         self.hide()

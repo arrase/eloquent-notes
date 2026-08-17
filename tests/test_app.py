@@ -432,7 +432,7 @@ def test_on_recording_tick_triggers_timeout_when_expired(qapp):
     assert not eloquent_app._recording_tick_timer.isActive()
 
 
-def test_manual_stop_stops_tick_timer_and_shows_processing(qapp):
+def test_manual_stop_stops_tick_timer_and_hides_hud(qapp):
     eloquent_app = EloquentApp(qapp)
     eloquent_app.state = "RECORDING"
     mock_rec = MagicMock()
@@ -440,13 +440,12 @@ def test_manual_stop_stops_tick_timer_and_shows_processing(qapp):
     eloquent_app._recording_tick_timer.start(100)
     eloquent_app._update_icon = MagicMock()
     eloquent_app._hud = MagicMock()
-    eloquent_app._hud.isVisible.return_value = True
 
     with patch("threading.Thread"):
         eloquent_app._stop_recording_and_process()
 
         assert not eloquent_app._recording_tick_timer.isActive()
-        eloquent_app._hud.show_processing.assert_called_once()
+        eloquent_app._hud.hide_hud.assert_called_once()
         assert eloquent_app.state == "PROCESSING"
 
 

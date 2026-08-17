@@ -81,17 +81,13 @@ def test_recording_hud_update_progress_zero_duration(qapp):
     hud.hide_hud()
 
 
-def test_recording_hud_show_processing(qapp):
-    """Test show_processing updates UI state."""
+def test_recording_hud_hide_hud(qapp):
+    """Test hide_hud hides the HUD widget."""
     hud = RecordingHUD()
     hud.show_recording(30.0)
-    hud.show_processing()
-
-    assert hud.lbl_status.text() == "Processing Note..."
-    assert hud.lbl_timer.text() == "LLM"
-    assert hud.lbl_dot.text() == "⏳"
-    assert hud.progress_bar.value() == 1000
+    assert hud.isVisible()
     hud.hide_hud()
+    assert not hud.isVisible()
 
 
 def test_recording_hud_mouse_click_emits_signal(qapp):

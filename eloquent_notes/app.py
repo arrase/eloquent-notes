@@ -291,8 +291,7 @@ class EloquentApp(QObject):
             self._state = "PROCESSING"
             rec = self._recorder
 
-        if self._hud.isVisible():
-            self._hud.show_processing()
+        self._hud.hide_hud()
 
         self._update_icon("orange", "Eloquent Notes (Processing...)")
         logger.info("Stopping recording and starting processing...")
