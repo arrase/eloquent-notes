@@ -1,6 +1,6 @@
 """Unit tests for eloquent_notes.llm module."""
 
-import json
+import base64
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -128,6 +128,30 @@ def test_execute_ollama_json_request_retry_and_immutability(mock_post):
 
 
 @patch("eloquent_notes.llm.requests.post")
+def test_execute_ollama_json_request_http_error(mock_post):
+    mock_resp = MagicMock()
+    mock_resp.status_code = 500
+    mock_resp.text = "Internal Server Error"
+    mock_resp.raise_for_status.side_effect = requests.HTTPError("500 Server Error", response=mock_resp)
+    mock_post.return_value = mock_resp
+
+    with pytest.raises(requests.HTTPError):
+        llm._execute_ollama_json_request(
+            ollama_url="http://localhost:11434",
+            model="gemma",
+            messages=[{"role": "user", "content": "test"}],
+            format_schema={},
+            required_keys=["result"],
+            retry_prompt="retry",
+            context_length=2048,
+            keep_alive="5m",
+            max_retries=1,
+            timeout=30,
+            task_name="http error test",
+        )
+
+
+@patch("eloquent_notes.llm.requests.post")
 def test_execute_ollama_json_request_missing_required_key(mock_post):
     mock_resp = MagicMock()
     mock_resp.raise_for_status.return_value = None
@@ -190,15 +214,23 @@ def test_transcribe_audio(mock_exec):
     res = llm.transcribe_audio(
         ollama_url="http://localhost:11434",
         model="gemma",
-        system_prompt="sys",
-        user_prompt="usr",
-        retry_prompt="retry",
+        system_prompt="sys prompt",
+        user_prompt="usr prompt",
+        retry_prompt="retry prompt",
         context_length=2048,
         audio_bytes=audio_bytes,
     )
 
     assert res == {"empty": False, "transcription": "Test speech"}
     mock_exec.assert_called_once()
+    kwargs = mock_exec.call_args.kwargs
+    assert kwargs["model"] == "gemma"
+    assert kwargs["messages"][0] == {"role": "system", "content": "sys prompt"}
+    assert kwargs["messages"][1]["role"] == "user"
+    assert kwargs["messages"][1]["images"] == [base64.b64encode(audio_bytes).decode("utf-8")]
+    assert "empty" in kwargs["format_schema"]["properties"]
+    assert "transcription" in kwargs["format_schema"]["properties"]
+    assert kwargs["required_keys"] == ["empty", "transcription"]
 
 
 @patch("eloquent_notes.llm._execute_ollama_json_request")
@@ -208,14 +240,21 @@ def test_rewrite_transcription(mock_exec):
     res = llm.rewrite_transcription(
         ollama_url="http://localhost:11434",
         model="gemma",
-        system_prompt="sys",
-        user_prompt="usr",
-        retry_prompt="retry",
+        system_prompt="sys rewrite",
+        user_prompt="usr rewrite",
+        retry_prompt="retry prompt",
         context_length=2048,
     )
 
     assert res == {"title": "Title", "content": "Content"}
     mock_exec.assert_called_once()
+    kwargs = mock_exec.call_args.kwargs
+    assert kwargs["model"] == "gemma"
+    assert kwargs["messages"][0] == {"role": "system", "content": "sys rewrite"}
+    assert kwargs["messages"][1] == {"role": "user", "content": "usr rewrite"}
+    assert "title" in kwargs["format_schema"]["properties"]
+    assert "content" in kwargs["format_schema"]["properties"]
+    assert kwargs["required_keys"] == ["title", "content"]
 
 
 @patch("eloquent_notes.llm._execute_ollama_json_request")
@@ -229,9 +268,9 @@ def test_classify_transcription(mock_exec):
     res = llm.classify_transcription(
         ollama_url="http://localhost:11434",
         model="gemma",
-        system_prompt="sys",
-        user_prompt="usr",
-        retry_prompt="retry",
+        system_prompt="sys classify",
+        user_prompt="usr classify",
+        retry_prompt="retry prompt",
         context_length=2048,
     )
 
@@ -241,3 +280,11 @@ def test_classify_transcription(mock_exec):
         "tags": ["tag1"],
     }
     mock_exec.assert_called_once()
+    kwargs = mock_exec.call_args.kwargs
+    assert kwargs["model"] == "gemma"
+    assert kwargs["messages"][0] == {"role": "system", "content": "sys classify"}
+    assert kwargs["messages"][1] == {"role": "user", "content": "usr classify"}
+    assert "type" in kwargs["format_schema"]["properties"]
+    assert "wikilinks" in kwargs["format_schema"]["properties"]
+    assert "tags" in kwargs["format_schema"]["properties"]
+    assert kwargs["required_keys"] == ["type", "wikilinks", "tags"]

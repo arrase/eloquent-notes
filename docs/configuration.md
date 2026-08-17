@@ -32,6 +32,7 @@ Configures runtime application logging behavior:
 Controls how generated dictations are integrated into your Obsidian vault:
 * **Vault Path**: The root path to your Obsidian vault directory (e.g., `~/Obsidian`).
 * **Dictations Subfolder**: The subfolder relative to your vault root where standalone notes are stored (default: `Dictations`).
+* **Subfolder Structure**: Organization strategy for notes inside the target folder (`none` for directly in target folder, `month` for `YYYY-MM`, `week` for `YYYY-Www`, or `month_week` for `YYYY-MM/Www`).
 * **Enable Daily Notes**: When enabled, dictations classified as daily entries or quick thoughts are automatically routed to your Obsidian Daily Notes folder (`YYYY-MM-DD.md`).
 * **Scan Vault Context**: Scans existing note titles in your vault and provides them as contextual hints to Gemma 4, allowing the model to automatically insert `[[WikiLinks]]` when existing topics are mentioned in audio.
 
@@ -76,8 +77,10 @@ When initialized, Eloquent Notes creates `~/.config/eloquent-notes/config.yaml`.
 obsidian:
   vault_path: "~/Obsidian"
   folder: "Dictations"
+  folder_organization: "none"   # Subfolder structure: "none", "month" (YYYY-MM), "week" (YYYY-Www), "month_week" (YYYY-MM/Www)
   daily_notes: true
   vault_context: true   # Scan vault for existing note names to suggest as wikilinks
+
 
 ai:
   ollama_url: "http://localhost:11434"

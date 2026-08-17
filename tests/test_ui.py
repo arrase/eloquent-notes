@@ -1,3 +1,5 @@
+"""Unit tests for eloquent_notes.ui module."""
+
 from PIL import Image
 from PyQt6.QtGui import QIcon
 import pytest
@@ -17,7 +19,6 @@ def test_create_icon_image(color):
     assert img.getbbox() is not None
 
 
-
 @pytest.mark.parametrize("color", ["red", "orange", "gray"])
 def test_get_qicon(qapp, color):
     """Test get_qicon converts PIL images to valid Qt QIcon objects."""
@@ -26,3 +27,8 @@ def test_get_qicon(qapp, color):
     assert not qicon.isNull()
 
 
+def test_get_qicon_cached(qapp):
+    """Test that repeated calls return the cached QIcon instance."""
+    icon1 = ui.get_qicon("red")
+    icon2 = ui.get_qicon("red")
+    assert icon1 is icon2

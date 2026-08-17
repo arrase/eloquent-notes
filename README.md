@@ -94,7 +94,7 @@ Eloquent Notes features a built-in graphical settings editor to modify your conf
 
 #### Tab Breakdown
 - **General:** Enable or disable automatic login startup, set logging levels, configure log file size limits, and view log files directly.
-- **Obsidian:** Browse for your Obsidian vault path, specify the target destination folder, toggle Daily Notes appending, and toggle vault-wide scanning to auto-generate Wikilink recommendations.
+- **Obsidian:** Browse for your Obsidian vault path, specify the target destination folder, configure subfolder structure (root, monthly, weekly, monthly + weekly), toggle Daily Notes appending, and toggle vault-wide scanning to auto-generate Wikilink recommendations.
 - **AI Settings:** Configure the Ollama API endpoint, select local LLM models, set the target **Output Language** (e.g. English, Spanish), set custom context lengths, adjust keep-alive limits to optimize GPU memory usage, and customize timeout/retry values.
 - **Audio:** Configure microphone sample rate, recording channels, maximum capture duration, and adjust acoustic feedback beeps (frequency, duration, or disable completely).
 - **Prompts:** Edit custom Markdown prompt definitions (system and user instructions) for all three pipeline stages plus retry rules.
@@ -113,6 +113,7 @@ Edit `~/.config/eloquent-notes/config.yaml` to specify your Obsidian vault path 
 obsidian:
   vault_path: "~/Obsidian"     # Absolute or user-relative path to your Obsidian Vault
   folder: "Dictations"         # Target folder inside the vault where notes will be saved
+  folder_organization: "none"  # Subfolder structure: "none", "month" (YYYY-MM), "week" (YYYY-Www), "month_week" (YYYY-MM/Www)
   daily_notes: true            # If true, appends dictations to daily note files (YYYY-MM-DD.md)
   vault_context: true          # If true, scans the vault for note names to suggest as wikilinks
 

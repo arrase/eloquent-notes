@@ -90,6 +90,13 @@ Each dictation creates a separate timestamped file in your vault target director
 - **Naming Pattern:** `Dictation-YYYY-MM-DD-HHMMSS.md` (e.g., `Dictation-2026-08-06-143205.md`).
 - Each note contains its own complete YAML frontmatter, tags, and callout content.
 
+### Subfolder Organization (`folder_organization`)
+You can control whether notes are placed directly in the target directory or organized into time-based subdirectories:
+- **`none`** (Default): Directly in the target folder (e.g. `Dictations/2026-08-17.md` or `Dictations/Dictation-2026-08-17-143205.md`).
+- **`month`**: Subfolders by month `YYYY-MM` (e.g. `Dictations/2026-08/2026-08-17.md`).
+- **`week`**: Subfolders by ISO week `YYYY-Www` (e.g. `Dictations/2026-W34/2026-08-17.md`).
+- **`month_week`**: Subfolders by month and ISO week `YYYY-MM/Www` (e.g. `Dictations/2026-08/W34/2026-08-17.md`).
+
 ---
 
 ## 4. Smart PyYAML Frontmatter Parsing & Tag Deduplication

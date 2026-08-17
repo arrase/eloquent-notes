@@ -61,7 +61,7 @@ def setup_logging(log_level_str, max_mb, backup_count):
         file_handler.setLevel(level)
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
-    except Exception as e:
+    except OSError as e:
         print(
             f"Warning: Could not initialize file logging: {e}",
             file=sys.stderr,

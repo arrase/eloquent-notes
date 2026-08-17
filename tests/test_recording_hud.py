@@ -1,8 +1,9 @@
+"""Unit tests for RecordingHUD."""
+
 from unittest.mock import MagicMock
 
 from PyQt6.QtCore import QPointF, Qt
 from PyQt6.QtGui import QMouseEvent
-import pytest
 
 from eloquent_notes.recording_hud import RecordingHUD
 
@@ -81,7 +82,7 @@ def test_recording_hud_update_progress_zero_duration(qapp):
 
 
 def test_recording_hud_show_processing(qapp):
-    """Test show_processing updates UI state before auto-hiding."""
+    """Test show_processing updates UI state."""
     hud = RecordingHUD()
     hud.show_recording(30.0)
     hud.show_processing()
@@ -94,11 +95,12 @@ def test_recording_hud_show_processing(qapp):
 
 
 def test_recording_hud_mouse_click_emits_signal(qapp):
-    """Test that clicking the HUD widget emits the clicked signal."""
+    """Test that left clicking the HUD widget emits the clicked signal."""
     hud = RecordingHUD()
     mock_slot = MagicMock()
     hud.clicked.connect(mock_slot)
 
+    # Left click triggers signal
     event = QMouseEvent(
         QMouseEvent.Type.MouseButtonPress,
         QPointF(20.0, 20.0),
@@ -108,4 +110,15 @@ def test_recording_hud_mouse_click_emits_signal(qapp):
     )
     hud.mousePressEvent(event)
     mock_slot.assert_called_once()
+
+    # Right click does not trigger signal
+    right_event = QMouseEvent(
+        QMouseEvent.Type.MouseButtonPress,
+        QPointF(20.0, 20.0),
+        Qt.MouseButton.RightButton,
+        Qt.MouseButton.RightButton,
+        Qt.KeyboardModifier.NoModifier,
+    )
+    hud.mousePressEvent(right_event)
+    assert mock_slot.call_count == 1
     hud.hide_hud()

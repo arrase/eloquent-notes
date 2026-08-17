@@ -1,13 +1,16 @@
 """Unit tests for eloquent_notes/obsidian.py."""
 
 import os
+from datetime import datetime
 
 import yaml
 
 from eloquent_notes.obsidian import (
+    _FRONTMATTER_RE,
     _inject_wikilinks,
     _update_frontmatter_tags,
     format_note_content,
+    get_target_directory,
     save_note,
     scan_vault_topics,
 )
@@ -129,10 +132,32 @@ def test_update_frontmatter_tags_no_global_side_effect():
     assert "Note body" in updated
 
 
+def test_update_frontmatter_tags_with_embedded_dashes():
+    initial_content = (
+        "---\n"
+        "title: 'My Title --- Subtitle'\n"
+        "tags:\n"
+        "  - existing\n"
+        "---\n"
+        "Body containing --- horizontal rules --- inside."
+    )
+    updated = _update_frontmatter_tags(initial_content, ["new_tag"])
+    assert "--- horizontal rules ---" in updated
+    match = _FRONTMATTER_RE.match(updated)
+    assert match is not None
+    parsed_fm = yaml.safe_load(match.group(1))
+    assert parsed_fm["tags"] == ["existing", "new_tag"]
+    assert parsed_fm["title"] == "My Title --- Subtitle"
+
+
 def test_update_frontmatter_tags_no_frontmatter():
     content = "Plain content without frontmatter"
     updated = _update_frontmatter_tags(content, ["tag1"])
     assert updated == content
+
+
+def test_format_note_content_empty():
+    assert format_note_content("task", "", ["tag"]) == ""
 
 
 def test_save_note_daily_new_and_append(tmp_path):
@@ -230,11 +255,6 @@ def test_update_frontmatter_tags_non_dict():
     assert _update_frontmatter_tags(non_dict_content, ["tag"]) == non_dict_content
 
 
-def test_format_note_content_empty():
-    assert format_note_content("task", "", ["tag"]) == ""
-    assert format_note_content("task", None, ["tag"]) == ""
-
-
 def test_inject_wikilinks_duplicates():
     wikilinks = ["Python", "Python", ""]
     text = "We use Python."
@@ -276,4 +296,95 @@ def test_save_standalone_collision(tmp_path, monkeypatch):
     assert path1 != path2
     assert os.path.exists(path1)
     assert os.path.exists(path2)
+
+
+def test_get_target_directory():
+    dt = datetime(2026, 8, 17, 10, 0, 0)  # 2026-08-17 is Monday, Week 34
+    vault = "/fake/vault"
+
+    # None / default
+    assert get_target_directory(vault, "Notes", "none", now=dt) == "/fake/vault/Notes"
+    assert get_target_directory(vault, "", "none", now=dt) == "/fake/vault"
+
+    # Month
+    assert get_target_directory(vault, "Notes", "month", now=dt) == "/fake/vault/Notes/2026-08"
+    assert get_target_directory(vault, "", "month", now=dt) == "/fake/vault/2026-08"
+
+    # Week
+    assert get_target_directory(vault, "Notes", "week", now=dt) == "/fake/vault/Notes/2026-W34"
+    assert get_target_directory(vault, "", "week", now=dt) == "/fake/vault/2026-W34"
+
+    # Month and Week
+    assert get_target_directory(vault, "Notes", "month_week", now=dt) == "/fake/vault/Notes/2026-08/W34"
+    assert get_target_directory(vault, "", "month_week", now=dt) == "/fake/vault/2026-08/W34"
+
+
+def test_save_note_folder_organization_monthly(tmp_path):
+    vault = tmp_path / "vault"
+    template_new = "---\ntags:\n{tags}\n---\n# {title}\n{text}\n"
+
+    note_path = save_note(
+        vault_path=str(vault),
+        folder="Daily",
+        daily_notes=True,
+        folder_organization="month",
+        title="Monthly Dictation",
+        text="Content",
+        tags=["month-tag"],
+        template_standalone="",
+        template_daily_new=template_new,
+        template_daily_append="",
+    )
+    now = datetime.now()
+    expected_subdir = now.strftime("%Y-%m")
+    assert f"Daily/{expected_subdir}" in note_path or f"Daily\\{expected_subdir}" in note_path
+    assert os.path.exists(note_path)
+
+
+def test_save_note_folder_organization_weekly(tmp_path):
+    vault = tmp_path / "vault"
+    template = "# {title}\n{text}"
+
+    note_path = save_note(
+        vault_path=str(vault),
+        folder="Notes",
+        daily_notes=False,
+        folder_organization="week",
+        title="Weekly Dictation",
+        text="Content",
+        tags=["week-tag"],
+        template_standalone=template,
+        template_daily_new="",
+        template_daily_append="",
+    )
+    now = datetime.now()
+    iso_year, iso_week, _ = now.isocalendar()
+    expected_subdir = f"{iso_year}-W{iso_week:02d}"
+    assert f"Notes/{expected_subdir}" in note_path or f"Notes\\{expected_subdir}" in note_path
+    assert os.path.exists(note_path)
+
+
+def test_save_note_folder_organization_month_week(tmp_path):
+    vault = tmp_path / "vault"
+    template_new = "---\ntags:\n{tags}\n---\n# {title}\n{text}\n"
+
+    note_path = save_note(
+        vault_path=str(vault),
+        folder="Notes",
+        daily_notes=True,
+        folder_organization="month_week",
+        title="Month Week Dictation",
+        text="Content",
+        tags=[],
+        template_standalone="",
+        template_daily_new=template_new,
+        template_daily_append="",
+    )
+    now = datetime.now()
+    month_str = now.strftime("%Y-%m")
+    iso_week = now.isocalendar().week
+    expected_sub = os.path.join(month_str, f"W{iso_week:02d}")
+    assert expected_sub in note_path
+    assert os.path.exists(note_path)
+
 

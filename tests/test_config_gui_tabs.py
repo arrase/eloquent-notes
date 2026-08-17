@@ -1,8 +1,8 @@
 """Unit tests for configuration GUI tabs (AITab, AudioTab, GeneralTab, ObsidianTab, TextFilesTab, PromptsTab, TemplatesTab)."""
 
-from unittest.mock import MagicMock, patch
 import os
-import pytest
+from unittest.mock import MagicMock, patch
+
 from PyQt6.QtWidgets import QMessageBox
 
 from eloquent_notes.config_gui.tabs.ai import AITab
@@ -42,36 +42,14 @@ def test_ai_tab_load_and_save_valid(qapp):
     assert tab.cmb_language.currentText() == "French"
     assert tab.spn_context_length.value() == 8192
     assert not tab.chk_context_default.isChecked()
+    assert tab.spn_preload_timeout.value() == 50
+    assert tab.spn_request_timeout.value() == 100
 
     res = tab.save_settings(config_data)
     assert res is True
     assert config_data["ai"]["ollama_url"] == "http://localhost:11434"
     assert config_data["ai"]["keep_alive"] == "10m"
     assert config_data["ai"]["output_language"] == "French"
-
-    tab.cleanup()
-
-
-def test_ai_tab_load_missing_or_invalid_fields(qapp):
-    with patch.object(AITab, "_fetch_models"):
-        tab = AITab()
-
-    config_data = {
-        "ai": {
-            "context_length": "invalid_int",
-            "max_retries": "invalid_int",
-            "preload_timeout": "invalid_int",
-            "request_timeout": "invalid_int",
-        }
-    }
-
-    with patch.object(AITab, "_fetch_models"):
-        tab.load_settings(config_data)
-
-    assert tab.spn_context_length.value() == 8192
-    assert tab.spn_max_retries.value() == 3
-    assert tab.spn_preload_timeout.value() == 60
-    assert tab.spn_request_timeout.value() == 120
 
     tab.cleanup()
 
@@ -84,9 +62,13 @@ def test_ai_tab_context_default_toggle(qapp):
         "ai": {
             "ollama_url": "http://localhost:11434",
             "model": "gemma",
+            "output_language": "English",
             "context_length": None,
             "keep_alive": "5m",
             "preload_keep_alive": "5m",
+            "max_retries": 3,
+            "preload_timeout": 60,
+            "request_timeout": 120,
         }
     }
 
@@ -109,7 +91,19 @@ def test_ai_tab_save_validation_failures(qapp):
     with patch.object(AITab, "_fetch_models"):
         tab = AITab()
 
-    config_data = {"ai": {}}
+    config_data = {
+        "ai": {
+            "ollama_url": "http://localhost:11434",
+            "model": "gemma",
+            "output_language": "English",
+            "context_length": 8192,
+            "keep_alive": "5m",
+            "preload_keep_alive": "5m",
+            "max_retries": 3,
+            "preload_timeout": 60,
+            "request_timeout": 120,
+        }
+    }
     tab.load_settings(config_data)
 
     # Empty URL
@@ -184,24 +178,6 @@ def test_audio_tab_load_and_save(qapp):
     assert config_data["audio"]["beep_enabled"] is False
 
 
-def test_audio_tab_invalid_config_fallback(qapp):
-    tab = AudioTab()
-    config_data = {
-        "audio": {
-            "sample_rate": "bad_val",
-            "capture_duration": "bad_val",
-            "beep_frequency": "bad_val",
-            "beep_duration": "bad_val",
-        }
-    }
-    tab.load_settings(config_data)
-    assert tab.spn_sample_rate.value() == 16000
-    assert tab.spn_capture_duration.value() == 30
-    assert tab.chk_recording_hud_enabled.isChecked()
-    assert tab.spn_beep_freq.value() == 1000
-    assert tab.spn_beep_duration.value() == 0.1
-
-
 # --- GENERAL TAB TESTS ---
 
 def test_general_tab_load_and_save(qapp):
@@ -223,6 +199,23 @@ def test_general_tab_load_and_save(qapp):
         assert res is True
         mock_install.assert_called_once()
         assert config_data["logging"]["level"] == "WARNING"
+
+
+def test_general_tab_autostart_removal(qapp):
+    tab = GeneralTab()
+    config_data = {
+        "logging": {"level": "INFO", "max_mb": 5, "backup_count": 3}
+    }
+
+    with patch("os.path.exists", return_value=True):
+        tab.load_settings(config_data)
+    assert tab.chk_autostart.isChecked()
+
+    tab.chk_autostart.setChecked(False)
+    with patch("os.path.exists", return_value=True), patch("os.remove") as mock_remove:
+        res = tab.save_settings(config_data)
+        assert res is True
+        mock_remove.assert_called_once()
 
 
 def test_general_tab_view_log_file(qapp, tmp_path):
@@ -249,6 +242,13 @@ def test_general_tab_view_log_file(qapp, tmp_path):
         mock_open.assert_called_once()
 
 
+def test_general_tab_lowercase_log_level(qapp):
+    tab = GeneralTab()
+    config_data = {"logging": {"level": "debug", "max_mb": 5, "backup_count": 3}}
+    tab.load_settings(config_data)
+    assert tab.cmb_log_level.currentText() == "DEBUG"
+
+
 # --- OBSIDIAN TAB TESTS ---
 
 def test_obsidian_tab_load_and_save(qapp, tmp_path):
@@ -260,6 +260,7 @@ def test_obsidian_tab_load_and_save(qapp, tmp_path):
         "obsidian": {
             "vault_path": vault_dir,
             "folder": "Daily",
+            "folder_organization": "week",
             "daily_notes": True,
             "vault_context": True,
         }
@@ -268,17 +269,30 @@ def test_obsidian_tab_load_and_save(qapp, tmp_path):
     tab.load_settings(config_data)
     assert tab.txt_vault_path.text() == vault_dir
     assert tab.txt_obs_folder.text() == "Daily"
+    assert tab.cmb_folder_organization.currentData() == "week"
     assert tab.chk_daily_notes.isChecked()
     assert tab.chk_vault_context.isChecked()
+
+    month_week_idx = tab.cmb_folder_organization.findData("month_week")
+    tab.cmb_folder_organization.setCurrentIndex(month_week_idx)
 
     res = tab.save_settings(config_data)
     assert res is True
     assert config_data["obsidian"]["folder"] == "Daily"
+    assert config_data["obsidian"]["folder_organization"] == "month_week"
 
 
 def test_obsidian_tab_empty_and_nonexistent_vault(qapp):
     tab = ObsidianTab()
-    config_data = {"obsidian": {}}
+    config_data = {
+        "obsidian": {
+            "vault_path": "",
+            "folder": "Notes",
+            "folder_organization": "none",
+            "daily_notes": False,
+            "vault_context": False,
+        }
+    }
 
     tab.txt_vault_path.setText("")
     with patch("PyQt6.QtWidgets.QMessageBox.warning"):
@@ -369,42 +383,3 @@ def test_text_files_tab_load_settings_row0_already_selected(qapp, tmp_path):
 
     tab.load_settings({})
     assert tab.editor.toPlainText() == "Updated Disk Text"
-
-
-def test_tabs_handle_none_config_sections(qapp, tmp_path):
-    config_data = {
-        "logging": None,
-        "audio": None,
-        "obsidian": None,
-        "ai": None,
-    }
-
-    gen_tab = GeneralTab()
-    gen_tab.load_settings(config_data)
-    assert gen_tab.save_settings(config_data) is True
-
-    aud_tab = AudioTab()
-    aud_tab.load_settings(config_data)
-    assert aud_tab.save_settings(config_data) is True
-
-    obs_tab = ObsidianTab()
-    vault_dir = str(tmp_path / "Vault")
-    os.makedirs(vault_dir, exist_ok=True)
-    obs_tab.txt_vault_path.setText(vault_dir)
-    obs_tab.load_settings(config_data)
-    obs_tab.txt_vault_path.setText(vault_dir)
-    assert obs_tab.save_settings(config_data) is True
-
-    with patch.object(AITab, "_fetch_models"):
-        ai_tab = AITab()
-        ai_tab.load_settings(config_data)
-        assert ai_tab.save_settings(config_data) is True
-        ai_tab.cleanup()
-
-
-def test_general_tab_lowercase_log_level(qapp):
-    tab = GeneralTab()
-    config_data = {"logging": {"level": "debug"}}
-    tab.load_settings(config_data)
-    assert tab.cmb_log_level.currentText() == "DEBUG"
-

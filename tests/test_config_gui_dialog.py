@@ -1,4 +1,6 @@
-from unittest.mock import MagicMock, mock_open, patch
+"""Unit tests for ConfigurationDialog."""
+
+from unittest.mock import mock_open, patch
 
 import pytest
 from PyQt6.QtGui import QCloseEvent
@@ -15,34 +17,52 @@ def mock_fetch_models():
         yield
 
 
-def test_dialog_init(qapp):
-    dummy_config = {
+def _make_valid_config(overrides=None):
+    base = {
         "ai": {
             "ollama_url": "http://localhost:11434",
-            "model": "gemma",
+            "model": "gemma4:e4b-it-qat",
             "output_language": "English",
             "context_length": 8192,
-            "keep_alive": "5m",
+            "keep_alive": "0",
             "preload_keep_alive": "5m",
             "max_retries": 3,
-            "preload_timeout": 60,
-            "request_timeout": 120,
+            "preload_timeout": 180,
+            "request_timeout": 300,
         },
         "audio": {
             "sample_rate": 16000,
             "channels": 1,
+            "capture_duration": 30,
+            "recording_hud_enabled": True,
             "beep_enabled": True,
-            "beep_frequency": 1000,
+            "beep_frequency": 440,
             "beep_duration": 0.1,
         },
-        "logging": {"level": "INFO", "max_mb": 10, "backup_count": 5},
+        "logging": {
+            "level": "INFO",
+            "max_mb": 5,
+            "backup_count": 3,
+        },
         "obsidian": {
             "vault_path": "/tmp/vault",
-            "folder": "Notes",
-            "daily_notes": False,
-            "vault_context": False,
+            "folder": "Dictations",
+            "folder_organization": "none",
+            "daily_notes": True,
+            "vault_context": True,
         },
     }
+    if overrides:
+        for section, sec_data in overrides.items():
+            if isinstance(sec_data, dict) and section in base:
+                base[section].update(sec_data)
+            else:
+                base[section] = sec_data
+    return base
+
+
+def test_dialog_init(qapp):
+    dummy_config = _make_valid_config()
 
     with patch("eloquent_notes.config.load_config", return_value=dummy_config):
         dialog = ConfigurationDialog()
@@ -61,7 +81,7 @@ def test_dialog_init(qapp):
 
 
 def test_dialog_load_settings(qapp):
-    dummy_config = {
+    dummy_config = _make_valid_config({
         "ai": {
             "ollama_url": "http://127.0.0.1:11434",
             "model": "whisper",
@@ -76,6 +96,7 @@ def test_dialog_load_settings(qapp):
         "audio": {
             "sample_rate": 44100,
             "channels": 2,
+            "capture_duration": 45,
             "beep_enabled": False,
             "beep_frequency": 800,
             "beep_duration": 0.2,
@@ -83,11 +104,12 @@ def test_dialog_load_settings(qapp):
         "logging": {"level": "DEBUG", "max_mb": 20, "backup_count": 2},
         "obsidian": {
             "vault_path": "/home/user/vault",
-            "folder": "Dictations",
-            "daily_notes": True,
-            "vault_context": True,
+            "folder": "MyNotes",
+            "folder_organization": "month",
+            "daily_notes": False,
+            "vault_context": False,
         },
-    }
+    })
 
     with patch("eloquent_notes.config.load_config", return_value=dummy_config):
         dialog = ConfigurationDialog()
@@ -98,17 +120,14 @@ def test_dialog_load_settings(qapp):
     assert dialog.audio_tab.spn_sample_rate.value() == 44100
     assert dialog.general_tab.cmb_log_level.currentText() == "DEBUG"
     assert dialog.obsidian_tab.txt_vault_path.text() == "/home/user/vault"
+    assert dialog.obsidian_tab.txt_obs_folder.text() == "MyNotes"
+    assert dialog.obsidian_tab.cmb_folder_organization.currentData() == "month"
 
     dialog.cleanup_tabs()
 
 
 def test_dialog_restore_defaults(qapp):
-    dummy_config = {
-        "ai": {"ollama_url": "http://localhost:11434", "model": "gemma", "output_language": "English"},
-        "audio": {"sample_rate": 16000, "channels": 1, "beep_enabled": True, "beep_frequency": 1000, "beep_duration": 0.1},
-        "logging": {"level": "INFO", "max_mb": 10, "backup_count": 5},
-        "obsidian": {"vault_path": "/tmp/v", "folder": "F", "daily_notes": False, "vault_context": False},
-    }
+    dummy_config = _make_valid_config()
     with patch("eloquent_notes.config.load_config", return_value=dummy_config):
         dialog = ConfigurationDialog()
 
@@ -117,12 +136,10 @@ def test_dialog_restore_defaults(qapp):
         dialog.restore_defaults()
 
     # User accepts prompt
-    default_data = {
-        "ai": {"ollama_url": "http://default:11434", "model": "def-model", "output_language": "English"},
-        "audio": {"sample_rate": 16000, "channels": 1, "beep_enabled": True, "beep_frequency": 1000, "beep_duration": 0.1},
-        "logging": {"level": "INFO", "max_mb": 10, "backup_count": 5},
-        "obsidian": {"vault_path": "/default/vault", "folder": "F", "daily_notes": False, "vault_context": False},
-    }
+    default_data = _make_valid_config({
+        "ai": {"ollama_url": "http://default:11434", "model": "def-model"},
+        "obsidian": {"vault_path": "/default/vault"},
+    })
 
     with patch("PyQt6.QtWidgets.QMessageBox.question", return_value=QMessageBox.StandardButton.Yes), patch(
         "yaml.safe_load", return_value=default_data
@@ -136,33 +153,7 @@ def test_dialog_restore_defaults(qapp):
 
 
 def test_dialog_save_settings(qapp):
-    dummy_config = {
-        "ai": {
-            "ollama_url": "http://localhost:11434",
-            "model": "gemma",
-            "output_language": "English",
-            "context_length": 8192,
-            "keep_alive": "5m",
-            "preload_keep_alive": "5m",
-            "max_retries": 3,
-            "preload_timeout": 60,
-            "request_timeout": 120,
-        },
-        "audio": {
-            "sample_rate": 16000,
-            "channels": 1,
-            "beep_enabled": True,
-            "beep_frequency": 1000,
-            "beep_duration": 0.1,
-        },
-        "logging": {"level": "INFO", "max_mb": 10, "backup_count": 5},
-        "obsidian": {
-            "vault_path": "/tmp/vault",
-            "folder": "Notes",
-            "daily_notes": False,
-            "vault_context": False,
-        },
-    }
+    dummy_config = _make_valid_config()
 
     with patch("eloquent_notes.config.load_config", return_value=dummy_config), patch(
         "os.path.exists", return_value=True
@@ -184,16 +175,7 @@ def test_dialog_save_settings(qapp):
 
 
 def test_dialog_save_validation_failure(qapp):
-    dummy_config = {
-        "ai": {
-            "ollama_url": "",
-            "model": "gemma",
-            "output_language": "English",
-        },
-        "audio": {"sample_rate": 16000, "channels": 1, "beep_enabled": True, "beep_frequency": 1000, "beep_duration": 0.1},
-        "logging": {"level": "INFO", "max_mb": 10, "backup_count": 5},
-        "obsidian": {"vault_path": "/tmp/v", "folder": "F", "daily_notes": False, "vault_context": False},
-    }
+    dummy_config = _make_valid_config({"ai": {"ollama_url": ""}})
 
     with patch("eloquent_notes.config.load_config", return_value=dummy_config), patch(
         "os.path.exists", return_value=True
@@ -206,17 +188,13 @@ def test_dialog_save_validation_failure(qapp):
     ):
         res = dialog.save_settings_from_ui()
         assert res is False
+        assert dialog.tab_widget.currentWidget() is dialog.ai_tab
 
     dialog.cleanup_tabs()
 
 
 def test_dialog_cleanup_on_close(qapp):
-    dummy_config = {
-        "ai": {"ollama_url": "http://localhost:11434", "model": "gemma", "output_language": "English"},
-        "audio": {"sample_rate": 16000, "channels": 1, "beep_enabled": True, "beep_frequency": 1000, "beep_duration": 0.1},
-        "logging": {"level": "INFO", "max_mb": 10, "backup_count": 5},
-        "obsidian": {"vault_path": "/tmp/v", "folder": "F", "daily_notes": False, "vault_context": False},
-    }
+    dummy_config = _make_valid_config()
 
     with patch("eloquent_notes.config.load_config", return_value=dummy_config):
         dialog = ConfigurationDialog()
@@ -235,4 +213,3 @@ def test_dialog_cleanup_on_close(qapp):
         event = QCloseEvent()
         dialog.closeEvent(event)
         mock_cleanup.assert_called_once()
-

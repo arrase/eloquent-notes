@@ -1,7 +1,7 @@
 """Background workers for Ollama model loading."""
 
-from PyQt6.QtCore import QThread, pyqtSignal
 import requests
+from PyQt6.QtCore import QThread, pyqtSignal
 
 
 class OllamaModelLoader(QThread):
@@ -25,15 +25,8 @@ class OllamaModelLoader(QThread):
                 return
 
             data = r.json()
-            raw_models = data.get("models") if isinstance(data, dict) else []
-            if not isinstance(raw_models, list):
-                raw_models = []
-
-            all_models = [
-                m["name"]
-                for m in raw_models
-                if isinstance(m, dict) and "name" in m
-            ]
+            models_list = data.get("models", [])
+            all_models = [m["name"] for m in models_list if "name" in m]
 
             audio_models = []
             for name in all_models:
@@ -60,7 +53,7 @@ class OllamaModelLoader(QThread):
                 return
 
             self.models_fetched.emit(audio_models)
-        except Exception as e:
+        except (requests.RequestException, ValueError) as e:
             if not self.isInterruptionRequested():
                 self.error_occurred.emit(str(e))
 

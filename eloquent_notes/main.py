@@ -13,7 +13,6 @@ from PyQt6.QtCore import QCoreApplication
 from PyQt6.QtNetwork import QLocalSocket
 from PyQt6.QtWidgets import QApplication, QDialog
 
-from eloquent_notes import config
 from eloquent_notes.autostart import install_autostart
 from eloquent_notes.config_gui import ConfigurationDialog
 
@@ -79,7 +78,6 @@ def run_cli(cli_args=None, launcher=os.execv, sys_exit=sys.exit):
         return
 
     if args.command == "config":
-        config.init_config_dir()
         app = QApplication.instance() or QApplication(sys.argv)
         dialog = ConfigurationDialog()
         if dialog.exec() == QDialog.DialogCode.Accepted:

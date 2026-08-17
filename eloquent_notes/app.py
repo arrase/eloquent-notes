@@ -252,7 +252,7 @@ class EloquentApp(QObject):
         self._recording_max_duration = float(duration)
 
         hud_enabled = self.active_config["audio"]["recording_hud_enabled"]
-        if hud_enabled and self._hud is not None:
+        if hud_enabled:
             self._hud.show_recording(self._recording_max_duration)
 
         self._recording_tick_timer.start(100)
@@ -268,14 +268,14 @@ class EloquentApp(QObject):
 
         if max_dur > 0:
             remaining = max(0.0, max_dur - elapsed)
-            if self._hud is not None and self._hud.isVisible():
+            if self._hud.isVisible():
                 self._hud.update_progress(elapsed, remaining, max_dur)
 
             if elapsed >= max_dur:
                 self._recording_tick_timer.stop()
                 self._on_capture_timeout()
         else:
-            if self._hud is not None and self._hud.isVisible():
+            if self._hud.isVisible():
                 self._hud.update_progress(elapsed, 0.0, 0.0)
 
     def _on_capture_timeout(self):
@@ -291,7 +291,7 @@ class EloquentApp(QObject):
             self._state = "PROCESSING"
             rec = self._recorder
 
-        if self._hud is not None and self._hud.isVisible():
+        if self._hud.isVisible():
             self._hud.show_processing()
 
         self._update_icon("orange", "Eloquent Notes (Processing...)")
@@ -404,6 +404,7 @@ class EloquentApp(QObject):
             vault_path=obs_cfg["vault_path"],
             folder=obs_cfg["folder"],
             daily_notes=obs_cfg["daily_notes"],
+            folder_organization=obs_cfg["folder_organization"],
             title=rewrite_result["title"],
             text=formatted_text,
             tags=classification_result["tags"],
@@ -459,7 +460,7 @@ class EloquentApp(QObject):
 
             logger.info("Transcription: %s", transcription)
 
-            target_language = ai_cfg.get("output_language", "English")
+            target_language = ai_cfg["output_language"]
             language_instruction = self._format_language_instruction(target_language)
 
             # --- Phase 2: Rewriting ---
@@ -494,8 +495,7 @@ class EloquentApp(QObject):
 
     def _on_processing_completed(self, status, detail):
         self._recording_tick_timer.stop()
-        if self._hud is not None:
-            self._hud.hide_hud()
+        self._hud.hide_hud()
         self.state = "IDLE"
         self.recorder = None
         self._update_icon("gray", "Eloquent Notes (Idle)")
@@ -564,9 +564,8 @@ class EloquentApp(QObject):
         """Clean up and exit the application."""
         logger.info("Exiting application...")
         self._recording_tick_timer.stop()
-        if self._hud is not None:
-            self._hud.hide_hud()
-            self._hud.close()
+        self._hud.hide_hud()
+        self._hud.close()
         with self._lock:
             prev_state = self._state
             self._state = "IDLE"
@@ -596,8 +595,6 @@ def main():
         "command", nargs="?", choices=["toggle"], metavar="command",
     )
     args = parser.parse_args()
-
-    config.init_config_dir()
 
     cfg = config.load_config()
     log_cfg = cfg["logging"]

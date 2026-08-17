@@ -1,7 +1,4 @@
-"""Unit tests for eloquent_notes/audio.py."""
-
 import io
-import queue
 import wave
 from unittest.mock import MagicMock, patch
 

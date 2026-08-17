@@ -30,7 +30,7 @@ class ConfigurationDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Eloquent Notes Configuration")
         self.setMinimumSize(850, 650)
-        self.config_data = config.load_config() or {}
+        self.config_data = config.load_config()
 
         self._tabs = []
         self._init_ui()
@@ -106,7 +106,7 @@ class ConfigurationDialog(QDialog):
 
         try:
             with open(config.DEFAULT_CONFIG_SRC, "r", encoding="utf-8") as f:
-                default_data = yaml.safe_load(f) or {}
+                default_data = yaml.safe_load(f)
 
             # Load default data into UI
             for tab_widget, _ in self._tabs:
@@ -118,7 +118,7 @@ class ConfigurationDialog(QDialog):
                 "Restore Defaults",
                 "Defaults restored. Click 'Save' to apply changes to disk.",
             )
-        except Exception as e:
+        except (OSError, yaml.YAMLError) as e:
             QMessageBox.critical(
                 self, "Error", f"Failed to restore defaults: {e}"
             )
@@ -127,20 +127,20 @@ class ConfigurationDialog(QDialog):
         """Gather settings from widgets and persist them to files on disk."""
         try:
             # Collect from all tabs inside try-except to catch OS/File errors
-            for tab_widget, title in self._tabs:
+            for tab_widget, _ in self._tabs:
                 if not tab_widget.save_settings(self.config_data):
                     # A tab returned False, meaning validation failed
                     self.tab_widget.setCurrentWidget(tab_widget)
                     return False
 
             with open(config.DEFAULT_CONFIG_SRC, "r", encoding="utf-8") as f:
-                default_config = yaml.safe_load(f) or {}
+                default_config = yaml.safe_load(f)
 
             overrides = diff_configs(default_config, self.config_data)
             config.save_config(overrides)
 
             return True
-        except Exception as e:
+        except (OSError, yaml.YAMLError) as e:
             QMessageBox.critical(
                 self, "Save Error", f"Failed to save settings: {e}"
             )
