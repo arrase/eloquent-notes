@@ -4,6 +4,7 @@ import os
 
 from PyQt6.QtWidgets import (
     QCheckBox,
+    QComboBox,
     QFileDialog,
     QFormLayout,
     QGroupBox,
@@ -57,6 +58,16 @@ class ObsidianTab(ConfigTab):
         )
         form_layout.addRow(QLabel("Target Folder:"), self.txt_obs_folder)
 
+        self.cmb_folder_organization = QComboBox()
+        self.cmb_folder_organization.addItem("None (Directly in target folder)", "none")
+        self.cmb_folder_organization.addItem("By Month (YYYY-MM)", "month")
+        self.cmb_folder_organization.addItem("By Week (YYYY-Www)", "week")
+        self.cmb_folder_organization.addItem("By Month and Week (YYYY-MM/Www)", "month_week")
+        self.cmb_folder_organization.setToolTip(
+            "Subdirectory structure to organize note files inside the target folder."
+        )
+        form_layout.addRow(QLabel("Subfolder Structure:"), self.cmb_folder_organization)
+
         self.chk_daily_notes = QCheckBox("Append dictations to daily note (YYYY-MM-DD.md)")
         self.chk_daily_notes.setToolTip(
             "If enabled, dictations are appended to the daily journal instead of"
@@ -86,13 +97,19 @@ class ObsidianTab(ConfigTab):
             self.txt_vault_path.setText(dir_path)
 
     def load_settings(self, config_data: dict) -> None:
-        obs_cfg = config_data.get("obsidian") if isinstance(config_data, dict) else None
-        if not isinstance(obs_cfg, dict):
-            obs_cfg = {}
-        self.txt_vault_path.setText(str(obs_cfg.get("vault_path", "")))
-        self.txt_obs_folder.setText(str(obs_cfg.get("folder", "Dictations")))
-        self.chk_daily_notes.setChecked(bool(obs_cfg.get("daily_notes", False)))
-        self.chk_vault_context.setChecked(bool(obs_cfg.get("vault_context", False)))
+        obs_cfg = config_data["obsidian"]
+        self.txt_vault_path.setText(str(obs_cfg["vault_path"]))
+        self.txt_obs_folder.setText(str(obs_cfg["folder"]))
+
+        org_val = obs_cfg["folder_organization"]
+        index = self.cmb_folder_organization.findData(org_val)
+        if index != -1:
+            self.cmb_folder_organization.setCurrentIndex(index)
+        else:
+            self.cmb_folder_organization.setCurrentIndex(0)
+
+        self.chk_daily_notes.setChecked(bool(obs_cfg["daily_notes"]))
+        self.chk_vault_context.setChecked(bool(obs_cfg["vault_context"]))
 
     def save_settings(self, config_data: dict) -> bool:
         vault = self.txt_vault_path.text().strip()
@@ -111,12 +128,10 @@ class ObsidianTab(ConfigTab):
             if confirm != QMessageBox.StandardButton.Yes:
                 return False
 
-        if not isinstance(config_data.get("obsidian"), dict):
-            config_data["obsidian"] = {}
-
         config_data["obsidian"].update({
             "vault_path": vault,
             "folder": self.txt_obs_folder.text().strip(),
+            "folder_organization": self.cmb_folder_organization.currentData(),
             "daily_notes": self.chk_daily_notes.isChecked(),
             "vault_context": self.chk_vault_context.isChecked(),
         })

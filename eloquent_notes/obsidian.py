@@ -115,49 +115,40 @@ def format_note_content(note_type, content, wikilinks):
     return text
 
 
+_FRONTMATTER_RE = re.compile(r"^---\r?\n(.*?)\r?\n---\r?\n?(.*)$", re.DOTALL)
+
+
 def _update_frontmatter_tags(content, new_tags):
     """Merge new_tags into an existing note's YAML frontmatter.
 
     Returns the full note content with updated frontmatter.
     If the note has no valid frontmatter, returns it unchanged.
     """
-    if not (content.startswith("---\n") or content.startswith("---\r\n") or content == "---"):
+    match = _FRONTMATTER_RE.match(content)
+    if not match:
         return content
 
-    end_frontmatter = content.find("---", 3)
-    if end_frontmatter == -1:
-        return content
-
-    frontmatter_str = content[3:end_frontmatter]
+    frontmatter_str, remainder = match.group(1), match.group(2)
     try:
         frontmatter = yaml.safe_load(frontmatter_str)
     except yaml.YAMLError:
         return content
 
-    if frontmatter is None:
-        frontmatter = {}
-    elif not isinstance(frontmatter, dict):
+    if not isinstance(frontmatter, dict):
         return content
 
-    existing_tags = frontmatter.get("tags", [])
+    existing_tags = frontmatter.setdefault("tags", [])
     if not isinstance(existing_tags, list):
         existing_tags = [existing_tags] if existing_tags else []
+        frontmatter["tags"] = existing_tags
 
     for tag in new_tags:
         if tag not in existing_tags:
             existing_tags.append(tag)
-    frontmatter["tags"] = existing_tags
 
     new_frontmatter = yaml.dump(
         frontmatter, Dumper=_NoAliasDumper, default_flow_style=False, sort_keys=False
     )
-
-    remainder = content[end_frontmatter + 3:]
-    if remainder.startswith("\r\n"):
-        remainder = remainder[2:]
-    elif remainder.startswith("\n"):
-        remainder = remainder[1:]
-
     return f"---\n{new_frontmatter}---\n{remainder}"
 
 
@@ -232,18 +223,41 @@ def _save_standalone(target_dir, date_str, time_str, title, text, tags,
     return note_path
 
 
+def get_target_directory(vault_path, folder, folder_organization="none", now=None):
+    """Compute the target directory path based on vault_path, folder, and folder_organization."""
+    if now is None:
+        now = datetime.now()
+
+    vault_dir = os.path.expanduser(vault_path)
+    base_dir = os.path.join(vault_dir, folder) if folder else vault_dir
+
+    if folder_organization == "month":
+        subfolder = now.strftime("%Y-%m")
+    elif folder_organization == "week":
+        iso_year, iso_week, _ = now.isocalendar()
+        subfolder = f"{iso_year}-W{iso_week:02d}"
+    elif folder_organization == "month_week":
+        month_str = now.strftime("%Y-%m")
+        _, iso_week, _ = now.isocalendar()
+        subfolder = os.path.join(month_str, f"W{iso_week:02d}")
+    else:
+        subfolder = ""
+
+    return os.path.join(base_dir, subfolder) if subfolder else base_dir
+
+
 def save_note(vault_path, folder, daily_notes, title, text, tags,
               template_standalone, template_daily_new,
-              template_daily_append):
+              template_daily_append, folder_organization="none"):
     """Save a dictation note to the Obsidian vault.
 
     Delegates to _save_daily or _save_standalone based on the
     daily_notes setting.
     """
-    target_dir = os.path.join(os.path.expanduser(vault_path), folder)
+    now = datetime.now()
+    target_dir = get_target_directory(vault_path, folder, folder_organization, now=now)
     os.makedirs(target_dir, exist_ok=True)
 
-    now = datetime.now()
     date_str = now.strftime("%Y-%m-%d")
     time_str = now.strftime("%H:%M:%S")
 
@@ -257,4 +271,5 @@ def save_note(vault_path, folder, daily_notes, title, text, tags,
         target_dir, date_str, time_str, title, text, tags,
         template_standalone,
     )
+
 

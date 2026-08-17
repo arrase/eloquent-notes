@@ -1,10 +1,6 @@
-"""Unit tests for eloquent_notes.logging_utils."""
-
 import logging
 import os
 from logging.handlers import RotatingFileHandler
-
-import pytest
 
 from eloquent_notes import logging_utils
 

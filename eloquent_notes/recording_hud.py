@@ -6,7 +6,7 @@ visual recording status, and progress bar during audio dictation.
 
 import math
 
-from PyQt6.QtCore import QRectF, Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import QRectF, Qt, pyqtSignal
 from PyQt6.QtGui import (
     QColor,
     QCursor,
@@ -45,7 +45,7 @@ class RecordingHUD(QWidget):
             }}
             """
 
-    def __init__(self, parent: QWidget | None = None) -> None:
+    def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self._total_duration = 30.0
         self._init_window()
@@ -99,7 +99,7 @@ class RecordingHUD(QWidget):
         self.progress_bar.setStyleSheet(self._progress_bar_qss("#E5E7EB"))
         layout.addWidget(self.progress_bar)
 
-    def paintEvent(self, event: QPaintEvent | None) -> None:
+    def paintEvent(self, event: QPaintEvent) -> None:
         """Render antialiased dark rounded pill background and subtle border."""
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
@@ -108,8 +108,8 @@ class RecordingHUD(QWidget):
         rect = QRectF(1.0, 1.0, float(self.width() - 2), float(self.height() - 2))
         painter.drawRoundedRect(rect, 16.0, 16.0)
 
-    def mousePressEvent(self, event: QMouseEvent | None) -> None:
-        if event is not None and event.button() == Qt.MouseButton.LeftButton:
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        if event.button() == Qt.MouseButton.LeftButton:
             self.clicked.emit()
         super().mousePressEvent(event)
 
@@ -173,18 +173,6 @@ class RecordingHUD(QWidget):
             secs = int(elapsed_seconds)
             self.lbl_timer.setText(f"{secs // 60:02d}:{secs % 60:02d}")
             self.progress_bar.setValue(0)
-
-    def show_processing(self) -> None:
-        """Update HUD state to indicate processing before hiding."""
-        self.lbl_dot.setText("⏳")
-        self.lbl_dot.setStyleSheet("color: #F59E0B; font-size: 12px;")
-        self.lbl_status.setText("Processing Note...")
-        self.lbl_timer.setText("LLM")
-        self.lbl_timer.setStyleSheet(self._TIMER_LABEL_QSS.format("#F59E0B"))
-        self.progress_bar.setValue(1000)
-        self.progress_bar.setStyleSheet(self._progress_bar_qss("#F59E0B"))
-        self.update()
-        QTimer.singleShot(1200, self.hide_hud)
 
     def hide_hud(self) -> None:
         """Hide and reset HUD display."""

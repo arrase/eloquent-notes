@@ -79,40 +79,16 @@ class AudioTab(ConfigTab):
         layout.addStretch()
 
     def load_settings(self, config_data: dict) -> None:
-        audio_cfg = config_data.get("audio") if isinstance(config_data, dict) else None
-        if not isinstance(audio_cfg, dict):
-            audio_cfg = {}
-
-        try:
-            self.spn_sample_rate.setValue(int(audio_cfg.get("sample_rate", 16000)))
-        except (ValueError, TypeError):
-            self.spn_sample_rate.setValue(16000)
-
-        channels = audio_cfg.get("channels", 1)
-        self.cmb_channels.setCurrentIndex(0 if channels == 1 else 1)
-
-        try:
-            self.spn_capture_duration.setValue(int(audio_cfg.get("capture_duration", 30)))
-        except (ValueError, TypeError):
-            self.spn_capture_duration.setValue(30)
-
-        self.chk_recording_hud_enabled.setChecked(bool(audio_cfg.get("recording_hud_enabled", True)))
-        self.chk_beep_enabled.setChecked(bool(audio_cfg.get("beep_enabled", True)))
-
-        try:
-            self.spn_beep_freq.setValue(int(audio_cfg.get("beep_frequency", 1000)))
-        except (ValueError, TypeError):
-            self.spn_beep_freq.setValue(1000)
-
-        try:
-            self.spn_beep_duration.setValue(float(audio_cfg.get("beep_duration", 0.1)))
-        except (ValueError, TypeError):
-            self.spn_beep_duration.setValue(0.1)
+        audio_cfg = config_data["audio"]
+        self.spn_sample_rate.setValue(int(audio_cfg["sample_rate"]))
+        self.cmb_channels.setCurrentIndex(0 if audio_cfg["channels"] == 1 else 1)
+        self.spn_capture_duration.setValue(int(audio_cfg["capture_duration"]))
+        self.chk_recording_hud_enabled.setChecked(bool(audio_cfg["recording_hud_enabled"]))
+        self.chk_beep_enabled.setChecked(bool(audio_cfg["beep_enabled"]))
+        self.spn_beep_freq.setValue(int(audio_cfg["beep_frequency"]))
+        self.spn_beep_duration.setValue(float(audio_cfg["beep_duration"]))
 
     def save_settings(self, config_data: dict) -> bool:
-        if not isinstance(config_data.get("audio"), dict):
-            config_data["audio"] = {}
-
         config_data["audio"].update({
             "sample_rate": self.spn_sample_rate.value(),
             "channels": 1 if self.cmb_channels.currentIndex() == 0 else 2,

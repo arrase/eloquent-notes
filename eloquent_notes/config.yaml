@@ -1,6 +1,7 @@
 obsidian:
   vault_path: "~/Obsidian"
   folder: "Dictations"
+  folder_organization: "none"   # Subfolder structure: "none", "month" (YYYY-MM), "week" (YYYY-Www), "month_week" (YYYY-MM/Www)
   daily_notes: true
   vault_context: true   # Scan vault for existing note names to suggest as wikilinks in the interpretation prompt.
 

@@ -21,6 +21,8 @@ from PyQt6.QtWidgets import (
 from eloquent_notes.config_gui.loader import OllamaModelLoader
 from eloquent_notes.config_gui.tabs.base import ConfigTab
 
+_DURATION_PATTERN = re.compile(r"^-?\d+[smh]?$")
+
 
 class AITab(ConfigTab):
     """AI and Ollama configuration tab."""
@@ -120,6 +122,8 @@ class AITab(ConfigTab):
         self.spn_request_timeout = QSpinBox()
         self.spn_request_timeout.setRange(10, 1000)
         self.spn_request_timeout.setSuffix(" sec")
+        form_layout.addRow(QLabel("Request Timeout:"), self.spn_request_timeout)
+
         self.cmb_language = QComboBox()
         self.cmb_language.setEditable(True)
         self.cmb_language.addItems(["English", "Spanish", "French", "German", "Italian", "Portuguese"])
@@ -205,17 +209,15 @@ class AITab(ConfigTab):
         self._model_loader = None
 
     def load_settings(self, config_data: dict) -> None:
-        ai_cfg = config_data.get("ai") if isinstance(config_data, dict) else None
-        if not isinstance(ai_cfg, dict):
-            ai_cfg = {}
-        self.txt_ollama_url.setText(str(ai_cfg.get("ollama_url", "http://localhost:11434")))
+        ai_cfg = config_data["ai"]
+        self.txt_ollama_url.setText(str(ai_cfg["ollama_url"]))
 
-        curr_model = str(ai_cfg.get("model", "gemma4:e4b-it-qat"))
+        curr_model = str(ai_cfg["model"])
         if self.cmb_model.findText(curr_model) == -1:
             self.cmb_model.addItem(curr_model)
         self.cmb_model.setCurrentText(curr_model)
 
-        context_len = ai_cfg.get("context_length", 8192)
+        context_len = ai_cfg["context_length"]
         if context_len is None:
             self.chk_context_default.setChecked(True)
             self.spn_context_length.setEnabled(False)
@@ -223,30 +225,15 @@ class AITab(ConfigTab):
         else:
             self.chk_context_default.setChecked(False)
             self.spn_context_length.setEnabled(True)
-            try:
-                self.spn_context_length.setValue(int(context_len))
-            except (ValueError, TypeError):
-                self.spn_context_length.setValue(8192)
+            self.spn_context_length.setValue(int(context_len))
 
-        self.txt_keep_alive.setText(str(ai_cfg.get("keep_alive", "5m")))
-        self.txt_preload_keep_alive.setText(str(ai_cfg.get("preload_keep_alive", "5m")))
+        self.txt_keep_alive.setText(str(ai_cfg["keep_alive"]))
+        self.txt_preload_keep_alive.setText(str(ai_cfg["preload_keep_alive"]))
+        self.spn_max_retries.setValue(int(ai_cfg["max_retries"]))
+        self.spn_preload_timeout.setValue(int(ai_cfg["preload_timeout"]))
+        self.spn_request_timeout.setValue(int(ai_cfg["request_timeout"]))
 
-        try:
-            self.spn_max_retries.setValue(int(ai_cfg.get("max_retries", 3)))
-        except (ValueError, TypeError):
-            self.spn_max_retries.setValue(3)
-
-        try:
-            self.spn_preload_timeout.setValue(int(ai_cfg.get("preload_timeout", 60)))
-        except (ValueError, TypeError):
-            self.spn_preload_timeout.setValue(60)
-
-        try:
-            self.spn_request_timeout.setValue(int(ai_cfg.get("request_timeout", 120)))
-        except (ValueError, TypeError):
-            self.spn_request_timeout.setValue(120)
-
-        curr_lang = str(ai_cfg.get("output_language", "English"))
+        curr_lang = str(ai_cfg["output_language"])
         if self.cmb_language.findText(curr_lang) == -1:
             self.cmb_language.addItem(curr_lang)
         self.cmb_language.setCurrentText(curr_lang)
@@ -265,8 +252,7 @@ class AITab(ConfigTab):
         keep_alive = self.txt_keep_alive.text().strip()
         preload_keep_alive = self.txt_preload_keep_alive.text().strip()
 
-        duration_pat = re.compile(r"^-?\d+[smh]?$")
-        if not duration_pat.match(keep_alive):
+        if not _DURATION_PATTERN.match(keep_alive):
             QMessageBox.warning(
                 self,
                 "Validation Error",
@@ -274,7 +260,7 @@ class AITab(ConfigTab):
                 "Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
             )
             return False
-        if not duration_pat.match(preload_keep_alive):
+        if not _DURATION_PATTERN.match(preload_keep_alive):
             QMessageBox.warning(
                 self,
                 "Validation Error",
@@ -284,11 +270,7 @@ class AITab(ConfigTab):
             return False
 
         context_len = None if self.chk_context_default.isChecked() else self.spn_context_length.value()
-
-        output_lang = self.cmb_language.currentText().strip() or "English"
-
-        if not isinstance(config_data.get("ai"), dict):
-            config_data["ai"] = {}
+        output_lang = self.cmb_language.currentText().strip()
 
         config_data["ai"].update({
             "ollama_url": url,

@@ -4,6 +4,7 @@ Renders colored circle icons with state indicators (microphone, recording
 dot, hourglass) using Pillow and converts them to Qt QIcon objects.
 """
 
+import functools
 from io import BytesIO
 
 from PIL import Image, ImageDraw
@@ -37,6 +38,7 @@ def create_icon_image(color: str) -> Image.Image:
     return image
 
 
+@functools.lru_cache(maxsize=4)
 def get_qicon(color: str) -> QIcon:
     """Convert a Pillow icon image to a Qt QIcon."""
     pil_img = create_icon_image(color)

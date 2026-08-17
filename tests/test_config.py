@@ -1,7 +1,4 @@
-"""Unit tests for eloquent_notes.config."""
-
 import os
-import shutil
 
 import pytest
 import yaml
@@ -176,5 +173,14 @@ def test_default_config_audio_capture_duration():
     assert "audio" in default_config
     assert default_config["audio"]["capture_duration"] == 30
     assert default_config["audio"]["recording_hud_enabled"] is True
+
+
+def test_default_config_obsidian_folder_organization():
+    """Verify that the packaged default config.yaml specifies folder_organization as 'none'."""
+    with open(config.DEFAULT_CONFIG_SRC, "r", encoding="utf-8") as f:
+        default_config = yaml.safe_load(f)
+    assert "obsidian" in default_config
+    assert default_config["obsidian"]["folder_organization"] == "none"
+
 
 

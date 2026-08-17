@@ -27,19 +27,6 @@ def _strip_code_fences(text):
     return match.group(1).strip() if match else text.strip()
 
 
-def _extract_message_content(resp_data):
-    """Extract the 'message.content' string from an Ollama API response dict.
-
-    Returns None if the response structure is invalid.
-    """
-    if not isinstance(resp_data, dict):
-        return None
-    message = resp_data.get("message")
-    if not isinstance(message, dict):
-        return None
-    return message.get("content")
-
-
 def preload_model(ollama_url, model, context_length, keep_alive="5m", timeout=180):
     """Send an empty request to Ollama to preload model weights into VRAM.
 
@@ -103,9 +90,7 @@ def _execute_ollama_json_request(
         raw_content = None
         try:
             resp_data = response.json()
-            raw_content = _extract_message_content(resp_data)
-            if raw_content is None:
-                raise ValueError(f"Ollama API response missing 'message.content': {resp_data}")
+            raw_content = resp_data["message"]["content"]
             content = _strip_code_fences(raw_content)
             result = json.loads(content)
             if not isinstance(result, dict) or not all(
@@ -115,7 +100,7 @@ def _execute_ollama_json_request(
                     f"JSON response missing required keys: {required_keys}"
                 )
             return result
-        except (json.JSONDecodeError, TypeError, ValueError) as json_err:
+        except (json.JSONDecodeError, KeyError, TypeError, ValueError) as json_err:
             logger.error(
                 "Invalid JSON output on attempt %d for %s: %s. Error: %s",
                 attempt, task_name, response.text, json_err,
@@ -126,7 +111,7 @@ def _execute_ollama_json_request(
                 f"{retry_prompt}\n\n"
                 f"Expected fields: {', '.join(required_keys)}."
             )
-            assistant_content = raw_content if raw_content else response.text
+            assistant_content = raw_content if raw_content is not None else response.text
             current_messages.append({"role": "assistant", "content": assistant_content})
             current_messages.append({"role": "user", "content": full_retry})
 

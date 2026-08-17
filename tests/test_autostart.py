@@ -1,17 +1,14 @@
 """Unit tests for eloquent_notes.autostart."""
 
 import os
+from pathlib import Path
 import stat
-
-import pytest
 
 from eloquent_notes import autostart
 
 
 def test_install_autostart_default(tmp_path, monkeypatch):
     """Test install_autostart creates desktop entry when executable is not found in PATH."""
-    autostart_dir = tmp_path / "autostart"
-
     monkeypatch.setattr(os.path, "expanduser", lambda p: p.replace("~", str(tmp_path)))
     monkeypatch.setattr("shutil.which", lambda cmd: None)
 
@@ -21,7 +18,7 @@ def test_install_autostart_default(tmp_path, monkeypatch):
     assert os.path.exists(filepath)
     assert filepath == expected_path
 
-    content = open(filepath, "r", encoding="utf-8").read()
+    content = Path(filepath).read_text(encoding="utf-8")
     assert "[Desktop Entry]" in content
     assert "Exec=eloquent-notes" in content
     assert "Name=Eloquent Notes" in content
@@ -40,5 +37,5 @@ def test_install_autostart_with_found_executable(tmp_path, monkeypatch):
 
     filepath = autostart.install_autostart()
 
-    content = open(filepath, "r", encoding="utf-8").read()
+    content = Path(filepath).read_text(encoding="utf-8")
     assert f"Exec={mock_bin}" in content

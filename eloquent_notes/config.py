@@ -19,41 +19,60 @@ TEMPLATES_DIR = os.path.join(CONFIG_DIR, "templates")
 PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_CONFIG_SRC = os.path.join(PACKAGE_DIR, "config.yaml")
 
-_MANAGED_FILES = [
-    ("RETRY", "prompts", "retry_prompt.md"),
-    ("TRANSCRIPTION_SYSTEM", "prompts", "transcription_system.md"),
-    ("TRANSCRIPTION_USER", "prompts", "transcription_user.md"),
-    ("REWRITING_SYSTEM", "prompts", "rewriting_system.md"),
-    ("REWRITING_USER", "prompts", "rewriting_user.md"),
-    ("CLASSIFICATION_SYSTEM", "prompts", "classification_system.md"),
-    ("CLASSIFICATION_USER", "prompts", "classification_user.md"),
-    ("STANDALONE", "templates", "standalone.md"),
-    ("DAILY_NEW", "templates", "daily_new.md"),
-    ("DAILY_APPEND", "templates", "daily_append.md"),
-]
+# User prompt paths
+RETRY_PROMPT_PATH = os.path.join(PROMPTS_DIR, "retry_prompt.md")
+TRANSCRIPTION_SYSTEM_PROMPT_PATH = os.path.join(PROMPTS_DIR, "transcription_system.md")
+TRANSCRIPTION_USER_PROMPT_PATH = os.path.join(PROMPTS_DIR, "transcription_user.md")
+REWRITING_SYSTEM_PROMPT_PATH = os.path.join(PROMPTS_DIR, "rewriting_system.md")
+REWRITING_USER_PROMPT_PATH = os.path.join(PROMPTS_DIR, "rewriting_user.md")
+CLASSIFICATION_SYSTEM_PROMPT_PATH = os.path.join(PROMPTS_DIR, "classification_system.md")
+CLASSIFICATION_USER_PROMPT_PATH = os.path.join(PROMPTS_DIR, "classification_user.md")
 
-PROMPT_AND_TEMPLATE_PATHS = []
-_FILES_TO_COPY = [(DEFAULT_CONFIG_SRC, CONFIG_PATH)]
+# Default prompt sources
+DEFAULT_RETRY_PROMPT_SRC = os.path.join(PACKAGE_DIR, "prompts", "retry_prompt.md")
+DEFAULT_TRANSCRIPTION_SYSTEM_SRC = os.path.join(PACKAGE_DIR, "prompts", "transcription_system.md")
+DEFAULT_TRANSCRIPTION_USER_SRC = os.path.join(PACKAGE_DIR, "prompts", "transcription_user.md")
+DEFAULT_REWRITING_SYSTEM_SRC = os.path.join(PACKAGE_DIR, "prompts", "rewriting_system.md")
+DEFAULT_REWRITING_USER_SRC = os.path.join(PACKAGE_DIR, "prompts", "rewriting_user.md")
+DEFAULT_CLASSIFICATION_SYSTEM_SRC = os.path.join(PACKAGE_DIR, "prompts", "classification_system.md")
+DEFAULT_CLASSIFICATION_USER_SRC = os.path.join(PACKAGE_DIR, "prompts", "classification_user.md")
 
-for _base, _subdir, _filename in _MANAGED_FILES:
-    if _subdir == "prompts":
-        _user_var = f"{_base}_PROMPT_PATH"
-        _default_var = f"DEFAULT_{_base}_SRC" if _base != "RETRY" else "DEFAULT_RETRY_PROMPT_SRC"
-    else:
-        _user_var = f"{_base}_TEMPLATE_PATH"
-        _default_var = f"DEFAULT_{_base}_TEMPLATE_SRC"
+# User template paths
+STANDALONE_TEMPLATE_PATH = os.path.join(TEMPLATES_DIR, "standalone.md")
+DAILY_NEW_TEMPLATE_PATH = os.path.join(TEMPLATES_DIR, "daily_new.md")
+DAILY_APPEND_TEMPLATE_PATH = os.path.join(TEMPLATES_DIR, "daily_append.md")
 
-    _target_dir = PROMPTS_DIR if _subdir == "prompts" else TEMPLATES_DIR
-    _user_path = os.path.join(_target_dir, _filename)
-    _src_path = os.path.join(PACKAGE_DIR, _subdir, _filename)
+# Default template sources
+DEFAULT_STANDALONE_TEMPLATE_SRC = os.path.join(PACKAGE_DIR, "templates", "standalone.md")
+DEFAULT_DAILY_NEW_TEMPLATE_SRC = os.path.join(PACKAGE_DIR, "templates", "daily_new.md")
+DEFAULT_DAILY_APPEND_TEMPLATE_SRC = os.path.join(PACKAGE_DIR, "templates", "daily_append.md")
 
-    globals()[_user_var] = _user_path
-    globals()[_default_var] = _src_path
+PROMPT_AND_TEMPLATE_PATHS = (
+    RETRY_PROMPT_PATH,
+    TRANSCRIPTION_SYSTEM_PROMPT_PATH,
+    TRANSCRIPTION_USER_PROMPT_PATH,
+    REWRITING_SYSTEM_PROMPT_PATH,
+    REWRITING_USER_PROMPT_PATH,
+    CLASSIFICATION_SYSTEM_PROMPT_PATH,
+    CLASSIFICATION_USER_PROMPT_PATH,
+    STANDALONE_TEMPLATE_PATH,
+    DAILY_NEW_TEMPLATE_PATH,
+    DAILY_APPEND_TEMPLATE_PATH,
+)
 
-    PROMPT_AND_TEMPLATE_PATHS.append(_user_path)
-    _FILES_TO_COPY.append((_src_path, _user_path))
-
-PROMPT_AND_TEMPLATE_PATHS = tuple(PROMPT_AND_TEMPLATE_PATHS)
+_FILES_TO_COPY = (
+    (DEFAULT_CONFIG_SRC, CONFIG_PATH),
+    (DEFAULT_RETRY_PROMPT_SRC, RETRY_PROMPT_PATH),
+    (DEFAULT_TRANSCRIPTION_SYSTEM_SRC, TRANSCRIPTION_SYSTEM_PROMPT_PATH),
+    (DEFAULT_TRANSCRIPTION_USER_SRC, TRANSCRIPTION_USER_PROMPT_PATH),
+    (DEFAULT_REWRITING_SYSTEM_SRC, REWRITING_SYSTEM_PROMPT_PATH),
+    (DEFAULT_REWRITING_USER_SRC, REWRITING_USER_PROMPT_PATH),
+    (DEFAULT_CLASSIFICATION_SYSTEM_SRC, CLASSIFICATION_SYSTEM_PROMPT_PATH),
+    (DEFAULT_CLASSIFICATION_USER_SRC, CLASSIFICATION_USER_PROMPT_PATH),
+    (DEFAULT_STANDALONE_TEMPLATE_SRC, STANDALONE_TEMPLATE_PATH),
+    (DEFAULT_DAILY_NEW_TEMPLATE_SRC, DAILY_NEW_TEMPLATE_PATH),
+    (DEFAULT_DAILY_APPEND_TEMPLATE_SRC, DAILY_APPEND_TEMPLATE_PATH),
+)
 
 
 def init_config_dir():

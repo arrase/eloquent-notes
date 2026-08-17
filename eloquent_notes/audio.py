@@ -47,10 +47,7 @@ class AudioRecorder:
                 self.stream = stream
             except Exception:
                 if stream is not None:
-                    try:
-                        stream.close()
-                    except Exception:
-                        pass
+                    stream.close()
                 self.stream = None
                 raise
 
