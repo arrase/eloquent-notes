@@ -16,7 +16,7 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
 )
 
-from eloquent_notes.autostart import install_autostart
+from eloquent_notes.autostart import get_autostart_path, install_autostart
 from eloquent_notes.config_gui.tabs.base import ConfigTab
 from eloquent_notes.logging_utils import get_log_dir
 
@@ -37,7 +37,7 @@ class GeneralTab(ConfigTab):
         startup_layout = QVBoxLayout(grp_startup)
         self.chk_autostart = QCheckBox("Start Eloquent Notes automatically on login")
         self.chk_autostart.setToolTip(
-            "Creates a desktop autostart entry in ~/.config/autostart"
+            "Creates a desktop autostart entry in the XDG autostart directory"
         )
         startup_layout.addWidget(self.chk_autostart)
         layout.addWidget(grp_startup)
@@ -86,8 +86,7 @@ class GeneralTab(ConfigTab):
         QDesktopServices.openUrl(QUrl.fromLocalFile(log_file_path))
 
     def load_settings(self, config_data: dict) -> None:
-        autostart_path = os.path.expanduser("~/.config/autostart/eloquent-notes.desktop")
-        self.chk_autostart.setChecked(os.path.exists(autostart_path))
+        self.chk_autostart.setChecked(os.path.exists(get_autostart_path()))
 
         log_cfg = config_data["logging"]
         self.cmb_log_level.setCurrentText(str(log_cfg["level"]).upper())
@@ -102,11 +101,10 @@ class GeneralTab(ConfigTab):
         })
 
         try:
-            autostart_path = os.path.expanduser("~/.config/autostart/eloquent-notes.desktop")
             if self.chk_autostart.isChecked():
                 install_autostart()
-            elif os.path.exists(autostart_path):
-                os.remove(autostart_path)
+            elif os.path.exists(get_autostart_path()):
+                os.remove(get_autostart_path())
             return True
         except OSError as e:
             QMessageBox.critical(

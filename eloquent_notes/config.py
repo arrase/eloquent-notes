@@ -10,7 +10,12 @@ import shutil
 
 import yaml
 
-CONFIG_DIR = os.path.expanduser("~/.config/eloquent-notes")
+def get_config_home():
+    """Return the XDG base directory for user configuration files."""
+    return os.environ.get("XDG_CONFIG_HOME") or os.path.expanduser("~/.config")
+
+
+CONFIG_DIR = os.path.join(get_config_home(), "eloquent-notes")
 CONFIG_PATH = os.path.join(CONFIG_DIR, "config.yaml")
 
 PROMPTS_DIR = os.path.join(CONFIG_DIR, "prompts")

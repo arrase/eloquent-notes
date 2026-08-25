@@ -1,12 +1,12 @@
-"""Audio recording and playback utilities.
+"""Audio capture and feedback tones.
 
-Provides AudioRecorder for capturing microphone input as WAV bytes,
-and play_beep for audible feedback tones.
+AudioRecorder captures default-input microphone audio via sounddevice and
+encodes it as 16-bit PCM WAV bytes. play_beep generates short sine-wave
+feedback tones with fade in/out to avoid speaker clicks.
 """
 
 import io
 import queue
-import threading
 import wave
 
 import numpy as np
@@ -14,107 +14,88 @@ import sounddevice as sd
 
 
 class AudioRecorder:
-    """Records audio from the default input device and produces WAV bytes."""
+    """Single-use microphone recorder producing WAV bytes once stopped."""
 
     def __init__(self, sample_rate=16000, channels=1):
         self.sample_rate = sample_rate
         self.channels = channels
-        self.q = queue.Queue()
-        self.stream = None
-        self._wav_bytes = None
-        self._lock = threading.Lock()
+        self._chunks = queue.Queue()
+        self._stream = None
 
-    def callback(self, indata, frames, time, status):
-        """Sounddevice stream callback — enqueues audio chunks."""
-        self.q.put(indata.copy())
+    def _on_audio(self, indata, frames, time_info, status):
+        """sounddevice callback — enqueue an immutable copy of each chunk."""
+        self._chunks.put(indata.copy())
 
     def start(self):
-        """Open the audio input stream and begin recording."""
-        with self._lock:
-            self._stop_unlocked()
-            self.q = queue.Queue()
-            self._wav_bytes = None
-
-            stream = None
-            try:
-                stream = sd.InputStream(
-                    samplerate=self.sample_rate,
-                    channels=self.channels,
-                    callback=self.callback,
-                    dtype="float32",
-                )
-                stream.start()
-                self.stream = stream
-            except Exception:
-                if stream is not None:
-                    stream.close()
-                self.stream = None
-                raise
+        """Open the input stream and begin recording."""
+        stream = sd.InputStream(
+            samplerate=self.sample_rate,
+            channels=self.channels,
+            dtype="float32",
+            callback=self._on_audio,
+        )
+        try:
+            stream.start()
+        except Exception:
+            stream.close()
+            raise
+        self._stream = stream
 
     def stop(self):
-        """Stop the recording stream. Non-blocking."""
-        with self._lock:
-            self._stop_unlocked()
-
-    def _stop_unlocked(self):
-        """Internal helper to stop and close stream without lock recursion."""
-        if self.stream is not None:
-            stream = self.stream
-            self.stream = None
-            try:
-                stream.stop()
-            finally:
-                stream.close()
+        """Stop and close the input stream."""
+        if self._stream is None:
+            return
+        stream, self._stream = self._stream, None
+        try:
+            stream.stop()
+        finally:
+            stream.close()
 
     @property
     def wav_bytes(self):
-        """Compile captured audio to WAV bytes on demand (lazy loading)."""
-        with self._lock:
-            if self.stream is not None:
-                self._stop_unlocked()
+        """Drain the captured chunks and encode them as 16-bit PCM WAV.
 
-            if self._wav_bytes is None:
-                chunks = []
-                while True:
-                    try:
-                        chunks.append(self.q.get_nowait())
-                    except queue.Empty:
-                        break
+        Returns b"" when nothing was captured.
+        """
+        chunks = []
+        while True:
+            try:
+                chunks.append(self._chunks.get_nowait())
+            except queue.Empty:
+                break
+        if not chunks:
+            return b""
 
-                if chunks:
-                    all_data = np.concatenate(chunks, axis=0)
-                else:
-                    all_data = np.zeros((0, self.channels), dtype=np.float32)
+        data = np.concatenate(chunks)
+        pcm16 = (data * 32767.0).clip(-32768, 32767).astype(np.int16)
 
-                pcm_data = (all_data * 32767.0).clip(-32768, 32767).astype(np.int16)
-
-                wav_buffer = io.BytesIO()
-                with wave.open(wav_buffer, "wb") as wf:
-                    wf.setnchannels(self.channels)
-                    wf.setsampwidth(2)  # 16-bit PCM
-                    wf.setframerate(self.sample_rate)
-                    wf.writeframes(pcm_data.tobytes())
-
-                self._wav_bytes = wav_buffer.getvalue()
-            return self._wav_bytes
+        buffer = io.BytesIO()
+        with wave.open(buffer, "wb") as wav:
+            wav.setnchannels(self.channels)
+            wav.setsampwidth(2)
+            wav.setframerate(self.sample_rate)
+            wav.writeframes(pcm16.tobytes())
+        return buffer.getvalue()
 
 
-def play_beep(frequency=440, duration=0.1, sample_rate=16000):
-    """Play a short sine-wave beep for audible feedback."""
+def play_beep(frequency=440, duration=0.1, sample_rate=16000, wait=True):
+    """Play a short sine-wave beep for audible feedback.
+
+    When wait=True the call blocks until playback finishes; callers use this
+    before opening the microphone so the tone cannot leak into the recording.
+    """
     num_samples = int(sample_rate * duration)
     if num_samples <= 0:
         return
 
-    t = np.linspace(0, duration, num_samples, endpoint=False)
-    sine_wave = np.sin(frequency * t * 2 * np.pi)
+    t = np.linspace(0.0, duration, num_samples, endpoint=False)
+    tone = np.sin(2.0 * np.pi * frequency * t)
 
-    # Smooth start and end to avoid clicks
     fade_len = min(int(sample_rate * 0.01), num_samples // 2)
     if fade_len > 0:
-        fade_in = np.linspace(0.0, 1.0, fade_len)
-        fade_out = np.linspace(1.0, 0.0, fade_len)
-        sine_wave[:fade_len] *= fade_in
-        sine_wave[-fade_len:] *= fade_out
+        tone[:fade_len] *= np.linspace(0.0, 1.0, fade_len)
+        tone[-fade_len:] *= np.linspace(1.0, 0.0, fade_len)
 
-    sd.play(sine_wave.astype(np.float32), sample_rate)
-    sd.wait()
+    sd.play(tone.astype(np.float32), sample_rate)
+    if wait:
+        sd.wait()

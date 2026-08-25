@@ -171,31 +171,33 @@ To completely eliminate this delay when recording finishes, Eloquent Notes start
 
 Eloquent Notes requires deterministic structured JSON output from Ollama to ensure safe parsing and file generation.
 
-Because LLMs can occasionally wrap output in Markdown code blocks (e.g., ` ```json ... ``` `) or omit required keys, `_execute_ollama_json_request()` implements robust validation and automatic retry attempts:
+Each phase requests constrained decoding via Ollama's `format` JSON schema, which makes the model emit valid JSON matching the expected shape. As a safety net (e.g. for Ollama versions that ignore `format`), `_execute_ollama_json_request()` validates every response and automatically retries:
 
 ```python
 def _execute_ollama_json_request(...):
+    conversation = list(messages)
+
     for attempt in range(max_retries + 1):
         response = requests.post(f"{ollama_url}/api/chat", json=payload, timeout=timeout)
-        content = _strip_code_fences(response.json()["message"]["content"])
+        content = response.json()["message"]["content"]
 
         try:
             result = json.loads(content)
             if not isinstance(result, dict) or not all(k in result for k in required_keys):
-                raise ValueError(f"Missing required keys: {required_keys}")
+                raise ValueError(f"missing required keys: {required_keys}")
             return result
-        except (json.JSONDecodeError, TypeError, ValueError) as json_err:
+        except (json.JSONDecodeError, KeyError, TypeError, ValueError) as err:
             if attempt >= max_retries:
-                raise json_err
-            
+                raise
+
             # Append failed response and custom retry prompt to history
             full_retry = f"{retry_prompt}\n\nExpected fields: {', '.join(required_keys)}."
-            messages.append({"role": "assistant", "content": content})
-            messages.append({"role": "user", "content": full_retry})
+            conversation.append({"role": "assistant", "content": content})
+            conversation.append({"role": "user", "content": full_retry})
 ```
 
 ### Retry Mechanism Details
-1. **Code Fence Stripping:** `_strip_code_fences()` uses regular expressions to strip backticks (` ```json ` ... ` ``` `) before passing text to `json.loads()`.
+1. **Schema-Constrained Output:** Requests include a `format` JSON schema so Ollama constrains sampling to the expected structure.
 2. **Schema Verification:** Ensures the output is a dictionary containing all mandatory keys for that phase.
 3. **Chat Context Appending:** If validation fails, the erroneous assistant message is appended to the message history followed by the contents of `~/.config/eloquent-notes/prompts/retry_prompt.md`.
 4. **Retry Loop:** Retries execution up to `max_retries` times (default: 3) before raising an exception.

@@ -1,37 +1,30 @@
-"""LLM interaction module for Ollama API.
+"""Ollama API client for the three-phase dictation pipeline.
 
-Implements a three-phase pipeline for audio-to-note conversion:
-  Phase 1 (transcription): Multimodal audio → clean text.
-  Phase 2 (rewriting): Text → rewritten note prose and title.
-  Phase 3 (classification): Text → metadata (note type, wikilinks, tags).
+Phase 1 (transcription): multimodal audio -> text.
+Phase 2 (rewriting): transcription -> clean note prose and title.
+Phase 3 (classification): transcription -> type, wikilinks and tags.
 
-Includes retry logic for malformed JSON responses.
+Every phase requests structured output through Ollama's ``format`` JSON
+schema. If a response still cannot be parsed or lacks required keys
+(e.g. an Ollama version that ignores ``format``), the offending answer is
+appended to the conversation together with a corrective instruction and
+the request is retried up to max_retries times.
 """
 
 import base64
-import copy
 import json
 import logging
-import re
 
 import requests
 
 logger = logging.getLogger("eloquent_notes.llm")
 
-_CODE_FENCE_RE = re.compile(r"```(?:[a-zA-Z0-9_-]+)?\s*(.*?)\s*```", re.DOTALL)
-
-
-def _strip_code_fences(text):
-    """Remove markdown code fences (```json ... ```) if present."""
-    match = _CODE_FENCE_RE.search(text)
-    return match.group(1).strip() if match else text.strip()
-
 
 def preload_model(ollama_url, model, context_length, keep_alive="5m", timeout=180):
-    """Send an empty request to Ollama to preload model weights into VRAM.
+    """Send an empty chat request so Ollama loads the model into VRAM.
 
-    This reduces cold start time when the user stops recording and
-    triggers generation.
+    Reduces cold-start latency when the user stops recording and triggers
+    the real pipeline.
     """
     response = requests.post(
         f"{ollama_url}/api/chat",
@@ -51,69 +44,68 @@ def _execute_ollama_json_request(
     retry_prompt, context_length, keep_alive, max_retries, timeout,
     task_name,
 ):
-    """Execute an Ollama chat request expecting structured JSON output.
+    """Run an Ollama chat request expecting a structured JSON response.
 
-    Retries up to max_retries times if the response is not valid JSON
-    or is missing required keys.
+    The input message list is never mutated; retries extend an internal
+    copy. Raises the parse error when all attempts are exhausted.
     """
     options = {"temperature": 0.0, "num_ctx": context_length, "num_predict": 2048}
-    current_messages = copy.deepcopy(messages)
+    conversation = list(messages)
 
     for attempt in range(max_retries + 1):
-        payload = {
-            "model": model,
-            "messages": current_messages,
-            "format": format_schema,
-            "options": options,
-            "keep_alive": keep_alive,
-            "stream": False,
-        }
-
         if attempt > 0:
             logger.warning(
                 "Retrying %s with Ollama (attempt %d/%d)...",
                 task_name, attempt, max_retries,
             )
 
+        payload = {
+            "model": model,
+            "messages": conversation,
+            "format": format_schema,
+            "options": options,
+            "keep_alive": keep_alive,
+            "stream": False,
+        }
+        response = requests.post(
+            f"{ollama_url}/api/chat", json=payload, timeout=timeout,
+        )
         try:
-            response = requests.post(
-                f"{ollama_url}/api/chat", json=payload, timeout=timeout,
-            )
             response.raise_for_status()
         except requests.HTTPError:
             logger.error(
-                "Ollama API HTTP error for %s on attempt %d: %s (response: %s)",
-                task_name, attempt, response.status_code, response.text,
+                "Ollama API HTTP error for %s (status %d): %s",
+                task_name, response.status_code, response.text,
             )
             raise
 
-        raw_content = None
+        content = None
         try:
-            resp_data = response.json()
-            raw_content = resp_data["message"]["content"]
-            content = _strip_code_fences(raw_content)
+            content = response.json()["message"]["content"]
             result = json.loads(content)
             if not isinstance(result, dict) or not all(
-                k in result for k in required_keys
+                key in result for key in required_keys
             ):
-                raise ValueError(
-                    f"JSON response missing required keys: {required_keys}"
-                )
+                raise ValueError(f"missing required keys: {required_keys}")
             return result
-        except (json.JSONDecodeError, KeyError, TypeError, ValueError) as json_err:
+        except (json.JSONDecodeError, KeyError, TypeError, ValueError) as err:
             logger.error(
-                "Invalid JSON output on attempt %d for %s: %s. Error: %s",
-                attempt, task_name, response.text, json_err,
+                "Invalid JSON output for %s (attempt %d): %r (%s)",
+                task_name, attempt, content, err,
             )
             if attempt >= max_retries:
-                raise json_err
-            full_retry = (
-                f"{retry_prompt}\n\n"
-                f"Expected fields: {', '.join(required_keys)}."
-            )
-            assistant_content = raw_content if raw_content is not None else response.text
-            current_messages.append({"role": "assistant", "content": assistant_content})
-            current_messages.append({"role": "user", "content": full_retry})
+                raise
+            conversation.append({
+                "role": "assistant",
+                "content": content if content is not None else response.text,
+            })
+            conversation.append({
+                "role": "user",
+                "content": (
+                    f"{retry_prompt}\n\n"
+                    f"Expected fields: {', '.join(required_keys)}."
+                ),
+            })
 
 
 def transcribe_audio(

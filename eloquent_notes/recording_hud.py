@@ -32,6 +32,13 @@ class RecordingHUD(QWidget):
 
     _TIMER_LABEL_QSS = "color: {}; font-size: 12px; font-weight: bold; font-family: monospace;"
 
+    # Urgency tiers: (timer label color, progress chunk color).
+    _TIERS = {
+        "normal": ("#FFFFFF", "#E5E7EB"),
+        "warning": ("#F59E0B", "#F59E0B"),
+        "critical": ("#EF4444", "#EF4444"),
+    }
+
     def _progress_bar_qss(self, chunk_color: str) -> str:
         return f"""
             QProgressBar {{
@@ -48,6 +55,7 @@ class RecordingHUD(QWidget):
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self._total_duration = 30.0
+        self._style_tier = None
         self._init_window()
         self._init_ui()
 
@@ -122,6 +130,15 @@ class RecordingHUD(QWidget):
             y = geom.y() + 40
             self.move(x, y)
 
+    def _apply_tier(self, tier: str) -> None:
+        """Apply timer/progress styles for an urgency tier (skip if unchanged)."""
+        if tier == self._style_tier:
+            return
+        self._style_tier = tier
+        timer_color, chunk_color = self._TIERS[tier]
+        self.lbl_timer.setStyleSheet(self._TIMER_LABEL_QSS.format(timer_color))
+        self.progress_bar.setStyleSheet(self._progress_bar_qss(chunk_color))
+
     def show_recording(self, total_duration: float) -> None:
         """Show HUD configured for recording with total duration in seconds."""
         self._total_duration = total_duration
@@ -129,7 +146,8 @@ class RecordingHUD(QWidget):
         self.lbl_dot.setStyleSheet("color: #EF4444; font-size: 14px; font-weight: bold;")
         self.lbl_status.setText("Recording Note...")
         self.progress_bar.setValue(0)
-        self.progress_bar.setStyleSheet(self._progress_bar_qss("#E5E7EB"))
+        self._style_tier = None
+        self._apply_tier("normal")
 
         if total_duration > 0:
             secs = int(total_duration)
@@ -137,7 +155,6 @@ class RecordingHUD(QWidget):
         else:
             self.lbl_timer.setText("00:00")
 
-        self.lbl_timer.setStyleSheet(self._TIMER_LABEL_QSS.format("#FFFFFF"))
         self.reposition()
         self.show()
         self.raise_()
@@ -154,21 +171,15 @@ class RecordingHUD(QWidget):
             fraction = min(1.0, max(0.0, elapsed_seconds / total_duration))
             self.progress_bar.setValue(int(fraction * 1000))
 
-            secs_left = max(0, int(math.ceil(remaining_seconds)))
+            secs_left = max(0, math.ceil(remaining_seconds))
             self.lbl_timer.setText(f"{secs_left // 60:02d}:{secs_left % 60:02d}")
 
             if remaining_seconds <= 5.0:
-                timer_color = "#EF4444"
-                chunk_color = "#EF4444"
+                self._apply_tier("critical")
             elif remaining_seconds <= 10.0:
-                timer_color = "#F59E0B"
-                chunk_color = "#F59E0B"
+                self._apply_tier("warning")
             else:
-                timer_color = "#FFFFFF"
-                chunk_color = "#E5E7EB"
-
-            self.lbl_timer.setStyleSheet(self._TIMER_LABEL_QSS.format(timer_color))
-            self.progress_bar.setStyleSheet(self._progress_bar_qss(chunk_color))
+                self._apply_tier("normal")
         else:
             secs = int(elapsed_seconds)
             self.lbl_timer.setText(f"{secs // 60:02d}:{secs % 60:02d}")

@@ -1,8 +1,10 @@
 """CLI entry point for Eloquent Notes.
 
-Handles single-instance enforcement via IPC, autostart installation,
-and toggle-recording commands. If no instance is running, launches
-the daemon process via os.execv.
+Handles single-instance communication via a local Unix socket, autostart
+installation, and launching the daemon or configuration window.
+
+Graphical components are imported lazily inside the branches that need
+them, so frequent invocations like ``eloquent-notes toggle`` stay cheap.
 """
 
 import argparse
@@ -11,10 +13,9 @@ import sys
 
 from PyQt6.QtCore import QCoreApplication
 from PyQt6.QtNetwork import QLocalSocket
-from PyQt6.QtWidgets import QApplication, QDialog
 
+from eloquent_notes import IPC_SERVER_NAME
 from eloquent_notes.autostart import install_autostart
-from eloquent_notes.config_gui import ConfigurationDialog
 
 
 def create_arg_parser():
@@ -56,7 +57,7 @@ def send_ipc_command(command, timeout_ms=500):
         bool: True if connection and write succeeded, False otherwise.
     """
     socket = QLocalSocket()
-    socket.connectToServer("eloquent_notes_ipc")
+    socket.connectToServer(IPC_SERVER_NAME)
     if socket.waitForConnected(timeout_ms):
         try:
             socket.write(command.encode("utf-8"))
@@ -78,7 +79,11 @@ def run_cli(cli_args=None, launcher=os.execv, sys_exit=sys.exit):
         return
 
     if args.command == "config":
-        app = QApplication.instance() or QApplication(sys.argv)
+        from PyQt6.QtWidgets import QApplication, QDialog
+
+        from eloquent_notes.config_gui import ConfigurationDialog
+
+        QApplication.instance() or QApplication(sys.argv)
         dialog = ConfigurationDialog()
         if dialog.exec() == QDialog.DialogCode.Accepted:
             send_ipc_command("reload", timeout_ms=200)
@@ -86,7 +91,7 @@ def run_cli(cli_args=None, launcher=os.execv, sys_exit=sys.exit):
         return
 
     if not QCoreApplication.instance():
-        _app = QCoreApplication(sys.argv)
+        QCoreApplication(sys.argv)
 
     message = "toggle" if wants_toggle else "notify_running"
     if send_ipc_command(message, timeout_ms=500):

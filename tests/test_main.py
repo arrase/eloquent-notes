@@ -83,14 +83,16 @@ def test_run_cli_install_autostart(monkeypatch):
     mock_exit.assert_called_once_with(0)
 
 
-def test_run_cli_config_accepted(monkeypatch):
+def test_run_cli_config_accepted(monkeypatch, qapp):
     """Test run_cli with config command when configuration dialog is accepted."""
     mock_dialog = MagicMock()
     mock_dialog.exec.return_value = QDialog.DialogCode.Accepted
     mock_send_ipc = MagicMock()
     mock_exit = MagicMock()
 
-    monkeypatch.setattr("eloquent_notes.main.ConfigurationDialog", lambda: mock_dialog)
+    monkeypatch.setattr(
+        "eloquent_notes.config_gui.ConfigurationDialog", lambda: mock_dialog
+    )
     monkeypatch.setattr("eloquent_notes.main.send_ipc_command", mock_send_ipc)
 
     main.run_cli(["config"], sys_exit=mock_exit)
@@ -100,14 +102,16 @@ def test_run_cli_config_accepted(monkeypatch):
     mock_exit.assert_called_once_with(0)
 
 
-def test_run_cli_config_rejected(monkeypatch):
+def test_run_cli_config_rejected(monkeypatch, qapp):
     """Test run_cli with config command when configuration dialog is rejected."""
     mock_dialog = MagicMock()
     mock_dialog.exec.return_value = QDialog.DialogCode.Rejected
     mock_send_ipc = MagicMock()
     mock_exit = MagicMock()
 
-    monkeypatch.setattr("eloquent_notes.main.ConfigurationDialog", lambda: mock_dialog)
+    monkeypatch.setattr(
+        "eloquent_notes.config_gui.ConfigurationDialog", lambda: mock_dialog
+    )
     monkeypatch.setattr("eloquent_notes.main.send_ipc_command", mock_send_ipc)
 
     main.run_cli(["config"], sys_exit=mock_exit)

@@ -2,7 +2,20 @@ import logging
 import os
 from logging.handlers import RotatingFileHandler
 
+import pytest
+
 from eloquent_notes import logging_utils
+
+
+def test_parse_log_level_valid():
+    assert logging_utils.parse_log_level("debug") == logging.DEBUG
+    assert logging_utils.parse_log_level("INFO") == logging.INFO
+    assert logging_utils.parse_log_level("Warning") == logging.WARNING
+
+
+def test_parse_log_level_invalid_fails_fast():
+    with pytest.raises(ValueError, match="Invalid log level"):
+        logging_utils.parse_log_level("NOT_A_LEVEL")
 
 
 def test_get_log_dir_custom_env(monkeypatch):
