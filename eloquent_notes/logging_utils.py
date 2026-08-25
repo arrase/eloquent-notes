@@ -19,9 +19,29 @@ def get_log_dir():
     return os.path.join(xdg_state, "eloquent-notes")
 
 
+_LOG_LEVELS = {
+    "DEBUG": logging.DEBUG,
+    "INFO": logging.INFO,
+    "WARNING": logging.WARNING,
+    "ERROR": logging.ERROR,
+    "CRITICAL": logging.CRITICAL,
+}
+
+
+def parse_log_level(name):
+    """Translate a configuration log-level name into a logging constant."""
+    try:
+        return _LOG_LEVELS[str(name).upper()]
+    except KeyError:
+        valid = ", ".join(_LOG_LEVELS)
+        raise ValueError(
+            f"Invalid log level {name!r}. Expected one of: {valid}"
+        ) from None
+
+
 def setup_logging(log_level_str, max_mb, backup_count):
     """Configure the eloquent_notes logger with console and file handlers."""
-    level = getattr(logging, log_level_str.upper(), logging.INFO)
+    level = parse_log_level(log_level_str)
 
     logger = logging.getLogger("eloquent_notes")
     logger.setLevel(level)

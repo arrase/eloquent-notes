@@ -13,9 +13,7 @@ def diff_configs(default: dict, current: dict) -> dict:
                 diff = diff_configs(default_val, v)
                 if diff or (not v and bool(default_val)):
                     overrides[k] = diff
-            elif isinstance(v, bool) != isinstance(default_val, bool):
-                overrides[k] = v
-            elif v != default_val:
+            elif isinstance(v, bool) != isinstance(default_val, bool) or v != default_val:
                 overrides[k] = v
     return overrides
 

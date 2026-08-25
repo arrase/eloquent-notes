@@ -330,7 +330,7 @@ flowchart TB
 * **CLI & GUI Decoupling:** The entry point (`eloquent-notes`) only loads PyQt's lightweight core components (`QCoreApplication` and `QLocalSocket`) when communicating with the running instance. If the daemon is already running, it sends an IPC command and exits immediately, avoiding loading any windows or graphical elements. If it is not running, it replaces the current process with the daemon (`eloquent_notes.app`) via `os.execv`.
 * **In-Memory Audio Processing:** Audio is captured directly from your microphone using `sounddevice` and loaded into an in-memory queue. When recording stops, it is processed into 16-bit PCM WAV bytes in-memory (using `io.BytesIO`). No temporary audio files are written to the disk, maximizing privacy, speed, and disk lifespan.
 * **Non-Blocking UI Threads:** Both the model preloading and the Ollama API request processing are offloaded to background threads. This ensures that the PyQt6 system tray UI loop remains entirely responsive without stuttering or freezing.
-* **Dynamic Icon Generation:** Custom state icons are drawn dynamically in-memory using Pillow (`PIL`) and converted to `QIcon` objects at runtime. No external image assets are required.
+* **Dynamic Icon Generation:** Custom state icons are drawn dynamically in-memory using Qt's `QPainter` and converted to `QIcon` objects at runtime. No external image assets or image-processing libraries are required.
   - 🔘 **Idle (Gray):** A gray circle with a white microphone icon.
   - 🔴 **Recording (Red):** A red circle with a white recording dot.
   - 🟠 **Processing (Orange):** An orange circle with a white hourglass.

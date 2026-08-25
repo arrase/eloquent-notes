@@ -1,11 +1,18 @@
 """Autostart desktop entry installer for Linux.
 
-Creates a .desktop file in ~/.config/autostart/ so Eloquent Notes
+Creates a .desktop file in the XDG autostart directory so Eloquent Notes
 launches automatically on login.
 """
 
 import os
 import shutil
+
+from eloquent_notes.config import get_config_home
+
+
+def get_autostart_path():
+    """Return the path of the Eloquent Notes autostart desktop entry."""
+    return os.path.join(get_config_home(), "autostart", "eloquent-notes.desktop")
 
 
 def install_autostart():
@@ -14,8 +21,7 @@ def install_autostart():
     Returns:
         str: Path to the installed desktop entry file.
     """
-    autostart_dir = os.path.expanduser("~/.config/autostart")
-    desktop_file_path = os.path.join(autostart_dir, "eloquent-notes.desktop")
+    desktop_file_path = get_autostart_path()
 
     exec_path = shutil.which("eloquent-notes")
     if not exec_path:
@@ -33,7 +39,7 @@ Icon=accessories-text-editor
 Categories=Utility;
 """
     print("Installing autostart desktop entry...")
-    os.makedirs(autostart_dir, exist_ok=True)
+    os.makedirs(os.path.dirname(desktop_file_path), exist_ok=True)
     with open(desktop_file_path, "w", encoding="utf-8") as f:
         f.write(desktop_entry_content)
     os.chmod(desktop_file_path, 0o644)

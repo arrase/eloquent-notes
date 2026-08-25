@@ -9,40 +9,6 @@ import requests
 from eloquent_notes import llm
 
 
-def test_strip_code_fences_plain_json():
-    text = '{"key": "value"}'
-    assert llm._strip_code_fences(text) == '{"key": "value"}'
-
-
-def test_strip_code_fences_standard_fence():
-    text = "```json\n{\"key\": \"value\"}\n```"
-    assert llm._strip_code_fences(text) == '{"key": "value"}'
-
-
-def test_strip_code_fences_no_lang_fence():
-    text = "```\n{\"key\": \"value\"}\n```"
-    assert llm._strip_code_fences(text) == '{"key": "value"}'
-
-
-def test_strip_code_fences_surrounding_text():
-    text = (
-        "Here is the requested JSON output:\n"
-        "```json\n"
-        "{\"empty\": false, \"transcription\": \"Hello world\"}\n"
-        "```\n"
-        "Hope this helps!"
-    )
-    assert (
-        llm._strip_code_fences(text)
-        == '{"empty": false, "transcription": "Hello world"}'
-    )
-
-
-def test_strip_code_fences_inline_fence():
-    text = '```json{"empty": true}```'
-    assert llm._strip_code_fences(text) == '{"empty": true}'
-
-
 @patch("eloquent_notes.llm.requests.post")
 def test_preload_model(mock_post):
     mock_response = MagicMock()

@@ -44,7 +44,7 @@ Eloquent Notes is a lightweight, system-tray-centric background utility for Linu
   <div class="feature-card">
     <i class="fa-solid fa-palette feature-icon"></i>
     <h3>Dynamic In-Memory Icons</h3>
-    <p>State icons (Idle gray microphone, Recording red dot, Processing orange hourglass) are dynamically drawn using Pillow in RAM.</p>
+    <p>State icons (Idle gray microphone, Recording red dot, Processing orange hourglass) are dynamically rendered with Qt <code>QPainter</code> in RAM.</p>
   </div>
 
   <div class="feature-card">

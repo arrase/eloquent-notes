@@ -1,49 +1,53 @@
-"""System tray icon generation.
-
-Renders colored circle icons with state indicators (microphone, recording
-dot, hourglass) using Pillow and converts them to Qt QIcon objects.
-"""
+"""System tray status icons rendered dynamically with QPainter."""
 
 import functools
-from io import BytesIO
 
-from PIL import Image, ImageDraw
-from PyQt6.QtGui import QIcon, QPixmap
+from PyQt6.QtCore import QPointF, QRectF, Qt
+from PyQt6.QtGui import QColor, QIcon, QPainter, QPen, QPixmap, QPolygonF
 
-COLOR_RED = (220, 38, 38, 255)
-COLOR_ORANGE = (217, 119, 6, 255)
-COLOR_GRAY = (75, 85, 99, 255)
-COLOR_WHITE = (255, 255, 255, 255)
+COLOR_RED = QColor(220, 38, 38)
+COLOR_ORANGE = QColor(217, 119, 6)
+COLOR_GRAY = QColor(75, 85, 99)
+COLOR_WHITE = QColor(255, 255, 255)
 
 
-def create_icon_image(color: str) -> Image.Image:
-    """Create a 64x64 RGBA icon image for the given state color."""
-    image = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(image)
+def create_icon_pixmap(color: str) -> QPixmap:
+    """Render a 64x64 status icon: colored circle with a white glyph."""
+    pixmap = QPixmap(64, 64)
+    pixmap.fill(Qt.GlobalColor.transparent)
 
+    painter = QPainter(pixmap)
+    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+    painter.setPen(Qt.PenStyle.NoPen)
+
+    circle_color = {"red": COLOR_RED, "orange": COLOR_ORANGE}.get(color, COLOR_GRAY)
+    painter.setBrush(circle_color)
+    painter.drawEllipse(QRectF(4.0, 4.0, 56.0, 56.0))
+
+    painter.setBrush(COLOR_WHITE)
     if color == "red":
-        draw.ellipse((4, 4, 60, 60), fill=COLOR_RED)
-        draw.ellipse((22, 22, 42, 42), fill=COLOR_WHITE)
+        painter.drawEllipse(QRectF(22.0, 22.0, 20.0, 20.0))
     elif color == "orange":
-        draw.ellipse((4, 4, 60, 60), fill=COLOR_ORANGE)
-        draw.polygon([(24, 20), (40, 20), (32, 32)], fill=COLOR_WHITE)
-        draw.polygon([(32, 32), (24, 44), (40, 44)], fill=COLOR_WHITE)
+        painter.drawPolygon(QPolygonF([
+            QPointF(24.0, 20.0), QPointF(40.0, 20.0), QPointF(32.0, 32.0),
+        ]))
+        painter.drawPolygon(QPolygonF([
+            QPointF(24.0, 44.0), QPointF(32.0, 32.0), QPointF(40.0, 44.0),
+        ]))
     else:
-        draw.ellipse((4, 4, 60, 60), fill=COLOR_GRAY)
-        draw.rounded_rectangle((26, 18, 38, 34), radius=6, fill=COLOR_WHITE)
-        draw.arc((20, 24, 44, 38), 0, 180, fill=COLOR_WHITE, width=3)
-        draw.line((32, 38, 32, 46), fill=COLOR_WHITE, width=3)
-        draw.line((22, 46, 42, 46), fill=COLOR_WHITE, width=3)
+        # Microphone: capsule, cradle arc, stem and base.
+        painter.drawRoundedRect(QRectF(26.0, 18.0, 12.0, 16.0), 6.0, 6.0)
+        painter.setPen(QPen(COLOR_WHITE, 3.0))
+        painter.setBrush(Qt.BrushStyle.NoBrush)
+        painter.drawArc(QRectF(20.0, 24.0, 24.0, 14.0), 180 * 16, 180 * 16)
+        painter.drawLine(QPointF(32.0, 38.0), QPointF(32.0, 46.0))
+        painter.drawLine(QPointF(22.0, 46.0), QPointF(42.0, 46.0))
 
-    return image
+    painter.end()
+    return pixmap
 
 
 @functools.lru_cache(maxsize=4)
 def get_qicon(color: str) -> QIcon:
-    """Convert a Pillow icon image to a Qt QIcon."""
-    pil_img = create_icon_image(color)
-    byte_arr = BytesIO()
-    pil_img.save(byte_arr, format="PNG")
-    pixmap = QPixmap()
-    pixmap.loadFromData(byte_arr.getvalue(), "PNG")
-    return QIcon(pixmap)
+    """Return the cached QIcon for the given state color."""
+    return QIcon(create_icon_pixmap(color))

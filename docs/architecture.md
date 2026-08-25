@@ -78,7 +78,7 @@ To eliminate sharp acoustic pops or clicks when audio playback starts and stops 
 
 ## 3. Dynamic In-Memory Icon Generation
 
-Instead of loading static PNG icons from disk, status indicators are rendered dynamically in RAM using Pillow (`PIL.ImageDraw`) and converted to Qt `QIcon` objects at runtime.
+Instead of loading static PNG icons from disk, status indicators are rendered dynamically with Qt's `QPainter` into a `QPixmap` and wrapped in a `QIcon` at runtime.
 
 The tray icon changes colors and central glyphs based on internal app state:
 
@@ -88,11 +88,11 @@ The tray icon changes colors and central glyphs based on internal app state:
 | **RECORDING** | Vivid Red (`#DC2626`) | White Recording Dot | Microphones streaming into RAM queue |
 | **PROCESSING** | Amber Orange (`#D97706`) | White Hourglass polygon | LLM pipeline executing via background thread |
 
-Rendering happens in `ui.create_icon_image(color)`:
-1. A transparent 64×64 pixel `RGBA` canvas is created.
-2. The outer colored circle backdrop is drawn (`ellipse`).
-3. Vector-calculated inner shapes (rounded rectangle mic body, arcs, or polygons) are rasterized onto the canvas.
-4. The image is exported into an in-memory `io.BytesIO` PNG stream and loaded into `QPixmap.loadFromData()` to return a `QIcon`.
+Rendering happens in `ui.create_icon_pixmap(color)`:
+1. A transparent 64×64 pixel `QPixmap` canvas is created.
+2. The outer colored circle backdrop is drawn (`drawEllipse`).
+3. Vector inner shapes (rounded rectangle mic body, arcs, or polygons) are painted onto the canvas.
+4. The resulting `QPixmap` is wrapped in a `QIcon`, which is cached per state (`functools.lru_cache`).
 
 ---
 
@@ -101,7 +101,7 @@ Rendering happens in `ui.create_icon_image(color)`:
 PyQt6 UI components run strictly on the main thread. To prevent UI freezing, cursor stuttering, or tray icon unresponsiveness during heavy audio encoding or LLM inference, long-running operations are offloaded to background threads (`threading.Thread`):
 
 1. **Concurrent Model Preloading:** When recording begins (transitioning to `RECORDING`), a background thread is immediately spawned to issue an empty keep-alive chat request to Ollama. This forces the GPU to load model weights into VRAM while the user is actively speaking.
-2. **Background Processing Thread:** When recording is toggled off (transitioning to `PROCESSING`), stopping the audio stream, compiling WAV bytes, executing the 3-phase LLM pipeline over HTTP, and writing notes to disk occur entirely inside `_process_audio()`, which runs on a dedicated daemon worker thread.
+2. **Background Processing Thread:** When recording is toggled off (transitioning to `PROCESSING`), the audio stream is stopped on the main thread, then compiling WAV bytes, executing the 3-phase LLM pipeline over HTTP, and writing notes to disk occur entirely inside `_process_audio()`, which runs on a dedicated daemon worker thread.
 3. **Qt Signal Delivery:** When processing completes, the worker thread emits a custom PyQt thread-safe signal (`processing_completed.emit(status, path)`), transferring control back to the main GUI thread to display desktop notifications and reset the tray icon to gray IDLE mode.
 
 ---
