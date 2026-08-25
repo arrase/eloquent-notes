@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "eloquent-notes"
-version = "0.1.0"
+version = "0.2.7"
 description = "A Linux system tray utility for offline dictation into Obsidian using Gemma 4."
 readme = "README.md"
 requires-python = ">=3.8"
