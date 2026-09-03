@@ -17,6 +17,7 @@ import sys
 import threading
 import time
 
+import requests
 from PyQt6.QtCore import QObject, QTimer, pyqtSignal
 from PyQt6.QtGui import QAction
 from PyQt6.QtNetwork import QLocalServer
@@ -46,11 +47,11 @@ class EloquentApp(QObject):
 
     processing_completed = pyqtSignal(str, str)
 
-    def __init__(self, qapp, start_recording_immediately=False):
+    def __init__(self, qapp, start_recording_immediately=False, app_config=None):
         super().__init__()
         self.app = qapp
         self.state = IDLE
-        self.config = config.load_config()
+        self.config = app_config if app_config is not None else config.load_config()
         self.tray = None
         self.menu = None
         self.server = None
@@ -86,7 +87,9 @@ class EloquentApp(QObject):
         self.server = QLocalServer(self)
         QLocalServer.removeServer(IPC_SERVER_NAME)
         if not self.server.listen(IPC_SERVER_NAME):
-            logger.error("Failed to start local IPC server.")
+            error_msg = f"Failed to start local IPC server: {self.server.errorString()}"
+            logger.error(error_msg)
+            raise RuntimeError(error_msg)
         self.server.newConnection.connect(self._handle_ipc_connection)
 
     def _init_tray_ui(self):
@@ -226,7 +229,7 @@ class EloquentApp(QObject):
                 keep_alive=ai_cfg["preload_keep_alive"],
                 timeout=ai_cfg["preload_timeout"],
             )
-        except Exception as e:
+        except requests.RequestException as e:
             logger.warning("Model preload skipped: %s", e)
 
     def _on_recording_tick(self):
@@ -530,9 +533,11 @@ def main():
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
 
-    eloquent_app = EloquentApp(app, start_recording_immediately=(
-        args.command == "toggle"
-    ))
+    eloquent_app = EloquentApp(
+        app,
+        start_recording_immediately=(args.command == "toggle"),
+        app_config=cfg,
+    )
     eloquent_app.run()
 
 

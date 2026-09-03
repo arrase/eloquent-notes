@@ -10,9 +10,11 @@ for contextual wikilink suggestions.
 
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 
 import yaml
+
+from eloquent_notes.config import atomic_write
 
 _CALLOUT_MAP = {
     "task": "todo",
@@ -33,10 +35,22 @@ class _NoAliasDumper(yaml.SafeDumper):
 
 
 class SafeDict(dict):
-    """Dictionary subclass that retains missing format placeholders during string formatting."""
+    """Dict that leaves missing template keys untouched (e.g. {unknown} remains {unknown})."""
 
     def __missing__(self, key):
         return f"{{{key}}}"
+
+
+def _build_template_context(date_str, time_str, title, text, tags):
+    """Prepare standardized replacement mapping for note templates."""
+    tags_formatted = "\n".join(f"  - {tag}" for tag in tags) if tags else ""
+    return SafeDict(
+        date=date_str,
+        time=time_str,
+        title=title,
+        text=text,
+        tags=tags_formatted,
+    )
 
 
 def scan_vault_topics(vault_path, max_topics=200):
@@ -84,12 +98,10 @@ def _inject_wikilinks(text, wikilinks):
             re.IGNORECASE,
         )
 
-        def replace_match(match):
-            if match.group(1):
-                return match.group(1)
-            return f"[[{link}]]"
-
-        text = pattern.sub(replace_match, text)
+        text = pattern.sub(
+            lambda match, target=link: match.group(1) if match.group(1) else f"[[{target}]]",
+            text,
+        )
 
     return text
 
@@ -160,21 +172,11 @@ def _save_daily(target_dir, date_str, time_str, title, text, tags,
     or appends to the existing one using template_append.
     """
     note_path = os.path.join(target_dir, f"{date_str}.md")
-    tags_formatted = "\n".join(f"  - {tag}" for tag in tags) if tags else ""
-    format_kwargs = SafeDict(
-        date=date_str,
-        time=time_str,
-        title=title,
-        text=text,
-        tags=tags_formatted,
-    )
+    format_kwargs = _build_template_context(date_str, time_str, title, text, tags)
 
     if not os.path.exists(note_path):
         content = template_new.format_map(format_kwargs)
-        tmp_path = f"{note_path}.tmp"
-        with open(tmp_path, "w", encoding="utf-8") as f:
-            f.write(content)
-        os.replace(tmp_path, note_path)
+        atomic_write(note_path, content)
         return note_path
 
     with open(note_path, "r", encoding="utf-8") as f:
@@ -183,13 +185,9 @@ def _save_daily(target_dir, date_str, time_str, title, text, tags,
     updated_content = _update_frontmatter_tags(existing_content, tags)
     append_content = template_append.format_map(format_kwargs)
 
-    tmp_path = f"{note_path}.tmp"
-    with open(tmp_path, "w", encoding="utf-8") as f:
-        f.write(updated_content)
-        if not updated_content.endswith("\n"):
-            f.write("\n")
-        f.write("\n" + append_content)
-    os.replace(tmp_path, note_path)
+    sep = "\n" if not updated_content.endswith("\n") else ""
+    full_content = f"{updated_content}{sep}\n{append_content}"
+    atomic_write(note_path, full_content)
 
     return note_path
 
@@ -197,7 +195,7 @@ def _save_daily(target_dir, date_str, time_str, title, text, tags,
 def _save_standalone(target_dir, date_str, time_str, title, text, tags,
                      template):
     """Save a dictation as a standalone timestamped note."""
-    timestamp = datetime.now().strftime("%Y-%m-%d-%H%M%S")
+    timestamp = f"{date_str}-{time_str.replace(':', '')}"
     base_name = f"Dictation-{timestamp}"
     note_path = os.path.join(target_dir, f"{base_name}.md")
     counter = 1
@@ -205,20 +203,9 @@ def _save_standalone(target_dir, date_str, time_str, title, text, tags,
         note_path = os.path.join(target_dir, f"{base_name}_{counter}.md")
         counter += 1
 
-    tags_formatted = "\n".join(f"  - {tag}" for tag in tags) if tags else ""
-    format_kwargs = SafeDict(
-        date=date_str,
-        time=time_str,
-        title=title,
-        text=text,
-        tags=tags_formatted,
-    )
-
+    format_kwargs = _build_template_context(date_str, time_str, title, text, tags)
     content = template.format_map(format_kwargs)
-    tmp_path = f"{note_path}.tmp"
-    with open(tmp_path, "w", encoding="utf-8") as f:
-        f.write(content)
-    os.replace(tmp_path, note_path)
+    atomic_write(note_path, content)
 
     return note_path
 
@@ -226,7 +213,7 @@ def _save_standalone(target_dir, date_str, time_str, title, text, tags,
 def get_target_directory(vault_path, folder, folder_organization="none", now=None):
     """Compute the target directory path based on vault_path, folder, and folder_organization."""
     if now is None:
-        now = datetime.now()
+        now = datetime.now(timezone.utc).astimezone()
 
     vault_dir = os.path.expanduser(vault_path)
     base_dir = os.path.join(vault_dir, folder) if folder else vault_dir
@@ -254,7 +241,7 @@ def save_note(vault_path, folder, daily_notes, title, text, tags,
     Delegates to _save_daily or _save_standalone based on the
     daily_notes setting.
     """
-    now = datetime.now()
+    now = datetime.now(timezone.utc).astimezone()
     target_dir = get_target_directory(vault_path, folder, folder_organization, now=now)
     os.makedirs(target_dir, exist_ok=True)
 

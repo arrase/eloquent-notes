@@ -87,6 +87,7 @@ def test_wav_bytes_encodes_captured_chunks():
     recorder._chunks.put(np.ones((800, 1), dtype=np.float32) * -0.5)
 
     wav_bytes = recorder.wav_bytes
+    assert recorder.wav_bytes == wav_bytes
     with wave.open(io.BytesIO(wav_bytes), "rb") as wf:
         assert wf.getnchannels() == 1
         assert wf.getsampwidth() == 2

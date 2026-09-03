@@ -13,7 +13,6 @@ from eloquent_notes.config_gui.tabs.prompts import PromptsTab
 from eloquent_notes.config_gui.tabs.templates import TemplatesTab
 from eloquent_notes.config_gui.tabs.text_files import TextFilesTab
 
-
 # --- AI TAB TESTS ---
 
 def test_ai_tab_load_and_save_valid(qapp):
@@ -224,7 +223,7 @@ def test_general_tab_view_log_file(qapp, tmp_path):
     log_file = os.path.join(log_dir, "app.log")
 
     # Missing log file
-    with patch("eloquent_notes.config_gui.tabs.general.get_log_dir", return_value=log_dir), patch(
+    with patch("eloquent_notes.config_gui.tabs.general.get_log_file_path", return_value=log_file), patch(
         "PyQt6.QtWidgets.QMessageBox.information"
     ) as mock_info:
         tab._view_log_file()
@@ -235,7 +234,7 @@ def test_general_tab_view_log_file(qapp, tmp_path):
     with open(log_file, "w") as f:
         f.write("Log line")
 
-    with patch("eloquent_notes.config_gui.tabs.general.get_log_dir", return_value=log_dir), patch(
+    with patch("eloquent_notes.config_gui.tabs.general.get_log_file_path", return_value=log_file), patch(
         "PyQt6.QtGui.QDesktopServices.openUrl"
     ) as mock_open:
         tab._view_log_file()

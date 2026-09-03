@@ -1,7 +1,14 @@
 import os
 import sys
+from unittest.mock import MagicMock
+
 import pytest
 from PyQt6.QtWidgets import QApplication
+
+if "sounddevice" not in sys.modules:
+    sd_mock = MagicMock()
+    sd_mock.CallbackFlags = MagicMock()
+    sys.modules["sounddevice"] = sd_mock
 
 
 @pytest.fixture(scope="session")

@@ -1,7 +1,7 @@
 """Unit tests for eloquent_notes/obsidian.py."""
 
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 import yaml
 
@@ -178,7 +178,8 @@ def test_save_note_daily_new_and_append(tmp_path):
         template_daily_append=template_append,
     )
     assert os.path.exists(note_path)
-    content1 = open(note_path).read()
+    with open(note_path, encoding="utf-8") as f:
+        content1 = f.read()
     assert "# Dictation 1" in content1
     assert "First text" in content1
     assert "tag1" in content1
@@ -196,7 +197,8 @@ def test_save_note_daily_new_and_append(tmp_path):
         template_daily_append=template_append,
     )
     assert note_path_2 == note_path
-    content2 = open(note_path_2).read()
+    with open(note_path_2, encoding="utf-8") as f:
+        content2 = f.read()
     assert "tag1" in content2
     assert "tag2" in content2
     assert "Second text" in content2
@@ -218,7 +220,8 @@ def test_save_note_standalone(tmp_path):
         template_daily_append="",
     )
     assert os.path.exists(note_path)
-    content = open(note_path).read()
+    with open(note_path, encoding="utf-8") as f:
+        content = f.read()
     assert "# Standalone Title" in content
     assert "Standalone body text" in content
     assert "  - idea" in content
@@ -239,7 +242,8 @@ def test_safe_template_formatting(tmp_path):
         template_daily_new="",
         template_daily_append="",
     )
-    content = open(note_path).read()
+    with open(note_path, encoding="utf-8") as f:
+        content = f.read()
     assert "Title with {braces}" in content
     assert "Text with {custom_var} inside" in content
     assert "Unmatched: {unknown_placeholder}" in content
@@ -299,7 +303,7 @@ def test_save_standalone_collision(tmp_path, monkeypatch):
 
 
 def test_get_target_directory():
-    dt = datetime(2026, 8, 17, 10, 0, 0)  # 2026-08-17 is Monday, Week 34
+    dt = datetime(2026, 8, 17, 10, 0, 0, tzinfo=timezone.utc)  # 2026-08-17 is Monday, Week 34
     vault = "/fake/vault"
 
     # None / default
@@ -335,7 +339,7 @@ def test_save_note_folder_organization_monthly(tmp_path):
         template_daily_new=template_new,
         template_daily_append="",
     )
-    now = datetime.now()
+    now = datetime.now(timezone.utc).astimezone()
     expected_subdir = now.strftime("%Y-%m")
     assert f"Daily/{expected_subdir}" in note_path or f"Daily\\{expected_subdir}" in note_path
     assert os.path.exists(note_path)
@@ -357,7 +361,7 @@ def test_save_note_folder_organization_weekly(tmp_path):
         template_daily_new="",
         template_daily_append="",
     )
-    now = datetime.now()
+    now = datetime.now(timezone.utc).astimezone()
     iso_year, iso_week, _ = now.isocalendar()
     expected_subdir = f"{iso_year}-W{iso_week:02d}"
     assert f"Notes/{expected_subdir}" in note_path or f"Notes\\{expected_subdir}" in note_path
@@ -380,7 +384,7 @@ def test_save_note_folder_organization_month_week(tmp_path):
         template_daily_new=template_new,
         template_daily_append="",
     )
-    now = datetime.now()
+    now = datetime.now(timezone.utc).astimezone()
     month_str = now.strftime("%Y-%m")
     iso_week = now.isocalendar().week
     expected_sub = os.path.join(month_str, f"W{iso_week:02d}")

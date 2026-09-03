@@ -69,8 +69,8 @@ def test_setup_logging(tmp_path, monkeypatch):
     assert file_handler.backupCount == 5
 
 
-def test_setup_logging_file_error(monkeypatch, capsys):
-    """Test setup_logging handles file logging initialization errors gracefully."""
+def test_setup_logging_file_error(monkeypatch):
+    """Test setup_logging fails fast and raises when file logging cannot be initialized."""
     logger = logging.getLogger("eloquent_notes")
     logger.handlers.clear()
 
@@ -79,8 +79,12 @@ def test_setup_logging_file_error(monkeypatch, capsys):
 
     monkeypatch.setattr(logging_utils, "get_log_dir", mock_get_log_dir)
 
-    returned_logger = logging_utils.setup_logging("INFO", max_mb=1, backup_count=1)
-    assert returned_logger is logger
+    with pytest.raises(PermissionError, match="Access denied"):
+        logging_utils.setup_logging("INFO", max_mb=1, backup_count=1)
 
-    stderr = capsys.readouterr().err
-    assert "Could not initialize file logging" in stderr
+
+def test_get_log_file_path():
+    """Test get_log_file_path returns app.log under the log directory."""
+    path = logging_utils.get_log_file_path()
+    assert path.endswith("app.log")
+    assert "eloquent-notes" in path

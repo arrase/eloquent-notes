@@ -6,7 +6,7 @@ from PyQt6.QtGui import QIcon
 from eloquent_notes import ui
 
 
-@pytest.mark.parametrize("color", ["red", "orange", "gray", "unknown"])
+@pytest.mark.parametrize("color", ["red", "orange", "gray"])
 def test_create_icon_pixmap(qapp, color):
     """Test create_icon_pixmap renders a valid opaque 64x64 icon."""
     pixmap = ui.create_icon_pixmap(color)
@@ -16,6 +16,12 @@ def test_create_icon_pixmap(qapp, color):
 
     center = pixmap.toImage().pixelColor(32, 32)
     assert center.alpha() == 255
+
+
+def test_create_icon_pixmap_unknown_raises(qapp):
+    """Test that create_icon_pixmap fails fast on invalid color."""
+    with pytest.raises(ValueError, match="Unknown icon status color"):
+        ui.create_icon_pixmap("unknown")
 
 
 @pytest.mark.parametrize("color", ["red", "orange", "gray"])

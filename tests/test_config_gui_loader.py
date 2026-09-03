@@ -1,6 +1,7 @@
 """Unit tests for OllamaModelLoader background thread worker."""
 
 from unittest.mock import MagicMock, patch
+
 import requests
 
 from eloquent_notes.config_gui.loader import OllamaModelLoader

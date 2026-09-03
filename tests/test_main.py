@@ -91,7 +91,7 @@ def test_run_cli_config_accepted(monkeypatch, qapp):
     mock_exit = MagicMock()
 
     monkeypatch.setattr(
-        "eloquent_notes.config_gui.ConfigurationDialog", lambda: mock_dialog
+        "eloquent_notes.main.ConfigurationDialog", lambda: mock_dialog
     )
     monkeypatch.setattr("eloquent_notes.main.send_ipc_command", mock_send_ipc)
 
@@ -110,7 +110,7 @@ def test_run_cli_config_rejected(monkeypatch, qapp):
     mock_exit = MagicMock()
 
     monkeypatch.setattr(
-        "eloquent_notes.config_gui.ConfigurationDialog", lambda: mock_dialog
+        "eloquent_notes.main.ConfigurationDialog", lambda: mock_dialog
     )
     monkeypatch.setattr("eloquent_notes.main.send_ipc_command", mock_send_ipc)
 
