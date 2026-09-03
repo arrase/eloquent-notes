@@ -10,6 +10,7 @@ import shutil
 
 import yaml
 
+
 def get_config_home():
     """Return the XDG base directory for user configuration files."""
     return os.environ.get("XDG_CONFIG_HOME") or os.path.expanduser("~/.config")
@@ -87,7 +88,7 @@ def init_config_dir():
     os.makedirs(TEMPLATES_DIR, exist_ok=True)
 
     for src, dst in _FILES_TO_COPY:
-        if not os.path.exists(dst) and os.path.exists(src):
+        if not os.path.exists(dst):
             shutil.copy(src, dst)
 
 
@@ -107,16 +108,18 @@ def load_config():
     init_config_dir()
 
     with open(DEFAULT_CONFIG_SRC, "r", encoding="utf-8") as f:
-        default_config = yaml.safe_load(f) or {}
+        default_config = yaml.safe_load(f)
 
     with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-        user_config = yaml.safe_load(f) or {}
+        user_config = yaml.safe_load(f)
 
     if not isinstance(default_config, dict):
-        raise ValueError(f"Default config at {DEFAULT_CONFIG_SRC} is not a valid YAML mapping")
+        raise TypeError(f"Default config at {DEFAULT_CONFIG_SRC} is not a valid YAML mapping")
 
-    if not isinstance(user_config, dict):
-        raise ValueError(f"User config at {CONFIG_PATH} is not a valid YAML mapping")
+    if user_config is None:
+        user_config = {}
+    elif not isinstance(user_config, dict):
+        raise TypeError(f"User config at {CONFIG_PATH} is not a valid YAML mapping")
 
     return _merge_configs(default_config, user_config)
 
@@ -127,17 +130,8 @@ def load_file(path):
         return f.read()
 
 
-def save_config(config_data):
-    """Save configuration data to user config file."""
-    os.makedirs(CONFIG_DIR, exist_ok=True)
-    tmp_path = f"{CONFIG_PATH}.tmp"
-    with open(tmp_path, "w", encoding="utf-8") as f:
-        yaml.safe_dump(config_data, f, default_flow_style=False, sort_keys=False)
-    os.replace(tmp_path, CONFIG_PATH)
-
-
-def save_file(path, content):
-    """Save text content to a file."""
+def atomic_write(path, content):
+    """Write content to a file atomically via a temporary replacement file."""
     dir_path = os.path.dirname(path)
     if dir_path:
         os.makedirs(dir_path, exist_ok=True)
@@ -145,3 +139,14 @@ def save_file(path, content):
     with open(tmp_path, "w", encoding="utf-8") as f:
         f.write(content)
     os.replace(tmp_path, path)
+
+
+def save_config(config_data):
+    """Save configuration data to user config file."""
+    content = yaml.safe_dump(config_data, default_flow_style=False, sort_keys=False)
+    save_file(CONFIG_PATH, content)
+
+
+def save_file(path, content):
+    """Save text content to a file."""
+    atomic_write(path, content)

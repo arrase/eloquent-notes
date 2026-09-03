@@ -16,8 +16,6 @@ class ConfigTab(QWidget):
 
     def restore_defaults(self) -> None:
         """Restore default settings in the UI."""
-        pass
 
     def cleanup(self) -> None:
         """Cleanup any background threads or resources."""
-        pass

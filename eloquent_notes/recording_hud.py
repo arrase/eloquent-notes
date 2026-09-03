@@ -4,7 +4,10 @@ Displays a modern, non-intrusive floating pill indicator with live countdown,
 visual recording status, and progress bar during audio dictation.
 """
 
+from __future__ import annotations
+
 import math
+from typing import ClassVar
 
 from PyQt6.QtCore import QRectF, Qt, pyqtSignal
 from PyQt6.QtGui import (
@@ -12,8 +15,8 @@ from PyQt6.QtGui import (
     QCursor,
     QGuiApplication,
     QMouseEvent,
-    QPaintEvent,
     QPainter,
+    QPaintEvent,
     QPen,
 )
 from PyQt6.QtWidgets import (
@@ -24,37 +27,34 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+_BG_COLOR = QColor(24, 24, 27, 240)
+_BORDER_PEN = QPen(QColor(255, 255, 255, 38), 1.0)
+_TIMER_LABEL_QSS = "color: {}; font-size: 12px; font-weight: bold; font-family: monospace;"
+_PROGRESS_BAR_QSS = (
+    "QProgressBar {{ background-color: rgba(255, 255, 255, 0.15); border: none; border-radius: 1px; }}"
+    "QProgressBar::chunk {{ background-color: {}; border-radius: 1px; }}"
+)
+
+
+def _format_time(seconds: float) -> str:
+    secs = max(0, int(seconds))
+    return f"{secs // 60:02d}:{secs % 60:02d}"
+
 
 class RecordingHUD(QWidget):
     """Minimalist floating recording indicator and countdown HUD."""
 
     clicked = pyqtSignal()
 
-    _TIMER_LABEL_QSS = "color: {}; font-size: 12px; font-weight: bold; font-family: monospace;"
-
     # Urgency tiers: (timer label color, progress chunk color).
-    _TIERS = {
+    _TIERS: ClassVar[dict[str, tuple[str, str]]] = {
         "normal": ("#FFFFFF", "#E5E7EB"),
         "warning": ("#F59E0B", "#F59E0B"),
         "critical": ("#EF4444", "#EF4444"),
     }
 
-    def _progress_bar_qss(self, chunk_color: str) -> str:
-        return f"""
-            QProgressBar {{
-                background-color: rgba(255, 255, 255, 0.15);
-                border: none;
-                border-radius: 1px;
-            }}
-            QProgressBar::chunk {{
-                background-color: {chunk_color};
-                border-radius: 1px;
-            }}
-            """
-
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
-        self._total_duration = 30.0
         self._style_tier = None
         self._init_window()
         self._init_ui()
@@ -84,16 +84,19 @@ class RecordingHUD(QWidget):
 
         self.lbl_dot = QLabel("●")
         self.lbl_dot.setStyleSheet("color: #EF4444; font-size: 14px; font-weight: bold;")
+        self.lbl_dot.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
         header_layout.addWidget(self.lbl_dot)
 
         self.lbl_status = QLabel("Recording Note...")
         self.lbl_status.setStyleSheet("color: #F3F4F6; font-size: 12px; font-weight: 600;")
+        self.lbl_status.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
         header_layout.addWidget(self.lbl_status)
 
         header_layout.addStretch()
 
         self.lbl_timer = QLabel("00:30")
-        self.lbl_timer.setStyleSheet(self._TIMER_LABEL_QSS.format("#FFFFFF"))
+        self.lbl_timer.setStyleSheet(_TIMER_LABEL_QSS.format("#FFFFFF"))
+        self.lbl_timer.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
         header_layout.addWidget(self.lbl_timer)
 
         layout.addLayout(header_layout)
@@ -104,15 +107,16 @@ class RecordingHUD(QWidget):
         self.progress_bar.setTextVisible(False)
         self.progress_bar.setRange(0, 1000)
         self.progress_bar.setValue(0)
-        self.progress_bar.setStyleSheet(self._progress_bar_qss("#E5E7EB"))
+        self.progress_bar.setStyleSheet(_PROGRESS_BAR_QSS.format("#E5E7EB"))
+        self.progress_bar.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
         layout.addWidget(self.progress_bar)
 
     def paintEvent(self, event: QPaintEvent) -> None:
         """Render antialiased dark rounded pill background and subtle border."""
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        painter.setBrush(QColor(24, 24, 27, 240))
-        painter.setPen(QPen(QColor(255, 255, 255, 38), 1.0))
+        painter.setBrush(_BG_COLOR)
+        painter.setPen(_BORDER_PEN)
         rect = QRectF(1.0, 1.0, float(self.width() - 2), float(self.height() - 2))
         painter.drawRoundedRect(rect, 16.0, 16.0)
 
@@ -136,25 +140,15 @@ class RecordingHUD(QWidget):
             return
         self._style_tier = tier
         timer_color, chunk_color = self._TIERS[tier]
-        self.lbl_timer.setStyleSheet(self._TIMER_LABEL_QSS.format(timer_color))
-        self.progress_bar.setStyleSheet(self._progress_bar_qss(chunk_color))
+        self.lbl_timer.setStyleSheet(_TIMER_LABEL_QSS.format(timer_color))
+        self.progress_bar.setStyleSheet(_PROGRESS_BAR_QSS.format(chunk_color))
 
     def show_recording(self, total_duration: float) -> None:
         """Show HUD configured for recording with total duration in seconds."""
-        self._total_duration = total_duration
-        self.lbl_dot.setText("●")
-        self.lbl_dot.setStyleSheet("color: #EF4444; font-size: 14px; font-weight: bold;")
-        self.lbl_status.setText("Recording Note...")
         self.progress_bar.setValue(0)
         self._style_tier = None
         self._apply_tier("normal")
-
-        if total_duration > 0:
-            secs = int(total_duration)
-            self.lbl_timer.setText(f"{secs // 60:02d}:{secs % 60:02d}")
-        else:
-            self.lbl_timer.setText("00:00")
-
+        self.lbl_timer.setText(_format_time(total_duration) if total_duration > 0 else "00:00")
         self.reposition()
         self.show()
         self.raise_()
@@ -170,9 +164,8 @@ class RecordingHUD(QWidget):
         if total_duration > 0:
             fraction = min(1.0, max(0.0, elapsed_seconds / total_duration))
             self.progress_bar.setValue(int(fraction * 1000))
-
             secs_left = max(0, math.ceil(remaining_seconds))
-            self.lbl_timer.setText(f"{secs_left // 60:02d}:{secs_left % 60:02d}")
+            self.lbl_timer.setText(_format_time(secs_left))
 
             if remaining_seconds <= 5.0:
                 self._apply_tier("critical")
@@ -181,8 +174,7 @@ class RecordingHUD(QWidget):
             else:
                 self._apply_tier("normal")
         else:
-            secs = int(elapsed_seconds)
-            self.lbl_timer.setText(f"{secs // 60:02d}:{secs % 60:02d}")
+            self.lbl_timer.setText(_format_time(elapsed_seconds))
             self.progress_bar.setValue(0)
 
     def hide_hud(self) -> None:

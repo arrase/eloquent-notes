@@ -52,3 +52,16 @@ def test_install_autostart_with_found_executable(tmp_path, monkeypatch):
 
     content = Path(filepath).read_text(encoding="utf-8")
     assert f"Exec={mock_bin}" in content
+
+
+def test_is_autostart_enabled_and_remove(tmp_path, monkeypatch):
+    """Test checking autostart status and removing the desktop entry."""
+    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path))
+
+    assert not autostart.is_autostart_enabled()
+    filepath = autostart.install_autostart()
+    assert autostart.is_autostart_enabled()
+
+    autostart.remove_autostart()
+    assert not autostart.is_autostart_enabled()
+    assert not os.path.exists(filepath)

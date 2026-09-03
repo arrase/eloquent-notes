@@ -1,5 +1,8 @@
 """Configuration GUI dialog for Eloquent Notes."""
 
+import copy
+
+import yaml
 from PyQt6.QtWidgets import (
     QDialog,
     QHBoxLayout,
@@ -8,7 +11,6 @@ from PyQt6.QtWidgets import (
     QTabWidget,
     QVBoxLayout,
 )
-import yaml
 
 from eloquent_notes import config
 from eloquent_notes.config_gui.styles import QSS_STYLESHEET
@@ -107,6 +109,8 @@ class ConfigurationDialog(QDialog):
         try:
             with open(config.DEFAULT_CONFIG_SRC, "r", encoding="utf-8") as f:
                 default_data = yaml.safe_load(f)
+
+            self.config_data = copy.deepcopy(default_data)
 
             # Load default data into UI
             for tab_widget, _ in self._tabs:

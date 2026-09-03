@@ -125,7 +125,13 @@ def test_load_config_non_dict_user_config(tmp_config_dir, monkeypatch):
     with open(user_cfg_path, "w", encoding="utf-8") as f:
         f.write("just a string\n")
 
-    with pytest.raises(ValueError, match="is not a valid YAML mapping"):
+    with pytest.raises(TypeError, match="is not a valid YAML mapping"):
+        config.load_config()
+
+    with open(user_cfg_path, "w", encoding="utf-8") as f:
+        f.write("[]\n")
+
+    with pytest.raises(TypeError, match="is not a valid YAML mapping"):
         config.load_config()
 
 

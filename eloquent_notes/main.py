@@ -13,9 +13,11 @@ import sys
 
 from PyQt6.QtCore import QCoreApplication
 from PyQt6.QtNetwork import QLocalSocket
+from PyQt6.QtWidgets import QApplication, QDialog
 
 from eloquent_notes import IPC_SERVER_NAME
 from eloquent_notes.autostart import install_autostart
+from eloquent_notes.config_gui import ConfigurationDialog
 
 
 def create_arg_parser():
@@ -79,11 +81,9 @@ def run_cli(cli_args=None, launcher=os.execv, sys_exit=sys.exit):
         return
 
     if args.command == "config":
-        from PyQt6.QtWidgets import QApplication, QDialog
-
-        from eloquent_notes.config_gui import ConfigurationDialog
-
-        QApplication.instance() or QApplication(sys.argv)
+        app = QApplication.instance()
+        if app is None:
+            app = QApplication(sys.argv)
         dialog = ConfigurationDialog()
         if dialog.exec() == QDialog.DialogCode.Accepted:
             send_ipc_command("reload", timeout_ms=200)

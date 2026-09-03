@@ -15,6 +15,18 @@ def get_autostart_path():
     return os.path.join(get_config_home(), "autostart", "eloquent-notes.desktop")
 
 
+def is_autostart_enabled():
+    """Return True if autostart desktop entry exists."""
+    return os.path.exists(get_autostart_path())
+
+
+def remove_autostart():
+    """Remove the autostart desktop entry if it exists."""
+    path = get_autostart_path()
+    if os.path.exists(path):
+        os.remove(path)
+
+
 def install_autostart():
     """Install the autostart desktop entry for Eloquent Notes.
 
@@ -38,12 +50,9 @@ Comment=Background dictation utility for Obsidian
 Icon=accessories-text-editor
 Categories=Utility;
 """
-    print("Installing autostart desktop entry...")
     os.makedirs(os.path.dirname(desktop_file_path), exist_ok=True)
     with open(desktop_file_path, "w", encoding="utf-8") as f:
         f.write(desktop_entry_content)
     os.chmod(desktop_file_path, 0o644)
-    print(f"Autostart entry created at: {desktop_file_path}")
-    print("Eloquent Notes will now start automatically upon login!")
     return desktop_file_path
 

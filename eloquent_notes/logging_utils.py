@@ -28,6 +28,14 @@ _LOG_LEVELS = {
 }
 
 
+LOG_FILE_NAME = "app.log"
+
+
+def get_log_file_path():
+    """Return the absolute path to the application log file."""
+    return os.path.join(get_log_dir(), LOG_FILE_NAME)
+
+
 def parse_log_level(name):
     """Translate a configuration log-level name into a logging constant."""
     try:
@@ -67,25 +75,19 @@ def setup_logging(log_level_str, max_mb, backup_count):
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
 
-    try:
-        log_dir = get_log_dir()
-        os.makedirs(log_dir, exist_ok=True)
-        log_file_path = os.path.join(log_dir, "app.log")
+    log_dir = get_log_dir()
+    os.makedirs(log_dir, exist_ok=True)
+    log_file_path = get_log_file_path()
 
-        file_handler = RotatingFileHandler(
-            log_file_path,
-            maxBytes=max_mb * 1024 * 1024,
-            backupCount=backup_count,
-            encoding="utf-8",
-        )
-        file_handler.setLevel(level)
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
-    except OSError as e:
-        print(
-            f"Warning: Could not initialize file logging: {e}",
-            file=sys.stderr,
-        )
+    file_handler = RotatingFileHandler(
+        log_file_path,
+        maxBytes=max_mb * 1024 * 1024,
+        backupCount=backup_count,
+        encoding="utf-8",
+    )
+    file_handler.setLevel(level)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
 
     return logger
 

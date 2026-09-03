@@ -4,10 +4,12 @@ import sys
 from unittest.mock import MagicMock, patch
 
 import pytest
+import requests
 from PyQt6.QtWidgets import QSystemTrayIcon
 
 from eloquent_notes import config
-from eloquent_notes.app import EloquentApp, main as app_main
+from eloquent_notes.app import EloquentApp
+from eloquent_notes.app import main as app_main
 
 
 @pytest.fixture
@@ -434,7 +436,7 @@ def test_preload_model_uses_snapshot(qapp):
     # Preload failure is logged but never raised
     with patch(
         "eloquent_notes.app.llm.preload_model",
-        side_effect=RuntimeError("Connection refused"),
+        side_effect=requests.RequestException("Connection refused"),
     ):
         eloquent_app._preload_model(snapshot)
 
@@ -526,7 +528,7 @@ def test_app_main_entry_point(monkeypatch):
     monkeypatch.setattr("eloquent_notes.app.QApplication", lambda args: mock_qapp)
     monkeypatch.setattr(
         "eloquent_notes.app.EloquentApp",
-        lambda app, start_recording_immediately: mock_eloquent_app,
+        lambda app, start_recording_immediately, **kwargs: mock_eloquent_app,
     )
     monkeypatch.setattr("eloquent_notes.app.setup_logging", MagicMock())
     monkeypatch.setattr(sys, "argv", ["eloquent-notes", "toggle"])

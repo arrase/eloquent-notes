@@ -16,9 +16,13 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
 )
 
-from eloquent_notes.autostart import get_autostart_path, install_autostart
+from eloquent_notes.autostart import (
+    install_autostart,
+    is_autostart_enabled,
+    remove_autostart,
+)
 from eloquent_notes.config_gui.tabs.base import ConfigTab
-from eloquent_notes.logging_utils import get_log_dir
+from eloquent_notes.logging_utils import get_log_file_path
 
 
 class GeneralTab(ConfigTab):
@@ -74,7 +78,7 @@ class GeneralTab(ConfigTab):
         layout.addStretch()
 
     def _view_log_file(self):
-        log_file_path = os.path.join(get_log_dir(), "app.log")
+        log_file_path = get_log_file_path()
         if not os.path.exists(log_file_path):
             QMessageBox.information(
                 self,
@@ -86,7 +90,7 @@ class GeneralTab(ConfigTab):
         QDesktopServices.openUrl(QUrl.fromLocalFile(log_file_path))
 
     def load_settings(self, config_data: dict) -> None:
-        self.chk_autostart.setChecked(os.path.exists(get_autostart_path()))
+        self.chk_autostart.setChecked(is_autostart_enabled())
 
         log_cfg = config_data["logging"]
         self.cmb_log_level.setCurrentText(str(log_cfg["level"]).upper())
@@ -103,8 +107,8 @@ class GeneralTab(ConfigTab):
         try:
             if self.chk_autostart.isChecked():
                 install_autostart()
-            elif os.path.exists(get_autostart_path()):
-                os.remove(get_autostart_path())
+            else:
+                remove_autostart()
             return True
         except OSError as e:
             QMessageBox.critical(
