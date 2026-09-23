@@ -170,10 +170,10 @@ def _execute_ollama_json_request(
             if not isinstance(result, dict) or not all(k in result for k in keys):
                 raise ValueError(f"missing required keys: {keys}")
             return result
-        except (json.JSONDecodeError, KeyError, TypeError, ValueError) as err:
-            logger.error(
-                "Invalid JSON output for %s (attempt %d): %r (%s)",
-                task_name, attempt, content, err,
+        except (KeyError, TypeError, ValueError):
+            logger.exception(
+                "Invalid JSON output for %s (attempt %d): %r",
+                task_name, attempt, content,
             )
             if attempt >= max_retries:
                 raise

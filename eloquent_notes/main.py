@@ -81,9 +81,7 @@ def run_cli(cli_args=None, launcher=os.execv, sys_exit=sys.exit):
         return
 
     if args.command == "config":
-        app = QApplication.instance()
-        if app is None:
-            app = QApplication(sys.argv)
+        _app = QApplication.instance() or QApplication(sys.argv)
         dialog = ConfigurationDialog()
         if dialog.exec() == QDialog.DialogCode.Accepted:
             send_ipc_command("reload", timeout_ms=200)

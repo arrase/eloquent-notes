@@ -24,6 +24,8 @@ from eloquent_notes.config_gui.tabs import (
 )
 from eloquent_notes.config_gui.utils import diff_configs
 
+RESTORE_DEFAULTS_TITLE = "Restore Defaults"
+
 
 class ConfigurationDialog(QDialog):
     """Dialogue window for full application settings management."""
@@ -71,7 +73,7 @@ class ConfigurationDialog(QDialog):
 
         # Bottom buttons
         btn_layout = QHBoxLayout()
-        self.btn_defaults = QPushButton("Restore Defaults")
+        self.btn_defaults = QPushButton(RESTORE_DEFAULTS_TITLE)
         self.btn_defaults.clicked.connect(self.restore_defaults)
         btn_layout.addWidget(self.btn_defaults)
 
@@ -97,7 +99,7 @@ class ConfigurationDialog(QDialog):
         """Overwrite current edits with factory defaults after confirmation."""
         confirm = QMessageBox.question(
             self,
-            "Restore Defaults",
+            RESTORE_DEFAULTS_TITLE,
             "Are you sure you want to restore all configuration settings,"
             " prompts, and templates to their default values?\n\nThis will"
             " overwrite current edits.",
@@ -119,7 +121,7 @@ class ConfigurationDialog(QDialog):
 
             QMessageBox.information(
                 self,
-                "Restore Defaults",
+                RESTORE_DEFAULTS_TITLE,
                 "Defaults restored. Click 'Save' to apply changes to disk.",
             )
         except (OSError, yaml.YAMLError) as e:

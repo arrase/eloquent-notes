@@ -14,6 +14,25 @@ class OllamaModelLoader(QThread):
         super().__init__(parent)
         self.url = url
 
+    def _supports_audio(self, name: str) -> bool:
+        """Check whether the given model supports audio capabilities."""
+        try:
+            show_r = requests.post(
+                f"{self.url}/api/show",
+                json={"name": name},
+                timeout=2.0,
+            )
+            if self.isInterruptionRequested():
+                return False
+            if show_r.status_code == 200:
+                show_data = show_r.json()
+                if isinstance(show_data, dict):
+                    caps = show_data.get("capabilities", [])
+                    return isinstance(caps, list) and "audio" in caps
+        except (requests.RequestException, ValueError, AttributeError):
+            pass
+        return False
+
     def run(self) -> None:
         """Fetch model names from Ollama API."""
         if self.isInterruptionRequested():
@@ -32,27 +51,11 @@ class OllamaModelLoader(QThread):
             for name in all_models:
                 if self.isInterruptionRequested():
                     return
-                try:
-                    show_r = requests.post(
-                        f"{self.url}/api/show",
-                        json={"name": name},
-                        timeout=2.0,
-                    )
-                    if self.isInterruptionRequested():
-                        return
-                    if show_r.status_code == 200:
-                        show_data = show_r.json()
-                        if isinstance(show_data, dict):
-                            caps = show_data.get("capabilities", [])
-                            if isinstance(caps, list) and "audio" in caps:
-                                audio_models.append(name)
-                except (requests.RequestException, ValueError, AttributeError):
-                    pass
+                if self._supports_audio(name):
+                    audio_models.append(name)
 
-            if self.isInterruptionRequested():
-                return
-
-            self.models_fetched.emit(audio_models)
+            if not self.isInterruptionRequested():
+                self.models_fetched.emit(audio_models)
         except (requests.RequestException, ValueError) as e:
             if not self.isInterruptionRequested():
                 self.error_occurred.emit(str(e))

@@ -53,6 +53,6 @@ Categories=Utility;
     os.makedirs(os.path.dirname(desktop_file_path), exist_ok=True)
     with open(desktop_file_path, "w", encoding="utf-8") as f:
         f.write(desktop_entry_content)
-    os.chmod(desktop_file_path, 0o644)
+    os.chmod(desktop_file_path, 0o600)
     return desktop_file_path
 

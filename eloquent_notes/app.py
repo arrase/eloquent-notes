@@ -40,6 +40,7 @@ logger = logging.getLogger("eloquent_notes.app")
 IDLE = "IDLE"
 RECORDING = "RECORDING"
 PROCESSING = "PROCESSING"
+APP_NAME = "Eloquent Notes"
 
 
 class EloquentApp(QObject):
@@ -145,7 +146,7 @@ class EloquentApp(QObject):
                         self.reload_config()
                     elif message == "notify_running":
                         self._notify(
-                            "Eloquent Notes",
+                            APP_NAME,
                             "Eloquent Notes is already running in the background.",
                         )
             finally:
@@ -173,7 +174,7 @@ class EloquentApp(QObject):
         elif self.state == RECORDING:
             self._stop_and_process()
         else:
-            self._notify("Eloquent Notes", "System is busy. Please wait.")
+            self._notify(APP_NAME, "System is busy. Please wait.")
 
     def _start_recording(self):
         snapshot = copy.deepcopy(self.config)
@@ -462,7 +463,7 @@ class EloquentApp(QObject):
             )
             logger.info("Configuration reloaded successfully")
             self._notify(
-                "Eloquent Notes",
+                APP_NAME,
                 "Configuration reloaded successfully.",
             )
         except Exception as e:

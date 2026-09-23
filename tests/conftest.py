@@ -18,4 +18,4 @@ def qapp():
     app = QApplication.instance()
     if app is None:
         app = QApplication(sys.argv)
-    yield app
+    return app

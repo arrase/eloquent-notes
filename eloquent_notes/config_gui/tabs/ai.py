@@ -22,6 +22,7 @@ from eloquent_notes.config_gui.loader import OllamaModelLoader
 from eloquent_notes.config_gui.tabs.base import ConfigTab
 
 _DURATION_PATTERN = re.compile(r"^-?\d+[smh]?$")
+VALIDATION_ERROR_TITLE = "Validation Error"
 
 
 class AITab(ConfigTab):
@@ -202,7 +203,7 @@ class AITab(ConfigTab):
 
     def cleanup(self):
         """Asynchronously cancel active loaders and wait with a timeout."""
-        for loader in list(self._running_loaders):
+        for loader in self._running_loaders:
             loader.requestInterruption()
             loader.wait(2500)
         self._running_loaders.clear()
@@ -246,7 +247,7 @@ class AITab(ConfigTab):
         self.txt_ollama_url.setText(url)
 
         if not url:
-            QMessageBox.warning(self, "Validation Error", "Ollama URL cannot be empty.")
+            QMessageBox.warning(self, VALIDATION_ERROR_TITLE, "Ollama URL cannot be empty.")
             return False
 
         keep_alive = self.txt_keep_alive.text().strip()
@@ -255,7 +256,7 @@ class AITab(ConfigTab):
         if not _DURATION_PATTERN.match(keep_alive):
             QMessageBox.warning(
                 self,
-                "Validation Error",
+                VALIDATION_ERROR_TITLE,
                 f"Invalid Keep Alive format: '{keep_alive}'. "
                 "Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
             )
@@ -263,7 +264,7 @@ class AITab(ConfigTab):
         if not _DURATION_PATTERN.match(preload_keep_alive):
             QMessageBox.warning(
                 self,
-                "Validation Error",
+                VALIDATION_ERROR_TITLE,
                 f"Invalid Preload Keep Alive format: '{preload_keep_alive}'. "
                 "Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
             )
