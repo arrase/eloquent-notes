@@ -156,6 +156,8 @@ def test_dialog_save_settings(qapp):
     dummy_config = _make_valid_config()
 
     with patch("eloquent_notes.config.load_config", return_value=dummy_config), patch(
+        "eloquent_notes.config.load_file", return_value=""
+    ), patch(
         "os.path.exists", return_value=True
     ):
         dialog = ConfigurationDialog()
@@ -178,6 +180,8 @@ def test_dialog_save_validation_failure(qapp):
     dummy_config = _make_valid_config({"ai": {"ollama_url": ""}})
 
     with patch("eloquent_notes.config.load_config", return_value=dummy_config), patch(
+        "eloquent_notes.config.load_file", return_value=""
+    ), patch(
         "os.path.exists", return_value=True
     ):
         dialog = ConfigurationDialog()
