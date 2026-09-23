@@ -38,7 +38,7 @@ def test_install_autostart(tmp_path, monkeypatch):
     assert "Name=Eloquent Notes" in content
 
     st_mode = os.stat(filepath).st_mode
-    assert stat.S_IMODE(st_mode) == 0o644
+    assert stat.S_IMODE(st_mode) == 0o600
 
 
 def test_install_autostart_with_found_executable(tmp_path, monkeypatch):
