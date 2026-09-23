@@ -157,3 +157,6 @@ build
 
 # Code-Reducer Lockfile
 .code-reducer.lock
+
+# SonarQube
+.scannerwork/

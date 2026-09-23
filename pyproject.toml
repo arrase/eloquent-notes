@@ -26,9 +26,26 @@ dependencies = [
 [project.scripts]
 eloquent-notes = "eloquent_notes.main:main"
 
+[project.optional-dependencies]
+test = [
+    "pytest>=8.0.0",
+    "pytest-cov>=5.0.0",
+]
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["eloquent_notes*"]
 
 [tool.setuptools.package-data]
 eloquent_notes = ["config.yaml", "prompts/*.md", "templates/*.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+
+[tool.coverage.run]
+source = ["eloquent_notes"]
+relative_files = true
+
+[tool.coverage.report]
+show_missing = true
