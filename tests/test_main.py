@@ -9,6 +9,15 @@ from PyQt6.QtWidgets import QDialog
 from eloquent_notes import main
 
 
+def test_version_flag_prints_installed_version(capsys):
+    """The --version flag reports the installed distribution version."""
+    with pytest.raises(SystemExit) as exc_info:
+        main.parse_args(["--version"])
+
+    assert exc_info.value.code == 0
+    assert main.__version__ in capsys.readouterr().out
+
+
 def test_parse_args():
     """Test argument parsing for various CLI command combinations."""
     args = main.parse_args([])

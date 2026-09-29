@@ -15,7 +15,7 @@ from PyQt6.QtCore import QCoreApplication
 from PyQt6.QtNetwork import QLocalSocket
 from PyQt6.QtWidgets import QApplication, QDialog
 
-from eloquent_notes import IPC_SERVER_NAME
+from eloquent_notes import IPC_SERVER_NAME, __version__
 from eloquent_notes.autostart import install_autostart
 from eloquent_notes.config_gui import ConfigurationDialog
 
@@ -23,10 +23,16 @@ from eloquent_notes.config_gui import ConfigurationDialog
 def create_arg_parser():
     """Create and return the CLI argument parser."""
     parser = argparse.ArgumentParser(
+        prog="eloquent-notes",
         description=(
             "Eloquent Notes - Linux system tray utility"
             " for offline dictation into Obsidian."
         ),
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {__version__}",
     )
     parser.add_argument(
         "command",

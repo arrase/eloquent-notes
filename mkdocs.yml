@@ -15,6 +15,7 @@ nav:
   - System Tray & Shortcuts: usage-shortcuts.md
   - CLI & Logging: cli.md
   - Installation & Setup: installation.md
+  - Release Process: releasing.md
 
 theme:
   name: material
