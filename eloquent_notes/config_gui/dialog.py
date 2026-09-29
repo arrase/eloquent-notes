@@ -109,7 +109,7 @@ class ConfigurationDialog(QDialog):
             return
 
         try:
-            with open(config.DEFAULT_CONFIG_SRC, "r", encoding="utf-8") as f:
+            with open(config.DEFAULT_CONFIG_SRC, encoding="utf-8") as f:
                 default_data = yaml.safe_load(f)
 
             self.config_data = copy.deepcopy(default_data)
@@ -139,18 +139,18 @@ class ConfigurationDialog(QDialog):
                     self.tab_widget.setCurrentWidget(tab_widget)
                     return False
 
-            with open(config.DEFAULT_CONFIG_SRC, "r", encoding="utf-8") as f:
+            with open(config.DEFAULT_CONFIG_SRC, encoding="utf-8") as f:
                 default_config = yaml.safe_load(f)
 
             overrides = diff_configs(default_config, self.config_data)
             config.save_config(overrides)
-
-            return True
         except (OSError, yaml.YAMLError) as e:
             QMessageBox.critical(
                 self, "Save Error", f"Failed to save settings: {e}"
             )
             return False
+        else:
+            return True
 
     def cleanup_tabs(self):
         """Clean up resources before closing."""

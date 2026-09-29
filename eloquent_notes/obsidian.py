@@ -66,7 +66,7 @@ def scan_vault_topics(vault_path, max_topics=200):
         return []
 
     topics = set()
-    for root, dirs, files in os.walk(vault_path):
+    for _root, dirs, files in os.walk(vault_path):
         dirs[:] = [d for d in dirs if not d.startswith(".")]
         for filename in files:
             if filename.endswith(".md") and not filename.startswith("."):
@@ -93,8 +93,8 @@ def _inject_wikilinks(text, wikilinks):
         end_b = r"(?!\w)" if re.match(r"\w", link[-1]) else r""
 
         pattern = re.compile(
-            r"(```[\s\S]*?```|`[^`\n]+`|\[\[[\s\S]*?\]\]|\[[^\]]*\]\([^)]*\))|"
-            + f"({start_b}{re.escape(link)}{end_b})",
+            r"(```[\s\S]*?```|`[^`\n]+`|\[\[[\s\S]*?\]\]|\[[^\]]*\]\([^)]*\))"
+            rf"|({start_b}{re.escape(link)}{end_b})",
             re.IGNORECASE,
         )
 
@@ -179,7 +179,7 @@ def _save_daily(target_dir, date_str, time_str, title, text, tags,
         atomic_write(note_path, content)
         return note_path
 
-    with open(note_path, "r", encoding="utf-8") as f:
+    with open(note_path, encoding="utf-8") as f:
         existing_content = f.read()
 
     updated_content = _update_frontmatter_tags(existing_content, tags)

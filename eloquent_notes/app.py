@@ -386,7 +386,7 @@ class EloquentApp(QObject):
             obs_cfg = snapshot["obsidian"]
 
             wav_bytes = recorder.wav_bytes
-            if not wav_bytes:
+            if not wav_bytes or recorder.is_silent:
                 self.processing_completed.emit("empty", "")
                 return
 

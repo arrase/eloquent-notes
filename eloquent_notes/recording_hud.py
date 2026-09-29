@@ -55,7 +55,7 @@ class RecordingHUD(QWidget):
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
-        self._style_tier = None
+        self._style_tier: str | None = None
         self._init_window()
         self._init_ui()
 
@@ -111,7 +111,7 @@ class RecordingHUD(QWidget):
         self.progress_bar.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
         layout.addWidget(self.progress_bar)
 
-    def paintEvent(self, event: QPaintEvent) -> None:
+    def paintEvent(self, event: QPaintEvent | None) -> None:
         """Render antialiased dark rounded pill background and subtle border."""
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
@@ -120,8 +120,8 @@ class RecordingHUD(QWidget):
         rect = QRectF(1.0, 1.0, float(self.width() - 2), float(self.height() - 2))
         painter.drawRoundedRect(rect, 16.0, 16.0)
 
-    def mousePressEvent(self, event: QMouseEvent) -> None:
-        if event.button() == Qt.MouseButton.LeftButton:
+    def mousePressEvent(self, event: QMouseEvent | None) -> None:
+        if event is not None and event.button() == Qt.MouseButton.LeftButton:
             self.clicked.emit()
         super().mousePressEvent(event)
 

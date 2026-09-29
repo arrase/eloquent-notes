@@ -323,15 +323,34 @@ def test_process_audio_empty_transcription(qapp):
 
     recorder = MagicMock()
     recorder.wav_bytes = b"RIFF" + b"\x00" * 100
+    recorder.is_silent = False
     snapshot = _pipeline_snapshot()
 
     with patch(
         "eloquent_notes.app.llm.transcribe_audio",
         return_value={"empty": True, "transcription": ""},
-    ):
+    ) as mock_transcribe:
         eloquent_app._process_audio(recorder, snapshot)
 
     eloquent_app.processing_completed.emit.assert_called_once_with("empty", "")
+    mock_transcribe.assert_called_once()
+
+
+def test_process_audio_local_silence_never_reaches_model(qapp):
+    """A quiet trigger is rejected locally, without a model round-trip."""
+    eloquent_app = make_app(qapp)
+    eloquent_app.processing_completed = MagicMock()
+
+    recorder = MagicMock()
+    recorder.wav_bytes = b"RIFF" + b"\x00" * 100
+    recorder.is_silent = True
+    snapshot = _pipeline_snapshot()
+
+    with patch("eloquent_notes.app.llm.transcribe_audio") as mock_transcribe:
+        eloquent_app._process_audio(recorder, snapshot)
+
+    eloquent_app.processing_completed.emit.assert_called_once_with("empty", "")
+    mock_transcribe.assert_not_called()
 
 
 def test_process_audio_full_pipeline_success(qapp, tmp_path):
@@ -340,6 +359,7 @@ def test_process_audio_full_pipeline_success(qapp, tmp_path):
 
     recorder = MagicMock()
     recorder.wav_bytes = b"RIFF" + b"\x00" * 100
+    recorder.is_silent = False
     snapshot = _pipeline_snapshot()
     snapshot["obsidian"]["vault_path"] = str(tmp_path / "vault")
     saved_path = str(tmp_path / "vault" / "Dictation-1.md")
@@ -376,6 +396,7 @@ def test_process_audio_exception_emits_error(qapp):
 
     recorder = MagicMock()
     recorder.wav_bytes = b"RIFF" + b"\x00" * 100
+    recorder.is_silent = False
     snapshot = _pipeline_snapshot()
 
     with patch(
