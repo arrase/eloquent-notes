@@ -7,7 +7,13 @@ from unittest.mock import MagicMock, patch
 import numpy as np
 import pytest
 
-from eloquent_notes.audio import AudioRecorder, play_beep
+from eloquent_notes.audio import (
+    AudioRecorder,
+    is_silent,
+    play_beep,
+    rms_level,
+    trim_silence,
+)
 
 
 def test_recorder_init():
@@ -92,6 +98,65 @@ def test_wav_bytes_encodes_captured_chunks():
         assert wf.getnchannels() == 1
         assert wf.getsampwidth() == 2
         assert wf.getframerate() == 16000
+        assert wf.getnframes() == 1600
+
+
+def test_rms_level_of_silence_and_tone():
+    assert rms_level(np.zeros((100, 1), dtype=np.float32)) == 0.0
+    assert rms_level(np.empty((0, 1), dtype=np.float32)) == 0.0
+    assert rms_level(np.full((100, 1), 0.5, dtype=np.float32)) == pytest.approx(0.5)
+
+
+def test_is_silent_rejects_noise_but_accepts_speech():
+    rng = np.random.default_rng(0)
+    speech = rng.standard_normal(1600).astype(np.float32) * 0.2
+
+    assert is_silent(np.zeros(1600, dtype=np.float32)) is True
+    assert is_silent(rng.standard_normal(1600).astype(np.float32) * 0.001) is True
+    assert is_silent(speech) is False
+
+
+def test_trim_silence_removes_leading_and_trailing_quiet_blocks():
+    loud = np.full((1600, 1), 0.2, dtype=np.float32)
+    quiet = np.zeros((1600, 1), dtype=np.float32)
+
+    trimmed = trim_silence([quiet, quiet, loud, quiet])
+    assert len(trimmed) == 1
+    assert np.array_equal(trimmed[0], loud)
+
+
+def test_trim_silence_keeps_interior_pauses():
+    loud = np.full((160, 1), 0.2, dtype=np.float32)
+    quiet = np.zeros((160, 1), dtype=np.float32)
+
+    trimmed = trim_silence([loud, quiet, loud])
+    assert len(trimmed) == 3
+
+
+def test_trim_silence_returns_all_silent_audio_unchanged():
+    quiet = [np.zeros((16, 1), dtype=np.float32) for _ in range(3)]
+    assert len(trim_silence(quiet)) == 3
+    assert trim_silence([]) == []
+
+
+def test_recorder_is_silent_for_quiet_and_loud_capture():
+    recorder = AudioRecorder(sample_rate=16000, channels=1)
+    assert recorder.is_silent is True
+
+    recorder._chunks.put(np.zeros((1600, 1), dtype=np.float32))
+    assert recorder.is_silent is True
+
+    recorder._chunks.put(np.full((1600, 1), 0.2, dtype=np.float32))
+    assert recorder.is_silent is False
+
+
+def test_wav_bytes_trims_surrounding_silence():
+    recorder = AudioRecorder(sample_rate=16000, channels=1)
+    recorder._chunks.put(np.zeros((1600, 1), dtype=np.float32))
+    recorder._chunks.put(np.full((1600, 1), 0.2, dtype=np.float32))
+    recorder._chunks.put(np.zeros((1600, 1), dtype=np.float32))
+
+    with wave.open(io.BytesIO(recorder.wav_bytes), "rb") as wf:
         assert wf.getnframes() == 1600
 
 

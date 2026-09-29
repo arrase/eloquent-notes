@@ -9,6 +9,18 @@ schema. If a response still cannot be parsed or lacks required keys
 (e.g. an Ollama version that ignores ``format``), the offending answer is
 appended to the conversation together with a corrective instruction and
 the request is retried up to max_retries times.
+
+Reasoning mode is explicitly disabled on every request. Gemma 4 defaults
+to ``thinking: true``, and the reasoning tokens it emits draw from the same
+``num_predict`` budget as the answer. Once that budget is exhausted Ollama
+returns an empty ``content`` with ``done_reason=length``, which the model
+reports as ``empty: true`` — a correctly transcribed dictation is silently
+discarded. Disabling reasoning also removes the thinking text Ollama appends
+to the assistant turn on retries.
+
+The ``empty`` field of ``TRANSCRIPTION_SCHEMA`` is advisory. Asked to label
+silence, the model frequently answers false and invents text instead, so
+:mod:`eloquent_notes.audio` decides silence locally before any audio is sent.
 """
 
 from __future__ import annotations
@@ -24,16 +36,15 @@ logger = logging.getLogger("eloquent_notes.llm")
 
 DEFAULT_NUM_PREDICT = 2048
 
+# Gemma 4 enables reasoning by default; see the module docstring.
+THINK = False
+
+# Field order matters: Ollama emits properties in schema order under
+# constrained decoding, so "transcription" must come first for the model to
+# commit to the transcript before deciding whether the audio was empty.
 TRANSCRIPTION_SCHEMA: dict[str, Any] = {
     "type": "object",
     "properties": {
-        "empty": {
-            "type": "boolean",
-            "description": (
-                "True if the audio contains only silence, background"
-                " noise, or no spoken words; False otherwise."
-            ),
-        },
         "transcription": {
             "type": "string",
             "description": (
@@ -41,8 +52,15 @@ TRANSCRIPTION_SCHEMA: dict[str, Any] = {
                 " spoken language (never translate), or empty string if audio is empty."
             ),
         },
+        "empty": {
+            "type": "boolean",
+            "description": (
+                "True if the audio contains only silence, background"
+                " noise, or no spoken words; False otherwise."
+            ),
+        },
     },
-    "required": ["empty", "transcription"],
+    "required": ["transcription", "empty"],
 }
 
 REWRITING_SCHEMA: dict[str, Any] = {
@@ -118,6 +136,21 @@ def preload_model(
     response.raise_for_status()
 
 
+def _parse_json_response(content: str | None, keys: list[str]) -> dict[str, Any]:
+    """Validate an Ollama reply as a JSON object carrying every required key.
+
+    Raises TypeError, ValueError or KeyError on anything malformed so the
+    caller can treat every failure mode alike and retry.
+    """
+    result = json.loads(content)  # type: ignore[arg-type]
+    if not isinstance(result, dict):
+        raise TypeError(f"expected a JSON object, got {type(result).__name__}")
+    missing = [k for k in keys if k not in result]
+    if missing:
+        raise ValueError(f"missing required keys: {missing}")
+    return result
+
+
 def _execute_ollama_json_request(
     ollama_url: str,
     model: str,
@@ -144,6 +177,7 @@ def _execute_ollama_json_request(
     }
     conversation = list(messages)
     url = _chat_url(ollama_url)
+    last_error: Exception | None = None
 
     for attempt in range(max_retries + 1):
         if attempt > 0:
@@ -152,13 +186,14 @@ def _execute_ollama_json_request(
                 task_name, attempt, max_retries,
             )
 
-        payload = {
+        payload: dict[str, Any] = {
             "model": model,
             "messages": conversation,
             "format": format_schema,
             "options": options,
             "keep_alive": keep_alive,
             "stream": False,
+            "think": THINK,
         }
         response = requests.post(url, json=payload, timeout=timeout)
         response.raise_for_status()
@@ -166,11 +201,9 @@ def _execute_ollama_json_request(
         content = None
         try:
             content = response.json()["message"]["content"]
-            result = json.loads(content)
-            if not isinstance(result, dict) or not all(k in result for k in keys):
-                raise ValueError(f"missing required keys: {keys}")
-            return result
-        except (KeyError, TypeError, ValueError):
+            return _parse_json_response(content, keys)
+        except (KeyError, TypeError, ValueError) as err:
+            last_error = err
             logger.exception(
                 "Invalid JSON output for %s (attempt %d): %r",
                 task_name, attempt, content,
@@ -185,6 +218,12 @@ def _execute_ollama_json_request(
                 "role": "user",
                 "content": f"{retry_prompt}\n\nExpected fields: {', '.join(keys)}.",
             })
+
+    # The loop only falls through when max_retries is negative, in which case
+    # no request was ever made.
+    raise last_error if last_error is not None else ValueError(
+        f"No attempt was made for {task_name}: max_retries={max_retries}"
+    )
 
 
 def transcribe_audio(
@@ -204,10 +243,12 @@ def transcribe_audio(
     Returns a dict with keys: 'empty' (bool) and 'transcription' (str).
     """
     audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
-    messages = [
+    messages: list[dict[str, Any]] = [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt, "images": [audio_base64]},
     ]
+    # Constrained decoding follows the schema's property order, so the audio
+    # is placed before the instruction text.
     return _execute_ollama_json_request(
         ollama_url=ollama_url,
         model=model,
@@ -219,7 +260,7 @@ def transcribe_audio(
         max_retries=max_retries,
         timeout=timeout,
         task_name="audio transcription",
-        required_keys=["empty", "transcription"],
+        required_keys=["transcription", "empty"],
     )
 
 
@@ -238,7 +279,7 @@ def rewrite_transcription(
 
     Returns a dict with keys: 'title' and 'content'.
     """
-    messages = [
+    messages: list[dict[str, Any]] = [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt},
     ]
@@ -272,7 +313,7 @@ def classify_transcription(
 
     Returns a dict with keys: 'type', 'wikilinks', and 'tags'.
     """
-    messages = [
+    messages: list[dict[str, Any]] = [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt},
     ]

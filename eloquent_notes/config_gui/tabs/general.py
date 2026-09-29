@@ -109,10 +109,11 @@ class GeneralTab(ConfigTab):
                 install_autostart()
             else:
                 remove_autostart()
-            return True
         except OSError as e:
             QMessageBox.critical(
                 self, "Error", f"Failed to update autostart setting: {e}"
             )
             return False
+        else:
+            return True
 

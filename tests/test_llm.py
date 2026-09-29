@@ -196,7 +196,123 @@ def test_transcribe_audio(mock_exec):
     assert kwargs["messages"][1]["images"] == [base64.b64encode(audio_bytes).decode("utf-8")]
     assert "empty" in kwargs["format_schema"]["properties"]
     assert "transcription" in kwargs["format_schema"]["properties"]
-    assert kwargs["required_keys"] == ["empty", "transcription"]
+    assert kwargs["required_keys"] == ["transcription", "empty"]
+
+
+def test_transcription_schema_orders_transcription_before_empty():
+    """Constrained decoding follows property order; transcript must win.
+
+    With "empty" first the model commits to that flag before transcribing and
+    reports empty=True even for a perfect transcript, discarding the note.
+    """
+    properties = list(llm.TRANSCRIPTION_SCHEMA["properties"])
+    assert properties.index("transcription") < properties.index("empty")
+    assert llm.TRANSCRIPTION_SCHEMA["required"] == ["transcription", "empty"]
+
+
+def test_parse_json_response_rejects_non_object_json():
+    """A bare JSON array/scalar is not a valid phase response."""
+    with pytest.raises(TypeError, match="expected a JSON object"):
+        llm._parse_json_response("[1, 2, 3]", ["result"])
+
+
+def test_parse_json_response_reports_missing_keys():
+    with pytest.raises(ValueError, match=r"missing required keys: \['other'\]"):
+        llm._parse_json_response('{"result": "ok"}', ["result", "other"])
+
+
+def test_execute_ollama_json_request_rejects_json_array():
+    resp1 = MagicMock()
+    resp1.raise_for_status.return_value = None
+    resp1.json.return_value = {"message": {"content": "[1, 2, 3]"}}
+
+    resp2 = MagicMock()
+    resp2.raise_for_status.return_value = None
+    resp2.json.return_value = {"message": {"content": '{"result": "ok"}'}}
+
+    with patch("eloquent_notes.llm.requests.post", side_effect=[resp1, resp2]):
+        res = llm._execute_ollama_json_request(
+            ollama_url="http://localhost:11434",
+            model="gemma",
+            messages=[{"role": "user", "content": "hi"}],
+            format_schema={},
+            required_keys=["result"],
+            retry_prompt="retry",
+            context_length=2048,
+            keep_alive="5m",
+            max_retries=1,
+            timeout=30,
+            task_name="array test",
+        )
+
+    assert res == {"result": "ok"}
+
+
+def test_execute_ollama_json_request_rejects_non_dict_and_raises():
+    resp = MagicMock()
+    resp.raise_for_status.return_value = None
+    resp.json.return_value = {"message": {"content": '"just a string"'}}
+
+    with patch("eloquent_notes.llm.requests.post", return_value=resp), pytest.raises(TypeError):
+        llm._execute_ollama_json_request(
+            ollama_url="http://localhost:11434",
+            model="gemma",
+            messages=[{"role": "user", "content": "hi"}],
+            format_schema={},
+            required_keys=["result"],
+            retry_prompt="retry",
+            context_length=2048,
+            keep_alive="5m",
+            max_retries=0,
+            timeout=30,
+            task_name="string test",
+        )
+
+
+def test_execute_ollama_json_request_negative_retries_raises():
+    with patch("eloquent_notes.llm.requests.post") as mock_post, pytest.raises(
+        ValueError, match="No attempt was made",
+    ):
+        llm._execute_ollama_json_request(
+            ollama_url="http://localhost:11434",
+            model="gemma",
+            messages=[{"role": "user", "content": "hi"}],
+            format_schema={},
+            required_keys=["result"],
+            retry_prompt="retry",
+            context_length=2048,
+            keep_alive="5m",
+            max_retries=-1,
+            timeout=30,
+            task_name="negative retries",
+        )
+    mock_post.assert_not_called()
+
+
+@patch("eloquent_notes.llm.requests.post")
+def test_execute_ollama_json_request_disables_thinking(mock_post):
+    """Gemma 4 thinks by default and starves num_predict (issue #16583)."""
+    mock_resp = MagicMock()
+    mock_resp.raise_for_status.return_value = None
+    mock_resp.json.return_value = {"message": {"content": '{"result": "ok"}'}}
+    mock_post.return_value = mock_resp
+
+    llm._execute_ollama_json_request(
+        ollama_url="http://localhost:11434",
+        model="gemma",
+        messages=[{"role": "user", "content": "hi"}],
+        format_schema={},
+        required_keys=["result"],
+        retry_prompt="retry",
+        context_length=2048,
+        keep_alive="5m",
+        max_retries=0,
+        timeout=30,
+        task_name="think test",
+    )
+
+    assert mock_post.call_args.kwargs["json"]["think"] is False
+    assert llm.THINK is False
 
 
 @patch("eloquent_notes.llm._execute_ollama_json_request")

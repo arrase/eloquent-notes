@@ -43,6 +43,11 @@ jobs:
         run: |
           mypy eloquent_notes/ --show-column-numbers --show-error-codes --ignore-missing-imports > mypy-report.txt || true
 
+      - name: Verify quality gates
+        run: |
+          ruff check .
+          mypy eloquent_notes/
+
       - name: Run tests with coverage
         run: |
           pytest --cov=eloquent_notes --cov-report=xml:coverage.xml --cov-report=term

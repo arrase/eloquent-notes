@@ -107,10 +107,10 @@ def load_config():
     """Load and merge default config with user overrides."""
     init_config_dir()
 
-    with open(DEFAULT_CONFIG_SRC, "r", encoding="utf-8") as f:
+    with open(DEFAULT_CONFIG_SRC, encoding="utf-8") as f:
         default_config = yaml.safe_load(f)
 
-    with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+    with open(CONFIG_PATH, encoding="utf-8") as f:
         user_config = yaml.safe_load(f)
 
     if not isinstance(default_config, dict):
@@ -126,7 +126,7 @@ def load_config():
 
 def load_file(path):
     """Load and return the text content of a file."""
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         return f.read()
 
 

@@ -18,7 +18,7 @@ Rather than attempting to force a single small LLM call to simultaneously transc
 │ Phase 1: Audio Transcription (Multimodal Input)                             │
 │ - Inputs: Base64 WAV bytes + System & User Prompts                          │
 │ - Tasks: Removes stutters, repetitions, and filler words.                   │
-│ - Output JSON: {"empty": bool, "transcription": string}                     │
+│ - Output JSON: {"transcription": string, "empty": bool}                      │
 └──────────────────────────────────────┬──────────────────────────────────────┘
                                        │ (Early exit if empty == true)
                                        ▼
@@ -54,18 +54,31 @@ Phase 1 takes the raw WAV audio bytes captured during dictation, base64 encodes 
 {
   "type": "object",
   "properties": {
-    "empty": {
-      "type": "boolean",
-      "description": "True if audio contains only silence, background noise, or no spoken words."
-    },
     "transcription": {
       "type": "string",
       "description": "Clean transcription of spoken words, or empty string if audio is empty."
+    },
+    "empty": {
+      "type": "boolean",
+      "description": "True if audio contains only silence, background noise, or no spoken words."
     }
   },
-  "required": ["empty", "transcription"]
+  "required": ["transcription", "empty"]
 }
 ```
+
+### Field Order Is Significant
+Under constrained decoding Ollama emits properties in the order the schema declares them, so `transcription` is declared **before** `empty` on purpose. With `empty` first, the model must commit to that flag before it has transcribed anything, and it reports `empty: true` even when the transcript it then produces is correct — a note lost despite a perfect transcription. Declaring the transcript first makes the model transcribe and only then judge whether the audio was silent.
+
+### Local Silence Detection
+
+The model cannot be trusted to recognise silence. Asked to label an empty recording it frequently answers `"empty": false` and invents text — in testing, a clip of pure digital silence came back as `empty: false` with a fluent Spanish sentence about time, which the pipeline would then have saved as a note.
+
+Eloquent Notes therefore decides emptiness locally, in `audio.is_silent()`, by comparing the recording's RMS amplitude against a speech threshold of -45 dBFS. The threshold sits far above a microphone's noise floor while leaving ample headroom for quiet dictation. If the recording carries no speech-level energy, `_process_audio()` emits the `empty` signal without contacting the model at all, so an accidental trigger in a quiet room costs nothing and cannot produce a fabricated note. The model's own `empty` flag is retained in the schema and honoured, but treated as advisory.
+
+### Silence Trimming
+
+`AudioRecorder.wav_bytes` additionally trims leading and trailing blocks below the same threshold before encoding, keeping interior pauses intact. This shortens the audio the model must encode, which makes it less likely to fill the gaps with invented speech and reduces the token cost. A recording of 4 s of silence, 1.8 s of dictation and 4 s of silence is sent as 1.8 s.
 
 ### Early Exit Safeguard
 If Phase 1 returns `"empty": true` or a blank transcription string, processing terminates immediately. The application fires an `"empty"` signal, displays a desktop notification ("Dictation Empty"), resets the tray icon to gray, and saves no file to disk.
@@ -166,6 +179,16 @@ To completely eliminate this delay when recording finishes, Eloquent Notes start
 3. By the time you click to stop recording, Ollama already has the Gemma 4 model fully loaded in VRAM, allowing Phase 1 execution to begin instantly without cold-start delay.
 
 ---
+
+## Reasoning Mode Is Disabled
+
+Gemma 4 enables reasoning by default (`thinking: true`, confirmed via `ollama show`). The reasoning tokens it emits are drawn from the same `num_predict` budget as the answer. When that budget is exhausted Ollama returns an **empty** `content` alongside `done_reason: length`, and the model reports that as `"empty": true` — so a correctly transcribed dictation is silently discarded and the user is told "Dictation Empty".
+
+This is not a rare edge case: it is what happens whenever background noise at the microphone degrades the transcript enough to make the model reason at length. Measured against a reference clip ("Why is the sky blue?") with noise added to 5 dB SNR, the default reasoning mode discarded 4 of 5 dictations.
+
+Eloquent Notes therefore sends `"think": false` on every pipeline request (`llm.THINK`). This restores correct transcription of noisy audio and is also substantially faster, since no tokens are spent on reasoning that a transcription task does not benefit from.
+
+Disabling reasoning also improves the two text-only phases: it removes the thinking text that Ollama would otherwise append to the assistant turn on retries, and it leaves more of the token budget for the note itself.
 
 ## Structured JSON Validation & Retry Logic
 

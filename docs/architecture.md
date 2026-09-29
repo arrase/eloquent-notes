@@ -63,7 +63,8 @@ This architecture ensures zero start-up delay for hotkeys while maintaining a si
 To maximize user privacy, eliminate security risks associated with unencrypted temporary audio files, and avoid unnecessary SSD wear, audio capture is performed entirely in RAM:
 
 - **Stream Capture:** `sounddevice.InputStream` captures PCM audio samples directly from the system's default microphone using a lightweight callback that enqueues float32 numpy arrays into a Python `queue.Queue`.
-- **In-Memory PCM Buffer:** When recording completes, `AudioRecorder.wav_bytes` drains the queue, concatenates all chunks into a unified NumPy array, scales the values to 16-bit signed PCM integer format (`clip(-32768, 32767).astype(np.int16)`), and writes the audio stream to an in-memory `io.BytesIO` buffer formatted as a standard WAV file.
+- **In-Memory PCM Buffer:** When recording completes, `AudioRecorder.wav_bytes` drains the queue, trims leading and trailing blocks below the speech threshold, concatenates all chunks into a unified NumPy array, scales the values to 16-bit signed PCM integer format (`clip(-32768, 32767).astype(np.int16)`), and writes the audio stream to an in-memory `io.BytesIO` buffer formatted as a standard WAV file.
+- **Local Silence Gate:** `AudioRecorder.is_silent` measures the recording's RMS amplitude against a -45 dBFS speech threshold. Silence is rejected before any audio is sent to Ollama, because the model cannot be relied upon to flag an empty recording and will otherwise invent text that gets saved as a note.
 - **Base64 Transmission:** The resulting raw WAV bytes are base64-encoded in memory and submitted directly in the JSON payload to Ollama's `/api/chat` endpoint. At no point is an audio file written to `/tmp` or disk.
 
 ### Audible Feedback Cues

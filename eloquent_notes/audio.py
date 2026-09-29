@@ -19,6 +19,48 @@ PCM16_MIN_INT = -32768
 PCM16_MAX_INT = 32767
 BYTES_PER_SAMPLE_16BIT = 2
 
+# RMS level (0.0-1.0) below which audio is treated as silence. Microphone
+# noise floors sit far lower than speech; -45 dBFS leaves ample headroom for
+# quiet dictation while rejecting true silence and hiss.
+SILENCE_RMS_THRESHOLD = 0.0056
+
+
+def rms_level(data: np.ndarray) -> float:
+    """Return the root-mean-square amplitude of a float32 audio block."""
+    if data.size == 0:
+        return 0.0
+    return float(np.sqrt(np.mean(np.square(data, dtype=np.float64))))
+
+
+def is_silent(data: np.ndarray, threshold: float = SILENCE_RMS_THRESHOLD) -> bool:
+    """Report whether an audio block carries no speech-level energy.
+
+    The transcription model cannot be trusted to flag empty recordings: given
+    silence it has been observed to answer empty=false and invent text, which
+    the pipeline would then save as a note. This RMS gate decides locally and
+    deterministically, before any audio is sent to the model.
+    """
+    return rms_level(data) < threshold
+
+
+def trim_silence(chunks: list[np.ndarray], threshold: float = SILENCE_RMS_THRESHOLD) -> list[np.ndarray]:
+    """Drop leading and trailing blocks quieter than the speech threshold.
+
+    Trimming reduces the audio the model must encode, which makes it less prone
+    to filling the gaps with invented speech, and saves tokens. Interior
+    pauses are preserved so the model's prosody handling is unchanged.
+    """
+    if not chunks:
+        return []
+
+    loud = [not is_silent(chunk, threshold) for chunk in chunks]
+    if not any(loud):
+        return chunks
+
+    first = loud.index(True)
+    last = len(loud) - loud[::-1].index(True)
+    return chunks[first:last]
+
 
 def encode_wav_bytes(chunks: list[np.ndarray], sample_rate: int, channels: int) -> bytes:
     """Encode captured float32 audio chunks into 16-bit PCM WAV bytes."""
@@ -92,9 +134,21 @@ class AudioRecorder:
         if self._wav_cache is not None:
             return self._wav_cache
 
-        chunks = list(self._chunks.queue)
+        chunks = trim_silence(list(self._chunks.queue))
         self._wav_cache = encode_wav_bytes(chunks, self.sample_rate, self.channels)
         return self._wav_cache
+
+    @property
+    def is_silent(self) -> bool:
+        """Report whether the recording holds no speech-level energy.
+
+        Checked locally so an accidental trigger in a quiet room never reaches
+        the model, which cannot reliably report empty audio on its own.
+        """
+        chunks = list(self._chunks.queue)
+        if not chunks:
+            return True
+        return all(is_silent(chunk) for chunk in chunks)
 
 
 def play_beep(
