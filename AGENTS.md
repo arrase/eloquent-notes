@@ -5,6 +5,7 @@ This repository contains documentation under `docs/` to help AI coding agents un
 - **System Blueprint**: Refer to docs/architecture.md for a high-level system overview, module relationships, and boundary definitions.
 - **Processing Pipeline**: Refer to docs/pipeline.md for details on the three-phase Ollama pipeline and retry logic.
 - **Configuration & Usage**: Refer to docs/configuration.md and README.md for settings, prompts, and templates.
+- **Releasing**: Refer to docs/releasing.md before cutting a version or tag.
 
 ## Code Principles
 

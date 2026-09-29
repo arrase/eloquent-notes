@@ -20,6 +20,7 @@ eloquent-notes [command] [options]
 | `toggle` | `-t` | Toggles recording (IDLE $\rightarrow$ RECORDING or RECORDING $\rightarrow$ PROCESSING). |
 | `config` | | Launches the standalone PyQt6 Configuration GUI window. |
 | `install-autostart` | | Installs the desktop autostart entry into `~/.config/autostart/`. |
+| `--version` | | Prints the installed version and exits. |
 
 ---
 
@@ -46,6 +47,17 @@ Opens the graphical configuration management dialog.
 ### 4. `eloquent-notes install-autostart`
 
 Creates a system autostart file `~/.config/autostart/eloquent-notes.desktop` pointing to your current executable installation path (`shutil.which("eloquent-notes")`).
+
+### 5. `eloquent-notes --version`
+
+Prints the installed version and exits, for example:
+
+```bash
+$ eloquent-notes --version
+eloquent-notes 0.3.0
+```
+
+The value is read from the installed distribution metadata, so it always matches the release you actually have installed rather than a separately maintained constant.
 
 ---
 
