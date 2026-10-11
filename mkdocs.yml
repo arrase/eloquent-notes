@@ -2,6 +2,7 @@ site_name: Eloquent Notes
 site_description: Lightweight, system-tray-centric utility for Linux dictation into Obsidian powered by Gemma 4 via Ollama.
 site_author: Arrase
 site_url: https://arrase.github.io/eloquent-notes/
+docs_dir: gh-pages
 
 repo_name: arrase/eloquent-notes
 repo_url: https://github.com/arrase/eloquent-notes
