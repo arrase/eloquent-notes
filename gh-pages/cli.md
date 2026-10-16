@@ -54,7 +54,7 @@ Prints the installed version and exits, for example:
 
 ```bash
 $ eloquent-notes --version
-eloquent-notes 0.3.0
+eloquent-notes 0.3.1
 ```
 
 The value is read from the installed distribution metadata, so it always matches the release you actually have installed rather than a separately maintained constant.
@@ -63,14 +63,14 @@ The value is read from the installed distribution metadata, so it always matches
 
 ## Decoupled CLI Architecture & Low-Latency IPC
 
-To ensure that pressing a global keyboard shortcut provides instantaneous audio feedback without UI lag or heavy memory allocation, Eloquent Notes separates the CLI launcher from heavy GUI widgets.
+To ensure that pressing a global keyboard shortcut provides instantaneous audio feedback without UI lag, Eloquent Notes uses a headless `QCoreApplication` and local socket IPC for control commands instead of creating GUI windows in the CLI client process.
 
 ```
                   +--------------------------+
                   |  eloquent-notes toggle   |
                   +-------------+------------+
                                 |
-                   QCoreApplication (No GUI)
+                   QCoreApplication (Headless)
                                 |
                      QLocalSocket ("eloquent_notes_ipc")
                                 |
@@ -83,7 +83,7 @@ To ensure that pressing a global keyboard shortcut provides instantaneous audio 
 
 ### Key Architectural Benefits
 
-1. **Lightweight Core App (`QCoreApplication`)**: When executing `eloquent-notes toggle`, the CLI instantiates `QCoreApplication` rather than `QApplication`. This avoids initializing display server widget libraries, window managers, or heavy graphics contexts, keeping memory footprint minimal (~15 MB).
+1. **Headless Core App (`QCoreApplication`)**: When executing `eloquent-notes toggle`, `run_cli()` instantiates a headless `QCoreApplication` rather than `QApplication` or any GUI dialogs, avoiding display server window initialization and keeping the IPC client fast.
 2. **Unix Domain Socket (`QLocalSocket`)**: Communication between the CLI process and daemon occurs over named Unix local sockets (`eloquent_notes_ipc`). The IPC handshake, message transfer (`"toggle"`), and socket disconnection complete in under 5 milliseconds.
 3. **Automatic Daemon Spawning (`os.execv`)**: If `QLocalSocket.connectToServer()` fails or times out after 500 ms, `main.py` detects that the background daemon is inactive. It replaces the current process image using `os.execv(sys.executable, daemon_args)` to start `eloquent_notes.app` directly.
 

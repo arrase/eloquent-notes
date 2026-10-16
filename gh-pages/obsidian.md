@@ -56,21 +56,37 @@ Once Phase 3 returns a list of candidate wikilinks, `_inject_wikilinks()` replac
 
 ```python
 def _inject_wikilinks(text, wikilinks):
-    # Sort by length descending so longer terms match first
-    sorted_links = sorted(wikilinks, key=len, reverse=True)
+    if not wikilinks or not text:
+        return text
+
+    unique_links = {
+        cleaned
+        for link in wikilinks
+        if (cleaned := link.strip().removeprefix("[[").removesuffix("]]").strip())
+    }
+    sorted_links = sorted(unique_links, key=len, reverse=True)
     for link in sorted_links:
+        start_b = r"(?<!\w)" if re.match(r"\w", link[0]) else r""
+        end_b = r"(?!\w)" if re.match(r"\w", link[-1]) else r""
+
         pattern = re.compile(
-            r"(?<!\[\[)\b" + re.escape(link) + r"\b(?!\]\])",
+            r"(```[\s\S]*?```|`[^`\n]+`|\[\[[\s\S]*?\]\]|\[[^\]]*\]\([^)]*\)|https?://\S+)"
+            rf"|({start_b}{re.escape(link)}{end_b})",
             re.IGNORECASE,
         )
-        text = pattern.sub(f"[[{link}]]", text)
+
+        text = pattern.sub(
+            lambda match, target=link: match.group(1) if match.group(1) else f"[[{target}]]",
+            text,
+        )
+
     return text
 ```
 
 #### Key Safeguards
-1. **Longest Terms First:** Links are sorted by string length in descending order before replacement. This prevents shorter terms from corrupting longer terms (for example, matching `"Postgres"` inside `"PostgreSQL"`, or `"Go"` inside `"Google"`).
-2. **Word Boundaries (`\b`):** Uses regex word boundaries to prevent matching inside unrelated words.
-3. **Negative Lookbehind/Lookahead:** Ensures terms that are already enclosed inside `[[ ... ]]` are skipped to prevent duplicate wrapping (e.g., `[[[[Topic]]]]`).
+1. **Longest Terms First:** Links are deduplicated, stripped of any surrounding `[[...]]`, and sorted by string length in descending order before replacement. This prevents shorter terms from corrupting longer terms (for example, matching `"Postgres"` inside `"PostgreSQL"`, or `"Go"` inside `"Google"`).
+2. **Word Boundaries:** Uses `\w`-aware negative lookbehind/lookahead boundaries (`(?<!\w)` / `(?!\w)`) to prevent matching inside unrelated words while still supporting terms starting or ending with punctuation (e.g., `"C++"`).
+3. **Protected Regions Skipped:** Fenced code blocks, inline code, existing `[[WikiLinks]]`, Markdown links (`[label](url)`), and bare URLs are matched by the first alternation group and left untouched.
 4. **Case Insensitivity:** Matches words regardless of spoken capitalization while preserving the canonical vault topic casing in the link target.
 
 ---
@@ -83,7 +99,7 @@ Eloquent Notes supports two distinct saving workflows controlled by the `obsidia
 All dictations recorded throughout the day are aggregated into a single daily note named `YYYY-MM-DD.md` inside your designated vault target folder.
 
 - **First Dictation of the Day:** If `YYYY-MM-DD.md` does not exist, Eloquent Notes creates it using `templates/daily_new.md`, initializing YAML frontmatter, tags, date, and the first entry under a time header.
-- **Subsequent Dictations:** If `YYYY-MM-DD.md` already exists, Eloquent Notes reads the file, parses and merges tags in the YAML frontmatter, and appends the new dictation entry using `templates/daily_append.md` under a new timestamp header (e.g., `### 14:32:05 - Note Title`).
+- **Subsequent Dictations:** If `YYYY-MM-DD.md` already exists, Eloquent Notes reads the file, parses and merges tags in the YAML frontmatter, and appends the new dictation entry using `templates/daily_append.md` under a new timestamp header (e.g., `## 14:32:05 — Note Title`).
 
 ### Mode B: Standalone Dictation Files (`daily_notes: false`)
 Each dictation creates a separate timestamped file in your vault target directory using `templates/standalone.md`:
@@ -106,37 +122,41 @@ When appending new dictations to an existing daily note (`daily_notes: true`), e
 `_update_frontmatter_tags()` parses and updates YAML frontmatter without breaking existing notes:
 
 ```python
+_FRONTMATTER_RE = re.compile(r"^---\r?\n(.*?)\r?\n---\r?\n?(.*)$", re.DOTALL)
+
+
 def _update_frontmatter_tags(content, new_tags):
-    if not content.startswith("---"):
+    match = _FRONTMATTER_RE.match(content)
+    if not match:
         return content
 
-    end_frontmatter = content.find("---", 3)
-    if end_frontmatter == -1:
+    frontmatter_str, remainder = match.group(1), match.group(2)
+    try:
+        frontmatter = yaml.safe_load(frontmatter_str)
+    except yaml.YAMLError:
         return content
 
-    frontmatter_str = content[3:end_frontmatter]
-    frontmatter = yaml.safe_load(frontmatter_str) or {}
+    if not isinstance(frontmatter, dict):
+        return content
 
-    existing_tags = frontmatter.get("tags", [])
+    existing_tags = frontmatter.setdefault("tags", [])
+    if not isinstance(existing_tags, list):
+        existing_tags = [existing_tags] if existing_tags else []
+        frontmatter["tags"] = existing_tags
+
     for tag in new_tags:
-        if tag not in existing_tags:
-            existing_tags.append(tag)
-    frontmatter["tags"] = existing_tags
+        cleaned = tag.strip().lstrip("#").strip()
+        if cleaned and cleaned not in existing_tags:
+            existing_tags.append(cleaned)
 
-    yaml.SafeDumper.ignore_aliases = lambda self, data: True
-    new_frontmatter = yaml.safe_dump(
-        frontmatter, default_flow_style=False, sort_keys=False,
+    new_frontmatter = yaml.dump(
+        frontmatter, Dumper=_NoAliasDumper, default_flow_style=False, sort_keys=False
     )
-
-    remainder = content[end_frontmatter + 3:]
-    if remainder.startswith('\n'):
-        remainder = remainder[1:]
-
     return f"---\n{new_frontmatter}---\n{remainder}"
 ```
 
 ### Frontmatter Preservation Guarantees
-- **Tag Merging:** New tags extracted by Phase 3 are appended to the existing `tags` list while eliminating duplicates.
+- **Tag Merging:** New tags extracted by Phase 3 are normalized (stripped of leading `#` and whitespace) and appended to the existing `tags` list while eliminating duplicates.
 - **Key Retention:** All pre-existing YAML keys (such as `date`, `aliases`, `author`, or custom properties) are preserved intact.
-- **No Alias Anchors:** `yaml.SafeDumper.ignore_aliases` is set to ensure PyYAML does not insert unwanted YAML pointer anchors (`*id001`) into arrays.
+- **No Alias Anchors:** `_NoAliasDumper` (a `yaml.SafeDumper` subclass) disables YAML pointer anchors (`*id001`) without mutating global PyYAML state.
 - **Clean Structure:** The existing frontmatter block is cleanly replaced while keeping the body of the daily note untouched before appending the new dictation entry.

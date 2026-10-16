@@ -1,7 +1,5 @@
 """Configuration GUI dialog for Eloquent Notes."""
 
-import copy
-
 import yaml
 from PyQt6.QtWidgets import (
     QDialog,
@@ -13,14 +11,14 @@ from PyQt6.QtWidgets import (
 )
 
 from eloquent_notes import config
+from eloquent_notes.config_gui.constants import PROMPTS, TEMPLATES
 from eloquent_notes.config_gui.styles import QSS_STYLESHEET
 from eloquent_notes.config_gui.tabs import (
     AITab,
     AudioTab,
     GeneralTab,
     ObsidianTab,
-    PromptsTab,
-    TemplatesTab,
+    TextFilesTab,
 )
 from eloquent_notes.config_gui.utils import diff_configs
 
@@ -34,7 +32,15 @@ class ConfigurationDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Eloquent Notes Configuration")
         self.setMinimumSize(850, 650)
-        self.config_data = config.load_config()
+        try:
+            self.config_data = config.load_config()
+        except (OSError, yaml.YAMLError, TypeError) as e:
+            QMessageBox.warning(
+                self,
+                "Configuration Error",
+                f"Failed to load user configuration: {e}\n\nLoaded default settings.",
+            )
+            self.config_data = config.load_default_config()
 
         self._tabs = []
         self._init_ui()
@@ -54,8 +60,12 @@ class ConfigurationDialog(QDialog):
         self.obsidian_tab = ObsidianTab()
         self.ai_tab = AITab()
         self.audio_tab = AudioTab()
-        self.prompts_tab = PromptsTab()
-        self.templates_tab = TemplatesTab()
+        self.prompts_tab = TextFilesTab(
+            PROMPTS, "Prompt Content:", "Select a prompt to edit..."
+        )
+        self.templates_tab = TextFilesTab(
+            TEMPLATES, "Template Content:", "Select a template to edit..."
+        )
 
         self._tabs = [
             (self.general_tab, "General"),
@@ -71,7 +81,6 @@ class ConfigurationDialog(QDialog):
 
         layout.addWidget(self.tab_widget)
 
-        # Bottom buttons
         btn_layout = QHBoxLayout()
         self.btn_defaults = QPushButton(RESTORE_DEFAULTS_TITLE)
         self.btn_defaults.clicked.connect(self.restore_defaults)
@@ -109,14 +118,18 @@ class ConfigurationDialog(QDialog):
             return
 
         try:
-            with open(config.DEFAULT_CONFIG_SRC, encoding="utf-8") as f:
-                default_data = yaml.safe_load(f)
+            default_data = config.load_default_config()
+            self.config_data = default_data
 
-            self.config_data = copy.deepcopy(default_data)
-
-            # Load default data into UI
-            for tab_widget, _ in self._tabs:
+            for tab_widget in (
+                self.general_tab,
+                self.obsidian_tab,
+                self.ai_tab,
+                self.audio_tab,
+            ):
                 tab_widget.load_settings(default_data)
+
+            for tab_widget in (self.prompts_tab, self.templates_tab):
                 tab_widget.restore_defaults()
 
             QMessageBox.information(
@@ -131,17 +144,21 @@ class ConfigurationDialog(QDialog):
 
     def save_settings_from_ui(self):
         """Gather settings from widgets and persist them to files on disk."""
+        save_order = (
+            self.obsidian_tab,
+            self.ai_tab,
+            self.audio_tab,
+            self.general_tab,
+            self.prompts_tab,
+            self.templates_tab,
+        )
         try:
-            # Collect from all tabs inside try-except to catch OS/File errors
-            for tab_widget, _ in self._tabs:
+            for tab_widget in save_order:
                 if not tab_widget.save_settings(self.config_data):
-                    # A tab returned False, meaning validation failed
                     self.tab_widget.setCurrentWidget(tab_widget)
                     return False
 
-            with open(config.DEFAULT_CONFIG_SRC, encoding="utf-8") as f:
-                default_config = yaml.safe_load(f)
-
+            default_config = config.load_default_config()
             overrides = diff_configs(default_config, self.config_data)
             config.save_config(overrides)
         except (OSError, yaml.YAMLError) as e:
@@ -154,12 +171,12 @@ class ConfigurationDialog(QDialog):
 
     def cleanup_tabs(self):
         """Clean up resources before closing."""
-        for tab_widget, _ in self._tabs:
-            tab_widget.cleanup()
+        self.ai_tab.cleanup()
 
     def closeEvent(self, event):
         """Ensure background threads and resources are cleaned up on window close."""
-        self.cleanup_tabs()
+        if not self.isVisible():
+            self.cleanup_tabs()
         super().closeEvent(event)
 
     def reject(self):

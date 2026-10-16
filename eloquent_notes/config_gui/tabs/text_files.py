@@ -1,4 +1,4 @@
-"""Base class for configuration tabs editing a list of files."""
+"""Configuration tab for editing a list of text files."""
 
 import os
 
@@ -15,10 +15,9 @@ from PyQt6.QtWidgets import (
 )
 
 from eloquent_notes import config
-from eloquent_notes.config_gui.tabs.base import ConfigTab
 
 
-class TextFilesTab(ConfigTab):
+class TextFilesTab(QWidget):
     """Generic tab for editing a list of text files (prompts or templates)."""
 
     def __init__(self, items, editor_label, placeholder, parent=None):
@@ -74,7 +73,7 @@ class TextFilesTab(ConfigTab):
 
         if current:
             path = current.data(Qt.ItemDataRole.UserRole)
-            self.editor.setPlainText(self.loaded_contents.get(path, ""))
+            self.editor.setPlainText(self.loaded_contents[path])
             self.editor.setEnabled(True)
             self.current_item = current
         else:
@@ -90,11 +89,7 @@ class TextFilesTab(ConfigTab):
 
     @staticmethod
     def _read_file_or_default(path, default_path):
-        if os.path.exists(path):
-            return config.load_file(path)
-        if os.path.exists(default_path):
-            return config.load_file(default_path)
-        return ""
+        return config.load_file(path if os.path.exists(path) else default_path)
 
     def load_settings(self, config_data: dict) -> None:
         self._block_cache = True
@@ -109,28 +104,23 @@ class TextFilesTab(ConfigTab):
         current = self.lst_items.currentItem()
         if current:
             path = current.data(Qt.ItemDataRole.UserRole)
-            self.editor.setPlainText(self.loaded_contents.get(path, ""))
+            self.editor.setPlainText(self.loaded_contents[path])
             self.editor.setEnabled(True)
             self.current_item = current
 
         self._block_cache = False
 
     def restore_defaults(self) -> None:
-        self._block_cache = True
         self.loaded_contents.clear()
         for _, path, default_path in self.items:
-            if os.path.exists(default_path):
-                self.loaded_contents[path] = config.load_file(default_path)
-            else:
-                self.loaded_contents[path] = ""
+            self.loaded_contents[path] = config.load_file(default_path)
         if self.current_item:
             path = self.current_item.data(Qt.ItemDataRole.UserRole)
-            self.editor.setPlainText(self.loaded_contents.get(path, ""))
-        self._block_cache = False
+            self.editor.setPlainText(self.loaded_contents[path])
 
     def save_settings(self, config_data: dict) -> bool:
         self.commit_active_editor()
         for _, path, _ in self.items:
-            content = self.loaded_contents.get(path, "")
-            config.save_file(path, content)
+            content = self.loaded_contents[path]
+            config.atomic_write(path, content)
         return True

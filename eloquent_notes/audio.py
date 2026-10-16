@@ -32,7 +32,7 @@ def rms_level(data: np.ndarray) -> float:
     return float(np.sqrt(np.mean(np.square(data, dtype=np.float64))))
 
 
-def is_silent(data: np.ndarray, threshold: float = SILENCE_RMS_THRESHOLD) -> bool:
+def is_silent(data: np.ndarray) -> bool:
     """Report whether an audio block carries no speech-level energy.
 
     The transcription model cannot be trusted to flag empty recordings: given
@@ -40,10 +40,10 @@ def is_silent(data: np.ndarray, threshold: float = SILENCE_RMS_THRESHOLD) -> boo
     the pipeline would then save as a note. This RMS gate decides locally and
     deterministically, before any audio is sent to the model.
     """
-    return rms_level(data) < threshold
+    return rms_level(data) < SILENCE_RMS_THRESHOLD
 
 
-def trim_silence(chunks: list[np.ndarray], threshold: float = SILENCE_RMS_THRESHOLD) -> list[np.ndarray]:
+def trim_silence(chunks: list[np.ndarray]) -> list[np.ndarray]:
     """Drop leading and trailing blocks quieter than the speech threshold.
 
     Trimming reduces the audio the model must encode, which makes it less prone
@@ -53,7 +53,7 @@ def trim_silence(chunks: list[np.ndarray], threshold: float = SILENCE_RMS_THRESH
     if not chunks:
         return []
 
-    loud = [not is_silent(chunk, threshold) for chunk in chunks]
+    loud = [not is_silent(chunk) for chunk in chunks]
     if not any(loud):
         return chunks
 
@@ -82,12 +82,11 @@ def encode_wav_bytes(chunks: list[np.ndarray], sample_rate: int, channels: int) 
 class AudioRecorder:
     """Single-use microphone recorder producing WAV bytes once stopped."""
 
-    def __init__(self, sample_rate: int = 16000, channels: int = 1) -> None:
+    def __init__(self, sample_rate: int, channels: int) -> None:
         self.sample_rate = sample_rate
         self.channels = channels
         self._chunks: queue.Queue[np.ndarray] = queue.Queue()
         self._stream: sd.InputStream | None = None
-        self._wav_cache: bytes | None = None
 
     def _on_audio(
         self,
@@ -126,17 +125,10 @@ class AudioRecorder:
 
     @property
     def wav_bytes(self) -> bytes:
-        """Encode captured chunks as 16-bit PCM WAV.
-
-        Idempotent: caches result on first access so subsequent reads
-        do not return empty bytes or destroy recorded audio.
-        """
-        if self._wav_cache is not None:
-            return self._wav_cache
-
-        chunks = trim_silence(list(self._chunks.queue))
-        self._wav_cache = encode_wav_bytes(chunks, self.sample_rate, self.channels)
-        return self._wav_cache
+        """Encode captured chunks as 16-bit PCM WAV."""
+        with self._chunks.mutex:
+            chunks = list(self._chunks.queue)
+        return encode_wav_bytes(trim_silence(chunks), self.sample_rate, self.channels)
 
     @property
     def is_silent(self) -> bool:
@@ -145,17 +137,18 @@ class AudioRecorder:
         Checked locally so an accidental trigger in a quiet room never reaches
         the model, which cannot reliably report empty audio on its own.
         """
-        chunks = list(self._chunks.queue)
+        with self._chunks.mutex:
+            chunks = list(self._chunks.queue)
         if not chunks:
             return True
         return all(is_silent(chunk) for chunk in chunks)
 
 
 def play_beep(
-    frequency: float = 440.0,
-    duration: float = 0.1,
-    sample_rate: int = 16000,
-    wait: bool = True,
+    frequency: float,
+    duration: float,
+    sample_rate: int,
+    wait: bool,
 ) -> None:
     """Play a short sine-wave beep for audible feedback.
 

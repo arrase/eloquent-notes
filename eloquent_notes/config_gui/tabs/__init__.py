@@ -1,17 +1,15 @@
-"""Base module for config tabs."""
+"""Configuration GUI tabs."""
 
 from .ai import AITab
 from .audio import AudioTab
 from .general import GeneralTab
 from .obsidian import ObsidianTab
-from .prompts import PromptsTab
-from .templates import TemplatesTab
+from .text_files import TextFilesTab
 
 __all__ = [
     "AITab",
     "AudioTab",
     "GeneralTab",
     "ObsidianTab",
-    "PromptsTab",
-    "TemplatesTab",
+    "TextFilesTab",
 ]

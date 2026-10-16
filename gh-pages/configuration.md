@@ -33,13 +33,14 @@ Controls how generated dictations are integrated into your Obsidian vault:
 * **Vault Path**: The root path to your Obsidian vault directory (e.g., `~/Obsidian`).
 * **Dictations Subfolder**: The subfolder relative to your vault root where standalone notes are stored (default: `Dictations`).
 * **Subfolder Structure**: Organization strategy for notes inside the target folder (`none` for directly in target folder, `month` for `YYYY-MM`, `week` for `YYYY-Www`, or `month_week` for `YYYY-MM/Www`).
-* **Enable Daily Notes**: When enabled, dictations classified as daily entries or quick thoughts are automatically routed to your Obsidian Daily Notes folder (`YYYY-MM-DD.md`).
+* **Enable Daily Notes**: When enabled, all dictations are appended to the daily note (`YYYY-MM-DD.md`) in the configured target folder instead of creating standalone files.
 * **Scan Vault Context**: Scans existing note titles in your vault and provides them as contextual hints to Gemma 4, allowing the model to automatically insert `[[WikiLinks]]` when existing topics are mentioned in audio.
 
 #### 3. AI Settings
 Configures connection parameters and behavior for the local Ollama inference server:
 * **Ollama Server URL**: Endpoint URL of your running Ollama service (default: `http://localhost:11434`).
 * **Model Name**: Large language / multimodal model tag (default: `gemma4:e4b-it-qat`).
+* **Output Language**: Target output language for rewritten notes, titles, wikilinks, and tags (default: `English`).
 * **Context Length (`num_ctx`)**: Context window limit for LLM requests (default: `8192` tokens).
 * **Keep-Alive Duration**: Time duration to keep model weights loaded in VRAM after note generation (e.g., `0` for immediate unload, `5m`, `10m`).
 * **Preload Keep-Alive**: VRAM persistence duration while actively recording audio to minimize latency during generation (default: `5m`).
@@ -85,6 +86,7 @@ obsidian:
 ai:
   ollama_url: "http://localhost:11434"
   model: "gemma4:e4b-it-qat"
+  output_language: "English" # Output language for rewritten notes, titles, wikilinks, and tags
   context_length: 8192  # Context window size in tokens
   keep_alive: "0"       # VRAM retention after note completion ("0" unloads immediately)
   preload_keep_alive: "5m" # VRAM retention during active recording
@@ -118,9 +120,9 @@ System and user prompts reside in `~/.config/eloquent-notes/prompts/`:
 | `transcription_system.md` | System instructions for audio transcription phase. | Sets multi-modal audio processing behavior. |
 | `transcription_user.md` | User prompt accompanying audio input. | Instructs model to extract speech verbatim. |
 | `rewriting_system.md` | System instructions for note rewriting phase. | Defines tone, formatting, and heading structure. |
-| `rewriting_user.md` | User prompt for note rewriting phase. | Accepts `{transcription}` variable. |
+| `rewriting_user.md` | User prompt for note rewriting phase. | Accepts `{transcription}` and `{language_instruction}` variables. |
 | `classification_system.md` | System instructions for note classification phase. | Rules for metadata extraction and JSON output. |
-| `classification_user.md` | User prompt for classification phase. | Accepts `{transcription}` and `{vault_context}` variables. |
+| `classification_user.md` | User prompt for classification phase. | Accepts `{transcription}`, `{vault_context}`, and `{language_instruction}` variables. |
 | `retry_prompt.md` | Correction prompt on invalid JSON responses. | Forces model to output strict JSON schema. |
 
 ---
@@ -134,12 +136,11 @@ Used when creating individual standalone notes inside your configured `folder`:
 
 ```markdown
 ---
-date: {date}
-time: {time}
 tags:
+  - dictation
 {tags}
+date: {date} {time}
 ---
-
 # {title}
 
 {text}
@@ -150,16 +151,14 @@ Used when creating a new Daily Note for the current day:
 
 ```markdown
 ---
-date: {date}
 tags:
-  - daily-notes
+  - dictation
+{tags}
+date: {date}
 ---
+# Dictations of {date}
 
-# Daily Note - {date}
-
-## Dictations
-
-### {time} - {title}
+## {time} — {title}
 {text}
 ```
 
@@ -167,7 +166,8 @@ tags:
 Appended to an existing Daily Note when additional dictations are recorded on the same day:
 
 ```markdown
-### {time} - {title}
+
+## {time} — {title}
 {text}
 ```
 

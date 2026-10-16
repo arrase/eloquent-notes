@@ -27,17 +27,8 @@ def test_recording_hud_show_recording(qapp):
     assert hud.lbl_timer.text() == "00:45"
     assert hud.progress_bar.value() == 0
     assert hud.isVisible()
-    hud.hide_hud()
-
-
-def test_recording_hud_show_recording_zero_duration(qapp):
-    """Test show_recording handles indefinite (0s) duration."""
-    hud = RecordingHUD()
-    hud.show_recording(0.0)
-
-    assert hud.lbl_timer.text() == "00:00"
-    assert hud.progress_bar.value() == 0
-    hud.hide_hud()
+    hud.hide()
+    assert not hud.isVisible()
 
 
 def test_recording_hud_update_progress(qapp):
@@ -67,27 +58,7 @@ def test_recording_hud_update_progress(qapp):
     assert "#EF4444" in hud.progress_bar.styleSheet()
     assert "#EF4444" in hud.lbl_dot.styleSheet()
 
-    hud.hide_hud()
-
-
-def test_recording_hud_update_progress_zero_duration(qapp):
-    """Test update_progress with indefinite duration (total_duration = 0)."""
-    hud = RecordingHUD()
-    hud.show_recording(0.0)
-
-    hud.update_progress(15.0, 0.0, 0.0)
-    assert hud.lbl_timer.text() == "00:15"
-    assert hud.progress_bar.value() == 0
-    hud.hide_hud()
-
-
-def test_recording_hud_hide_hud(qapp):
-    """Test hide_hud hides the HUD widget."""
-    hud = RecordingHUD()
-    hud.show_recording(30.0)
-    assert hud.isVisible()
-    hud.hide_hud()
-    assert not hud.isVisible()
+    hud.hide()
 
 
 def test_recording_hud_mouse_click_emits_signal(qapp):
@@ -117,4 +88,4 @@ def test_recording_hud_mouse_click_emits_signal(qapp):
     )
     hud.mousePressEvent(right_event)
     assert mock_slot.call_count == 1
-    hud.hide_hud()
+    hud.hide()

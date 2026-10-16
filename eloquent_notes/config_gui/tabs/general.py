@@ -14,6 +14,7 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QSpinBox,
     QVBoxLayout,
+    QWidget,
 )
 
 from eloquent_notes.autostart import (
@@ -21,11 +22,10 @@ from eloquent_notes.autostart import (
     is_autostart_enabled,
     remove_autostart,
 )
-from eloquent_notes.config_gui.tabs.base import ConfigTab
 from eloquent_notes.logging_utils import get_log_file_path
 
 
-class GeneralTab(ConfigTab):
+class GeneralTab(QWidget):
     """General settings and logs tab."""
 
     def __init__(self, parent=None):

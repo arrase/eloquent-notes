@@ -9,13 +9,22 @@ import requests
 from eloquent_notes import llm
 
 
+SIMPLE_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "result": {"type": "string"},
+    },
+    "required": ["result"],
+}
+
+
 @patch("eloquent_notes.llm.requests.post")
 def test_preload_model(mock_post):
     mock_response = MagicMock()
     mock_response.raise_for_status.return_value = None
     mock_post.return_value = mock_response
 
-    llm.preload_model("http://localhost:11434", "gemma", 4096)
+    llm.preload_model("http://localhost:11434", "gemma", 4096, "5m", 180)
 
     mock_post.assert_called_once_with(
         "http://localhost:11434/api/chat",
@@ -24,6 +33,26 @@ def test_preload_model(mock_post):
             "messages": [],
             "keep_alive": "5m",
             "options": {"temperature": 0.0, "num_ctx": 4096},
+        },
+        timeout=180,
+    )
+
+
+@patch("eloquent_notes.llm.requests.post")
+def test_preload_model_without_context_length(mock_post):
+    mock_response = MagicMock()
+    mock_response.raise_for_status.return_value = None
+    mock_post.return_value = mock_response
+
+    llm.preload_model("http://localhost:11434", "gemma", None, "5m", 180)
+
+    mock_post.assert_called_once_with(
+        "http://localhost:11434/api/chat",
+        json={
+            "model": "gemma",
+            "messages": [],
+            "keep_alive": "5m",
+            "options": {"temperature": 0.0},
         },
         timeout=180,
     )
@@ -43,8 +72,7 @@ def test_execute_ollama_json_request_success_first_try(mock_post):
         ollama_url="http://localhost:11434",
         model="gemma",
         messages=messages,
-        format_schema={},
-        required_keys=["result"],
+        format_schema=SIMPLE_SCHEMA,
         retry_prompt="retry",
         context_length=2048,
         keep_alive="5m",
@@ -55,6 +83,33 @@ def test_execute_ollama_json_request_success_first_try(mock_post):
 
     assert res == {"result": "ok"}
     assert len(messages) == 1  # Verify original list unchanged
+
+
+@patch("eloquent_notes.llm.requests.post")
+def test_execute_ollama_json_request_without_context_length(mock_post):
+    mock_response = MagicMock()
+    mock_response.raise_for_status.return_value = None
+    mock_response.json.return_value = {
+        "message": {"content": '{"result": "ok"}'}
+    }
+    mock_post.return_value = mock_response
+
+    llm._execute_ollama_json_request(
+        ollama_url="http://localhost:11434",
+        model="gemma",
+        messages=[{"role": "user", "content": "hi"}],
+        format_schema=SIMPLE_SCHEMA,
+        retry_prompt="retry",
+        context_length=None,
+        keep_alive="5m",
+        max_retries=0,
+        timeout=30,
+        task_name="test task",
+    )
+
+    options = mock_post.call_args.kwargs["json"]["options"]
+    assert "num_ctx" not in options
+    assert options["temperature"] == 0.0
 
 
 @patch("eloquent_notes.llm.requests.post")
@@ -77,8 +132,7 @@ def test_execute_ollama_json_request_retry_and_immutability(mock_post):
         ollama_url="http://localhost:11434",
         model="gemma",
         messages=messages_copy,
-        format_schema={},
-        required_keys=["result"],
+        format_schema=SIMPLE_SCHEMA,
         retry_prompt="Please fix JSON",
         context_length=2048,
         keep_alive="5m",
@@ -106,8 +160,7 @@ def test_execute_ollama_json_request_http_error(mock_post):
             ollama_url="http://localhost:11434",
             model="gemma",
             messages=[{"role": "user", "content": "test"}],
-            format_schema={},
-            required_keys=["result"],
+            format_schema=SIMPLE_SCHEMA,
             retry_prompt="retry",
             context_length=2048,
             keep_alive="5m",
@@ -124,14 +177,18 @@ def test_execute_ollama_json_request_missing_required_key(mock_post):
     mock_resp.json.return_value = {"message": {"content": '{"wrong_key": "val"}'}}
     mock_post.return_value = mock_resp
 
+    schema = {
+        "type": "object",
+        "properties": {"expected_key": {"type": "string"}},
+        "required": ["expected_key"],
+    }
     messages = [{"role": "user", "content": "test"}]
     with pytest.raises(ValueError, match="missing required keys"):
         llm._execute_ollama_json_request(
             ollama_url="http://localhost:11434",
             model="gemma",
             messages=messages,
-            format_schema={},
-            required_keys=["expected_key"],
+            format_schema=schema,
             retry_prompt="retry",
             context_length=2048,
             keep_alive="5m",
@@ -158,8 +215,7 @@ def test_execute_ollama_json_request_malformed_response_structure(mock_post):
         ollama_url="http://localhost:11434",
         model="gemma",
         messages=[{"role": "user", "content": "hi"}],
-        format_schema={},
-        required_keys=["result"],
+        format_schema=SIMPLE_SCHEMA,
         retry_prompt="retry",
         context_length=2048,
         keep_alive="5m",
@@ -185,6 +241,9 @@ def test_transcribe_audio(mock_exec):
         retry_prompt="retry prompt",
         context_length=2048,
         audio_bytes=audio_bytes,
+        keep_alive="5m",
+        max_retries=3,
+        timeout=300,
     )
 
     assert res == {"empty": False, "transcription": "Test speech"}
@@ -194,9 +253,7 @@ def test_transcribe_audio(mock_exec):
     assert kwargs["messages"][0] == {"role": "system", "content": "sys prompt"}
     assert kwargs["messages"][1]["role"] == "user"
     assert kwargs["messages"][1]["images"] == [base64.b64encode(audio_bytes).decode("utf-8")]
-    assert "empty" in kwargs["format_schema"]["properties"]
-    assert "transcription" in kwargs["format_schema"]["properties"]
-    assert kwargs["required_keys"] == ["transcription", "empty"]
+    assert kwargs["format_schema"] is llm.TRANSCRIPTION_SCHEMA
 
 
 def test_transcription_schema_orders_transcription_before_empty():
@@ -213,12 +270,64 @@ def test_transcription_schema_orders_transcription_before_empty():
 def test_parse_json_response_rejects_non_object_json():
     """A bare JSON array/scalar is not a valid phase response."""
     with pytest.raises(TypeError, match="expected a JSON object"):
-        llm._parse_json_response("[1, 2, 3]", ["result"])
+        llm._parse_json_response("[1, 2, 3]", SIMPLE_SCHEMA)
 
 
 def test_parse_json_response_reports_missing_keys():
+    schema = {
+        "type": "object",
+        "properties": {
+            "result": {"type": "string"},
+            "other": {"type": "string"},
+        },
+        "required": ["result", "other"],
+    }
     with pytest.raises(ValueError, match=r"missing required keys: \['other'\]"):
-        llm._parse_json_response('{"result": "ok"}', ["result", "other"])
+        llm._parse_json_response('{"result": "ok"}', schema)
+
+
+def test_parse_json_response_validates_field_types_and_enum():
+    # String type mismatch
+    with pytest.raises(TypeError, match="field 'transcription' must be a string"):
+        llm._parse_json_response(
+            '{"transcription": 123, "empty": false}',
+            llm.TRANSCRIPTION_SCHEMA,
+        )
+
+    # Boolean type mismatch
+    with pytest.raises(TypeError, match="field 'empty' must be a boolean"):
+        llm._parse_json_response(
+            '{"transcription": "hello", "empty": "false"}',
+            llm.TRANSCRIPTION_SCHEMA,
+        )
+
+    # Enum violation
+    with pytest.raises(ValueError, match="field 'type' has invalid value 'invalid_type'"):
+        llm._parse_json_response(
+            '{"type": "invalid_type", "wikilinks": [], "tags": []}',
+            llm.CLASSIFICATION_SCHEMA,
+        )
+
+    # Array type mismatch (not a list)
+    with pytest.raises(TypeError, match="field 'wikilinks' must be a list of strings"):
+        llm._parse_json_response(
+            '{"type": "note", "wikilinks": "not-a-list", "tags": []}',
+            llm.CLASSIFICATION_SCHEMA,
+        )
+
+    # Array item type mismatch (list contains non-string)
+    with pytest.raises(TypeError, match="field 'tags' must be a list of strings"):
+        llm._parse_json_response(
+            '{"type": "note", "wikilinks": ["A"], "tags": ["ok", 42]}',
+            llm.CLASSIFICATION_SCHEMA,
+        )
+
+    # Valid classification payload
+    parsed = llm._parse_json_response(
+        '{"type": "task", "wikilinks": ["Redis"], "tags": ["cache"]}',
+        llm.CLASSIFICATION_SCHEMA,
+    )
+    assert parsed == {"type": "task", "wikilinks": ["Redis"], "tags": ["cache"]}
 
 
 def test_execute_ollama_json_request_rejects_json_array():
@@ -235,8 +344,7 @@ def test_execute_ollama_json_request_rejects_json_array():
             ollama_url="http://localhost:11434",
             model="gemma",
             messages=[{"role": "user", "content": "hi"}],
-            format_schema={},
-            required_keys=["result"],
+            format_schema=SIMPLE_SCHEMA,
             retry_prompt="retry",
             context_length=2048,
             keep_alive="5m",
@@ -258,8 +366,7 @@ def test_execute_ollama_json_request_rejects_non_dict_and_raises():
             ollama_url="http://localhost:11434",
             model="gemma",
             messages=[{"role": "user", "content": "hi"}],
-            format_schema={},
-            required_keys=["result"],
+            format_schema=SIMPLE_SCHEMA,
             retry_prompt="retry",
             context_length=2048,
             keep_alive="5m",
@@ -271,14 +378,13 @@ def test_execute_ollama_json_request_rejects_non_dict_and_raises():
 
 def test_execute_ollama_json_request_negative_retries_raises():
     with patch("eloquent_notes.llm.requests.post") as mock_post, pytest.raises(
-        ValueError, match="No attempt was made",
+        ValueError, match="max_retries must be >= 0",
     ):
         llm._execute_ollama_json_request(
             ollama_url="http://localhost:11434",
             model="gemma",
             messages=[{"role": "user", "content": "hi"}],
-            format_schema={},
-            required_keys=["result"],
+            format_schema=SIMPLE_SCHEMA,
             retry_prompt="retry",
             context_length=2048,
             keep_alive="5m",
@@ -301,8 +407,7 @@ def test_execute_ollama_json_request_disables_thinking(mock_post):
         ollama_url="http://localhost:11434",
         model="gemma",
         messages=[{"role": "user", "content": "hi"}],
-        format_schema={},
-        required_keys=["result"],
+        format_schema=SIMPLE_SCHEMA,
         retry_prompt="retry",
         context_length=2048,
         keep_alive="5m",
@@ -326,6 +431,9 @@ def test_rewrite_transcription(mock_exec):
         user_prompt="usr rewrite",
         retry_prompt="retry prompt",
         context_length=2048,
+        keep_alive="5m",
+        max_retries=3,
+        timeout=300,
     )
 
     assert res == {"title": "Title", "content": "Content"}
@@ -334,9 +442,7 @@ def test_rewrite_transcription(mock_exec):
     assert kwargs["model"] == "gemma"
     assert kwargs["messages"][0] == {"role": "system", "content": "sys rewrite"}
     assert kwargs["messages"][1] == {"role": "user", "content": "usr rewrite"}
-    assert "title" in kwargs["format_schema"]["properties"]
-    assert "content" in kwargs["format_schema"]["properties"]
-    assert kwargs["required_keys"] == ["title", "content"]
+    assert kwargs["format_schema"] is llm.REWRITING_SCHEMA
 
 
 @patch("eloquent_notes.llm._execute_ollama_json_request")
@@ -354,6 +460,9 @@ def test_classify_transcription(mock_exec):
         user_prompt="usr classify",
         retry_prompt="retry prompt",
         context_length=2048,
+        keep_alive="0",
+        max_retries=3,
+        timeout=300,
     )
 
     assert res == {
@@ -366,7 +475,4 @@ def test_classify_transcription(mock_exec):
     assert kwargs["model"] == "gemma"
     assert kwargs["messages"][0] == {"role": "system", "content": "sys classify"}
     assert kwargs["messages"][1] == {"role": "user", "content": "usr classify"}
-    assert "type" in kwargs["format_schema"]["properties"]
-    assert "wikilinks" in kwargs["format_schema"]["properties"]
-    assert "tags" in kwargs["format_schema"]["properties"]
-    assert kwargs["required_keys"] == ["type", "wikilinks", "tags"]
+    assert kwargs["format_schema"] is llm.CLASSIFICATION_SCHEMA

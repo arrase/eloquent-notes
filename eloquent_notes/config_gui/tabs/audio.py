@@ -9,12 +9,11 @@ from PyQt6.QtWidgets import (
     QLabel,
     QSpinBox,
     QVBoxLayout,
+    QWidget,
 )
 
-from eloquent_notes.config_gui.tabs.base import ConfigTab
 
-
-class AudioTab(ConfigTab):
+class AudioTab(QWidget):
     """Audio configuration tab."""
 
     def __init__(self, parent=None):

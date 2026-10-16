@@ -2,7 +2,7 @@
 
 Phase 1 (transcription): multimodal audio -> text.
 Phase 2 (rewriting): transcription -> clean note prose and title.
-Phase 3 (classification): transcription -> type, wikilinks and tags.
+Phase 3 (classification): rewritten note -> type, wikilinks and tags.
 
 Every phase requests structured output through Ollama's ``format`` JSON
 schema. If a response still cannot be parsed or lacks required keys
@@ -114,40 +114,63 @@ def _chat_url(ollama_url: str) -> str:
 def preload_model(
     ollama_url: str,
     model: str,
-    context_length: int,
-    keep_alive: str = "5m",
-    timeout: int = 180,
+    context_length: int | None,
+    keep_alive: str,
+    timeout: int,
 ) -> None:
     """Send an empty chat request so Ollama loads the model into VRAM.
 
     Reduces cold-start latency when the user stops recording and triggers
     the real pipeline.
     """
+    options: dict[str, Any] = {"temperature": 0.0}
+    if context_length is not None:
+        options["num_ctx"] = context_length
+
     response = requests.post(
         _chat_url(ollama_url),
         json={
             "model": model,
             "messages": [],
             "keep_alive": keep_alive,
-            "options": {"temperature": 0.0, "num_ctx": context_length},
+            "options": options,
         },
         timeout=timeout,
     )
     response.raise_for_status()
 
 
-def _parse_json_response(content: str | None, keys: list[str]) -> dict[str, Any]:
-    """Validate an Ollama reply as a JSON object carrying every required key.
+def _parse_json_response(content: str, format_schema: dict[str, Any]) -> dict[str, Any]:
+    """Validate an Ollama reply against the requested JSON schema.
 
     Raises TypeError, ValueError or KeyError on anything malformed so the
     caller can treat every failure mode alike and retry.
     """
-    result = json.loads(content)  # type: ignore[arg-type]
+    result = json.loads(content)
     if not isinstance(result, dict):
         raise TypeError(f"expected a JSON object, got {type(result).__name__}")
-    missing = [k for k in keys if k not in result]
+    missing = [k for k in format_schema["required"] if k not in result]
     if missing:
         raise ValueError(f"missing required keys: {missing}")
+
+    for key, prop_schema in format_schema["properties"].items():
+        val = result[key]
+        prop_type = prop_schema["type"]
+        if prop_type == "string":
+            if not isinstance(val, str):
+                raise TypeError(f"field {key!r} must be a string, got {type(val).__name__}")
+            if "enum" in prop_schema and val not in prop_schema["enum"]:
+                raise ValueError(
+                    f"field {key!r} has invalid value {val!r}, "
+                    f"expected one of {prop_schema['enum']}"
+                )
+        elif prop_type == "boolean":
+            if not isinstance(val, bool):
+                raise TypeError(f"field {key!r} must be a boolean, got {type(val).__name__}")
+        elif prop_type == "array":
+            if not isinstance(val, list) or not all(isinstance(item, str) for item in val):
+                raise TypeError(f"field {key!r} must be a list of strings")
+
     return result
 
 
@@ -157,29 +180,33 @@ def _execute_ollama_json_request(
     messages: list[dict[str, Any]],
     format_schema: dict[str, Any],
     retry_prompt: str,
-    context_length: int,
+    context_length: int | None,
     keep_alive: str,
     max_retries: int,
     timeout: int,
     task_name: str,
-    required_keys: list[str] | None = None,
 ) -> dict[str, Any]:
     """Run an Ollama chat request expecting a structured JSON response.
 
     The input message list is never mutated; retries extend an internal
     copy. Raises the parse error when all attempts are exhausted.
     """
-    keys = required_keys if required_keys is not None else format_schema.get("required", [])
-    options = {
+    if max_retries < 0:
+        raise ValueError(f"max_retries must be >= 0, got {max_retries}")
+
+    keys = format_schema["required"]
+    options: dict[str, Any] = {
         "temperature": 0.0,
-        "num_ctx": context_length,
         "num_predict": DEFAULT_NUM_PREDICT,
     }
+    if context_length is not None:
+        options["num_ctx"] = context_length
+
     conversation = list(messages)
     url = _chat_url(ollama_url)
-    last_error: Exception | None = None
+    attempt = 0
 
-    for attempt in range(max_retries + 1):
+    while True:
         if attempt > 0:
             logger.warning(
                 "Retrying %s with Ollama (attempt %d/%d)...",
@@ -201,9 +228,8 @@ def _execute_ollama_json_request(
         content = None
         try:
             content = response.json()["message"]["content"]
-            return _parse_json_response(content, keys)
-        except (KeyError, TypeError, ValueError) as err:
-            last_error = err
+            return _parse_json_response(content, format_schema)
+        except (KeyError, TypeError, ValueError):
             logger.exception(
                 "Invalid JSON output for %s (attempt %d): %r",
                 task_name, attempt, content,
@@ -218,12 +244,7 @@ def _execute_ollama_json_request(
                 "role": "user",
                 "content": f"{retry_prompt}\n\nExpected fields: {', '.join(keys)}.",
             })
-
-    # The loop only falls through when max_retries is negative, in which case
-    # no request was ever made.
-    raise last_error if last_error is not None else ValueError(
-        f"No attempt was made for {task_name}: max_retries={max_retries}"
-    )
+            attempt += 1
 
 
 def transcribe_audio(
@@ -232,11 +253,11 @@ def transcribe_audio(
     system_prompt: str,
     user_prompt: str,
     retry_prompt: str,
-    context_length: int,
+    context_length: int | None,
     audio_bytes: bytes,
-    keep_alive: str = "5m",
-    max_retries: int = 3,
-    timeout: int = 300,
+    keep_alive: str,
+    max_retries: int,
+    timeout: int,
 ) -> dict[str, Any]:
     """Transcribe audio through Ollama (Phase 1).
 
@@ -247,8 +268,6 @@ def transcribe_audio(
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt, "images": [audio_base64]},
     ]
-    # Constrained decoding follows the schema's property order, so the audio
-    # is placed before the instruction text.
     return _execute_ollama_json_request(
         ollama_url=ollama_url,
         model=model,
@@ -260,7 +279,6 @@ def transcribe_audio(
         max_retries=max_retries,
         timeout=timeout,
         task_name="audio transcription",
-        required_keys=["transcription", "empty"],
     )
 
 
@@ -270,10 +288,10 @@ def rewrite_transcription(
     system_prompt: str,
     user_prompt: str,
     retry_prompt: str,
-    context_length: int,
-    keep_alive: str = "5m",
-    max_retries: int = 3,
-    timeout: int = 300,
+    context_length: int | None,
+    keep_alive: str,
+    max_retries: int,
+    timeout: int,
 ) -> dict[str, Any]:
     """Rewrite a transcription into a structured clean note (Phase 2).
 
@@ -294,7 +312,6 @@ def rewrite_transcription(
         max_retries=max_retries,
         timeout=timeout,
         task_name="note rewriting",
-        required_keys=["title", "content"],
     )
 
 
@@ -304,10 +321,10 @@ def classify_transcription(
     system_prompt: str,
     user_prompt: str,
     retry_prompt: str,
-    context_length: int,
-    keep_alive: str = "0",
-    max_retries: int = 3,
-    timeout: int = 300,
+    context_length: int | None,
+    keep_alive: str,
+    max_retries: int,
+    timeout: int,
 ) -> dict[str, Any]:
     """Classify and extract metadata from the transcription (Phase 3).
 
@@ -328,5 +345,4 @@ def classify_transcription(
         max_retries=max_retries,
         timeout=timeout,
         task_name="note classification",
-        required_keys=["type", "wikilinks", "tags"],
     )

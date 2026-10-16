@@ -3,10 +3,12 @@
 import os
 from datetime import datetime, timezone
 
+import pytest
 import yaml
 
 from eloquent_notes.obsidian import (
     _FRONTMATTER_RE,
+    _build_template_context,
     _inject_wikilinks,
     _update_frontmatter_tags,
     format_note_content,
@@ -392,3 +394,53 @@ def test_save_note_folder_organization_month_week(tmp_path):
     assert os.path.exists(note_path)
 
 
+def test_inject_wikilinks_normalizes_prebracketed_and_whitespace_links():
+    wikilinks = ["[[Redis]]", "  [[ Postgres ]]  ", "   ", "", "[[]]"]
+    text = "Using Redis with Postgres today."
+    result = _inject_wikilinks(text, wikilinks)
+    assert result == "Using [[Redis]] with [[Postgres]] today."
+
+
+def test_inject_wikilinks_protects_bare_urls():
+    wikilinks = ["Redis", "Python"]
+    text = (
+        "See https://redis.io/docs/redis and http://python.org/Python "
+        "to configure Redis in Python."
+    )
+    result = _inject_wikilinks(text, wikilinks)
+    assert "https://redis.io/docs/redis" in result
+    assert "http://python.org/Python" in result
+    assert "to configure [[Redis]] in [[Python]]." in result
+
+
+def test_build_template_context_normalizes_and_deduplicates_tags():
+    ctx = _build_template_context(
+        "2026-10-15",
+        "12:00:00",
+        "Title",
+        "Text",
+        ["#python", " python ", "#", "   ", "dictation", "#Dictation", "ai"],
+    )
+    assert ctx["tags"] == "  - python\n  - ai"
+
+
+def test_update_frontmatter_tags_normalizes_and_deduplicates():
+    initial_content = (
+        "---\n"
+        "tags:\n"
+        "  - dictation\n"
+        "  - existing\n"
+        "---\n"
+        "Body"
+    )
+    updated = _update_frontmatter_tags(
+        initial_content,
+        ["#new-tag", " new-tag ", "#", "  ", "#existing", "#dictation"],
+    )
+    parsed_fm = yaml.safe_load(updated.split("---")[1])
+    assert parsed_fm["tags"] == ["dictation", "existing", "new-tag"]
+
+
+def test_get_target_directory_invalid_folder_organization():
+    with pytest.raises(ValueError, match="Invalid folder_organization"):
+        get_target_directory("/fake/vault", "Notes", "yearly")

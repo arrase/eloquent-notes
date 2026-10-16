@@ -44,7 +44,7 @@ Audio beeps are generated dynamically using NumPy sound wave synthesis:
 
 1. **Sine-Wave Generation**: Generates a pure audio frequency (default `440` Hz, A4 note) over the configured duration (default `0.1` seconds / 100 ms).
 2. **Anti-Click Linear Fades**: Applies a 10 ms linear fade-in (`0.0` to `1.0`) at the start and a 10 ms linear fade-out (`1.0` to `0.0`) at the end of the waveform array. This eliminates sharp voltage steps that cause harsh speaker clicking artifacts.
-3. **Sound Playback**: Output is played asynchronously through `sounddevice` using float32 PCM precision.
+3. **Sound Playback**: Output is played through `sounddevice` using float32 PCM precision. The start beep is played synchronously (`wait=True`) before opening the microphone so the tone cannot leak into the recording, while the stop beep is played asynchronously (`wait=False`) after closing the microphone.
 
 ```python
 # Pure sine wave with 10ms anti-click envelope

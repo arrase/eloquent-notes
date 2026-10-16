@@ -88,6 +88,9 @@ def test_merge_configs():
     # Verify base was not mutated
     assert base["audio"]["device"] == 0
 
+    with pytest.raises(TypeError, match="Configuration section 'audio' must be a mapping"):
+        config._merge_configs(base, {"audio": None})
+
 
 def test_load_config(tmp_config_dir, monkeypatch):
     """Test load_config merges default config and user config."""
@@ -111,7 +114,7 @@ def test_load_config(tmp_config_dir, monkeypatch):
 
 
 def test_load_config_non_dict_user_config(tmp_config_dir, monkeypatch):
-    """Test load_config raises ValueError if user config is not a YAML mapping."""
+    """Test load_config raises TypeError if user config is not a YAML mapping."""
     user_cfg_path = tmp_config_dir["config_path"]
 
     monkeypatch.setattr(config, "CONFIG_DIR", tmp_config_dir["config_dir"])
@@ -135,23 +138,23 @@ def test_load_config_non_dict_user_config(tmp_config_dir, monkeypatch):
         config.load_config()
 
 
-def test_load_and_save_file(tmp_path):
-    """Test loading and saving text files."""
+def test_load_and_atomic_write(tmp_path):
+    """Test loading and atomically writing text files."""
     file_path = tmp_path / "sub" / "test.txt"
     content = "Hello World\nLine 2"
 
-    config.save_file(str(file_path), content)
+    config.atomic_write(str(file_path), content)
     assert os.path.isfile(file_path)
 
     loaded = config.load_file(str(file_path))
     assert loaded == content
 
 
-def test_save_file_flat_path(tmp_path, monkeypatch):
-    """Test save_file when path has no directory component."""
+def test_atomic_write_flat_path(tmp_path, monkeypatch):
+    """Test atomic_write when path has no directory component."""
     monkeypatch.chdir(tmp_path)
     filename = "flat_file.txt"
-    config.save_file(filename, "flat content")
+    config.atomic_write(filename, "flat content")
 
     assert os.path.isfile(filename)
     assert config.load_file(filename) == "flat content"

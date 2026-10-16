@@ -32,8 +32,9 @@ Rather than attempting to force a single small LLM call to simultaneously transc
                                        ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ Phase 3: Note Classification & Context Analysis                             │
-│ - Inputs: Transcription + Vault Topic Context + System & User Prompts       │
-│ - Tasks: Classifies note type, extracts wikilinks, generates English tags. │
+│ - Inputs: Phase 2 Rewritten Content + Vault Topic Context + Prompts         │
+│ - Tasks: Classifies note type, extracts wikilinks, generates tags in        │
+│          the configured output_language.                                    │
 │ - Output JSON: {"type": string, "wikilinks": list, "tags": list}            │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -101,11 +102,11 @@ Phase 2 converts the raw transcribed text from Phase 1 into structured, direct, 
   "properties": {
     "title": {
       "type": "string",
-      "description": "Concise title (max 8 words) capturing the main topic."
+      "description": "Concise title (max 8 words) in the requested output language."
     },
     "content": {
       "type": "string",
-      "description": "Clean, direct note prose with basic markdown formatting."
+      "description": "Clean, direct note prose in the requested output language."
     }
   },
   "required": ["title", "content"]
@@ -116,10 +117,10 @@ Phase 2 converts the raw transcribed text from Phase 1 into structured, direct, 
 
 ## 3. Phase 3: Classification & Wikilink Extraction
 
-Phase 3 analyzes the dictation alongside existing vault topics to extract metadata and categorize the note.
+Phase 3 analyzes the rewritten note content from Phase 2 alongside existing vault topics to extract metadata and categorize the note.
 
 ### Goals
-- **Vault Topic Matching:** Scans your Obsidian vault for existing note names to construct a context list. If a spoken phrase matches an existing note topic, it is flagged as a candidate `[[Wikilink]]`.
+- **Vault Topic Matching:** Scans your Obsidian vault for existing note names to construct a context list. If a phrase matches an existing note topic, it is flagged as a candidate `[[Wikilink]]`.
 - **Type Classification:** Categorizes the entry into one of six core note types:
   - `task` → Action items, to-dos, or actionable chores.
   - `idea` → Insights, creative concepts, or brain dumps.
@@ -127,7 +128,7 @@ Phase 3 analyzes the dictation alongside existing vault topics to extract metada
   - `question` → Unresolved inquiries or topics requiring research.
   - `decision` → Architectural decisions or agreed outcomes.
   - `note` → Standard informational observations or general prose.
-- **Tag Generation:** Generates 2 to 5 relevant lowercase English tags for vault categorization (e.g., `["python", "architecture", "pyqt6"]`).
+- **Tag Generation:** Generates 2 to 5 relevant lowercase tags in the configured `output_language` for vault categorization (e.g., `["python", "architecture", "pyqt6"]`).
 
 ### JSON Format Schema
 ```json
@@ -142,12 +143,12 @@ Phase 3 analyzes the dictation alongside existing vault topics to extract metada
     "wikilinks": {
       "type": "array",
       "items": { "type": "string" },
-      "description": "Key concepts, tools, or proper nouns that deserve linked notes."
+      "description": "Key concepts, tools, or proper nouns in the requested output language that deserve linked notes."
     },
     "tags": {
       "type": "array",
       "items": { "type": "string" },
-      "description": "2 to 5 relevant tags, lowercase, in English."
+      "description": "2 to 5 relevant tags, lowercase, in the requested output language."
     }
   },
   "required": ["type", "wikilinks", "tags"]
@@ -194,33 +195,69 @@ Disabling reasoning also improves the two text-only phases: it removes the think
 
 Eloquent Notes requires deterministic structured JSON output from Ollama to ensure safe parsing and file generation.
 
-Each phase requests constrained decoding via Ollama's `format` JSON schema, which makes the model emit valid JSON matching the expected shape. As a safety net (e.g. for Ollama versions that ignore `format`), `_execute_ollama_json_request()` validates every response and automatically retries:
+Each phase requests constrained decoding via Ollama's `format` JSON schema, which makes the model emit valid JSON matching the expected shape. As a safety net (e.g. for Ollama versions that ignore `format`), `_execute_ollama_json_request()` validates every response via `_parse_json_response()` and automatically retries:
 
 ```python
-def _execute_ollama_json_request(...):
+def _execute_ollama_json_request(
+    ollama_url: str,
+    model: str,
+    messages: list[dict[str, Any]],
+    format_schema: dict[str, Any],
+    retry_prompt: str,
+    context_length: int | None,
+    keep_alive: str,
+    max_retries: int,
+    timeout: int,
+    task_name: str,
+) -> dict[str, Any]:
+    if max_retries < 0:
+        raise ValueError(f"max_retries must be >= 0, got {max_retries}")
+
+    keys = format_schema["required"]
+    options: dict[str, Any] = {
+        "temperature": 0.0,
+        "num_predict": DEFAULT_NUM_PREDICT,
+    }
+    if context_length is not None:
+        options["num_ctx"] = context_length
+
     conversation = list(messages)
+    url = _chat_url(ollama_url)
+    attempt = 0
 
-    for attempt in range(max_retries + 1):
-        response = requests.post(f"{ollama_url}/api/chat", json=payload, timeout=timeout)
-        content = response.json()["message"]["content"]
+    while True:
+        payload: dict[str, Any] = {
+            "model": model,
+            "messages": conversation,
+            "format": format_schema,
+            "options": options,
+            "keep_alive": keep_alive,
+            "stream": False,
+            "think": THINK,
+        }
+        response = requests.post(url, json=payload, timeout=timeout)
+        response.raise_for_status()
 
+        content = None
         try:
-            result = json.loads(content)
-            if not isinstance(result, dict) or not all(k in result for k in required_keys):
-                raise ValueError(f"missing required keys: {required_keys}")
-            return result
-        except (json.JSONDecodeError, KeyError, TypeError, ValueError) as err:
+            content = response.json()["message"]["content"]
+            return _parse_json_response(content, format_schema)
+        except (KeyError, TypeError, ValueError):
             if attempt >= max_retries:
                 raise
-
-            # Append failed response and custom retry prompt to history
-            full_retry = f"{retry_prompt}\n\nExpected fields: {', '.join(required_keys)}."
-            conversation.append({"role": "assistant", "content": content})
-            conversation.append({"role": "user", "content": full_retry})
+            conversation.append({
+                "role": "assistant",
+                "content": content if content is not None else response.text,
+            })
+            conversation.append({
+                "role": "user",
+                "content": f"{retry_prompt}\n\nExpected fields: {', '.join(keys)}.",
+            })
+            attempt += 1
 ```
 
 ### Retry Mechanism Details
 1. **Schema-Constrained Output:** Requests include a `format` JSON schema so Ollama constrains sampling to the expected structure.
-2. **Schema Verification:** Ensures the output is a dictionary containing all mandatory keys for that phase.
+2. **Schema Verification:** `_parse_json_response()` verifies that the output is a JSON object containing all required keys with matching types and enum values.
 3. **Chat Context Appending:** If validation fails, the erroneous assistant message is appended to the message history followed by the contents of `~/.config/eloquent-notes/prompts/retry_prompt.md`.
 4. **Retry Loop:** Retries execution up to `max_retries` times (default: 3) before raising an exception.

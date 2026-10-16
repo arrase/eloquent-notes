@@ -1,8 +1,9 @@
 """Unit tests for ConfigurationDialog."""
 
-from unittest.mock import mock_open, patch
+from unittest.mock import patch
 
 import pytest
+import yaml
 from PyQt6.QtGui import QCloseEvent
 from PyQt6.QtWidgets import QMessageBox
 
@@ -80,6 +81,23 @@ def test_dialog_init(qapp):
     dialog.cleanup_tabs()
 
 
+def test_dialog_init_falls_back_to_default_on_corrupt_config(qapp):
+    default_config = _make_valid_config()
+
+    with patch(
+        "eloquent_notes.config.load_config",
+        side_effect=yaml.YAMLError("Corrupt YAML"),
+    ), patch(
+        "eloquent_notes.config.load_default_config",
+        return_value=default_config,
+    ), patch("PyQt6.QtWidgets.QMessageBox.warning") as mock_warn:
+        dialog = ConfigurationDialog()
+
+    mock_warn.assert_called_once()
+    assert dialog.config_data == default_config
+    dialog.cleanup_tabs()
+
+
 def test_dialog_load_settings(qapp):
     dummy_config = _make_valid_config({
         "ai": {
@@ -141,9 +159,11 @@ def test_dialog_restore_defaults(qapp):
         "obsidian": {"vault_path": "/default/vault"},
     })
 
-    with patch("PyQt6.QtWidgets.QMessageBox.question", return_value=QMessageBox.StandardButton.Yes), patch(
-        "yaml.safe_load", return_value=default_data
-    ), patch("builtins.open", mock_open(read_data="sample prompt text")), patch(
+    with patch(
+        "PyQt6.QtWidgets.QMessageBox.question", return_value=QMessageBox.StandardButton.Yes
+    ), patch(
+        "eloquent_notes.config.load_default_config", return_value=default_data
+    ), patch(
         "eloquent_notes.config.load_file", return_value="sample prompt text"
     ), patch("PyQt6.QtWidgets.QMessageBox.information"):
         dialog.restore_defaults()
@@ -162,10 +182,10 @@ def test_dialog_save_settings(qapp):
     ):
         dialog = ConfigurationDialog()
 
-    with patch("yaml.safe_load", return_value=dummy_config), patch(
-        "builtins.open", mock_open(read_data="")
+    with patch(
+        "eloquent_notes.config.load_default_config", return_value=dummy_config
     ), patch("eloquent_notes.config.save_config") as mock_save, patch(
-        "eloquent_notes.config.save_file"
+        "eloquent_notes.config.atomic_write"
     ), patch("os.path.exists", return_value=True), patch(
         "eloquent_notes.config_gui.tabs.general.install_autostart"
     ):
@@ -176,7 +196,7 @@ def test_dialog_save_settings(qapp):
     dialog.cleanup_tabs()
 
 
-def test_dialog_save_validation_failure(qapp):
+def test_dialog_save_validation_failure_does_not_mutate_disk(qapp):
     dummy_config = _make_valid_config({"ai": {"ollama_url": ""}})
 
     with patch("eloquent_notes.config.load_config", return_value=dummy_config), patch(
@@ -189,10 +209,19 @@ def test_dialog_save_validation_failure(qapp):
     dialog.ai_tab.txt_ollama_url.setText("")
     with patch("PyQt6.QtWidgets.QMessageBox.warning"), patch(
         "PyQt6.QtWidgets.QMessageBox.question", return_value=QMessageBox.StandardButton.Yes
-    ):
+    ), patch(
+        "eloquent_notes.config_gui.tabs.general.install_autostart"
+    ) as mock_install, patch(
+        "eloquent_notes.config_gui.tabs.general.remove_autostart"
+    ) as mock_remove, patch(
+        "eloquent_notes.config.atomic_write"
+    ) as mock_write:
         res = dialog.save_settings_from_ui()
         assert res is False
         assert dialog.tab_widget.currentWidget() is dialog.ai_tab
+        mock_install.assert_not_called()
+        mock_remove.assert_not_called()
+        mock_write.assert_not_called()
 
     dialog.cleanup_tabs()
 

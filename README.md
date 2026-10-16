@@ -96,7 +96,7 @@ Eloquent Notes features a built-in graphical settings editor to modify your conf
 - **General:** Enable or disable automatic login startup, set logging levels, configure log file size limits, and view log files directly.
 - **Obsidian:** Browse for your Obsidian vault path, specify the target destination folder, configure subfolder structure (root, monthly, weekly, monthly + weekly), toggle Daily Notes appending, and toggle vault-wide scanning to auto-generate Wikilink recommendations.
 - **AI Settings:** Configure the Ollama API endpoint, select local LLM models, set the target **Output Language** (e.g. English, Spanish), set custom context lengths, adjust keep-alive limits to optimize GPU memory usage, and customize timeout/retry values.
-- **Audio:** Configure microphone sample rate, recording channels, maximum capture duration, and adjust acoustic feedback beeps (frequency, duration, or disable completely).
+- **Audio:** Configure microphone sample rate, recording channels, maximum capture duration, toggle the floating Recording HUD countdown overlay, and adjust acoustic feedback beeps (frequency, duration, or disable completely).
 - **Prompts:** Edit custom Markdown prompt definitions (system and user instructions) for all three pipeline stages plus retry rules.
 - **Templates:** Edit and customize the layout files (`standalone.md`, `daily_new.md`, and `daily_append.md`) for note generation.
 
@@ -132,12 +132,15 @@ audio:
   sample_rate: 16000           # Audio sample rate (16kHz is ideal for Gemma 4)
   channels: 1                  # Mono channel recording
   capture_duration: 30         # Maximum audio capture duration in seconds
+  recording_hud_enabled: true  # Floating countdown HUD overlay during recording
   beep_frequency: 440          # Audio cue beep frequency (Hz)
   beep_duration: 0.1           # Beep duration (seconds)
   beep_enabled: true           # Enable/disable audio cues (beeps)
 
 logging:
   level: "INFO"                # Logger verbosity level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+  max_mb: 5                    # Maximum log file size in MB before rotation
+  backup_count: 3              # Number of rotated log archives to retain
 ```
 
 #### 2. Custom Prompts
@@ -275,7 +278,7 @@ flowchart TB
             T2{"Is Transcription Empty?"}
             T3["Phase 2: Rewriting\n(Clean Note Prose + Title)"]
             T4["Scan Vault for Wikilink Context"]
-            T5["Phase 3: Classification\n(Type, Wikilinks, English Tags)"]
+            T5["Phase 3: Classification\n(Type, Wikilinks, Tags in output_language)"]
             
             T1 --> T2
             T2 -- No --> T3
@@ -327,7 +330,7 @@ flowchart TB
 
 ### Key Technical Details
 
-* **CLI & GUI Decoupling:** The entry point (`eloquent-notes`) only loads PyQt's lightweight core components (`QCoreApplication` and `QLocalSocket`) when communicating with the running instance. If the daemon is already running, it sends an IPC command and exits immediately, avoiding loading any windows or graphical elements. If it is not running, it replaces the current process with the daemon (`eloquent_notes.app`) via `os.execv`.
+* **CLI & GUI Decoupling:** For `toggle` and single-instance checks, the CLI entry point (`eloquent-notes`) instantiates a headless `QCoreApplication` and communicates over `QLocalSocket` without creating any GUI windows. If the daemon is already running, it sends an IPC command and exits immediately. If it is not running, it replaces the current process with the daemon (`eloquent_notes.app`) via `os.execv`.
 * **In-Memory Audio Processing:** Audio is captured directly from your microphone using `sounddevice` and loaded into an in-memory queue. When recording stops, it is processed into 16-bit PCM WAV bytes in-memory (using `io.BytesIO`). No temporary audio files are written to the disk, maximizing privacy, speed, and disk lifespan.
 * **Non-Blocking UI Threads:** Both the model preloading and the Ollama API request processing are offloaded to background threads. This ensures that the PyQt6 system tray UI loop remains entirely responsive without stuttering or freezing.
 * **Dynamic Icon Generation:** Custom state icons are drawn dynamically in-memory using Qt's `QPainter` and converted to `QIcon` objects at runtime. No external image assets or image-processing libraries are required.
@@ -335,9 +338,9 @@ flowchart TB
   - 🔴 **Recording (Red):** A red circle with a white recording dot.
   - 🟠 **Processing (Orange):** An orange circle with a white hourglass.
 * **Three-Phase LLM Pipeline:** The request is split into three phases to reduce the cognitive load on small models (~15B):
-  1. **Transcription (Phase 1):** Sends base64-encoded WAV bytes to the multimodal LLM to generate a transcription (Gemma 4 models support audio inputs up to 30 seconds). Returns a JSON object with `{"empty": bool, "transcription": string}`.
+  1. **Transcription (Phase 1):** Sends base64-encoded WAV bytes to the multimodal LLM to generate a transcription (Gemma 4 models support audio inputs up to 30 seconds). Returns a JSON object with `{"transcription": string, "empty": bool}`.
   2. **Rewriting (Phase 2):** Sends the transcription text to the LLM to rewrite it into clean, direct, first-person note prose and generate a concise title. Returns `{"title": string, "content": string}`.
-  3. **Classification (Phase 3):** Scans the vault for note names to build a context list of known topics, and sends the transcription + vault context to the LLM. Returns metadata `{"type": string, "wikilinks": list, "tags": list}` where type is one of: `task`, `idea`, `note`, `reminder`, `question`, or `decision`.
+  3. **Classification (Phase 3):** Scans the vault for note names to build a context list of known topics, and sends the rewritten note content + vault context to the LLM. Returns metadata `{"type": string, "wikilinks": list, "tags": list}` where type is one of: `task`, `idea`, `note`, `reminder`, `question`, or `decision`.
 * **Retry and Validation Logic:** If the Ollama model returns invalid JSON or fails to include the required keys, the application automatically appends a custom retry instruction (`retry_prompt.md`) to the chat history and retries up to `max_retries` (default: 3) to ensure robust structured output.
 * **Obsidian Integration & YAML Merging:**
   - **WikiLink Injection:** Identified wikilink terms are injected into the note prose using case-insensitive regex word-boundary matching. Longer terms are processed first to avoid substring conflicts (e.g., "Postgres" won't match inside "Postgresql").

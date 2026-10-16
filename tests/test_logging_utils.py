@@ -69,18 +69,21 @@ def test_setup_logging(tmp_path, monkeypatch):
     assert file_handler.backupCount == 5
 
 
-def test_setup_logging_file_error(monkeypatch):
-    """Test setup_logging fails fast and raises when file logging cannot be initialized."""
+def test_setup_logging_file_error(tmp_path, monkeypatch):
+    """Test setup_logging fails fast and leaves handlers empty when file logging fails."""
+    monkeypatch.setenv("XDG_STATE_HOME", str(tmp_path))
     logger = logging.getLogger("eloquent_notes")
     logger.handlers.clear()
 
-    def mock_get_log_dir():
+    def fail_file_handler(*args, **kwargs):
         raise PermissionError("Access denied")
 
-    monkeypatch.setattr(logging_utils, "get_log_dir", mock_get_log_dir)
+    monkeypatch.setattr(logging_utils, "RotatingFileHandler", fail_file_handler)
 
     with pytest.raises(PermissionError, match="Access denied"):
         logging_utils.setup_logging("INFO", max_mb=1, backup_count=1)
+
+    assert logger.handlers == []
 
 
 def test_get_log_file_path():

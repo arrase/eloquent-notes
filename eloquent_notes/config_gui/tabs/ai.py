@@ -19,13 +19,12 @@ from PyQt6.QtWidgets import (
 )
 
 from eloquent_notes.config_gui.loader import OllamaModelLoader
-from eloquent_notes.config_gui.tabs.base import ConfigTab
 
 _DURATION_PATTERN = re.compile(r"^-?\d+[smh]?$")
 VALIDATION_ERROR_TITLE = "Validation Error"
 
 
-class AITab(ConfigTab):
+class AITab(QWidget):
     """AI and Ollama configuration tab."""
 
     def __init__(self, parent=None):
@@ -203,7 +202,10 @@ class AITab(ConfigTab):
 
     def cleanup(self):
         """Asynchronously cancel active loaders and wait with a timeout."""
-        for loader in self._running_loaders:
+        for loader in list(self._running_loaders):
+            loader.models_fetched.disconnect(self._on_models_fetched)
+            loader.error_occurred.disconnect(self._on_models_fetch_failed)
+            loader.finished.disconnect(self._on_loader_finished)
             loader.requestInterruption()
             loader.wait(2500)
         self._running_loaders.clear()
@@ -239,7 +241,6 @@ class AITab(ConfigTab):
             self.cmb_language.addItem(curr_lang)
         self.cmb_language.setCurrentText(curr_lang)
 
-        # Trigger an initial fetch
         self._fetch_models()
 
     def save_settings(self, config_data: dict) -> bool:
@@ -248,6 +249,23 @@ class AITab(ConfigTab):
 
         if not url:
             QMessageBox.warning(self, VALIDATION_ERROR_TITLE, "Ollama URL cannot be empty.")
+            return False
+        if not url.startswith(("http://", "https://")):
+            QMessageBox.warning(
+                self,
+                VALIDATION_ERROR_TITLE,
+                "Ollama URL must start with http:// or https://.",
+            )
+            return False
+
+        model = self.cmb_model.currentText().strip()
+        if not model:
+            QMessageBox.warning(self, VALIDATION_ERROR_TITLE, "AI Model cannot be empty.")
+            return False
+
+        output_lang = self.cmb_language.currentText().strip()
+        if not output_lang:
+            QMessageBox.warning(self, VALIDATION_ERROR_TITLE, "Output Language cannot be empty.")
             return False
 
         keep_alive = self.txt_keep_alive.text().strip()
@@ -271,11 +289,10 @@ class AITab(ConfigTab):
             return False
 
         context_len = None if self.chk_context_default.isChecked() else self.spn_context_length.value()
-        output_lang = self.cmb_language.currentText().strip()
 
         config_data["ai"].update({
             "ollama_url": url,
-            "model": self.cmb_model.currentText().strip(),
+            "model": model,
             "output_language": output_lang,
             "context_length": context_len,
             "keep_alive": keep_alive,
