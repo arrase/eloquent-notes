@@ -176,3 +176,21 @@ def test_ollama_loader_invalid_json_body_resilience(qapp):
 
     assert models_signal_data == [["audio-model"]]
 
+
+def test_ollama_loader_invalid_tags_payload_emits_error(qapp):
+    loader = OllamaModelLoader("http://localhost:11434/")
+    assert loader.url == "http://localhost:11434"
+
+    errors = []
+    loader.error_occurred.connect(errors.append)
+
+    for bad_payload in (["not", "dict"], {"models": "not-list"}, {"models": ["not-dict"]}):
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = bad_payload
+        with patch("requests.get", return_value=mock_resp):
+            loader.run()
+
+    assert len(errors) == 3
+    assert all("Invalid response format from Ollama" in e for e in errors)
+

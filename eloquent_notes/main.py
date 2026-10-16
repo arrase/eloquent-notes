@@ -2,9 +2,6 @@
 
 Handles single-instance communication via a local Unix socket, autostart
 installation, and launching the daemon or configuration window.
-
-Graphical components are imported lazily inside the branches that need
-them, so frequent invocations like ``eloquent-notes toggle`` stay cheap.
 """
 
 import argparse
@@ -20,8 +17,8 @@ from eloquent_notes.autostart import install_autostart
 from eloquent_notes.config_gui import ConfigurationDialog
 
 
-def create_arg_parser():
-    """Create and return the CLI argument parser."""
+def parse_args(cli_args=None):
+    """Parse command line arguments."""
     parser = argparse.ArgumentParser(
         prog="eloquent-notes",
         description=(
@@ -49,12 +46,6 @@ def create_arg_parser():
         action="store_true",
         help="Alias for 'toggle' command.",
     )
-    return parser
-
-
-def parse_args(cli_args=None):
-    """Parse command line arguments."""
-    parser = create_arg_parser()
     return parser.parse_args(cli_args)
 
 
@@ -76,14 +67,13 @@ def send_ipc_command(command, timeout_ms=500):
     return False
 
 
-def run_cli(cli_args=None, launcher=os.execv, sys_exit=sys.exit):
+def run_cli(cli_args=None, launcher=os.execv):
     """Execute CLI logic based on provided arguments."""
     args = parse_args(cli_args)
     wants_toggle = args.command == "toggle" or args.toggle
 
     if args.command == "install-autostart":
         install_autostart()
-        sys_exit(0)
         return
 
     if args.command == "config":
@@ -91,7 +81,6 @@ def run_cli(cli_args=None, launcher=os.execv, sys_exit=sys.exit):
         dialog = ConfigurationDialog()
         if dialog.exec() == QDialog.DialogCode.Accepted:
             send_ipc_command("reload", timeout_ms=200)
-        sys_exit(0)
         return
 
     if not QCoreApplication.instance():
@@ -99,7 +88,6 @@ def run_cli(cli_args=None, launcher=os.execv, sys_exit=sys.exit):
 
     message = "toggle" if wants_toggle else "notify_running"
     if send_ipc_command(message, timeout_ms=500):
-        sys_exit(0)
         return
 
     daemon_args = [sys.executable, "-m", "eloquent_notes.app"]

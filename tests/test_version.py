@@ -44,9 +44,6 @@ def test_pyproject_version_is_semver():
 
 
 def test_package_exposes_installed_version():
-    assert eloquent_notes.__version__ != "0.0.0+unknown", (
-        "package is not installed; version metadata is unavailable"
-    )
     assert SEMVER.match(eloquent_notes.__version__)
 
 

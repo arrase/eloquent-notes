@@ -1,4 +1,4 @@
-"""Unit tests for configuration GUI tabs (AITab, AudioTab, GeneralTab, ObsidianTab, TextFilesTab, PromptsTab, TemplatesTab)."""
+"""Unit tests for configuration GUI tabs (AITab, AudioTab, GeneralTab, ObsidianTab, TextFilesTab)."""
 
 import os
 from unittest.mock import MagicMock, patch
@@ -9,8 +9,6 @@ from eloquent_notes.config_gui.tabs.ai import AITab
 from eloquent_notes.config_gui.tabs.audio import AudioTab
 from eloquent_notes.config_gui.tabs.general import GeneralTab
 from eloquent_notes.config_gui.tabs.obsidian import ObsidianTab
-from eloquent_notes.config_gui.tabs.prompts import PromptsTab
-from eloquent_notes.config_gui.tabs.templates import TemplatesTab
 from eloquent_notes.config_gui.tabs.text_files import TextFilesTab
 
 # --- AI TAB TESTS ---
@@ -103,15 +101,33 @@ def test_ai_tab_save_validation_failures(qapp):
             "request_timeout": 120,
         }
     }
-    tab.load_settings(config_data)
+    with patch.object(AITab, "_fetch_models"):
+        tab.load_settings(config_data)
 
     # Empty URL
     tab.txt_ollama_url.setText("")
     with patch("PyQt6.QtWidgets.QMessageBox.warning"):
         assert tab.save_settings(config_data) is False
 
-    # Invalid keep alive format
+    # Invalid URL scheme
+    tab.txt_ollama_url.setText("localhost:11434")
+    with patch("PyQt6.QtWidgets.QMessageBox.warning"):
+        assert tab.save_settings(config_data) is False
+
+    # Empty model
     tab.txt_ollama_url.setText("http://localhost:11434")
+    tab.cmb_model.setCurrentText("   ")
+    with patch("PyQt6.QtWidgets.QMessageBox.warning"):
+        assert tab.save_settings(config_data) is False
+
+    # Empty output language
+    tab.cmb_model.setCurrentText("gemma")
+    tab.cmb_language.setCurrentText("   ")
+    with patch("PyQt6.QtWidgets.QMessageBox.warning"):
+        assert tab.save_settings(config_data) is False
+
+    # Invalid keep alive format
+    tab.cmb_language.setCurrentText("English")
     tab.txt_keep_alive.setText("invalid_duration")
     with patch("PyQt6.QtWidgets.QMessageBox.warning"):
         assert tab.save_settings(config_data) is False
@@ -132,6 +148,7 @@ def test_ai_tab_model_loader_callbacks(qapp):
     # Mock running loader
     mock_loader = MagicMock()
     tab._model_loader = mock_loader
+    tab._running_loaders.add(mock_loader)
 
     with patch.object(tab, "sender", return_value=mock_loader):
         tab._on_models_fetched(["model_a", "model_b"])
@@ -142,6 +159,11 @@ def test_ai_tab_model_loader_callbacks(qapp):
         assert "Connection failed: Server error 500" in tab.lbl_model_status.text()
 
     tab.cleanup()
+    mock_loader.models_fetched.disconnect.assert_called_once_with(tab._on_models_fetched)
+    mock_loader.error_occurred.disconnect.assert_called_once_with(tab._on_models_fetch_failed)
+    mock_loader.finished.disconnect.assert_called_once_with(tab._on_loader_finished)
+    mock_loader.requestInterruption.assert_called_once()
+    mock_loader.wait.assert_called_once_with(2500)
 
 
 # --- AUDIO TAB TESTS ---
@@ -311,7 +333,7 @@ def test_obsidian_tab_browse_vault(qapp, tmp_path):
         assert tab.txt_vault_path.text() == "/selected/vault"
 
 
-# --- TEXT FILES / PROMPTS / TEMPLATES TAB TESTS ---
+# --- TEXT FILES TAB TESTS ---
 
 def test_text_files_tab_flow(qapp, tmp_path):
     f1 = str(tmp_path / "prompt1.md")
@@ -321,6 +343,8 @@ def test_text_files_tab_flow(qapp, tmp_path):
 
     with open(f1, "w") as f:
         f.write("Custom Prompt 1")
+    with open(def1, "w") as f:
+        f.write("Default Prompt 1")
     with open(def2, "w") as f:
         f.write("Default Prompt 2")
 
@@ -344,22 +368,14 @@ def test_text_files_tab_flow(qapp, tmp_path):
     assert tab.loaded_contents[f1] == "Modified Prompt 1"
 
     # Save settings writes file
-    with patch("eloquent_notes.config.save_file") as mock_save:
+    with patch("eloquent_notes.config.atomic_write") as mock_write:
         tab.save_settings(config_data)
-        assert mock_save.call_count == 2
+        assert mock_write.call_count == 2
 
     # Restore defaults
     tab.restore_defaults()
-    assert tab.loaded_contents[f1] == ""
+    assert tab.loaded_contents[f1] == "Default Prompt 1"
     assert tab.loaded_contents[f2] == "Default Prompt 2"
-
-
-def test_prompts_and_templates_tabs_init(qapp):
-    p_tab = PromptsTab()
-    assert p_tab.lst_items.count() > 0
-
-    t_tab = TemplatesTab()
-    assert t_tab.lst_items.count() > 0
 
 
 def test_text_files_tab_load_settings_row0_already_selected(qapp, tmp_path):

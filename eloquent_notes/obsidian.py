@@ -43,7 +43,12 @@ class SafeDict(dict):
 
 def _build_template_context(date_str, time_str, title, text, tags):
     """Prepare standardized replacement mapping for note templates."""
-    tags_formatted = "\n".join(f"  - {tag}" for tag in tags) if tags else ""
+    normalized_tags = []
+    for tag in tags:
+        cleaned = tag.strip().lstrip("#").strip()
+        if cleaned and cleaned.lower() != "dictation" and cleaned not in normalized_tags:
+            normalized_tags.append(cleaned)
+    tags_formatted = "\n".join(f"  - {tag}" for tag in normalized_tags)
     return SafeDict(
         date=date_str,
         time=time_str,
@@ -59,8 +64,6 @@ def scan_vault_topics(vault_path, max_topics=200):
     Skips date-named files (e.g., 2024-01-15.md) and hidden directories starting with '.',
     and caps results to max_topics entries to limit prompt size.
     """
-    if not vault_path:
-        return []
     vault_path = os.path.expanduser(vault_path)
     if not os.path.isdir(vault_path):
         return []
@@ -81,19 +84,23 @@ def _inject_wikilinks(text, wikilinks):
     """Replace mentions of wikilink terms with [[WikiLink]] syntax.
 
     Processes longer terms first to avoid substring conflicts.
-    Skips code blocks, inline code, and existing links.
+    Skips code blocks, inline code, existing links, and bare URLs.
     """
     if not wikilinks or not text:
         return text
 
-    unique_links = {link for link in wikilinks if link}
+    unique_links = {
+        cleaned
+        for link in wikilinks
+        if (cleaned := link.strip().removeprefix("[[").removesuffix("]]").strip())
+    }
     sorted_links = sorted(unique_links, key=len, reverse=True)
     for link in sorted_links:
         start_b = r"(?<!\w)" if re.match(r"\w", link[0]) else r""
         end_b = r"(?!\w)" if re.match(r"\w", link[-1]) else r""
 
         pattern = re.compile(
-            r"(```[\s\S]*?```|`[^`\n]+`|\[\[[\s\S]*?\]\]|\[[^\]]*\]\([^)]*\))"
+            r"(```[\s\S]*?```|`[^`\n]+`|\[\[[\s\S]*?\]\]|\[[^\]]*\]\([^)]*\)|https?://\S+)"
             rf"|({start_b}{re.escape(link)}{end_b})",
             re.IGNORECASE,
         )
@@ -155,8 +162,9 @@ def _update_frontmatter_tags(content, new_tags):
         frontmatter["tags"] = existing_tags
 
     for tag in new_tags:
-        if tag not in existing_tags:
-            existing_tags.append(tag)
+        cleaned = tag.strip().lstrip("#").strip()
+        if cleaned and cleaned not in existing_tags:
+            existing_tags.append(cleaned)
 
     new_frontmatter = yaml.dump(
         frontmatter, Dumper=_NoAliasDumper, default_flow_style=False, sort_keys=False
@@ -227,8 +235,10 @@ def get_target_directory(vault_path, folder, folder_organization="none", now=Non
         month_str = now.strftime("%Y-%m")
         _, iso_week, _ = now.isocalendar()
         subfolder = os.path.join(month_str, f"W{iso_week:02d}")
-    else:
+    elif folder_organization == "none":
         subfolder = ""
+    else:
+        raise ValueError(f"Invalid folder_organization: {folder_organization!r}")
 
     return os.path.join(base_dir, subfolder) if subfolder else base_dir
 

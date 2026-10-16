@@ -12,7 +12,7 @@ class OllamaModelLoader(QThread):
 
     def __init__(self, url: str, parent=None):
         super().__init__(parent)
-        self.url = url
+        self.url = url.rstrip("/")
 
     def _supports_audio(self, name: str) -> bool:
         """Check whether the given model supports audio capabilities."""
@@ -29,7 +29,7 @@ class OllamaModelLoader(QThread):
                 if isinstance(show_data, dict):
                     caps = show_data.get("capabilities", [])
                     return isinstance(caps, list) and "audio" in caps
-        except (requests.RequestException, ValueError, AttributeError):
+        except (requests.RequestException, ValueError):
             pass
         return False
 
@@ -44,8 +44,16 @@ class OllamaModelLoader(QThread):
                 return
 
             data = r.json()
+            if not isinstance(data, dict):
+                raise ValueError("Invalid response format from Ollama")
             models_list = data.get("models", [])
-            all_models = [m["name"] for m in models_list if "name" in m]
+            if not isinstance(models_list, list) or not all(
+                isinstance(m, dict) for m in models_list
+            ):
+                raise ValueError("Invalid response format from Ollama")
+            all_models = [
+                m["name"] for m in models_list if isinstance(m.get("name"), str)
+            ]
 
             audio_models = []
             for name in all_models:

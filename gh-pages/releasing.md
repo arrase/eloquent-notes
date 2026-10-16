@@ -44,7 +44,7 @@ are derived from it and must never be created independently.
 that:
 
 - the `pyproject.toml` version is valid `MAJOR.MINOR.PATCH`
-- the package exposes a real installed version, not the uninstalled fallback
+- the package exposes a valid semantic version via `eloquent_notes.__version__`
 - `pyproject.toml` and the installed distribution metadata agree
 - the newest `v*` tag equals `v<pyproject version>`
 

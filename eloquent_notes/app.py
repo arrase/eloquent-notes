@@ -57,8 +57,10 @@ class EloquentApp(QObject):
         self.menu = None
         self.server = None
 
+        self._start_recording_immediately = start_recording_immediately
         self._snapshot = None  # config + prompt files frozen at recording start
         self._recorder = None
+        self._preload_thread = None
         self._processing_thread = None
         self._config_dialog = None
         self._capture_duration = 0.0
@@ -72,9 +74,6 @@ class EloquentApp(QObject):
 
         self.processing_completed.connect(self._on_processing_completed)
 
-        if start_recording_immediately:
-            QTimer.singleShot(100, self.toggle_action)
-
     # --- UI setup ---------------------------------------------------------
 
     def run(self):
@@ -82,6 +81,8 @@ class EloquentApp(QObject):
         self.tray = QSystemTrayIcon()
         self._init_ipc_server()
         self._init_tray_ui()
+        if self._start_recording_immediately:
+            QTimer.singleShot(100, self.toggle_action)
         sys.exit(self.app.exec())
 
     def _init_ipc_server(self):
@@ -131,15 +132,13 @@ class EloquentApp(QObject):
             self.toggle_action()
 
     def _handle_ipc_connection(self):
-        if self.server is None:
-            return
         while self.server.hasPendingConnections():
             socket = self.server.nextPendingConnection()
             if socket is None:
                 break
             try:
                 if socket.bytesAvailable() > 0 or socket.waitForReadyRead(50):
-                    message = bytes(socket.readAll()).decode("utf-8")
+                    message = bytes(socket.readAll()).decode("utf-8", errors="replace")
                     if message == "toggle":
                         self.toggle_action()
                     elif message == "reload":
@@ -165,6 +164,20 @@ class EloquentApp(QObject):
                 QSystemTrayIcon.MessageIcon.Information, 5000,
             )
 
+    @staticmethod
+    def _play_beep(audio_cfg, wait):
+        if not audio_cfg["beep_enabled"]:
+            return
+        try:
+            audio.play_beep(
+                frequency=audio_cfg["beep_frequency"],
+                duration=audio_cfg["beep_duration"],
+                sample_rate=audio_cfg["sample_rate"],
+                wait=wait,
+            )
+        except Exception as e:
+            logger.warning("Audio feedback beep failed: %s", e)
+
     # --- Recording lifecycle (main thread) ---------------------------------
 
     def toggle_action(self):
@@ -177,24 +190,17 @@ class EloquentApp(QObject):
             self._notify(APP_NAME, "System is busy. Please wait.")
 
     def _start_recording(self):
-        snapshot = copy.deepcopy(self.config)
-        snapshot["_loaded_files"] = {
-            path: config.load_file(path)
-            for path in config.PROMPT_AND_TEMPLATE_PATHS
-        }
-        audio_cfg = snapshot["audio"]
-
-        self._update_icon("red", "Eloquent Notes (Recording...)")
         logger.info("Starting audio recording...")
         try:
-            if audio_cfg["beep_enabled"]:
-                # Played synchronously so the tone finishes before the
-                # microphone opens and cannot leak into the recording.
-                audio.play_beep(
-                    frequency=audio_cfg["beep_frequency"],
-                    duration=audio_cfg["beep_duration"],
-                    sample_rate=audio_cfg["sample_rate"],
-                )
+            snapshot = copy.deepcopy(self.config)
+            snapshot["_loaded_files"] = {
+                path: config.load_file(path)
+                for path in config.PROMPT_AND_TEMPLATE_PATHS
+            }
+            audio_cfg = snapshot["audio"]
+            # Played synchronously so the tone finishes before the
+            # microphone opens and cannot leak into the recording.
+            self._play_beep(audio_cfg, wait=True)
             recorder = audio.AudioRecorder(
                 sample_rate=audio_cfg["sample_rate"],
                 channels=audio_cfg["channels"],
@@ -211,13 +217,16 @@ class EloquentApp(QObject):
         self._capture_duration = float(audio_cfg["capture_duration"])
         self._recording_started_at = time.monotonic()
 
+        self._update_icon("red", "Eloquent Notes (Recording...)")
         if audio_cfg["recording_hud_enabled"]:
             self._hud.show_recording(self._capture_duration)
         self._tick_timer.start(100)
 
-        threading.Thread(
-            target=self._preload_model, args=(snapshot,), daemon=True,
-        ).start()
+        if self._preload_thread is None or not self._preload_thread.is_alive():
+            self._preload_thread = threading.Thread(
+                target=self._preload_model, args=(snapshot,), daemon=True,
+            )
+            self._preload_thread.start()
 
     def _preload_model(self, snapshot):
         """Warm the model weights while the user dictates (best effort)."""
@@ -230,7 +239,7 @@ class EloquentApp(QObject):
                 keep_alive=ai_cfg["preload_keep_alive"],
                 timeout=ai_cfg["preload_timeout"],
             )
-        except requests.RequestException as e:
+        except (requests.RequestException, ValueError) as e:
             logger.warning("Model preload skipped: %s", e)
 
     def _on_recording_tick(self):
@@ -248,28 +257,24 @@ class EloquentApp(QObject):
             self._stop_and_process()
 
     def _stop_and_process(self):
-        if self.state != RECORDING:
-            return
         self.state = PROCESSING
         self._tick_timer.stop()
-        self._hud.hide_hud()
+        self._hud.hide()
 
         recorder, snapshot = self._recorder, self._snapshot
         self._recorder = None
         self._snapshot = None
 
-        self._update_icon("orange", "Eloquent Notes (Processing...)")
         logger.info("Stopping recording and starting processing...")
+        try:
+            recorder.stop()
+        except Exception as e:
+            logger.exception("Failed to stop recording")
+            self.processing_completed.emit("error", f"Could not stop recording: {e}")
+            return
 
-        audio_cfg = snapshot["audio"]
-        if audio_cfg["beep_enabled"]:
-            audio.play_beep(
-                frequency=audio_cfg["beep_frequency"],
-                duration=audio_cfg["beep_duration"],
-                sample_rate=audio_cfg["sample_rate"],
-                wait=False,
-            )
-        recorder.stop()
+        self._play_beep(snapshot["audio"], wait=False)
+        self._update_icon("orange", "Eloquent Notes (Processing...)")
 
         self._processing_thread = threading.Thread(
             target=self._process_audio, args=(recorder, snapshot), daemon=True,
@@ -282,7 +287,7 @@ class EloquentApp(QObject):
     def _language_instruction(target_language):
         return (
             f"IMPORTANT: You MUST write the title, content, wikilinks, and tags "
-            f"in {target_language}. DO NOT translate to any other language."
+            f"in {target_language}, translating from the transcription language if necessary."
         )
 
     @staticmethod
@@ -318,9 +323,11 @@ class EloquentApp(QObject):
 
     @staticmethod
     def _rewrite(ai_cfg, loaded, transcription, language_instruction):
-        user_prompt = loaded[config.REWRITING_USER_PROMPT_PATH].format(
-            transcription=transcription,
-            language_instruction=language_instruction,
+        user_prompt = loaded[config.REWRITING_USER_PROMPT_PATH].format_map(
+            obsidian.SafeDict(
+                transcription=transcription,
+                language_instruction=language_instruction,
+            )
         )
         return llm.rewrite_transcription(
             ollama_url=ai_cfg["ollama_url"],
@@ -335,10 +342,12 @@ class EloquentApp(QObject):
         )
 
     def _classify(self, ai_cfg, obs_cfg, loaded, transcription, language_instruction):
-        user_prompt = loaded[config.CLASSIFICATION_USER_PROMPT_PATH].format(
-            transcription=transcription,
-            vault_context=self._build_vault_context(obs_cfg),
-            language_instruction=language_instruction,
+        user_prompt = loaded[config.CLASSIFICATION_USER_PROMPT_PATH].format_map(
+            obsidian.SafeDict(
+                transcription=transcription,
+                vault_context=self._build_vault_context(obs_cfg),
+                language_instruction=language_instruction,
+            )
         )
         return llm.classify_transcription(
             ollama_url=ai_cfg["ollama_url"],
@@ -381,20 +390,22 @@ class EloquentApp(QObject):
         """
         logger.info("Processing recorded audio...")
         loaded = snapshot["_loaded_files"]
+        ai_cfg = snapshot["ai"]
+        obs_cfg = snapshot["obsidian"]
+        completed_phase3 = False
+        status, detail = "empty", ""
         try:
-            ai_cfg = snapshot["ai"]
-            obs_cfg = snapshot["obsidian"]
+            if recorder.is_silent:
+                return
 
             wav_bytes = recorder.wav_bytes
-            if not wav_bytes or recorder.is_silent:
-                self.processing_completed.emit("empty", "")
-                return
 
             logger.info("Phase 1: Transcribing audio...")
             transcription_result = self._transcribe(ai_cfg, loaded, wav_bytes)
+            if transcription_result["empty"]:
+                return
             transcription = transcription_result["transcription"].strip()
-            if transcription_result["empty"] or not transcription:
-                self.processing_completed.emit("empty", "")
+            if not transcription:
                 return
             logger.info("Transcription: %s", transcription)
 
@@ -406,8 +417,9 @@ class EloquentApp(QObject):
 
             logger.info("Phase 3: Classifying transcription...")
             classification = self._classify(
-                ai_cfg, obs_cfg, loaded, transcription, language_instruction,
+                ai_cfg, obs_cfg, loaded, rewrite["content"], language_instruction,
             )
+            completed_phase3 = True
             logger.info(
                 "Classification: type=%s, wikilinks=%s, tags=%s",
                 classification["type"],
@@ -416,19 +428,30 @@ class EloquentApp(QObject):
             )
 
             saved_path = self._save_note(snapshot, obs_cfg, rewrite, classification)
-            self.processing_completed.emit("success", saved_path)
+            status, detail = "success", saved_path
         except Exception as e:
             logger.exception("Error during audio processing/saving")
-            self.processing_completed.emit("error", str(e))
+            status, detail = "error", str(e)
+        finally:
+            if not completed_phase3 and ai_cfg["keep_alive"] != ai_cfg["preload_keep_alive"]:
+                if self._preload_thread is not None and self._preload_thread.is_alive():
+                    self._preload_thread.join(timeout=ai_cfg["preload_timeout"])
+                try:
+                    llm.preload_model(
+                        ollama_url=ai_cfg["ollama_url"],
+                        model=ai_cfg["model"],
+                        context_length=ai_cfg["context_length"],
+                        keep_alive=ai_cfg["keep_alive"],
+                        timeout=ai_cfg["preload_timeout"],
+                    )
+                except (requests.RequestException, ValueError) as e:
+                    logger.warning("Model keep_alive reset skipped: %s", e)
+            self.processing_completed.emit(status, detail)
 
     # --- Completion, reload and shutdown -----------------------------------
 
     def _on_processing_completed(self, status, detail):
-        self._tick_timer.stop()
-        self._hud.hide_hud()
         self.state = IDLE
-        self._recorder = None
-        self._snapshot = None
         self._update_icon("gray", "Eloquent Notes (Idle)")
 
         if status == "success":
@@ -454,13 +477,14 @@ class EloquentApp(QObject):
     def reload_config(self):
         """Reload configuration from disk."""
         try:
-            self.config = config.load_config()
-            log_cfg = self.config["logging"]
+            new_config = config.load_config()
+            log_cfg = new_config["logging"]
             setup_logging(
                 log_level_str=log_cfg["level"],
                 max_mb=log_cfg["max_mb"],
                 backup_count=log_cfg["backup_count"],
             )
+            self.config = new_config
             logger.info("Configuration reloaded successfully")
             self._notify(
                 APP_NAME,
@@ -495,11 +519,13 @@ class EloquentApp(QObject):
         """Clean up and exit the application."""
         logger.info("Exiting application...")
         self._tick_timer.stop()
-        self._hud.hide_hud()
         self._hud.close()
 
         if self.state == RECORDING and self._recorder is not None:
-            self._recorder.stop()
+            try:
+                self._recorder.stop()
+            except Exception:
+                logger.exception("Error stopping recorder on exit")
         elif self.state == PROCESSING and self._processing_thread is not None:
             self._processing_thread.join(timeout=5.0)
 

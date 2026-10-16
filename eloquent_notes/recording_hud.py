@@ -77,7 +77,6 @@ class RecordingHUD(QWidget):
         layout.setContentsMargins(16, 8, 16, 8)
         layout.setSpacing(5)
 
-        # Header row: Dot + Status + Spacer + Timer
         header_layout = QHBoxLayout()
         header_layout.setSpacing(8)
         header_layout.setContentsMargins(0, 0, 0, 0)
@@ -101,7 +100,6 @@ class RecordingHUD(QWidget):
 
         layout.addLayout(header_layout)
 
-        # Progress bar
         self.progress_bar = QProgressBar()
         self.progress_bar.setFixedHeight(3)
         self.progress_bar.setTextVisible(False)
@@ -148,7 +146,7 @@ class RecordingHUD(QWidget):
         self.progress_bar.setValue(0)
         self._style_tier = None
         self._apply_tier("normal")
-        self.lbl_timer.setText(_format_time(total_duration) if total_duration > 0 else "00:00")
+        self.lbl_timer.setText(_format_time(total_duration))
         self.reposition()
         self.show()
         self.raise_()
@@ -161,22 +159,14 @@ class RecordingHUD(QWidget):
         total_duration: float,
     ) -> None:
         """Update countdown timer, color state, and progress bar."""
-        if total_duration > 0:
-            fraction = min(1.0, max(0.0, elapsed_seconds / total_duration))
-            self.progress_bar.setValue(int(fraction * 1000))
-            secs_left = max(0, math.ceil(remaining_seconds))
-            self.lbl_timer.setText(_format_time(secs_left))
+        fraction = min(1.0, max(0.0, elapsed_seconds / total_duration))
+        self.progress_bar.setValue(int(fraction * 1000))
+        secs_left = max(0, math.ceil(remaining_seconds))
+        self.lbl_timer.setText(_format_time(secs_left))
 
-            if remaining_seconds <= 5.0:
-                self._apply_tier("critical")
-            elif remaining_seconds <= 10.0:
-                self._apply_tier("warning")
-            else:
-                self._apply_tier("normal")
+        if remaining_seconds <= 5.0:
+            self._apply_tier("critical")
+        elif remaining_seconds <= 10.0:
+            self._apply_tier("warning")
         else:
-            self.lbl_timer.setText(_format_time(elapsed_seconds))
-            self.progress_bar.setValue(0)
-
-    def hide_hud(self) -> None:
-        """Hide and reset HUD display."""
-        self.hide()
+            self._apply_tier("normal")

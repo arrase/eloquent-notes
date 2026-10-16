@@ -49,7 +49,7 @@ The background daemon runs continuously on top of the `QApplication` event loop 
 ### Decoupled Single-Instance IPC
 When the user executes `eloquent-notes toggle` via a terminal or global desktop hotkey (such as GNOME, KDE, or i3/Sway shortcuts), the CLI entry point (`eloquent_notes.main`) executes a lightweight check:
 
-1. It initializes `QCoreApplication` (loading only core low-level Qt primitives, without heavy GUI widgets).
+1. It instantiates a headless `QCoreApplication` (without initializing a `QApplication` display connection or creating any GUI windows).
 2. It attempts to connect to a named Unix local socket (`eloquent_notes_ipc`) using `QLocalSocket`.
 3. **If the daemon is already running:** The client writes `"toggle"` over the socket connection and exits immediately. The daemon's `QLocalServer` receives the `newConnection` signal, reads `"toggle"`, and invokes `toggle_action()`.
 4. **If no daemon is running:** The CLI replaces its own process image using `os.execv` to spawn `eloquent_notes.app` in background daemon mode.
@@ -63,7 +63,7 @@ This architecture ensures zero start-up delay for hotkeys while maintaining a si
 To maximize user privacy, eliminate security risks associated with unencrypted temporary audio files, and avoid unnecessary SSD wear, audio capture is performed entirely in RAM:
 
 - **Stream Capture:** `sounddevice.InputStream` captures PCM audio samples directly from the system's default microphone using a lightweight callback that enqueues float32 numpy arrays into a Python `queue.Queue`.
-- **In-Memory PCM Buffer:** When recording completes, `AudioRecorder.wav_bytes` drains the queue, trims leading and trailing blocks below the speech threshold, concatenates all chunks into a unified NumPy array, scales the values to 16-bit signed PCM integer format (`clip(-32768, 32767).astype(np.int16)`), and writes the audio stream to an in-memory `io.BytesIO` buffer formatted as a standard WAV file.
+- **In-Memory PCM Buffer:** When recording completes, `AudioRecorder.wav_bytes` copies the recorded chunks from the queue, trims leading and trailing blocks below the speech threshold, concatenates all chunks into a unified NumPy array, scales the values to 16-bit signed PCM integer format (`clip(-32768, 32767).astype(np.int16)`), and writes the audio stream to an in-memory `io.BytesIO` buffer formatted as a standard WAV file.
 - **Local Silence Gate:** `AudioRecorder.is_silent` measures the recording's RMS amplitude against a -45 dBFS speech threshold. Silence is rejected before any audio is sent to Ollama, because the model cannot be relied upon to flag an empty recording and will otherwise invent text that gets saved as a note.
 - **Base64 Transmission:** The resulting raw WAV bytes are base64-encoded in memory and submitted directly in the JSON payload to Ollama's `/api/chat` endpoint. At no point is an audio file written to `/tmp` or disk.
 
@@ -160,7 +160,7 @@ flowchart TB
             T2{"Is Transcription Empty?"}
             T3["Phase 2: Rewriting\n(Clean Note Prose + Title)"]
             T4["Scan Vault for Wikilink Context"]
-            T5["Phase 3: Classification\n(Type, Wikilinks, English Tags)"]
+            T5["Phase 3: Classification\n(Type, Wikilinks, Tags in output_language)"]
             
             T1 --> T2
             T2 -- No --> T3

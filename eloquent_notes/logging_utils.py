@@ -70,11 +70,6 @@ def setup_logging(log_level_str, max_mb, backup_count):
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel(level)
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
-
     log_dir = get_log_dir()
     os.makedirs(log_dir, exist_ok=True)
     log_file_path = get_log_file_path()
@@ -87,6 +82,12 @@ def setup_logging(log_level_str, max_mb, backup_count):
     )
     file_handler.setLevel(level)
     file_handler.setFormatter(formatter)
+
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setLevel(level)
+    console_handler.setFormatter(formatter)
+
+    logger.addHandler(console_handler)
     logger.addHandler(file_handler)
 
     return logger

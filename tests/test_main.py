@@ -82,14 +82,12 @@ def test_send_ipc_command_exception(monkeypatch):
 def test_run_cli_install_autostart(monkeypatch):
     """Test run_cli with install-autostart command."""
     mock_autostart = MagicMock()
-    mock_exit = MagicMock()
 
     monkeypatch.setattr("eloquent_notes.main.install_autostart", mock_autostart)
 
-    main.run_cli(["install-autostart"], sys_exit=mock_exit)
+    main.run_cli(["install-autostart"])
 
     mock_autostart.assert_called_once()
-    mock_exit.assert_called_once_with(0)
 
 
 def test_run_cli_config_accepted(monkeypatch, qapp):
@@ -97,18 +95,16 @@ def test_run_cli_config_accepted(monkeypatch, qapp):
     mock_dialog = MagicMock()
     mock_dialog.exec.return_value = QDialog.DialogCode.Accepted
     mock_send_ipc = MagicMock()
-    mock_exit = MagicMock()
 
     monkeypatch.setattr(
         "eloquent_notes.main.ConfigurationDialog", lambda: mock_dialog
     )
     monkeypatch.setattr("eloquent_notes.main.send_ipc_command", mock_send_ipc)
 
-    main.run_cli(["config"], sys_exit=mock_exit)
+    main.run_cli(["config"])
 
     mock_dialog.exec.assert_called_once()
     mock_send_ipc.assert_called_once_with("reload", timeout_ms=200)
-    mock_exit.assert_called_once_with(0)
 
 
 def test_run_cli_config_rejected(monkeypatch, qapp):
@@ -116,32 +112,28 @@ def test_run_cli_config_rejected(monkeypatch, qapp):
     mock_dialog = MagicMock()
     mock_dialog.exec.return_value = QDialog.DialogCode.Rejected
     mock_send_ipc = MagicMock()
-    mock_exit = MagicMock()
 
     monkeypatch.setattr(
         "eloquent_notes.main.ConfigurationDialog", lambda: mock_dialog
     )
     monkeypatch.setattr("eloquent_notes.main.send_ipc_command", mock_send_ipc)
 
-    main.run_cli(["config"], sys_exit=mock_exit)
+    main.run_cli(["config"])
 
     mock_dialog.exec.assert_called_once()
     mock_send_ipc.assert_not_called()
-    mock_exit.assert_called_once_with(0)
 
 
 def test_run_cli_daemon_already_running(monkeypatch):
     """Test run_cli notifies running daemon via IPC if daemon is already active."""
     mock_send_ipc = MagicMock(return_value=True)
     mock_launcher = MagicMock()
-    mock_exit = MagicMock()
 
     monkeypatch.setattr("eloquent_notes.main.send_ipc_command", mock_send_ipc)
 
-    main.run_cli(["-t"], launcher=mock_launcher, sys_exit=mock_exit)
+    main.run_cli(["-t"], launcher=mock_launcher)
 
     mock_send_ipc.assert_called_once_with("toggle", timeout_ms=500)
-    mock_exit.assert_called_once_with(0)
     mock_launcher.assert_not_called()
 
 
@@ -149,14 +141,12 @@ def test_run_cli_default_no_args_already_running(monkeypatch):
     """Test run_cli sends notify_running when launched with no args and daemon is running."""
     mock_send_ipc = MagicMock(return_value=True)
     mock_launcher = MagicMock()
-    mock_exit = MagicMock()
 
     monkeypatch.setattr("eloquent_notes.main.send_ipc_command", mock_send_ipc)
 
-    main.run_cli([], launcher=mock_launcher, sys_exit=mock_exit)
+    main.run_cli([], launcher=mock_launcher)
 
     mock_send_ipc.assert_called_once_with("notify_running", timeout_ms=500)
-    mock_exit.assert_called_once_with(0)
     mock_launcher.assert_not_called()
 
 
@@ -164,14 +154,12 @@ def test_run_cli_launch_daemon(monkeypatch):
     """Test run_cli launches daemon process when no instance is running."""
     mock_send_ipc = MagicMock(return_value=False)
     mock_launcher = MagicMock()
-    mock_exit = MagicMock()
 
     monkeypatch.setattr("eloquent_notes.main.send_ipc_command", mock_send_ipc)
 
-    main.run_cli(["toggle"], launcher=mock_launcher, sys_exit=mock_exit)
+    main.run_cli(["toggle"], launcher=mock_launcher)
 
     mock_send_ipc.assert_called_once_with("toggle", timeout_ms=500)
-    mock_exit.assert_not_called()
     mock_launcher.assert_called_once_with(
         sys.executable,
         [sys.executable, "-m", "eloquent_notes.app", "toggle"]
@@ -182,14 +170,12 @@ def test_run_cli_launch_daemon_default_no_args(monkeypatch):
     """Test run_cli launches daemon process without toggle arg when started with no args."""
     mock_send_ipc = MagicMock(return_value=False)
     mock_launcher = MagicMock()
-    mock_exit = MagicMock()
 
     monkeypatch.setattr("eloquent_notes.main.send_ipc_command", mock_send_ipc)
 
-    main.run_cli([], launcher=mock_launcher, sys_exit=mock_exit)
+    main.run_cli([], launcher=mock_launcher)
 
     mock_send_ipc.assert_called_once_with("notify_running", timeout_ms=500)
-    mock_exit.assert_not_called()
     mock_launcher.assert_called_once_with(
         sys.executable,
         [sys.executable, "-m", "eloquent_notes.app"]

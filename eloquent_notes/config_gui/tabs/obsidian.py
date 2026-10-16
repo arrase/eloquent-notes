@@ -17,10 +17,8 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from eloquent_notes.config_gui.tabs.base import ConfigTab
 
-
-class ObsidianTab(ConfigTab):
+class ObsidianTab(QWidget):
     """Obsidian configuration tab."""
 
     def __init__(self, parent=None):

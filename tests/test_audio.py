@@ -28,7 +28,7 @@ def test_start_and_stop(mock_input_stream):
     stream_instance = MagicMock()
     mock_input_stream.return_value = stream_instance
 
-    recorder = AudioRecorder()
+    recorder = AudioRecorder(sample_rate=16000, channels=1)
     recorder.start()
 
     mock_input_stream.assert_called_once()
@@ -51,7 +51,7 @@ def test_start_failure_closes_stream_and_raises(mock_input_stream):
     stream_instance.start.side_effect = RuntimeError("Device unavailable")
     mock_input_stream.return_value = stream_instance
 
-    recorder = AudioRecorder()
+    recorder = AudioRecorder(sample_rate=16000, channels=1)
     with pytest.raises(RuntimeError, match="Device unavailable"):
         recorder.start()
 
@@ -60,7 +60,7 @@ def test_start_failure_closes_stream_and_raises(mock_input_stream):
 
 
 def test_stop_exception_safety():
-    recorder = AudioRecorder()
+    recorder = AudioRecorder(sample_rate=16000, channels=1)
     stream_instance = MagicMock()
     stream_instance.stop.side_effect = Exception("PortAudio error")
     recorder._stream = stream_instance
@@ -73,7 +73,7 @@ def test_stop_exception_safety():
 
 
 def test_callback_enqueues_copy():
-    recorder = AudioRecorder()
+    recorder = AudioRecorder(sample_rate=16000, channels=1)
     chunk = np.zeros((100, 1), dtype=np.float32)
     recorder._on_audio(chunk, 100, None, None)
 
@@ -162,8 +162,8 @@ def test_wav_bytes_trims_surrounding_silence():
 
 @patch("sounddevice.wait")
 @patch("sounddevice.play")
-def test_play_beep_blocks_by_default(mock_play, mock_wait):
-    play_beep(frequency=440, duration=0.1, sample_rate=16000)
+def test_play_beep_blocks_when_wait_true(mock_play, mock_wait):
+    play_beep(frequency=440, duration=0.1, sample_rate=16000, wait=True)
 
     assert mock_play.called
     assert mock_wait.called
@@ -186,7 +186,7 @@ def test_play_beep_non_blocking(mock_play, mock_wait):
 @patch("sounddevice.wait")
 @patch("sounddevice.play")
 def test_play_beep_zero_duration(mock_play, mock_wait):
-    play_beep(frequency=440, duration=0.0, sample_rate=16000)
+    play_beep(frequency=440, duration=0.0, sample_rate=16000, wait=True)
 
     assert not mock_play.called
     assert not mock_wait.called
