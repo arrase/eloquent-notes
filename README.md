@@ -1,15 +1,16 @@
 # Eloquent Notes for Linux
 
-[![Quality Gate Status](https://img.shields.io/sonar/quality_gate/arrase_eloquent-notes?server=https%3A%2F%2Fsonarcloud.io&logo=sonarcloud)](https://sonarcloud.io/summary/new_code?id=arrase_eloquent-notes)
-[![Coverage](https://img.shields.io/sonar/coverage/arrase_eloquent-notes?server=https%3A%2F%2Fsonarcloud.io&logo=sonarcloud)](https://sonarcloud.io/summary/new_code?id=arrase_eloquent-notes)
-[![Bugs](https://img.shields.io/sonar/bugs/arrase_eloquent-notes?server=https%3A%2F%2Fsonarcloud.io&logo=sonarcloud)](https://sonarcloud.io/summary/new_code?id=arrase_eloquent-notes)
-[![Vulnerabilities](https://img.shields.io/sonar/vulnerabilities/arrase_eloquent-notes?server=https%3A%2F%2Fsonarcloud.io&logo=sonarcloud)](https://sonarcloud.io/summary/new_code?id=arrase_eloquent-notes)
-[![Code Smells](https://img.shields.io/sonar/code_smells/arrase_eloquent-notes?server=https%3A%2F%2Fsonarcloud.io&logo=sonarcloud)](https://sonarcloud.io/summary/new_code?id=arrase_eloquent-notes)
-[![Tech Debt](https://img.shields.io/sonar/tech_debt/arrase_eloquent-notes?server=https%3A%2F%2Fsonarcloud.io&logo=sonarcloud)](https://sonarcloud.io/summary/new_code?id=arrase_eloquent-notes)
-[![Duplicated Lines](https://img.shields.io/sonar/duplicated_lines_density/arrase_eloquent-notes?server=https%3A%2F%2Fsonarcloud.io&logo=sonarcloud)](https://sonarcloud.io/summary/new_code?id=arrase_eloquent-notes)
-[![Security Rating](https://img.shields.io/sonar/security_rating/arrase_eloquent-notes?server=https%3A%2F%2Fsonarcloud.io&logo=sonarcloud)](https://sonarcloud.io/summary/new_code?id=arrase_eloquent-notes)
-[![Reliability Rating](https://img.shields.io/sonar/reliability_rating/arrase_eloquent-notes?server=https%3A%2F%2Fsonarcloud.io&logo=sonarcloud)](https://sonarcloud.io/summary/new_code?id=arrase_eloquent-notes)
-[![Maintainability Rating](https://img.shields.io/sonar/sqale_rating/arrase_eloquent-notes?server=https%3A%2F%2Fsonarcloud.io&logo=sonarcloud)](https://sonarcloud.io/summary/new_code?id=arrase_eloquent-notes)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&metric=alert_status)](https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&metric=coverage)](https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&metric=bugs)](https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&metric=vulnerabilities)](https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&metric=code_smells)](https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&metric=sqale_index)](https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&metric=duplicated_lines_density)](https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&metric=security_rating)](https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&metric=reliability_rating)](https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&metric=sqale_rating)](https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&metric=ncloc)](https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes)
 
 Eloquent Notes is a lightweight, system-tray-centric utility for Linux inspired by [Google Eloquent](https://developers.google.com/edge/eloquent) that runs silently in the background. It allows you to record quick dictations, automatically transcribes them, rewrites them into a clean first-person note, extracts relevant metadata (type, wikilinks, tags) using a three-phase local **Gemma 4** model pipeline (via Ollama), and writes the resulting notes directly to your Obsidian vault.
 

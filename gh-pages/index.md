@@ -19,16 +19,17 @@ hide:
     <a href="https://github.com/arrase/eloquent-notes/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   </div>
   <div class="hero-badges">
-    <a href="https://sonarcloud.io/summary/new_code?id=arrase_eloquent-notes"><img src="https://img.shields.io/sonar/quality_gate/arrase_eloquent-notes?server=https%3A%2F%2Fsonarcloud.io&amp;logo=sonarcloud" alt="Quality Gate Status"></a>
-    <a href="https://sonarcloud.io/summary/new_code?id=arrase_eloquent-notes"><img src="https://img.shields.io/sonar/coverage/arrase_eloquent-notes?server=https%3A%2F%2Fsonarcloud.io&amp;logo=sonarcloud" alt="Coverage"></a>
-    <a href="https://sonarcloud.io/summary/new_code?id=arrase_eloquent-notes"><img src="https://img.shields.io/sonar/bugs/arrase_eloquent-notes?server=https%3A%2F%2Fsonarcloud.io&amp;logo=sonarcloud" alt="Bugs"></a>
-    <a href="https://sonarcloud.io/summary/new_code?id=arrase_eloquent-notes"><img src="https://img.shields.io/sonar/vulnerabilities/arrase_eloquent-notes?server=https%3A%2F%2Fsonarcloud.io&amp;logo=sonarcloud" alt="Vulnerabilities"></a>
-    <a href="https://sonarcloud.io/summary/new_code?id=arrase_eloquent-notes"><img src="https://img.shields.io/sonar/code_smells/arrase_eloquent-notes?server=https%3A%2F%2Fsonarcloud.io&amp;logo=sonarcloud" alt="Code Smells"></a>
-    <a href="https://sonarcloud.io/summary/new_code?id=arrase_eloquent-notes"><img src="https://img.shields.io/sonar/tech_debt/arrase_eloquent-notes?server=https%3A%2F%2Fsonarcloud.io&amp;logo=sonarcloud" alt="Tech Debt"></a>
-    <a href="https://sonarcloud.io/summary/new_code?id=arrase_eloquent-notes"><img src="https://img.shields.io/sonar/duplicated_lines_density/arrase_eloquent-notes?server=https%3A%2F%2Fsonarcloud.io&amp;logo=sonarcloud" alt="Duplicated Lines"></a>
-    <a href="https://sonarcloud.io/summary/new_code?id=arrase_eloquent-notes"><img src="https://img.shields.io/sonar/security_rating/arrase_eloquent-notes?server=https%3A%2F%2Fsonarcloud.io&amp;logo=sonarcloud" alt="Security Rating"></a>
-    <a href="https://sonarcloud.io/summary/new_code?id=arrase_eloquent-notes"><img src="https://img.shields.io/sonar/reliability_rating/arrase_eloquent-notes?server=https%3A%2F%2Fsonarcloud.io&amp;logo=sonarcloud" alt="Reliability Rating"></a>
-    <a href="https://sonarcloud.io/summary/new_code?id=arrase_eloquent-notes"><img src="https://img.shields.io/sonar/sqale_rating/arrase_eloquent-notes?server=https%3A%2F%2Fsonarcloud.io&amp;logo=sonarcloud" alt="Maintainability Rating"></a>
+    <a href="https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes"><img src="https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&amp;metric=alert_status" alt="Quality Gate Status"></a>
+    <a href="https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes"><img src="https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&amp;metric=coverage" alt="Coverage"></a>
+    <a href="https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes"><img src="https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&amp;metric=bugs" alt="Bugs"></a>
+    <a href="https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes"><img src="https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&amp;metric=vulnerabilities" alt="Vulnerabilities"></a>
+    <a href="https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes"><img src="https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&amp;metric=code_smells" alt="Code Smells"></a>
+    <a href="https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes"><img src="https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&amp;metric=sqale_index" alt="Technical Debt"></a>
+    <a href="https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes"><img src="https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&amp;metric=duplicated_lines_density" alt="Duplicated Lines (%)"></a>
+    <a href="https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes"><img src="https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&amp;metric=security_rating" alt="Security Rating"></a>
+    <a href="https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes"><img src="https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&amp;metric=reliability_rating" alt="Reliability Rating"></a>
+    <a href="https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes"><img src="https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&amp;metric=sqale_rating" alt="Maintainability Rating"></a>
+    <a href="https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes"><img src="https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&amp;metric=ncloc" alt="Lines of Code"></a>
   </div>
 </div>
 
