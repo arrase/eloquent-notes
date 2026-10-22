@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from PyQt6.QtCore import QEvent, QPointF, Qt
 from PyQt6.QtGui import QGuiApplication, QMouseEvent
-from PyQt6.QtWidgets import QLabel, QMessageBox
+from PyQt6.QtWidgets import QLabel, QMessageBox, QPushButton
 
 from eloquent_notes import notes, ui
 from eloquent_notes.window import PAGE_MARGIN, MainWindow, NoteCard, day_label, format_time
@@ -195,30 +195,24 @@ def test_clicking_card_opens_reader(window):
     assert window.reader.title_edit.text() == "Launch decision"
 
 
-def test_record_button_and_state(window):
-    recorded = MagicMock()
-    window.record_clicked.connect(recorded)
-
-    window.timeline.record_button.click()
-    recorded.assert_called_once()
-
+def test_set_state_updates_dictate_button(window):
     window.set_state("RECORDING")
-    assert window.timeline.record_status.text() == "Recording… click to stop"
     assert window.reader.btn_dictate.text() == "Stop dictation"
+    assert window.reader.btn_dictate.isEnabled()
 
     window.set_state("PROCESSING")
-    assert not window.timeline.record_button.isEnabled()
+    assert window.reader.btn_dictate.text() == "Processing…"
     assert not window.reader.btn_dictate.isEnabled()
 
     window.set_state("IDLE")
-    assert window.timeline.record_button.isEnabled()
     assert window.reader.btn_dictate.text() == "Add dictation"
+    assert window.reader.btn_dictate.isEnabled()
 
 
 def test_settings_button(window):
     clicked = MagicMock()
     window.settings_clicked.connect(clicked)
-    next(b for b in window.timeline.findChildren(type(window.timeline.record_button)) if b.text() == "Settings").click()
+    next(b for b in window.timeline.findChildren(QPushButton) if b.text() == "Settings").click()
     clicked.assert_called_once()
 
 

@@ -771,17 +771,6 @@ def test_show_window_creates_window_once_and_loads_notes(qapp, mock_config, tmp_
     window.close()
 
 
-def test_window_record_button_toggles_recording(qapp):
-    eloquent_app = make_app(qapp)
-    eloquent_app.toggle_action = MagicMock()
-    eloquent_app.show_window()
-
-    eloquent_app.window.timeline.record_button.click()
-
-    eloquent_app.toggle_action.assert_called_once()
-    eloquent_app.window.close()
-
-
 def test_note_edited_is_saved_and_listed(qapp, tmp_path):
     note = _write_note(tmp_path / "notes")
     eloquent_app = make_app(qapp)
@@ -924,7 +913,7 @@ def test_update_icon_syncs_window_state(qapp):
 
     eloquent_app._update_icon("orange", "Processing")
 
-    assert not eloquent_app.window.timeline.record_button.isEnabled()
+    assert not eloquent_app.window.reader.btn_dictate.isEnabled()
     eloquent_app.window.close()
 
 

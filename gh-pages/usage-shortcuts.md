@@ -41,7 +41,6 @@ The window shows a single centered column:
 * **Search box**: press <kbd>Enter</kbd> to search notes by meaning; clear it to return to the timeline.
 * **Filters**: type chips (All, Notes, Tasks, Ideas, Reminders, Questions, Decisions) and a tag selector.
 * **Timeline**: note cards grouped by day (Today, Yesterday, "Monday, 19 October"). Click a card to open it; click a `#tag` to filter by it.
-* **Record button**: the large round button at the bottom records a new note. The text below shows *Click to record a note*, *Recording… click to stop* or *Writing your note…*.
 
 In the **reader**, title, type, tags and body are editable. The toolbar offers **← Back** (<kbd>Esc</kbd>), **Add dictation** (becomes *Stop dictation* while recording), **Copy** and **Delete**. See [Notes & Search](notes.md) for details.
 
@@ -57,7 +56,7 @@ The tray icon changes color and symbol to indicate the active state:
 | **Recording** | Red Circle + White Recording Dot | `Eloquent Notes (Recording...)` | Microphone audio is recorded into memory; the model is preloaded in the background. |
 | **Processing** | Orange Circle + White Hourglass | `Eloquent Notes (Processing...)` | The Ollama pipeline is writing the note (transcription, rewriting, classification). |
 
-The same icons appear on the record button and the **Add dictation** button in the notes window.
+The same icons appear on the **Add dictation** button in the notes window.
 
 ---
 

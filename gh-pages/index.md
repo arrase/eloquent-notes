@@ -41,7 +41,7 @@ hide:
   <div class="feature-card">
     <i class="fa-solid fa-microphone feature-icon" aria-hidden="true"></i>
     <h3>One-Gesture Capture</h3>
-    <p>Left-click the tray icon, press the record button or a global shortcut bound to <code>eloquent-notes toggle</code>. Visual and acoustic cues show the recording state.</p>
+    <p>Left-click the tray icon or press a global shortcut bound to <code>eloquent-notes toggle</code>. Visual and acoustic cues show the recording state.</p>
   </div>
 
   <div class="feature-card">

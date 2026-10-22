@@ -16,14 +16,14 @@ Eloquent Notes is a Linux tray daemon with one job: turn voice dictations into w
 | `search.py` | `SemanticIndex`: embedding cache and cosine-similarity ranking. |
 | `window.py` | `MainWindow`: timeline and reader pages. A pure view that reports user intent through signals. |
 | `recording_hud.py` | Floating countdown overlay shown while recording (click to stop). |
-| `ui.py` | Tray / record-button state icons drawn with `QPainter` and light/dark theme stylesheets. |
+| `ui.py` | Tray and dictation state icons drawn with `QPainter`, plus light/dark theme stylesheets. |
 | `config.py` | XDG paths, default file installation, config loading/merging, atomic writes. |
 | `config_gui/` | Configuration dialog (General, Notes, AI Settings, Audio, Prompts tabs). |
 | `autostart.py`, `logging_utils.py` | Autostart desktop entry; rotating XDG log files. |
 
 ### Boundaries
 
-- `window.py` never touches files, audio or models. It renders the `Note` objects it is given and emits signals (`record_clicked`, `dictate_clicked`, `note_edited`, `delete_requested`, `search_requested`, `settings_clicked`).
+- `window.py` never touches files, audio or models. It renders the `Note` objects it is given and emits signals (`dictate_clicked`, `note_edited`, `delete_requested`, `search_requested`, `settings_clicked`).
 - `notes.py` and `search.py` have no Qt dependency; `llm.py` and `audio.py` neither.
 - `EloquentApp` is the only place where these pieces meet and where application state changes.
 
@@ -95,7 +95,7 @@ The CLI entry point (`eloquent_notes.main`) works as a lightweight client:
 
 At recording start, the configuration and all prompt files are copied into a **snapshot**, so editing settings mid-dictation cannot affect the note being processed. `dictate_into(note)` records the same way but remembers the target note; the pipeline then stops after Phase 2 and the text is appended to that note (see [Three-Phase AI Pipeline](pipeline.md)).
 
-While processing, further toggles only show a "System is busy" notification; the record buttons in the window are disabled.
+While processing, further toggles only show a "System is busy" notification; the dictate button in the window is disabled.
 
 ---
 
@@ -123,7 +123,7 @@ The window uses the desktop palette with a small palette-based stylesheet, so it
 
 ## 5. Dynamic In-Memory Icon Generation
 
-State icons are drawn with `QPainter` into a `QPixmap` and wrapped in a cached `QIcon` (`ui.get_qicon(color)`). The same icons are used by the tray and by the record buttons in the window.
+State icons are drawn with `QPainter` into a `QPixmap` and wrapped in a cached `QIcon` (`ui.get_qicon(color)`). The same icons are used by the tray and by the dictate button in the window.
 
 | State | Circle Color | Glyph |
 | :--- | :--- | :--- |

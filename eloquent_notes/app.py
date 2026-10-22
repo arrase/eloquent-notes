@@ -216,7 +216,6 @@ class EloquentApp(QObject):
         """Show the notes window, creating it on first use."""
         if self.window is None:
             self.window = MainWindow(columns=self.config["notes"]["columns"])
-            self.window.record_clicked.connect(self.toggle_action)
             self.window.dictate_clicked.connect(self.dictate_into)
             self.window.note_edited.connect(self._on_note_edited)
             self.window.delete_requested.connect(self._on_delete_requested)

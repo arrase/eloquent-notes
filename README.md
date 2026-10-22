@@ -20,7 +20,7 @@ Everything runs offline on your machine.
 
 ## ✨ Features
 
-- **One-gesture capture:** left-click the tray icon, click the record button in the window, or bind `eloquent-notes toggle` to a global shortcut. A floating HUD shows the remaining time while you speak.
+- **One-gesture capture:** left-click the tray icon or bind `eloquent-notes toggle` to a global shortcut. A floating HUD shows the remaining time while you speak.
 - **Clean notes, not transcripts:** a three-phase pipeline (transcription → rewriting → classification) removes filler words, writes a concise title and assigns a type (`note`, `task`, `idea`, `reminder`, `question`, `decision`) and 2–5 tags.
 - **Plain Markdown files:** one file per note with YAML frontmatter, in a folder you choose. No database, no lock-in.
 - **Notes window:** a timeline grouped by day, type and tag filters, and a reader where title, type, tags and body are editable.
@@ -80,7 +80,7 @@ eloquent-notes install-autostart    # start it automatically on login
 ```
 
 ### Record a note
-1. Start recording: left-click the tray icon, click the record button in the notes window, or run `eloquent-notes toggle`. A beep plays and the icon turns **red**.
+1. Start recording: left-click the tray icon or run `eloquent-notes toggle`. A beep plays and the icon turns **red**.
 2. Speak (up to 30 s). The model is preloaded in the background while you talk.
 3. Stop recording the same way. The icon turns **orange** while the note is written.
 4. A **Note Saved** notification appears and the icon returns to **gray**. Click the notification to open the notes window. Silent recordings produce a **Dictation Empty** notification and no note.

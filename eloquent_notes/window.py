@@ -37,19 +37,13 @@ PAGE_MARGIN = 20
 DEFAULT_COLUMNS = 2
 PREVIEW_CHARS = 180
 
-RECORD_STATES = {
-    IDLE: ("gray", "Click to record a note"),
-    RECORDING: ("red", "Recording… click to stop"),
-    PROCESSING: ("orange", "Writing your note…"),
-}
-
 # Dates follow the English UI rather than the system locale.
 _UI_LOCALE = QLocale(QLocale.Language.English, QLocale.Country.UnitedKingdom)
 
-DICTATE_LABELS = {
-    IDLE: "Add dictation",
-    RECORDING: "Stop dictation",
-    PROCESSING: "Processing…",
+DICTATE_STATES = {
+    IDLE: ("gray", "Add dictation"),
+    RECORDING: ("red", "Stop dictation"),
+    PROCESSING: ("orange", "Processing…"),
 }
 
 
@@ -151,9 +145,8 @@ class NoteCard(QFrame):
 
 
 class TimelinePage(QWidget):
-    """Search box, filters, day-grouped note cards and the record button."""
+    """Search box, filters and day-grouped note cards."""
 
-    record_clicked = pyqtSignal()
     settings_clicked = pyqtSignal()
     search_requested = pyqtSignal(str)
     note_opened = pyqtSignal(object)
@@ -168,11 +161,10 @@ class TimelinePage(QWidget):
         self._results: list[Note] | None = None
         self._grid = QGridLayout()
         self._init_ui()
-        self.set_state(IDLE)
 
     def _init_ui(self) -> None:
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 14)
+        layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
         top = QVBoxLayout()
@@ -226,19 +218,6 @@ class TimelinePage(QWidget):
         self._scroll.setWidget(QWidget())
         layout.addWidget(self._scroll, stretch=1)
 
-        layout.addSpacing(8)
-        self.record_button = QPushButton()
-        self.record_button.setObjectName("record")
-        self.record_button.setFixedSize(68, 68)
-        self.record_button.setIconSize(self.record_button.size())
-        self.record_button.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.record_button.clicked.connect(self.record_clicked)
-        layout.addWidget(self.record_button, alignment=Qt.AlignmentFlag.AlignHCenter)
-
-        layout.addSpacing(4)
-        self.record_status = _muted(QLabel())
-        layout.addWidget(self.record_status, alignment=Qt.AlignmentFlag.AlignHCenter)
-
     # --- Public API ------------------------------------------------------
 
     def set_columns(self, columns: int) -> None:
@@ -266,12 +245,6 @@ class TimelinePage(QWidget):
 
     def select_tag(self, tag: str) -> None:
         self.tag_filter.setCurrentIndex(self.tag_filter.findData(tag))
-
-    def set_state(self, state: str) -> None:
-        color, status = RECORD_STATES[state]
-        self.record_button.setIcon(ui.get_qicon(color))
-        self.record_button.setEnabled(state != PROCESSING)
-        self.record_status.setText(status)
 
     # --- Search & filters --------------------------------------------------
 
@@ -403,6 +376,7 @@ class ReaderPage(QWidget):
         super().__init__()
         self.setObjectName("readerPage")
         self._init_ui()
+        self.set_state(IDLE)
 
     def _init_ui(self) -> None:
         layout = QVBoxLayout(self)
@@ -416,8 +390,7 @@ class ReaderPage(QWidget):
         btn_back.clicked.connect(self.back_clicked)
         toolbar.addWidget(btn_back)
         toolbar.addStretch()
-        self.btn_dictate = QPushButton(DICTATE_LABELS[IDLE])
-        self.btn_dictate.setIcon(ui.get_qicon("gray"))
+        self.btn_dictate = QPushButton()
         self.btn_dictate.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_dictate.clicked.connect(self.dictate_clicked)
         toolbar.addWidget(self.btn_dictate)
@@ -497,15 +470,15 @@ class ReaderPage(QWidget):
         return True
 
     def set_state(self, state: str) -> None:
-        self.btn_dictate.setText(DICTATE_LABELS[state])
-        self.btn_dictate.setIcon(ui.get_qicon(RECORD_STATES[state][0]))
+        color, label = DICTATE_STATES[state]
+        self.btn_dictate.setText(label)
+        self.btn_dictate.setIcon(ui.get_qicon(color))
         self.btn_dictate.setEnabled(state != PROCESSING)
 
 
 class MainWindow(QMainWindow):
     """Two-page window: the notes timeline and the note reader."""
 
-    record_clicked = pyqtSignal()
     dictate_clicked = pyqtSignal(object)
     note_edited = pyqtSignal(object)
     delete_requested = pyqtSignal(object)
@@ -527,7 +500,6 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(self.reader)
         self.setCentralWidget(self.stack)
 
-        self.timeline.record_clicked.connect(self.record_clicked)
         self.timeline.settings_clicked.connect(self.settings_clicked)
         self.timeline.search_requested.connect(self.search_requested)
         self.timeline.note_opened.connect(self.show_note)
@@ -558,7 +530,6 @@ class MainWindow(QMainWindow):
         self.timeline.show_search_error(query, message)
 
     def set_state(self, state: str) -> None:
-        self.timeline.set_state(state)
         self.reader.set_state(state)
 
     def show_note(self, note: Note) -> None:

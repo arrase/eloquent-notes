@@ -234,7 +234,6 @@ def window_stylesheet(t: Theme) -> str:
     QScrollArea {{
         border: none;
         border-top: 1px solid {t.border};
-        border-bottom: 1px solid {t.border};
         background: transparent;
     }}
     QLabel {{
@@ -315,15 +314,6 @@ def window_stylesheet(t: Theme) -> str:
         font-size: 12px;
         color: {t.tag};
         padding-top: 2px;
-    }}
-    QPushButton#record {{
-        border: none;
-        background: transparent;
-        padding: 0px;
-    }}
-    QPushButton#record:hover, QPushButton#record:pressed, QPushButton#record:disabled {{
-        border: none;
-        background: transparent;
     }}
     QFrame#readerCard {{
         background-color: {t.surface};
