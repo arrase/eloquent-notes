@@ -4,11 +4,11 @@ from datetime import date, datetime, timedelta
 from unittest.mock import MagicMock, patch
 
 import pytest
-from PyQt6.QtCore import QPointF, Qt
+from PyQt6.QtCore import QEvent, QPointF, Qt
 from PyQt6.QtGui import QGuiApplication, QMouseEvent
 from PyQt6.QtWidgets import QLabel, QMessageBox
 
-from eloquent_notes import notes
+from eloquent_notes import notes, ui
 from eloquent_notes.window import MainWindow, NoteCard, day_label, format_time
 
 
@@ -366,3 +366,19 @@ def test_delete_requires_confirmation(window, sample_notes):
         window.reader.delete_clicked.emit()
     deleted.assert_called_once_with(sample_notes[0])
     assert window.stack.currentWidget() is window.timeline
+
+
+def test_window_palette_change_updates_theme(qapp, sample_notes):
+    with patch("eloquent_notes.ui.is_dark_theme", return_value=False):
+        win = MainWindow()
+        win.set_notes(sample_notes)
+
+    assert win.styleSheet() == ui.window_stylesheet(ui.LIGHT_THEME)
+
+    with patch("eloquent_notes.ui.is_dark_theme", return_value=True):
+        win.changeEvent(QEvent(QEvent.Type.PaletteChange))
+
+    assert win.styleSheet() == ui.window_stylesheet(ui.DARK_THEME)
+    card = next(w for w in list_widgets(win) if isinstance(w, NoteCard) and w.note.title == "Launch decision")
+    assert ui.DARK_THEME.type_colors["decision"] in card.findChildren(QLabel)[0].text()
+    win.close()

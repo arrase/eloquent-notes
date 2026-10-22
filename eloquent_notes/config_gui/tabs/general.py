@@ -2,7 +2,7 @@
 
 import os
 
-from PyQt6.QtCore import QUrl
+from PyQt6.QtCore import Qt, QUrl
 from PyQt6.QtGui import QDesktopServices
 from PyQt6.QtWidgets import (
     QCheckBox,
@@ -73,7 +73,7 @@ class GeneralTab(QWidget):
             "Open the background daemon log file in your system editor."
         )
         self.btn_view_logs.clicked.connect(self._view_log_file)
-        layout.addWidget(self.btn_view_logs)
+        layout.addWidget(self.btn_view_logs, alignment=Qt.AlignmentFlag.AlignLeft)
 
         layout.addStretch()
 

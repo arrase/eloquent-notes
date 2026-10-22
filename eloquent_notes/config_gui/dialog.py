@@ -1,6 +1,7 @@
 """Configuration GUI dialog for Eloquent Notes."""
 
 import yaml
+from PyQt6.QtCore import QEvent
 from PyQt6.QtWidgets import (
     QDialog,
     QHBoxLayout,
@@ -10,7 +11,7 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
 )
 
-from eloquent_notes import config
+from eloquent_notes import config, ui
 from eloquent_notes.config_gui.constants import PROMPTS
 from eloquent_notes.config_gui.tabs import (
     AITab,
@@ -30,7 +31,7 @@ class ConfigurationDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Eloquent Notes Configuration")
-        self.setMinimumSize(850, 650)
+        self.setMinimumSize(850, 700)
         try:
             self.config_data = config.load_config()
         except (OSError, yaml.YAMLError, TypeError) as e:
@@ -41,9 +42,20 @@ class ConfigurationDialog(QDialog):
             )
             self.config_data = config.load_default_config()
 
+        self._dark = ui.is_dark_theme()
+        self.setStyleSheet(ui.dialog_stylesheet(ui.current_theme()))
         self._tabs = []
         self._init_ui()
         self.load_settings_to_ui()
+
+    def changeEvent(self, event):
+        """Update theme stylesheet when the system palette changes."""
+        if event is not None and event.type() == QEvent.Type.PaletteChange:
+            dark = ui.is_dark_theme()
+            if dark != self._dark:
+                self._dark = dark
+                self.setStyleSheet(ui.dialog_stylesheet(ui.current_theme()))
+        super().changeEvent(event)
 
     def _init_ui(self):
         """Build the GUI widgets."""

@@ -36,6 +36,12 @@ class TextFilesTab(QWidget):
         layout.setSpacing(10)
 
         splitter = QSplitter(Qt.Orientation.Horizontal)
+        splitter.setHandleWidth(12)
+
+        left_widget = QWidget()
+        left_layout = QVBoxLayout(left_widget)
+        left_layout.setContentsMargins(0, 0, 0, 0)
+        left_layout.addWidget(QLabel("Prompts:"))
 
         self.lst_items = QListWidget()
         for label, path, _ in self.items:
@@ -43,7 +49,8 @@ class TextFilesTab(QWidget):
             item.setData(Qt.ItemDataRole.UserRole, path)
             self.lst_items.addItem(item)
 
-        splitter.addWidget(self.lst_items)
+        left_layout.addWidget(self.lst_items)
+        splitter.addWidget(left_widget)
 
         editor_widget = QWidget()
         editor_layout = QVBoxLayout(editor_widget)

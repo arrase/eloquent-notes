@@ -45,7 +45,7 @@ class NotesTab(QWidget):
         )
         self.btn_browse_folder = QPushButton("Browse...")
         self.btn_browse_folder.clicked.connect(self._browse_folder)
-        path_layout.addWidget(self.txt_folder)
+        path_layout.addWidget(self.txt_folder, 1)
         path_layout.addWidget(self.btn_browse_folder)
 
         form_layout.addRow(QLabel("Notes Folder:"), path_widget)

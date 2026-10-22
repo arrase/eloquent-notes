@@ -1,7 +1,9 @@
 """Unit tests for eloquent_notes.ui module."""
 
+from unittest.mock import patch
+
 import pytest
-from PyQt6.QtGui import QIcon
+from PyQt6.QtGui import QColor, QIcon, QPalette
 
 from eloquent_notes import ui
 
@@ -37,3 +39,23 @@ def test_get_qicon_cached(qapp):
     icon1 = ui.get_qicon("red")
     icon2 = ui.get_qicon("red")
     assert icon1 is icon2
+
+
+def test_theme_selection_and_stylesheets(qapp):
+    """Test light and dark theme detection and stylesheet builders."""
+    light_palette = QPalette()
+    light_palette.setColor(QPalette.ColorRole.Window, QColor("#F3F5F8"))
+    with patch("eloquent_notes.ui.QGuiApplication.palette", return_value=light_palette):
+        assert not ui.is_dark_theme()
+        assert ui.current_theme() is ui.LIGHT_THEME
+
+    dark_palette = QPalette()
+    dark_palette.setColor(QPalette.ColorRole.Window, QColor("#13161C"))
+    with patch("eloquent_notes.ui.QGuiApplication.palette", return_value=dark_palette):
+        assert ui.is_dark_theme()
+        assert ui.current_theme() is ui.DARK_THEME
+
+    assert ui.LIGHT_THEME.window in ui.window_stylesheet(ui.LIGHT_THEME)
+    assert ui.DARK_THEME.window in ui.window_stylesheet(ui.DARK_THEME)
+    assert ui.LIGHT_THEME.surface in ui.dialog_stylesheet(ui.LIGHT_THEME)
+    assert ui.DARK_THEME.surface in ui.dialog_stylesheet(ui.DARK_THEME)

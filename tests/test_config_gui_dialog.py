@@ -4,9 +4,11 @@ from unittest.mock import patch
 
 import pytest
 import yaml
+from PyQt6.QtCore import QEvent
 from PyQt6.QtGui import QCloseEvent
 from PyQt6.QtWidgets import QMessageBox
 
+from eloquent_notes import ui
 from eloquent_notes.config_gui.dialog import ConfigurationDialog
 from eloquent_notes.config_gui.tabs.ai import AITab
 
@@ -79,7 +81,24 @@ def test_dialog_init(qapp):
         "Audio",
         "Prompts",
     ]
-    assert dialog.styleSheet() == ""
+    assert dialog.styleSheet() == ui.dialog_stylesheet(ui.current_theme())
+    dialog.cleanup_tabs()
+
+
+def test_dialog_palette_change_updates_stylesheet(qapp):
+    dummy_config = _make_valid_config()
+
+    with patch("eloquent_notes.config.load_config", return_value=dummy_config), patch(
+        "eloquent_notes.ui.is_dark_theme", return_value=False
+    ):
+        dialog = ConfigurationDialog()
+
+    assert dialog.styleSheet() == ui.dialog_stylesheet(ui.LIGHT_THEME)
+
+    with patch("eloquent_notes.ui.is_dark_theme", return_value=True):
+        dialog.changeEvent(QEvent(QEvent.Type.PaletteChange))
+
+    assert dialog.styleSheet() == ui.dialog_stylesheet(ui.DARK_THEME)
     dialog.cleanup_tabs()
 
 

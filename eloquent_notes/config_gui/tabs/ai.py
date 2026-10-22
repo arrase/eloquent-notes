@@ -63,10 +63,11 @@ class AITab(QWidget):
         self.btn_refresh_models = QPushButton("Refresh")
         self.btn_refresh_models.clicked.connect(self._fetch_models)
 
-        model_row.addWidget(self.cmb_model)
+        model_row.addWidget(self.cmb_model, 1)
         model_row.addWidget(self.btn_refresh_models)
 
         self.lbl_model_status = QLabel("Ready")
+        self.lbl_model_status.setObjectName("statusHint")
 
         model_layout.addLayout(model_row)
         model_layout.addWidget(self.lbl_model_status)
@@ -95,6 +96,7 @@ class AITab(QWidget):
 
         context_layout.addWidget(self.spn_context_length)
         context_layout.addWidget(self.chk_context_default)
+        context_layout.addStretch()
         form_layout.addRow(QLabel("Context Length:"), context_widget)
 
         self.txt_keep_alive = QLineEdit()

@@ -10,8 +10,8 @@ from __future__ import annotations
 import html
 from datetime import date, datetime, timedelta
 
-from PyQt6.QtCore import QDateTime, QLocale, Qt, pyqtSignal
-from PyQt6.QtGui import QCloseEvent, QGuiApplication, QKeySequence, QMouseEvent, QPalette, QResizeEvent, QShortcut
+from PyQt6.QtCore import QDateTime, QEvent, QLocale, Qt, pyqtSignal
+from PyQt6.QtGui import QCloseEvent, QGuiApplication, QKeySequence, QMouseEvent, QResizeEvent, QShortcut
 from PyQt6.QtWidgets import (
     QButtonGroup,
     QComboBox,
@@ -39,15 +39,6 @@ COLUMN_WIDTH = 440
 DEFAULT_COLUMNS = 2
 PREVIEW_CHARS = 180
 
-TYPE_COLORS = {
-    "note": "#64748b",
-    "task": "#2563eb",
-    "idea": "#d97706",
-    "reminder": "#dc2626",
-    "question": "#7c3aed",
-    "decision": "#059669",
-}
-
 RECORD_STATES = {
     IDLE: ("gray", "Click to record a note"),
     RECORDING: ("red", "Recording… click to stop"),
@@ -62,29 +53,6 @@ DICTATE_LABELS = {
     RECORDING: "Stop dictation",
     PROCESSING: "Processing…",
 }
-
-STYLESHEET = """
-QLabel#appTitle { font-size: 20px; font-weight: 700; }
-QLineEdit#search {
-    padding: 8px 12px; border: 1px solid palette(mid); border-radius: 8px; background: palette(base);
-}
-QPushButton#chip {
-    padding: 4px 12px; border: 1px solid palette(mid); border-radius: 12px; background: transparent;
-}
-QPushButton#chip:checked {
-    background: palette(highlight); color: palette(highlighted-text); border-color: palette(highlight);
-}
-QFrame#card { background: palette(base); border: 1px solid palette(mid); border-radius: 10px; }
-QFrame#card:hover { border-color: palette(highlight); }
-QLabel#cardTitle { font-size: 15px; font-weight: 600; }
-QLabel#dayHeader { font-size: 11px; font-weight: 700; padding-top: 14px; }
-QPushButton#record { border: none; background: transparent; }
-QLineEdit#titleEdit { font-size: 22px; font-weight: 700; border: none; background: transparent; }
-QLineEdit#tagsEdit, QPlainTextEdit#bodyEdit { border: none; background: transparent; }
-QPlainTextEdit#bodyEdit { font-size: 14px; }
-QFrame#separator { border: none; background: palette(mid); }
-QScrollArea { border: none; background: transparent; }
-"""
 
 
 def format_time(moment: datetime, pattern: str) -> str:
@@ -102,7 +70,8 @@ def day_label(day: date, today: date) -> str:
 
 
 def _muted(label: QLabel) -> QLabel:
-    label.setForegroundRole(QPalette.ColorRole.PlaceholderText)
+    if not label.objectName():
+        label.setObjectName("mutedLabel")
     return label
 
 
@@ -110,7 +79,8 @@ def _plain(text: str, object_name: str = "") -> QLabel:
     label = QLabel(text)
     label.setTextFormat(Qt.TextFormat.PlainText)
     label.setWordWrap(True)
-    label.setObjectName(object_name)
+    if object_name:
+        label.setObjectName(object_name)
     return label
 
 
@@ -119,9 +89,10 @@ class Column(QWidget):
 
     def __init__(self, max_width: int = CONTENT_MAX_WIDTH) -> None:
         super().__init__()
+        self.setObjectName("columnContainer")
         self.max_width = max_width
         self.column = QVBoxLayout(self)
-        self.column.setSpacing(8)
+        self.column.setSpacing(10)
 
     def set_max_width(self, max_width: int) -> None:
         self.max_width = max_width
@@ -147,14 +118,16 @@ class NoteCard(QFrame):
         self.note = note
         self.setObjectName("card")
         self.setCursor(Qt.CursorShape.PointingHandCursor)
+        theme = ui.current_theme()
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(16, 12, 16, 12)
-        layout.setSpacing(4)
+        layout.setContentsMargins(18, 14, 18, 14)
+        layout.setSpacing(6)
 
         when = format_time(note.created, "d MMM yyyy, HH:mm" if show_date else "HH:mm")
+        type_color = theme.type_colors[note.type]
         meta = _muted(QLabel(
-            f'{when} · <span style="color: {TYPE_COLORS[note.type]}; font-weight: 600;">'
+            f'{when} &nbsp;·&nbsp; <span style="color: {type_color}; font-weight: 600;">'
             f"● {note.type.capitalize()}</span>"
         ))
         layout.addWidget(meta)
@@ -163,13 +136,15 @@ class NoteCard(QFrame):
         if note.body:
             flat = " ".join(note.body.split())
             preview = flat if len(flat) <= PREVIEW_CHARS else f"{flat[:PREVIEW_CHARS].rstrip()}…"
-            layout.addWidget(_muted(_plain(preview)))
+            layout.addWidget(_plain(preview, "cardPreview"))
 
         if note.tags:
             tags = QLabel(" &nbsp; ".join(
-                f'<a href="{html.escape(tag)}" style="text-decoration: none;">#{html.escape(tag)}</a>'
+                f'<a href="{html.escape(tag)}" style="text-decoration: none; color: {theme.tag}; font-weight: 500;">'
+                f"#{html.escape(tag)}</a>"
                 for tag in note.tags
             ))
+            tags.setObjectName("cardTags")
             tags.setWordWrap(True)
             tags.setTextInteractionFlags(Qt.TextInteractionFlag.LinksAccessibleByMouse)
             tags.linkActivated.connect(self.tag_clicked)
@@ -193,6 +168,7 @@ class TimelinePage(QWidget):
 
     def __init__(self, columns: int = DEFAULT_COLUMNS) -> None:
         super().__init__()
+        self.setObjectName("timelinePage")
         self._columns = columns
         self._notes: list[Note] = []
         self._type = ""
@@ -207,7 +183,7 @@ class TimelinePage(QWidget):
 
     def _init_ui(self) -> None:
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 8, 0, 12)
+        layout.setContentsMargins(0, 8, 0, 14)
         layout.setSpacing(0)
 
         self._top = Column(self._max_width())
@@ -219,7 +195,7 @@ class TimelinePage(QWidget):
         header.addWidget(title)
         header.addStretch()
         btn_settings = QPushButton("Settings")
-        btn_settings.setFlat(True)
+        btn_settings.setCursor(Qt.CursorShape.PointingHandCursor)
         btn_settings.clicked.connect(self.settings_clicked)
         header.addWidget(btn_settings)
         self._top.column.addLayout(header)
@@ -240,12 +216,14 @@ class TimelinePage(QWidget):
             chip.setObjectName("chip")
             chip.setCheckable(True)
             chip.setChecked(not note_type)
+            chip.setCursor(Qt.CursorShape.PointingHandCursor)
             chip.setProperty("noteType", note_type)
             self.type_filter.addButton(chip)
             filters.addWidget(chip)
         self.type_filter.buttonClicked.connect(self._on_type_clicked)
         filters.addStretch()
         self.tag_filter = QComboBox()
+        self.tag_filter.setCursor(Qt.CursorShape.PointingHandCursor)
         self.tag_filter.addItem("All tags", "")
         self.tag_filter.currentIndexChanged.connect(self._render)
         filters.addWidget(self.tag_filter)
@@ -257,14 +235,16 @@ class TimelinePage(QWidget):
         self._scroll.setWidget(Column(self._max_width()))
         layout.addWidget(self._scroll, stretch=1)
 
+        layout.addSpacing(8)
         self.record_button = QPushButton()
         self.record_button.setObjectName("record")
-        self.record_button.setFixedSize(72, 72)
+        self.record_button.setFixedSize(68, 68)
         self.record_button.setIconSize(self.record_button.size())
         self.record_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.record_button.clicked.connect(self.record_clicked)
         layout.addWidget(self.record_button, alignment=Qt.AlignmentFlag.AlignHCenter)
 
+        layout.addSpacing(4)
         self.record_status = _muted(QLabel())
         layout.addWidget(self.record_status, alignment=Qt.AlignmentFlag.AlignHCenter)
 
@@ -390,7 +370,7 @@ class TimelinePage(QWidget):
         column = Column(self._max_width())
         self._grid = QGridLayout()
         self._grid.setContentsMargins(0, 0, 0, 0)
-        self._grid.setSpacing(8)
+        self._grid.setSpacing(12)
         for col in range(self._columns):
             self._grid.setColumnStretch(col, 1)
 
@@ -429,60 +409,76 @@ class ReaderPage(QWidget):
 
     def __init__(self) -> None:
         super().__init__()
+        self.setObjectName("readerPage")
         self._init_ui()
 
     def _init_ui(self) -> None:
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 8, 0, 0)
+        layout.setContentsMargins(0, 8, 0, 16)
         content = Column()
         layout.addWidget(content)
 
         toolbar = QHBoxLayout()
+        toolbar.setSpacing(8)
         btn_back = QPushButton("← Back")
-        btn_back.setFlat(True)
+        btn_back.setCursor(Qt.CursorShape.PointingHandCursor)
         btn_back.clicked.connect(self.back_clicked)
         toolbar.addWidget(btn_back)
         toolbar.addStretch()
         self.btn_dictate = QPushButton(DICTATE_LABELS[IDLE])
         self.btn_dictate.setIcon(ui.get_qicon("gray"))
+        self.btn_dictate.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_dictate.clicked.connect(self.dictate_clicked)
         toolbar.addWidget(self.btn_dictate)
         btn_copy = QPushButton("Copy")
+        btn_copy.setCursor(Qt.CursorShape.PointingHandCursor)
         btn_copy.clicked.connect(self.copy_clicked)
         toolbar.addWidget(btn_copy)
         btn_delete = QPushButton("Delete")
+        btn_delete.setObjectName("dangerButton")
+        btn_delete.setCursor(Qt.CursorShape.PointingHandCursor)
         btn_delete.clicked.connect(self.delete_clicked)
         toolbar.addWidget(btn_delete)
         content.column.addLayout(toolbar)
 
+        card = QFrame()
+        card.setObjectName("readerCard")
+        sheet = QVBoxLayout(card)
+        sheet.setContentsMargins(28, 24, 28, 24)
+        sheet.setSpacing(10)
+
         meta = QHBoxLayout()
+        meta.setSpacing(12)
         self.type_box = QComboBox()
+        self.type_box.setCursor(Qt.CursorShape.PointingHandCursor)
         for note_type in NOTE_TYPES:
             self.type_box.addItem(note_type.capitalize(), note_type)
         meta.addWidget(self.type_box)
         self.date_label = _muted(QLabel())
         meta.addWidget(self.date_label)
         meta.addStretch()
-        content.column.addLayout(meta)
+        sheet.addLayout(meta)
 
         self.title_edit = QLineEdit()
         self.title_edit.setObjectName("titleEdit")
         self.title_edit.setPlaceholderText("Title")
-        content.column.addWidget(self.title_edit)
+        sheet.addWidget(self.title_edit)
 
         self.tags_edit = QLineEdit()
         self.tags_edit.setObjectName("tagsEdit")
         self.tags_edit.setPlaceholderText("Tags, separated by commas")
-        content.column.addWidget(self.tags_edit)
+        sheet.addWidget(self.tags_edit)
 
         separator = QFrame()
         separator.setObjectName("separator")
         separator.setFixedHeight(1)
-        content.column.addWidget(separator)
+        sheet.addWidget(separator)
 
         self.body_edit = QPlainTextEdit()
         self.body_edit.setObjectName("bodyEdit")
-        content.column.addWidget(self.body_edit, stretch=1)
+        sheet.addWidget(self.body_edit, stretch=1)
+
+        content.column.addWidget(card, stretch=1)
 
         QShortcut(QKeySequence(Qt.Key.Key_Escape), self).activated.connect(self.back_clicked)
 
@@ -529,7 +525,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Eloquent Notes")
         self.resize(960, 880)
         self.setMinimumWidth(720)
-        self.setStyleSheet(STYLESHEET)
+        self._dark = ui.is_dark_theme()
+        self.setStyleSheet(ui.window_stylesheet(ui.current_theme()))
 
         self.timeline = TimelinePage(columns=columns)
         self.reader = ReaderPage()
@@ -546,6 +543,15 @@ class MainWindow(QMainWindow):
         self.reader.dictate_clicked.connect(self._on_dictate)
         self.reader.copy_clicked.connect(self._on_copy)
         self.reader.delete_clicked.connect(self._on_delete)
+
+    def changeEvent(self, event: QEvent | None) -> None:
+        if event is not None and event.type() == QEvent.Type.PaletteChange:
+            dark = ui.is_dark_theme()
+            if dark != self._dark:
+                self._dark = dark
+                self.setStyleSheet(ui.window_stylesheet(ui.current_theme()))
+                self.timeline._render()
+        super().changeEvent(event)
 
     def set_columns(self, columns: int) -> None:
         self.timeline.set_columns(columns)
