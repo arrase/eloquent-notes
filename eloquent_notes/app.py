@@ -30,6 +30,7 @@ from eloquent_notes import (
     PROCESSING,
     RECORDING,
     audio,
+    autostart,
     config,
     config_gui,
     llm,
@@ -63,6 +64,9 @@ class EloquentApp(QObject):
     def __init__(self, qapp, start_recording_immediately=False, open_window_immediately=False, app_config=None):
         super().__init__()
         self.app = qapp
+        self.app.setApplicationName("eloquent-notes")
+        self.app.setApplicationDisplayName(APP_NAME)
+        self.app.setDesktopFileName("eloquent-notes")
         self.app.setWindowIcon(ui.get_app_icon())
         self.state = IDLE
         self.config = app_config if app_config is not None else config.load_config()
@@ -224,6 +228,7 @@ class EloquentApp(QObject):
             self.window.settings_clicked.connect(self.show_config_dialog)
             self.window.set_state(self.state)
         self._refresh_window()
+        self.window.show_timeline()
         self.window.show()
         self.window.raise_()
         self.window.activateWindow()
@@ -640,6 +645,7 @@ def main():
         max_mb=log_cfg["max_mb"],
         backup_count=log_cfg["backup_count"],
     )
+    autostart.install_desktop_entry()
     logger.info("Starting Eloquent Notes daemon...")
 
     app = QApplication(sys.argv)

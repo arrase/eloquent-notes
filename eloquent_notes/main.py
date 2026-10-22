@@ -78,6 +78,8 @@ def run_cli(cli_args=None, launcher=os.execv):
 
     if args.command == "config":
         _app = QApplication.instance() or QApplication(sys.argv)
+        _app.setApplicationName("eloquent-notes")
+        QApplication.setDesktopFileName("eloquent-notes")
         dialog = ConfigurationDialog()
         if dialog.exec() == QDialog.DialogCode.Accepted:
             send_ipc_command("reload", timeout_ms=200)

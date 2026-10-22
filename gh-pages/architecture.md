@@ -19,7 +19,7 @@ Eloquent Notes is a Linux tray daemon with one job: turn voice dictations into w
 | `ui.py` | Application, tray and dictation state icons drawn with `QPainter`, plus light/dark theme stylesheets. |
 | `config.py` | XDG paths, default file installation, config loading/merging, atomic writes. |
 | `config_gui/` | Configuration dialog (General, Notes, AI Settings, Audio, Prompts tabs). |
-| `autostart.py`, `logging_utils.py` | Autostart desktop entry; rotating XDG log files. |
+| `autostart.py`, `logging_utils.py` | Application launcher, SVG icon and autostart desktop entries; rotating XDG log files. |
 
 ### Boundaries
 

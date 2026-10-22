@@ -198,4 +198,11 @@ def test_cache_dir_follows_xdg_cache_home():
     assert config.CACHE_DIR == os.path.join(os.environ["XDG_CACHE_HOME"], "eloquent-notes")
 
 
+def test_get_data_home_follows_xdg_data_home(monkeypatch):
+    monkeypatch.setenv("XDG_DATA_HOME", "/custom/data")
+    assert config.get_data_home() == "/custom/data"
+    monkeypatch.delenv("XDG_DATA_HOME", raising=False)
+    assert config.get_data_home() == os.path.expanduser("~/.local/share")
+
+
 

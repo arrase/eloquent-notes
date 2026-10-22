@@ -53,7 +53,7 @@ Opens the graphical configuration management dialog.
 
 ### 5. `eloquent-notes install-autostart`
 
-Creates a system autostart file `~/.config/autostart/eloquent-notes.desktop` pointing to your current executable installation path (`shutil.which("eloquent-notes")`).
+Creates the system autostart file `~/.config/autostart/eloquent-notes.desktop` (starts quietly in the tray on login) as well as the application launcher entry `~/.local/share/applications/eloquent-notes.desktop` (`Exec=<path> open`, which opens the notes list and starts the daemon if needed) and SVG icon `~/.local/share/icons/hicolor/scalable/apps/eloquent-notes.svg`.
 
 ### 6. `eloquent-notes --version`
 
@@ -159,5 +159,7 @@ logging:
 | Path | Content |
 | :--- | :--- |
 | `$XDG_CONFIG_HOME/eloquent-notes/` (default `~/.config/eloquent-notes/`) | `config.yaml` and `prompts/` (see [Configuration](configuration.md)). |
+| `$XDG_DATA_HOME/applications/eloquent-notes.desktop` (default `~/.local/share/applications/`) | Application menu / dock launcher (`eloquent-notes open`). |
+| `$XDG_DATA_HOME/icons/hicolor/scalable/apps/eloquent-notes.svg` | Application SVG icon. |
 | `$XDG_CACHE_HOME/eloquent-notes/embeddings.npz` (default `~/.cache/eloquent-notes/`) | Semantic search embedding cache; safe to delete (see [Notes & Search](notes.md)). |
 | `notes.folder` (default `~/Documents/Eloquent Notes`) | The notes themselves, one Markdown file each. |

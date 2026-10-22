@@ -21,6 +21,11 @@ def get_cache_home():
     return os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache")
 
 
+def get_data_home():
+    """Return the XDG base directory for user data files."""
+    return os.environ.get("XDG_DATA_HOME") or os.path.expanduser("~/.local/share")
+
+
 CONFIG_DIR = os.path.join(get_config_home(), "eloquent-notes")
 CONFIG_PATH = os.path.join(CONFIG_DIR, "config.yaml")
 CACHE_DIR = os.path.join(get_cache_home(), "eloquent-notes")

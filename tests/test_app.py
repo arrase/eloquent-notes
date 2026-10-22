@@ -73,6 +73,8 @@ def test_app_init_starts_idle(qapp):
     assert eloquent_app.state == "IDLE"
     assert eloquent_app._recorder is None
     assert eloquent_app._snapshot is None
+    assert qapp.applicationName() == "eloquent-notes"
+    assert qapp.desktopFileName() == "eloquent-notes"
 
 
 def test_toggle_from_idle_starts_recording(qapp, mock_config):
@@ -736,6 +738,7 @@ def test_run_schedules_initial_toggle_after_tray_init(qapp):
 def test_app_main_entry_point(monkeypatch):
     mock_qapp = MagicMock()
     mock_eloquent_app = MagicMock()
+    mock_install_desktop = MagicMock()
 
     monkeypatch.setattr("eloquent_notes.app.QApplication", lambda args: mock_qapp)
     monkeypatch.setattr(
@@ -743,10 +746,12 @@ def test_app_main_entry_point(monkeypatch):
         lambda app, start_recording_immediately, open_window_immediately, **kwargs: mock_eloquent_app,
     )
     monkeypatch.setattr("eloquent_notes.app.setup_logging", MagicMock())
+    monkeypatch.setattr("eloquent_notes.app.autostart.install_desktop_entry", mock_install_desktop)
     monkeypatch.setattr(sys, "argv", ["eloquent-notes", "toggle"])
 
     app_main()
 
+    mock_install_desktop.assert_called_once()
     mock_qapp.setQuitOnLastWindowClosed.assert_called_once_with(False)
     mock_eloquent_app.run.assert_called_once()
 
@@ -759,15 +764,19 @@ def _write_note(folder, title="Groceries", body="Buy milk."):
 
 
 def test_show_window_creates_window_once_and_loads_notes(qapp, mock_config, tmp_path):
-    _write_note(tmp_path / "notes")
+    note = _write_note(tmp_path / "notes")
     eloquent_app = make_app(qapp)
 
     eloquent_app.show_window()
     window = eloquent_app.window
+    window.show_note(note)
+    assert window.stack.currentWidget() is window.reader
+
     eloquent_app.show_window()
 
     assert eloquent_app.window is window
-    assert [note.title for note in window.timeline._notes] == ["Groceries"]
+    assert window.stack.currentWidget() is window.timeline
+    assert [n.title for n in window.timeline._notes] == ["Groceries"]
     window.close()
 
 

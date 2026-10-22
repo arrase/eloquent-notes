@@ -146,15 +146,10 @@ eloquent-notes install-autostart
 
 ### What This Does
 
-This command resolves the executable path (`shutil.which("eloquent-notes")`) and creates a FreeDesktop desktop entry at:
+This command resolves the executable path (`shutil.which("eloquent-notes")`) and installs:
 
-```
-~/.config/autostart/eloquent-notes.desktop
-```
-
-The entry runs `Exec=<path to eloquent-notes>` with `X-GNOME-Autostart-enabled=true`. The same file is created or removed by the **Start automatically on login** option in the **General** tab of the configuration dialog.
-
-Eloquent Notes will now start silently in your system tray upon desktop login. Run `eloquent-notes` again (or middle-click the tray icon) to open the notes window.
+- `~/.config/autostart/eloquent-notes.desktop` (`Exec=<path to eloquent-notes>` with `X-GNOME-Autostart-enabled=true`), so Eloquent Notes starts silently in the system tray upon desktop login. The same file is created or removed by the **Start automatically on login** option in the **General** tab of the configuration dialog.
+- `~/.local/share/applications/eloquent-notes.desktop` (`Exec=<path to eloquent-notes> open`) and `~/.local/share/icons/hicolor/scalable/apps/eloquent-notes.svg` (also installed automatically whenever the daemon starts), so Eloquent Notes appears in your desktop's application menu, can be pinned to the dock/panel, and opens the notes list when clicked.
 
 ---
 

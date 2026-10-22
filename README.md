@@ -207,7 +207,7 @@ Prompts live in `~/.config/eloquent-notes/prompts/`:
 | `eloquent-notes toggle` (`-t`, `--toggle`) | Start / stop recording (starts the daemon if needed). |
 | `eloquent-notes open` | Open the notes window (starts the daemon if needed). |
 | `eloquent-notes config` | Open the configuration dialog. |
-| `eloquent-notes install-autostart` | Install `~/.config/autostart/eloquent-notes.desktop`. |
+| `eloquent-notes install-autostart` | Install `~/.config/autostart/eloquent-notes.desktop` and the desktop launcher entry. |
 | `eloquent-notes --version` | Print the installed version. |
 
 Logs are written to `$XDG_STATE_HOME/eloquent-notes/app.log` (default `~/.local/state/eloquent-notes/app.log`) with rotation. The embedding cache lives at `$XDG_CACHE_HOME/eloquent-notes/embeddings.npz`.
