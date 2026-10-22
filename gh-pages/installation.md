@@ -1,6 +1,6 @@
 # Installation & Setup
 
-This guide walks you through setting up system prerequisites, installing local AI models with Ollama, installing Eloquent Notes, and configuring desktop autostart.
+This guide walks you through setting up system prerequisites, installing the local AI models with Ollama, installing Eloquent Notes, and configuring desktop autostart.
 
 ---
 
@@ -11,7 +11,7 @@ Eloquent Notes is engineered for Linux desktop environments. Ensure your system 
 | Component | Minimum Requirement | Notes |
 | :--- | :--- | :--- |
 | **Operating System** | Linux (Ubuntu, Debian, Fedora, Arch, openSUSE, etc.) | Uses XDG directory standards and X11/Wayland system tray. |
-| **Python** | Python 3.8+ | Standard Python runtime environment. |
+| **Python** | Python 3.11+ | Standard Python runtime environment. |
 | **Audio Subsystem** | PortAudio (`libportaudio2`) | Required by `sounddevice` for microphone capture and sine tone playback. |
 | **Notifications** | DBus Notification Server | Required for desktop status popups (`dunst`, `mako`, GNOME/KDE built-in). |
 | **AI Runtime** | Ollama | Local inference service running on `http://localhost:11434`. |
@@ -47,9 +47,9 @@ Install PortAudio and DBus notification utilities using your distribution packag
 
 ---
 
-## Local Ollama Setup & Gemma 4 Model Download
+## Local Ollama Setup & Model Download
 
-Eloquent Notes relies on **Ollama** to run the multimodal Gemma 4 model locally on your hardware for transcription, note rewriting, and classification.
+Eloquent Notes relies on **Ollama** to run two models locally: the multimodal Gemma 4 model for transcription, rewriting and classification, and an EmbeddingGemma model for semantic search.
 
 ### 1. Install Ollama
 
@@ -65,15 +65,16 @@ Verify that the Ollama service is running:
 systemctl status ollama
 ```
 
-### 2. Download Gemma 4 Model
+### 2. Download the Models
 
-Download the recommended quantized Gemma 4 model (`gemma4:e4b-it-qat`):
+Download the quantized Gemma 4 model (`gemma4:e4b-it-qat`) and the embedding model (`embeddinggemma-2:latest`):
 
 ```bash
 ollama pull gemma4:e4b-it-qat
+ollama pull embeddinggemma-2:latest
 ```
 
-*(Note: You can also use other multimodal models compatible with audio dictation by updating the model name in your `config.yaml` or through the **AI Settings** tab in the GUI).*
+*(Note: You can use other audio-capable or embedding models by updating `ai.model` / `search.embedding_model` in `config.yaml` or in the **AI Settings** tab of the GUI. The embedding model is only needed for search; recording works without it.)*
 
 ---
 
@@ -130,7 +131,7 @@ If you want to contribute or modify the source code locally:
 3. Install in editable mode with development dependencies:
 
    ```bash
-   pip install -e .
+   pip install -e ".[dev]"
    ```
 
 ---
@@ -145,25 +146,20 @@ eloquent-notes install-autostart
 
 ### What This Does
 
-This command resolves the binary executable path and creates a FreeDesktop-compliant desktop entry file at:
+This command resolves the executable path (`shutil.which("eloquent-notes")`) and creates a FreeDesktop desktop entry at:
 
 ```
 ~/.config/autostart/eloquent-notes.desktop
 ```
 
-With the following content:
+The entry runs `Exec=<path to eloquent-notes>` with `X-GNOME-Autostart-enabled=true`. The same file is created or removed by the **Start automatically on login** option in the **General** tab of the configuration dialog.
 
-```ini
-[Desktop Entry]
-Type=Application
-Exec=/home/username/.local/bin/eloquent-notes
-Hidden=false
-NoDisplay=false
-X-GNOME-Autostart-enabled=true
-Name=Eloquent Notes
-Comment=Background dictation utility for Obsidian
-Icon=accessories-text-editor
-Categories=Utility;
-```
+Eloquent Notes will now start silently in your system tray upon desktop login. Run `eloquent-notes` again (or middle-click the tray icon) to open the notes window.
 
-Eloquent Notes will now start silently in your system tray upon desktop login.
+---
+
+## First Run
+
+1. Start the daemon: `eloquent-notes &`.
+2. Open **Configuration** from the tray menu and check the **Notes Folder** (default `~/Documents/Eloquent Notes`) and the models in **AI Settings**.
+3. Left-click the tray icon, speak, and click again. The note appears in the notes window.

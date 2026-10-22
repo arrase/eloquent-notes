@@ -1,104 +1,108 @@
-# Configuration & Templates
+# Configuration
 
-Eloquent Notes provides flexible configuration management, allowing users to customize behavior either visually through a built-in **PyQt6 Configuration GUI** or directly by editing YAML configuration and Markdown template files.
+Eloquent Notes can be configured visually through the built-in **PyQt6 Configuration GUI** or by editing the YAML configuration and Markdown prompt files directly.
 
-All configuration data, prompts, and templates are stored in standard user configuration paths under `~/.config/eloquent-notes/`.
+All configuration lives under `~/.config/eloquent-notes/` (or `$XDG_CONFIG_HOME/eloquent-notes/`). On first run, the packaged defaults are copied there; existing files are never overwritten.
+
+```
+~/.config/eloquent-notes/
+├── config.yaml
+└── prompts/
+    ├── transcription_system.md
+    ├── transcription_user.md
+    ├── rewriting_system.md
+    ├── rewriting_user.md
+    ├── classification_system.md
+    ├── classification_user.md
+    └── retry_prompt.md
+```
+
+User values in `config.yaml` are merged over the packaged defaults, so missing keys fall back to the defaults. A section that is not a mapping is rejected with an error notification.
 
 ---
 
 ## Built-in PyQt6 Configuration GUI
 
-You can launch the configuration dialog at any time by running:
+Open the dialog with:
 
 ```bash
 eloquent-notes config
 ```
 
-Alternatively, right-click the Eloquent Notes system tray icon and select **Configuration**.
+Alternatively, choose **Configuration** in the tray menu or click **Settings** in the notes window.
 
 ![Configuration GUI](screenshots/configuration.png)
 
-The dialog provides tabbed navigation across six settings panels, along with **Restore Defaults**, **Cancel**, and **Save** action buttons at the bottom.
+The dialog has five tabs plus **Restore Defaults**, **Cancel** and **Save** buttons. Saving writes the prompt files and the settings that differ from the defaults to `config.yaml`, then reloads the running daemon. The dialog uses the system theme.
 
 ### Tab Breakdown
 
 #### 1. General
-Configures runtime application logging behavior:
-* **Log Level**: Verbosity level for system logs (`DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`).
-* **Max File Size (MB)**: Maximum disk storage space dedicated to a single log file before rotation (default: `5` MB).
-* **Backup Count**: Number of historical rotated log archives to preserve in storage (default: `3`).
+* **Start automatically on login**: installs or removes `~/.config/autostart/eloquent-notes.desktop`.
+* **Logging Level**: `DEBUG`, `INFO`, `WARNING`, `ERROR` or `CRITICAL`.
+* **Max Log File Size**: size in MB before rotation (default `5`).
+* **Backup Count**: rotated log files to keep (default `3`).
+* **View Log File**: opens `app.log`.
 
-#### 2. Obsidian
-Controls how generated dictations are integrated into your Obsidian vault:
-* **Vault Path**: The root path to your Obsidian vault directory (e.g., `~/Obsidian`).
-* **Dictations Subfolder**: The subfolder relative to your vault root where standalone notes are stored (default: `Dictations`).
-* **Subfolder Structure**: Organization strategy for notes inside the target folder (`none` for directly in target folder, `month` for `YYYY-MM`, `week` for `YYYY-Www`, or `month_week` for `YYYY-MM/Www`).
-* **Enable Daily Notes**: When enabled, all dictations are appended to the daily note (`YYYY-MM-DD.md`) in the configured target folder instead of creating standalone files.
-* **Scan Vault Context**: Scans existing note titles in your vault and provides them as contextual hints to Gemma 4, allowing the model to automatically insert `[[WikiLinks]]` when existing topics are mentioned in audio.
+#### 2. Notes
+* **Notes Folder**: folder where each note is saved as a Markdown file (default `~/Documents/Eloquent Notes`). It may point inside an Obsidian vault; files without Eloquent Notes frontmatter are ignored. See [Notes & Search](notes.md).
 
 #### 3. AI Settings
-Configures connection parameters and behavior for the local Ollama inference server:
-* **Ollama Server URL**: Endpoint URL of your running Ollama service (default: `http://localhost:11434`).
-* **Model Name**: Large language / multimodal model tag (default: `gemma4:e4b-it-qat`).
-* **Output Language**: Target output language for rewritten notes, titles, wikilinks, and tags (default: `English`).
-* **Context Length (`num_ctx`)**: Context window limit for LLM requests (default: `8192` tokens).
-* **Keep-Alive Duration**: Time duration to keep model weights loaded in VRAM after note generation (e.g., `0` for immediate unload, `5m`, `10m`).
-* **Preload Keep-Alive**: VRAM persistence duration while actively recording audio to minimize latency during generation (default: `5m`).
-* **Max Retries**: Retry count for JSON schema validation failures during prompt execution (default: `3`).
-* **Preload Timeout**: Maximum wait time in seconds for model weights to load into memory (default: `180` seconds).
-* **Request Timeout**: Maximum wait time in seconds for inference generation to complete (default: `300` seconds).
+**Ollama & AI Pipeline Settings**
+* **Ollama URL**: endpoint of the Ollama server (default `http://localhost:11434`).
+* **AI Model (Audio)**: multimodal model used for all three pipeline phases (default `gemma4:e4b-it-qat`). **Refresh** queries Ollama and lists the installed models that report the `audio` capability.
+* **Context Length**: `num_ctx` for requests (default `8192`). **Use default context length** stores `null` so Ollama uses the model's maximum.
+* **Keep Alive Time**: how long the model stays loaded after a note is generated (default `"0"`, unload immediately).
+* **Preload Keep Alive**: how long the model stays loaded while recording and between phases (default `"5m"`).
+* **Max Retries**: retries when a response fails JSON validation (default `3`).
+* **Preload Timeout** / **Request Timeout**: seconds allowed for model loading (default `180`) and for each pipeline request (default `300`).
+* **Output Language**: language for titles, rewritten prose and tags (default `English`; editable).
+
+**Semantic Search**
+* **Embedding Model**: Ollama embedding model used for search (default `embeddinggemma-2:latest`). **Refresh** also lists installed models that report the `embedding` capability.
+* **Minimum Similarity**: cosine similarity below which search results are hidden (default `0.6`).
 
 #### 4. Audio
-Controls input recording settings, duration limits, and visual/audible status notifications:
-* **Sample Rate**: Recording sample frequency in Hertz (default: `16000` Hz / 16 kHz).
-* **Channels**: Audio channels captured (`1` for Mono, `2` for Stereo).
-* **Capture Duration**: Maximum recording duration in seconds before automatically stopping and sending to LLM (default: `30` seconds).
-* **Show Recording HUD**: Displays a floating pill overlay with real-time countdown timer and progress bar while dictating (default: `true`).
-* **Enable Audio Feedback**: Toggle sound effects played upon starting and stopping recording.
-* **Beep Frequency**: Pitch of the audio tone in Hertz (default: `440` Hz, musical note A4).
-* **Beep Duration**: Length of tone playback in seconds (default: `0.1` seconds).
+* **Sample Rate**: recording rate in Hz (default `16000`).
+* **Audio Channels**: `1` (mono) or `2` (stereo).
+* **Capture Duration**: maximum recording length in seconds before recording stops automatically (default `30`, the Gemma 4 audio limit).
+* **Show floating countdown HUD**: overlay with the remaining time while recording; clicking it stops the recording.
+* **Play beep on recording start and stop**: audio cues, with **Beep Frequency** (default `440` Hz) and **Beep Duration** (default `0.1` s).
 
 #### 5. Prompts
-Provides a rich text editor for customizing the Markdown prompts that drive each stage of the three-phase AI pipeline:
-* **Transcription System & User Prompts**: Direct audio-to-text conversion and noise filtering.
-* **Rewriting System & User Prompts**: Structuring raw text into coherent titles and formatted Markdown content.
-* **Classification System & User Prompts**: Metadata extraction (note category, tags, and wikilinks).
-* **Retry Prompt**: Correction instructions issued when LLM output violates expected JSON formatting.
-
-#### 6. Templates
-Allows live editing of the Markdown layout templates used when creating notes in your Obsidian vault.
+Editor for the Markdown prompts of each pipeline phase and the retry prompt (see below).
 
 ---
 
 ## Manual YAML Configuration Reference (`config.yaml`)
 
-When initialized, Eloquent Notes creates `~/.config/eloquent-notes/config.yaml`. Below is the complete reference schema with default values:
+Default configuration:
 
 ```yaml
-obsidian:
-  vault_path: "~/Obsidian"
-  folder: "Dictations"
-  folder_organization: "none"   # Subfolder structure: "none", "month" (YYYY-MM), "week" (YYYY-Www), "month_week" (YYYY-MM/Www)
-  daily_notes: true
-  vault_context: true   # Scan vault for existing note names to suggest as wikilinks
-
+notes:
+  folder: "~/Documents/Eloquent Notes"   # One Markdown file per voice note.
 
 ai:
   ollama_url: "http://localhost:11434"
   model: "gemma4:e4b-it-qat"
-  output_language: "English" # Output language for rewritten notes, titles, wikilinks, and tags
-  context_length: 8192  # Context window size in tokens
-  keep_alive: "0"       # VRAM retention after note completion ("0" unloads immediately)
-  preload_keep_alive: "5m" # VRAM retention during active recording
-  max_retries: 3        # Retries on JSON parsing failure
-  preload_timeout: 180  # Seconds allowed for model load
-  request_timeout: 300  # Seconds allowed for request inference
+  output_language: "English" # Output language for rewritten notes, titles, and tags.
+  context_length: 8192 # If null or not set, the maximum allowed by the model is used.
+  keep_alive: "0"       # Time to keep model loaded after note generation (e.g. "5m", "10m", or "0" to unload immediately).
+  preload_keep_alive: "5m" # Time to keep model weights loaded in VRAM during recording to reduce note generation time.
+  max_retries: 3        # Number of times to retry LLM execution if the output is not valid JSON.
+  preload_timeout: 180  # Timeout in seconds for preloading the model weights.
+  request_timeout: 300  # Timeout in seconds for note generation requests.
+
+search:
+  embedding_model: "embeddinggemma-2:latest"
+  keep_alive: "5m"      # Time to keep the embedding model loaded between searches.
+  min_similarity: 0.6   # Hide search results below this cosine similarity.
 
 audio:
   sample_rate: 16000
   channels: 1
-  capture_duration: 30  # Maximum audio capture duration in seconds
-  recording_hud_enabled: true # Floating countdown HUD overlay during recording
+  capture_duration: 30
+  recording_hud_enabled: true
   beep_frequency: 440
   beep_duration: 0.1
   beep_enabled: true
@@ -109,74 +113,22 @@ logging:
   backup_count: 3
 ```
 
+After editing the file by hand, choose **Reload Configuration** in the tray menu. Changes apply from the next recording or search; a dictation in progress keeps the settings and prompts that were active when it started.
+
 ---
 
 ## Custom Markdown Prompts
 
-System and user prompts reside in `~/.config/eloquent-notes/prompts/`:
+Prompts reside in `~/.config/eloquent-notes/prompts/`:
 
-| File Name | Purpose | Key Variables / Notes |
+| File Name | Purpose | Placeholders |
 | :--- | :--- | :--- |
-| `transcription_system.md` | System instructions for audio transcription phase. | Sets multi-modal audio processing behavior. |
-| `transcription_user.md` | User prompt accompanying audio input. | Instructs model to extract speech verbatim. |
-| `rewriting_system.md` | System instructions for note rewriting phase. | Defines tone, formatting, and heading structure. |
-| `rewriting_user.md` | User prompt for note rewriting phase. | Accepts `{transcription}` and `{language_instruction}` variables. |
-| `classification_system.md` | System instructions for note classification phase. | Rules for metadata extraction and JSON output. |
-| `classification_user.md` | User prompt for classification phase. | Accepts `{transcription}`, `{vault_context}`, and `{language_instruction}` variables. |
-| `retry_prompt.md` | Correction prompt on invalid JSON responses. | Forces model to output strict JSON schema. |
+| `transcription_system.md` | System instructions for Phase 1 (audio transcription). | — |
+| `transcription_user.md` | User prompt sent with the audio. | — |
+| `rewriting_system.md` | System instructions for Phase 2 (title and note prose). | — |
+| `rewriting_user.md` | User prompt for Phase 2. | `{transcription}`, `{language_instruction}` |
+| `classification_system.md` | System instructions for Phase 3 (type and tags). | — |
+| `classification_user.md` | User prompt for Phase 3. | `{transcription}` (the rewritten content), `{language_instruction}` |
+| `retry_prompt.md` | Correction sent when a response is not valid JSON. | — |
 
----
-
-## Custom Markdown Templates
-
-Note formatting templates reside in `~/.config/eloquent-notes/templates/`:
-
-### 1. `standalone.md`
-Used when creating individual standalone notes inside your configured `folder`:
-
-```markdown
----
-tags:
-  - dictation
-{tags}
-date: {date} {time}
----
-# {title}
-
-{text}
-```
-
-### 2. `daily_new.md`
-Used when creating a new Daily Note for the current day:
-
-```markdown
----
-tags:
-  - dictation
-{tags}
-date: {date}
----
-# Dictations of {date}
-
-## {time} — {title}
-{text}
-```
-
-### 3. `daily_append.md`
-Appended to an existing Daily Note when additional dictations are recorded on the same day:
-
-```markdown
-
-## {time} — {title}
-{text}
-```
-
-### Available Template Placeholders
-
-| Placeholder | Description | Example Output |
-| :--- | :--- | :--- |
-| `{title}` | Title generated by Phase 2 (Rewriting) | `Project Architecture Review` |
-| `{text}` | Clean, structured Markdown content body | Main note paragraphs and bullet lists |
-| `{tags}` | Indented YAML tag array generated by Phase 3 | `  - architecture`<br>`  - meeting` |
-| `{date}` | Current local date | `2026-08-06` |
-| `{time}` | Current local time stamp | `14:30:15` |
+Unknown placeholders are left untouched. The JSON output shapes are fixed by the schemas in `llm.py` (see [Three-Phase AI Pipeline](pipeline.md)); prompts change the model's behavior, not the fields it returns.

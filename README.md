@@ -12,351 +12,207 @@
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&metric=sqale_rating)](https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes)
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=arrase_eloquent-notes&metric=ncloc)](https://sonarcloud.io/summary/overall?id=arrase_eloquent-notes)
 
-Eloquent Notes is a lightweight, system-tray-centric utility for Linux inspired by [Google Eloquent](https://developers.google.com/edge/eloquent) that runs silently in the background. It allows you to record quick dictations, automatically transcribes them, rewrites them into a clean first-person note, extracts relevant metadata (type, wikilinks, tags) using a three-phase local **Gemma 4** model pipeline (via Ollama), and writes the resulting notes directly to your Obsidian vault.
+Eloquent Notes is a Linux system tray app, inspired by [Google Eloquent](https://developers.google.com/edge/eloquent), that turns voice dictations into well-structured, well-ordered notes. Press a shortcut, speak, press it again: a local **Gemma 4** model (via Ollama) transcribes the audio, rewrites it as clean prose with a title, classifies it and tags it. Each note is saved as a plain Markdown file, and a notes window lets you browse, search, edit and extend them.
+
+Everything runs offline on your machine.
 
 ---
 
 ## ✨ Features
 
-- **System Tray Centric UX:** Control recording easily by clicking the system tray icon (click to start, click again to stop and process).
-- **Context Menu Actions:** Right-click the system tray icon to reveal a menu with options to:
-  - **Start/Stop Recording**
-  - **Configuration** (opens the graphical configuration editor)
-  - **Reload Configuration** (reloads settings and prompts on-the-fly without restarting the application)
-  - **Quit**
-- **CLI Command Suite:** Use `eloquent-notes toggle` to control recording remotely, or `eloquent-notes config` to open the settings interface. The toggle command is lightweight and decoupled from the running daemon, using a local Unix socket for zero-latency control signals.
-- **Offline & Private:** Transcribes and refines audio locally on your machine using Gemma 4 via Ollama.
-- **Dynamic Icons:** Status indicators are rendered dynamically in memory:
-  - 🔘 **Idle (Gray):** A gray circle with a white microphone icon.
-  - 🔴 **Recording (Red):** A red circle with a white recording dot.
-  - 🟠 **Processing (Orange):** An orange circle with a white hourglass.
-- **Advanced Obsidian Integration:**
-  - Automatically enriches your spoken notes with Obsidian callouts based on classified type (`> [!todo]`, `> [!tip]`, etc.) and wikilinks (`[[topics]]`).
-  - Automatically analyzes dictations to generate relevant tags.
-  - Appends notes to daily journals or creates new individual files inside your vault.
-  - Intelligently parses, merges, and updates YAML frontmatter metadata when appending to existing notes without breaking formatting.
-- **Multilingual Support & Output Language Control:** Dictate in any language and configure your desired `output_language` (e.g., English, Spanish, French, German, etc.). The AI pipeline automatically generates titles, rewritten prose, wikilinks, and tags in your chosen language without extra LLM passes or latency overhead.
-- **Customizable Prompts:** Edit custom Markdown prompts for each phase (Transcription, Rewriting, Classification, and Retry) loaded directly from your user config directory.
-- **Custom Note Templates:** You can customize the Markdown formatting of the generated notes, including dynamic `{title}`, `{text}`, and `{tags}` injection.
+- **One-gesture capture:** left-click the tray icon, click the record button in the window, or bind `eloquent-notes toggle` to a global shortcut. A floating HUD shows the remaining time while you speak.
+- **Clean notes, not transcripts:** a three-phase pipeline (transcription → rewriting → classification) removes filler words, writes a concise title and assigns a type (`note`, `task`, `idea`, `reminder`, `question`, `decision`) and 2–5 tags.
+- **Plain Markdown files:** one file per note with YAML frontmatter, in a folder you choose. No database, no lock-in.
+- **Notes window:** a timeline grouped by day, type and tag filters, and a reader where title, type, tags and body are editable.
+- **Add dictation:** dictate more text into an existing note; it is rewritten and appended as a new paragraph.
+- **Semantic search:** search notes by meaning with a local embedding model (`embeddinggemma-2:latest`). Embeddings are computed on demand and cached.
+- **Multilingual:** dictate in any language and pick the output language for titles, prose and tags.
+- **Customizable prompts:** every pipeline phase is driven by editable Markdown prompts.
 
 ---
 
 ## 📋 Prerequisites
 
-1. **Ollama & Gemma 4 Model:**
-   Ensure you have Ollama running locally and have pulled a Gemma 4 model (the default model configured is `gemma4:e4b-it-qat`):
+1. **Ollama with a Gemma 4 model and an embedding model:**
    ```bash
    ollama pull gemma4:e4b-it-qat
+   ollama pull embeddinggemma-2:latest
    ```
    > [!NOTE]
-   > **Audio Duration Limit:** Gemma 4 audio models support audio clips of up to **30 seconds**. Eloquent Notes is designed and optimized for quick voice dictations within this 30-second limit.
+   > Gemma 4 audio models accept clips of up to **30 seconds**, so recordings stop automatically after `audio.capture_duration` (default 30 s).
 
-2. **System Dependencies:**
-   Install PortAudio (required for audio capture and beep playback) and a notification server (PyQt6 uses DBus/System notification services to display desktop alerts):
+2. **PortAudio** (audio capture and beeps) and a desktop notification server:
    ```bash
-   # On Ubuntu/Debian/Pop!_OS:
+   # Ubuntu / Debian / Pop!_OS
    sudo apt install libportaudio2
    ```
+
+3. **Python 3.11+**.
 
 ---
 
 ## 🚀 Installation
 
-### Option A: Install using `pipx` or `uv` (Recommended)
-You can install the utility directly from GitHub:
+### Option A: `uv` or `pipx` (recommended)
 ```bash
-# Using uv
 uv tool install git+https://github.com/arrase/eloquent-notes.git
-
-# Or using pipx
+# or
 pipx install git+https://github.com/arrase/eloquent-notes.git
 ```
 
-### Option B: Local Installation (For Development)
-If you want to modify the source code or run in development mode:
+### Option B: Local development install
 ```bash
-# Clone the repository and navigate inside
 git clone https://github.com/arrase/eloquent-notes.git
 cd eloquent-notes
-
-# Create virtual environment and install in editable mode
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -e .
+pip install -e ".[dev]"
 ```
-
----
-
-## ⚙️ Configuration
-
-Upon the first execution, Eloquent Notes will automatically initialize a configuration directory at `~/.config/eloquent-notes/`.
-
-### 🖥️ Configuration GUI
-
-Eloquent Notes features a built-in graphical settings editor to modify your configuration, prompts, and templates directly from a clean UI.
-
-![Configuration GUI](screenshots/configuration.png)
-
-#### Launching the GUI
-- **Via the System Tray:** Right-click the tray icon and select **Configuration**.
-- **Via the CLI:** Run the following command:
-  ```bash
-  eloquent-notes config
-  ```
-
-#### Tab Breakdown
-- **General:** Enable or disable automatic login startup, set logging levels, configure log file size limits, and view log files directly.
-- **Obsidian:** Browse for your Obsidian vault path, specify the target destination folder, configure subfolder structure (root, monthly, weekly, monthly + weekly), toggle Daily Notes appending, and toggle vault-wide scanning to auto-generate Wikilink recommendations.
-- **AI Settings:** Configure the Ollama API endpoint, select local LLM models, set the target **Output Language** (e.g. English, Spanish), set custom context lengths, adjust keep-alive limits to optimize GPU memory usage, and customize timeout/retry values.
-- **Audio:** Configure microphone sample rate, recording channels, maximum capture duration, toggle the floating Recording HUD countdown overlay, and adjust acoustic feedback beeps (frequency, duration, or disable completely).
-- **Prompts:** Edit custom Markdown prompt definitions (system and user instructions) for all three pipeline stages plus retry rules.
-- **Templates:** Edit and customize the layout files (`standalone.md`, `daily_new.md`, and `daily_append.md`) for note generation.
-
----
-
-### 🛠️ Manual File Configuration
-
-If you prefer to edit configuration files directly, you can access them inside `~/.config/eloquent-notes/`.
-
-#### 1. `config.yaml`
-Edit `~/.config/eloquent-notes/config.yaml` to specify your Obsidian vault path and adjust system parameters. Below is the default configuration:
-
-```yaml
-obsidian:
-  vault_path: "~/Obsidian"     # Absolute or user-relative path to your Obsidian Vault
-  folder: "Dictations"         # Target folder inside the vault where notes will be saved
-  folder_organization: "none"  # Subfolder structure: "none", "month" (YYYY-MM), "week" (YYYY-Www), "month_week" (YYYY-MM/Www)
-  daily_notes: true            # If true, appends dictations to daily note files (YYYY-MM-DD.md)
-  vault_context: true          # If true, scans the vault for note names to suggest as wikilinks
-
-ai:
-  ollama_url: "http://localhost:11434"
-  model: "gemma4:e4b-it-qat"
-  output_language: "English"   # Output language for rewritten notes, titles, wikilinks, and tags (e.g. English, Spanish)
-  context_length: 8192         # Context length limit (null defaults to model maximum)
-  keep_alive: "0"              # Time to keep model loaded in VRAM after note generation (e.g. "5m", "10m", or "0" to unload immediately)
-  preload_keep_alive: "5m"     # Time to keep model weights loaded in VRAM during recording to minimize note generation cold-start
-  max_retries: 3               # Number of times to retry LLM execution if the output is not valid JSON
-  preload_timeout: 180         # Timeout in seconds for preloading the model weights
-  request_timeout: 300         # Timeout in seconds for note generation requests
-
-audio:
-  sample_rate: 16000           # Audio sample rate (16kHz is ideal for Gemma 4)
-  channels: 1                  # Mono channel recording
-  capture_duration: 30         # Maximum audio capture duration in seconds
-  recording_hud_enabled: true  # Floating countdown HUD overlay during recording
-  beep_frequency: 440          # Audio cue beep frequency (Hz)
-  beep_duration: 0.1           # Beep duration (seconds)
-  beep_enabled: true           # Enable/disable audio cues (beeps)
-
-logging:
-  level: "INFO"                # Logger verbosity level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-  max_mb: 5                    # Maximum log file size in MB before rotation
-  backup_count: 3              # Number of rotated log archives to retain
-```
-
-#### 2. Custom Prompts
-You can edit the prompts in `~/.config/eloquent-notes/prompts/` to customize the behavior of the three-phase pipeline:
-
-- **`transcription_system.md`** & **`transcription_user.md`** (Phase 1): Instructions for pure audio transcription, removing stutters and filler words.
-- **`rewriting_system.md`** & **`rewriting_user.md`** (Phase 2): Instructions for rewriting the transcription into a direct, first-person note and generating a short title.
-- **`classification_system.md`** & **`classification_user.md`** (Phase 3): Instructions for classifying the note's type, identifying wikilinks, and generating tags in the configured output language.
-- **`retry_prompt.md`**: Instructs the model how to correct its response if it outputs invalid JSON (specifically preventing markdown code fences).
-
-#### 3. Custom Note Templates
-You can customize the Markdown formatting of the generated notes, including frontmatter and headers. Eloquent Notes provides three template files in `~/.config/eloquent-notes/templates/`:
-- **`standalone.md`:** Used when `daily_notes: false` (creates an individual file per dictation).
-- **`daily_new.md`:** Used when `daily_notes: true` and a new daily note is being created.
-- **`daily_append.md`:** Used when `daily_notes: true` and the daily note already exists (useful for skipping frontmatter on subsequent entries).
-
-You can use the following placeholders in these templates, which will be automatically replaced when saving the note:
-- `{title}`: The short title of the note generated by the rewriting phase.
-- `{text}`: The rewritten note text formatted with callouts and wikilinks.
-- `{tags}`: A YAML-formatted string array of tags extracted by the AI model.
-- `{date}`: The current date (e.g., `2026-07-04`).
-- `{time}`: The current time (e.g., `00:45:45`).
 
 ---
 
 ## 🎮 Usage
 
-### 🔄 1. Setup Autostart on Boot
-To ensure Eloquent Notes runs in the background automatically when you log in (allowing keyboard shortcuts to work instantly), execute:
+### Start the app
 ```bash
-eloquent-notes install-autostart
-```
-This generates a desktop autostart entry at `~/.config/autostart/eloquent-notes.desktop`.
-
-*If you want to start the background service manually for the first time without logging out, run:*
-```bash
-eloquent-notes &
+eloquent-notes &                    # start the tray daemon (or open the notes window if it is already running)
+eloquent-notes install-autostart    # start it automatically on login
 ```
 
-### ⌨️ 2. Global Keyboard Shortcut (Recommended)
-Instead of clicking the system tray icon, you can toggle recording from anywhere (even inside fullscreen apps) using a global keyboard shortcut. Eloquent Notes exposes a toggle command:
-```bash
-eloquent-notes toggle
-```
-*(You can also use the shorthand: `eloquent-notes -t` or `eloquent-notes --toggle`)*
+### Record a note
+1. Start recording: left-click the tray icon, click the record button in the notes window, or run `eloquent-notes toggle`. A beep plays and the icon turns **red**.
+2. Speak (up to 30 s). The model is preloaded in the background while you talk.
+3. Stop recording the same way. The icon turns **orange** while the note is written.
+4. A **Note Saved** notification appears and the icon returns to **gray**. Click the notification to open the notes window. Silent recordings produce a **Dictation Empty** notification and no note.
 
-To bind this to a keyboard shortcut in your Linux desktop environment:
+### Tray icon
 
-#### GNOME (Ubuntu, Debian, Pop!_OS, Fedora)
-1. Go to **Settings** -> **Keyboard** -> **Keyboard Shortcuts** -> **View and Customise Shortcuts**.
-2. Scroll to the bottom and select **Custom Shortcuts**.
-3. Click the **+** button (or **Add Shortcut**) and enter:
-   - **Name:** `Eloquent Notes Toggle`
-   - **Command:** `eloquent-notes toggle`
-   - **Shortcut:** Press your preferred keys (e.g., `Ctrl+Alt+N`)
-4. Click **Add**.
+| Action | Effect |
+| :--- | :--- |
+| Left click | Start / stop recording |
+| Middle click | Show / hide the notes window |
+| Right click | Menu: **Start/Stop Recording**, **Open Notes**, **Configuration**, **Reload Configuration**, **Quit** |
 
-#### KDE Plasma
-1. Go to **System Settings** -> **Shortcuts** -> **Custom Shortcuts**.
-2. Select **Edit** -> **New** -> **Global Shortcut** -> **Command/URL**.
-3. Name it `Eloquent Notes Toggle`.
-4. In the **Trigger** tab, record your shortcut.
-5. In the **Action** tab, set the command to `eloquent-notes toggle`.
-6. Click **Apply**.
+### Notes window
+Open it with a middle click on the tray icon, **Open Notes** in the menu, or `eloquent-notes open`.
 
-#### i3 / Sway
-Add the following keybinding to your config file (usually `~/.config/i3/config` or `~/.config/sway/config`):
-```text
-bindsym $mod+Ctrl+n exec --no-startup-id eloquent-notes toggle
-```
+- **Timeline:** notes grouped by day (Today, Yesterday, "Monday, 19 October", …), newest first.
+- **Filters:** type chips (All, Notes, Tasks, Ideas, …) and a tag selector. Clicking a `#tag` on a card selects it.
+- **Search:** type a query and press <kbd>Enter</kbd> to search by meaning. Clearing the box returns to the timeline.
+- **Reader:** click a card to open it. Title, type, tags (comma separated) and body are editable and saved when you leave the reader or close the window. <kbd>Esc</kbd> goes back.
+  - **Add dictation** records a new dictation and appends its rewritten text to the note, keeping its type and tags.
+  - **Copy** copies the note as Markdown (`# Title` + body) to the clipboard.
+  - **Delete** asks for confirmation and moves the file to the system trash.
 
-### 🔘 3. Interaction Flow
-1. **Idle State:** The gray microphone icon is shown in the system tray.
-2. **Start Dictation:** Click the tray icon, trigger your custom global shortcut, or run `eloquent-notes toggle`. A beep plays, and the icon turns **red** to indicate it is recording.
-   * *Note: The model starts preloading into VRAM in the background during recording to speed up processing. Gemma 4 audio models support up to 30 seconds of audio per dictation.*
-3. **Stop & Process:** Click the tray icon, trigger the shortcut, or run `eloquent-notes toggle` again. A beep plays, the icon turns **orange**, and the application starts processing the audio via the local Ollama API.
-4. **Completion:**
-   * **Success:** The cleaned transcription is saved to your Obsidian vault, a desktop notification is displayed, and the icon returns to **gray**.
-   * **Empty Audio:** If the audio contains only silence or background noise, a "Dictation Empty" notification is displayed, and no note is created. The icon returns to **gray**.
+### Global keyboard shortcut
+Bind `eloquent-notes toggle` in your desktop environment:
+
+- **GNOME:** Settings → Keyboard → View and Customise Shortcuts → Custom Shortcuts → **+**. Command: `eloquent-notes toggle`.
+- **KDE Plasma:** System Settings → Shortcuts → Add New → Global Shortcut → Command/URL. Command: `eloquent-notes toggle`.
+- **i3 / Sway:** `bindsym $mod+Ctrl+n exec --no-startup-id eloquent-notes toggle`
 
 ---
 
-## 🏗️ Architectural Overview
+## 📝 Note Format
 
-Eloquent Notes is built with a highly responsive, asynchronous, and memory-efficient architecture:
+Each note is a Markdown file in the notes folder (default `~/Documents/Eloquent Notes`), named `YYYY-MM-DD HHMMSS Title.md`:
 
-```mermaid
-flowchart TB
-    %% Subgraphs
-    subgraph CLI ["CLI Interface"]
-        C1["eloquent-notes (toggle | install-autostart)"]
-        C2{"Is Daemon Running?"}
-        C3["Send IPC via QLocalSocket"]
-        C4["os.execv (Launch Daemon)"]
-        
-        C1 --> C2
-        C2 -- Yes --> C3
-        C2 -- No --> C4
-    end
-
-    subgraph Daemon ["Daemon Main Thread (PyQt6 Event Loop)"]
-        D1["QSystemTrayIcon (IPC Server: QLocalServer)"]
-        D2{"State?"}
-        D3["Transition: IDLE -> RECORDING\nTray Icon: Gray -> Red"]
-        D4["Transition: RECORDING -> PROCESSING\nTray Icon: Red -> Orange"]
-        D5["Transition: PROCESSING -> IDLE\nTray Icon: Orange -> Gray"]
-        D6["Desktop Notification\n(Success, Empty, or Error)"]
-        
-        D1 -->|"User Action / IPC Signal"| D2
-        D2 -->|IDLE| D3
-        D2 -->|RECORDING| D4
-        D2 -->|"PROCESSING (Ignore/Alert)"| D1
-        
-        D5 --> D6
-    end
-
-    subgraph BG_Record ["Background Recording Thread & Audio I/O"]
-        R1["Play Beep (sounddevice)"]
-        R2["AudioRecorder (sounddevice.InputStream)"]
-        R3["Record into Queue (Memory)"]
-        R4["Preload Model Thread (Keep-Alive Chat API)"]
-        
-        D3 --> R1
-        R1 --> R2
-        R2 -->|Enqueue Chunks| R3
-        D3 -->|Concurrent Preload| R4
-    end
-
-    subgraph BG_Process ["Background Worker Thread (3-Phase Pipeline)"]
-        P1["Stop Stream & Read Queue"]
-        P2["Convert to WAV bytes (io.BytesIO)"]
-        
-        subgraph Pipeline ["Three-Phase LLM Pipeline (Ollama Chat API)"]
-            T1["Phase 1: Transcription\n(Multimodal WAV -> Text)"]
-            T2{"Is Transcription Empty?"}
-            T3["Phase 2: Rewriting\n(Clean Note Prose + Title)"]
-            T4["Scan Vault for Wikilink Context"]
-            T5["Phase 3: Classification\n(Type, Wikilinks, Tags in output_language)"]
-            
-            T1 --> T2
-            T2 -- No --> T3
-            T3 --> T4
-            T4 --> T5
-        end
-
-        subgraph SaveObsidian ["Obsidian Formatting & Saving"]
-            S1["Inject WikiLinks (Regex replacement)"]
-            S2["Wrap in Callouts by Type\n(todo, tip, warning, etc.)"]
-            S3["Load templates from disk"]
-            S4{"daily_notes?"}
-            S5["Save Standalone\n(Dictation-YYYY-MM-DD-HHMMSS.md)"]
-            S6["Read existing daily note"]
-            S7["Merge & De-duplicate YAML tags"]
-            S8["Append entry (daily_append.md)"]
-            
-            T5 --> S1
-            S1 --> S2
-            S2 --> S3
-            S3 --> S4
-            S4 -- No --> S5
-            S4 -- Yes --> S6
-            S6 --> S7
-            S7 --> S8
-        end
-        
-        D4 --> P1
-        P1 --> P2
-        P2 --> T1
-        
-        T2 -->|"Yes (Early Exit)"| D5
-        S5 -->|Emit Signal| D5
-        S8 -->|Emit Signal| D5
-    end
-
-    %% External Services
-    Ollama["Local Ollama API\n(gemma4:e4b-it-qat)"]
-    Vault[("Obsidian Vault\n(Markdown Files)")]
-    
-    R4 -->|"POST /api/chat"| Ollama
-    T1 -->|"POST /api/chat (base64 audio)"| Ollama
-    T3 -->|"POST /api/chat"| Ollama
-    T5 -->|"POST /api/chat"| Ollama
-    T4 -.->|Scan Directory| Vault
-    S5 -.->|Write File| Vault
-    S6 -.->|Read/Write File| Vault
+```markdown
+---
+title: Redis cache for Postgres
+created: '2026-10-19T09:42:17+02:00'
+type: idea
+tags:
+- redis
+- caching
+- performance
+---
+Consider using Redis as a caching layer to avoid hitting Postgres directly on slow queries.
 ```
 
-### Key Technical Details
+- The timestamp prefix keeps file names unique and chronological; editing a title never renames the file.
+- Files without valid frontmatter (`title`, `created`, a known `type`) are ignored, so the folder can live inside an Obsidian vault or any other Markdown collection.
+- Files edited outside the app are picked up the next time the window refreshes; their embeddings are recomputed on the next search.
 
-* **CLI & GUI Decoupling:** For `toggle` and single-instance checks, the CLI entry point (`eloquent-notes`) instantiates a headless `QCoreApplication` and communicates over `QLocalSocket` without creating any GUI windows. If the daemon is already running, it sends an IPC command and exits immediately. If it is not running, it replaces the current process with the daemon (`eloquent_notes.app`) via `os.execv`.
-* **In-Memory Audio Processing:** Audio is captured directly from your microphone using `sounddevice` and loaded into an in-memory queue. When recording stops, it is processed into 16-bit PCM WAV bytes in-memory (using `io.BytesIO`). No temporary audio files are written to the disk, maximizing privacy, speed, and disk lifespan.
-* **Non-Blocking UI Threads:** Both the model preloading and the Ollama API request processing are offloaded to background threads. This ensures that the PyQt6 system tray UI loop remains entirely responsive without stuttering or freezing.
-* **Dynamic Icon Generation:** Custom state icons are drawn dynamically in-memory using Qt's `QPainter` and converted to `QIcon` objects at runtime. No external image assets or image-processing libraries are required.
-  - 🔘 **Idle (Gray):** A gray circle with a white microphone icon.
-  - 🔴 **Recording (Red):** A red circle with a white recording dot.
-  - 🟠 **Processing (Orange):** An orange circle with a white hourglass.
-* **Three-Phase LLM Pipeline:** The request is split into three phases to reduce the cognitive load on small models (~15B):
-  1. **Transcription (Phase 1):** Sends base64-encoded WAV bytes to the multimodal LLM to generate a transcription (Gemma 4 models support audio inputs up to 30 seconds). Returns a JSON object with `{"transcription": string, "empty": bool}`.
-  2. **Rewriting (Phase 2):** Sends the transcription text to the LLM to rewrite it into clean, direct, first-person note prose and generate a concise title. Returns `{"title": string, "content": string}`.
-  3. **Classification (Phase 3):** Scans the vault for note names to build a context list of known topics, and sends the rewritten note content + vault context to the LLM. Returns metadata `{"type": string, "wikilinks": list, "tags": list}` where type is one of: `task`, `idea`, `note`, `reminder`, `question`, or `decision`.
-* **Retry and Validation Logic:** If the Ollama model returns invalid JSON or fails to include the required keys, the application automatically appends a custom retry instruction (`retry_prompt.md`) to the chat history and retries up to `max_retries` (default: 3) to ensure robust structured output.
-* **Obsidian Integration & YAML Merging:**
-  - **WikiLink Injection:** Identified wikilink terms are injected into the note prose using case-insensitive regex word-boundary matching. Longer terms are processed first to avoid substring conflicts (e.g., "Postgres" won't match inside "Postgresql").
-  - **Callout Formatting:** Based on the note's classification type, the prose is wrapped in standard Obsidian callouts (`> [!todo]`, `> [!tip]`, `> [!warning]`, etc.). Note type `note` is kept as plain text.
-  - **YAML Metadata Merging:** If appending to an existing daily note, Eloquent Notes reads the note, uses PyYAML to parse the frontmatter, merges any new tags without duplication, and writes back the updated frontmatter before appending the new dictation under a timestamp header.
-* **Audible Cues & Anti-Click Fades:** Audio recording start and stop actions are accompanied by custom sine-wave beep tones. The beep audio generation applies a linear fade-in and fade-out to the first and last 10ms of the waveform to prevent annoying speaker clicks.
-* **Structured Logging (XDG Compliant):** Logs are stored in accordance with the XDG Base Directory specification at `~/.local/state/eloquent-notes/app.log` (or `$XDG_STATE_HOME/eloquent-notes/app.log`). The logging level is configurable in `config.yaml`, and logs are automatically rotated (max 5MB, up to 3 backups).
+---
+
+## ⚙️ Configuration
+
+On first run, Eloquent Notes creates `~/.config/eloquent-notes/` with `config.yaml` and the prompt files.
+
+### Configuration GUI
+Open it from the tray menu (**Configuration**), the **Settings** button in the notes window, or `eloquent-notes config`. Saving reloads the running daemon.
+
+![Configuration GUI](screenshots/configuration.png)
+
+- **General:** autostart on login, logging level, log rotation, view the log file.
+- **Notes:** the notes folder.
+- **AI Settings:** Ollama URL, audio model, output language, context length, keep-alive, retries and timeouts; **Semantic Search** group with the embedding model and minimum similarity. **Refresh** lists the audio-capable and embedding models installed in Ollama.
+- **Audio:** sample rate, channels, maximum capture duration, recording HUD, beeps.
+- **Prompts:** edit the transcription, rewriting, classification and retry prompts.
+
+### `config.yaml`
+
+```yaml
+notes:
+  folder: "~/Documents/Eloquent Notes"   # One Markdown file per voice note.
+
+ai:
+  ollama_url: "http://localhost:11434"
+  model: "gemma4:e4b-it-qat"
+  output_language: "English" # Output language for rewritten notes, titles, and tags.
+  context_length: 8192 # If null or not set, the maximum allowed by the model is used.
+  keep_alive: "0"       # Time to keep model loaded after note generation (e.g. "5m", "10m", or "0" to unload immediately).
+  preload_keep_alive: "5m" # Time to keep model weights loaded in VRAM during recording to reduce note generation time.
+  max_retries: 3        # Number of times to retry LLM execution if the output is not valid JSON.
+  preload_timeout: 180  # Timeout in seconds for preloading the model weights.
+  request_timeout: 300  # Timeout in seconds for note generation requests.
+
+search:
+  embedding_model: "embeddinggemma-2:latest"
+  keep_alive: "5m"      # Time to keep the embedding model loaded between searches.
+  min_similarity: 0.6   # Hide search results below this cosine similarity.
+
+audio:
+  sample_rate: 16000
+  channels: 1
+  capture_duration: 30
+  recording_hud_enabled: true
+  beep_frequency: 440
+  beep_duration: 0.1
+  beep_enabled: true
+
+logging:
+  level: "INFO"
+  max_mb: 5
+  backup_count: 3
+```
+
+### Prompts
+Prompts live in `~/.config/eloquent-notes/prompts/`:
+
+- `transcription_system.md`, `transcription_user.md` — Phase 1: audio to clean text.
+- `rewriting_system.md`, `rewriting_user.md` — Phase 2: title and note prose.
+- `classification_system.md`, `classification_user.md` — Phase 3: type and tags.
+- `retry_prompt.md` — correction sent when a response is not valid JSON.
+
+---
+
+## 💻 CLI
+
+| Command | Effect |
+| :--- | :--- |
+| `eloquent-notes` | Start the tray daemon; if it is already running, open the notes window. |
+| `eloquent-notes toggle` (`-t`, `--toggle`) | Start / stop recording (starts the daemon if needed). |
+| `eloquent-notes open` | Open the notes window (starts the daemon if needed). |
+| `eloquent-notes config` | Open the configuration dialog. |
+| `eloquent-notes install-autostart` | Install `~/.config/autostart/eloquent-notes.desktop`. |
+| `eloquent-notes --version` | Print the installed version. |
+
+Logs are written to `$XDG_STATE_HOME/eloquent-notes/app.log` (default `~/.local/state/eloquent-notes/app.log`) with rotation. The embedding cache lives at `$XDG_CACHE_HOME/eloquent-notes/embeddings.npz`.
+
+---
+
+## 📚 Documentation
+
+Full documentation, including architecture and pipeline details: <https://arrase.github.io/eloquent-notes/>

@@ -46,7 +46,7 @@ Hidden=false
 NoDisplay=false
 X-GNOME-Autostart-enabled=true
 Name=Eloquent Notes
-Comment=Background dictation utility for Obsidian
+Comment=Voice dictations turned into organized notes
 Icon=accessories-text-editor
 Categories=Utility;
 """

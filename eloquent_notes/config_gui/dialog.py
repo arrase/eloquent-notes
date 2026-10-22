@@ -102,7 +102,7 @@ class ConfigurationDialog(QDialog):
         confirm = QMessageBox.question(
             self,
             RESTORE_DEFAULTS_TITLE,
-            "Are you sure you want to restore all configuration settings,"
+            "Are you sure you want to restore all configuration settings"
             " and prompts to their default values?\n\nThis will"
             " overwrite current edits.",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,

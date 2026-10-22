@@ -16,9 +16,10 @@ eloquent-notes [command] [options]
 
 | Command | Short Flag | Purpose |
 | :--- | :--- | :--- |
-| *(None)* | | Starts the background system tray daemon. If already running, notifies user. |
-| `toggle` | `-t` | Toggles recording (IDLE $\rightarrow$ RECORDING or RECORDING $\rightarrow$ PROCESSING). |
-| `config` | | Launches the standalone PyQt6 Configuration GUI window. |
+| *(None)* | | Starts the tray daemon. If it is already running, opens the notes window. |
+| `toggle` | `-t`, `--toggle` | Toggles recording (IDLE $\rightarrow$ RECORDING or RECORDING $\rightarrow$ PROCESSING). |
+| `open` | | Opens the notes window. |
+| `config` | | Opens the configuration dialog. |
 | `install-autostart` | | Installs the desktop autostart entry into `~/.config/autostart/`. |
 | `--version` | | Prints the installed version and exits. |
 
@@ -28,9 +29,9 @@ eloquent-notes [command] [options]
 
 ### 1. `eloquent-notes` (Daemon Launch / Single-Instance Check)
 
-Launching `eloquent-notes` without subcommands will attempt to establish a local IPC connection to `eloquent_notes_ipc`.
-* If a background daemon is **already running**, it sends a `notify_running` signal, triggering a desktop notification and exiting immediately.
-* If **no daemon is running**, it executes `eloquent_notes.app` to start the tray application, system tray icon, and IPC server listener.
+Launching `eloquent-notes` without a command connects to the local IPC socket `eloquent_notes_ipc`.
+* If the daemon is **already running**, it sends `open`, which shows the notes window, and exits.
+* If **no daemon is running**, it executes `eloquent_notes.app` to start the tray icon and the IPC server. The window is not opened; the app starts quietly in the tray.
 
 ### 2. `eloquent-notes toggle` (or `eloquent-notes -t`)
 
@@ -38,17 +39,23 @@ Toggles the recording state. This command is intended to be called by desktop ke
 * If daemon is **running**, sends a `toggle` message via IPC.
 * If daemon is **not running**, automatically launches the daemon in background mode and immediately starts recording (`os.execv` fallback).
 
-### 3. `eloquent-notes config`
+### 3. `eloquent-notes open`
+
+Shows the notes window (timeline, search and reader).
+* If daemon is **running**, sends an `open` message via IPC.
+* If daemon is **not running**, launches the daemon and opens the window right away.
+
+### 4. `eloquent-notes config`
 
 Opens the graphical configuration management dialog.
-* Runs independently as a PyQt6 application window.
+* Runs in its own process, independent of the daemon.
 * Upon clicking **Save**, if an active daemon is detected on `eloquent_notes_ipc`, it sends a `reload` IPC signal to reload configuration in-memory without restarting the daemon process.
 
-### 4. `eloquent-notes install-autostart`
+### 5. `eloquent-notes install-autostart`
 
 Creates a system autostart file `~/.config/autostart/eloquent-notes.desktop` pointing to your current executable installation path (`shutil.which("eloquent-notes")`).
 
-### 5. `eloquent-notes --version`
+### 6. `eloquent-notes --version`
 
 Prints the installed version and exits, for example:
 
@@ -65,9 +72,18 @@ The value is read from the installed distribution metadata, so it always matches
 
 To ensure that pressing a global keyboard shortcut provides instantaneous audio feedback without UI lag, Eloquent Notes uses a headless `QCoreApplication` and local socket IPC for control commands instead of creating GUI windows in the CLI client process.
 
+The daemon accepts three IPC messages:
+
+| Message | Sent by | Effect |
+| :--- | :--- | :--- |
+| `toggle` | `eloquent-notes toggle` / `-t` | `toggle_action()`: start or stop recording. |
+| `open` | `eloquent-notes`, `eloquent-notes open` | `show_window()`: show and raise the notes window. |
+| `reload` | `eloquent-notes config` after **Save** | `reload_config()`: reload settings, prompts and logging. |
+
 ```
                   +--------------------------+
-                  |  eloquent-notes toggle   |
+                  |  eloquent-notes [open |  |
+                  |          toggle]         |
                   +-------------+------------+
                                 |
                    QCoreApplication (Headless)
@@ -77,15 +93,15 @@ To ensure that pressing a global keyboard shortcut provides instantaneous audio 
            +--------------------+--------------------+
            | (Socket Connected)                      | (Connection Failed)
            v                                         v
-   Send "toggle" bytes                     os.execv(sys.executable, ...)
+   Send "toggle" / "open"                  os.execv(sys.executable, ...)
    to Running Daemon (<5ms)                Spawn Daemon Process
 ```
 
 ### Key Architectural Benefits
 
-1. **Headless Core App (`QCoreApplication`)**: When executing `eloquent-notes toggle`, `run_cli()` instantiates a headless `QCoreApplication` rather than `QApplication` or any GUI dialogs, avoiding display server window initialization and keeping the IPC client fast.
+1. **Headless Core App (`QCoreApplication`)**: When executing `eloquent-notes`, `toggle` or `open`, `run_cli()` instantiates a headless `QCoreApplication` rather than `QApplication` or any GUI dialogs, avoiding display server window initialization and keeping the IPC client fast.
 2. **Unix Domain Socket (`QLocalSocket`)**: Communication between the CLI process and daemon occurs over named Unix local sockets (`eloquent_notes_ipc`). The IPC handshake, message transfer (`"toggle"`), and socket disconnection complete in under 5 milliseconds.
-3. **Automatic Daemon Spawning (`os.execv`)**: If `QLocalSocket.connectToServer()` fails or times out after 500 ms, `main.py` detects that the background daemon is inactive. It replaces the current process image using `os.execv(sys.executable, daemon_args)` to start `eloquent_notes.app` directly.
+3. **Automatic Daemon Spawning (`os.execv`)**: If `QLocalSocket.connectToServer()` fails or times out after 500 ms, `main.py` detects that the background daemon is inactive. It replaces the current process image using `os.execv(sys.executable, daemon_args)` to start `eloquent_notes.app` directly, passing `toggle` or `open` so the new daemon performs the requested action once its event loop starts.
 
 ---
 
@@ -120,10 +136,11 @@ To prevent log files from growing indefinitely, Eloquent Notes implements a `Rot
 Logs format timestamps, levels, thread names, module functions, and line numbers:
 
 ```text
-2026-08-06 14:30:00 [INFO] (MainThread) eloquent_notes.app._start_recording:146 - Starting audio recording...
-2026-08-06 14:30:05 [INFO] (Thread-1) eloquent_notes.app._process_audio:257 - Phase 1: Transcribing audio...
-2026-08-06 14:30:08 [INFO] (Thread-1) eloquent_notes.app._process_audio:308 - Rewriting: title=Daily Standup Notes
-2026-08-06 14:30:10 [INFO] (Thread-1) eloquent_notes.app._on_processing_completed:378 - Dictation saved successfully: 2026-08-06-Daily-Standup-Notes.md
+2026-08-06 14:30:00 [INFO] (MainThread) eloquent_notes.app._start_recording:289 - Starting audio recording...
+2026-08-06 14:30:05 [INFO] (Thread-2) eloquent_notes.app._process_audio:465 - Phase 1: Transcribing audio...
+2026-08-06 14:30:08 [INFO] (Thread-2) eloquent_notes.app._process_audio:478 - Rewriting: title=Daily Standup Notes
+2026-08-06 14:30:09 [INFO] (Thread-2) eloquent_notes.app._process_audio:484 - Phase 3: Classifying note...
+2026-08-06 14:30:10 [INFO] (MainThread) eloquent_notes.app._on_processing_completed:528 - Note saved: Daily Standup Notes
 ```
 
 Log level and rotation limits can be changed in the **General** tab of the GUI or directly inside `config.yaml`:
@@ -134,3 +151,13 @@ logging:
   max_mb: 5           # Log file size limit before rotation
   backup_count: 3     # Maximum rotated log archives
 ```
+
+---
+
+## Other Files
+
+| Path | Content |
+| :--- | :--- |
+| `$XDG_CONFIG_HOME/eloquent-notes/` (default `~/.config/eloquent-notes/`) | `config.yaml` and `prompts/` (see [Configuration](configuration.md)). |
+| `$XDG_CACHE_HOME/eloquent-notes/embeddings.npz` (default `~/.cache/eloquent-notes/`) | Semantic search embedding cache; safe to delete (see [Notes & Search](notes.md)). |
+| `notes.folder` (default `~/Documents/Eloquent Notes`) | The notes themselves, one Markdown file each. |
