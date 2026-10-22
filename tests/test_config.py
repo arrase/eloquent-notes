@@ -184,6 +184,7 @@ def test_default_config_notes_and_search():
         default_config = yaml.safe_load(f)
     assert "obsidian" not in default_config
     assert default_config["notes"]["folder"] == "~/Documents/Eloquent Notes"
+    assert default_config["notes"]["columns"] == 2
     assert default_config["search"]["embedding_model"] == "embeddinggemma-2:latest"
     assert default_config["search"]["min_similarity"] == 0.6
 

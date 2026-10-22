@@ -146,7 +146,7 @@ Open it from the tray menu (**Configuration**), the **Settings** button in the n
 ![Configuration GUI](screenshots/configuration.png)
 
 - **General:** autostart on login, logging level, log rotation, view the log file.
-- **Notes:** the notes folder.
+- **Notes:** the notes folder and timeline grid columns.
 - **AI Settings:** Ollama URL, audio model, output language, context length, keep-alive, retries and timeouts; **Semantic Search** group with the embedding model and minimum similarity. **Refresh** lists the audio-capable and embedding models installed in Ollama.
 - **Audio:** sample rate, channels, maximum capture duration, recording HUD, beeps.
 - **Prompts:** edit the transcription, rewriting, classification and retry prompts.
@@ -156,6 +156,7 @@ Open it from the tray menu (**Configuration**), the **Settings** button in the n
 ```yaml
 notes:
   folder: "~/Documents/Eloquent Notes"   # One Markdown file per voice note.
+  columns: 2                             # Number of columns in the timeline grid.
 
 ai:
   ollama_url: "http://localhost:11434"

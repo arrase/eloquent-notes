@@ -294,19 +294,22 @@ def test_general_tab_lowercase_log_level(qapp):
 
 def test_notes_tab_load_and_save(qapp):
     tab = NotesTab()
-    config_data = {"notes": {"folder": "~/Notes"}}
+    config_data = {"notes": {"folder": "~/Notes", "columns": 2}}
 
     tab.load_settings(config_data)
     assert tab.txt_folder.text() == "~/Notes"
+    assert tab.spn_columns.value() == 2
 
     tab.txt_folder.setText("  ~/Voice Notes  ")
+    tab.spn_columns.setValue(3)
     assert tab.save_settings(config_data) is True
     assert config_data["notes"]["folder"] == "~/Voice Notes"
+    assert config_data["notes"]["columns"] == 3
 
 
 def test_notes_tab_rejects_empty_folder(qapp):
     tab = NotesTab()
-    config_data = {"notes": {"folder": "~/Notes"}}
+    config_data = {"notes": {"folder": "~/Notes", "columns": 2}}
     tab.txt_folder.setText("  ")
 
     with patch("PyQt6.QtWidgets.QMessageBox.warning") as mock_warn:

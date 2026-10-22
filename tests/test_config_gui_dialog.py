@@ -47,6 +47,7 @@ def _make_valid_config(overrides=None):
         },
         "notes": {
             "folder": "/tmp/notes",
+            "columns": 2,
         },
         "search": {
             "embedding_model": "embeddinggemma-2:latest",

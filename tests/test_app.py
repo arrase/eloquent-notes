@@ -37,6 +37,7 @@ def mock_config(tmp_path):
         },
         "notes": {
             "folder": str(tmp_path / "notes"),
+            "columns": 2,
         },
         "search": {
             "embedding_model": "embed",

@@ -40,8 +40,13 @@ def window(qapp, sample_notes):
 
 
 def list_widgets(win):
-    column = win.timeline._scroll.widget().column
-    return [column.itemAt(i).widget() for i in range(column.count()) if column.itemAt(i).widget() is not None]
+    grid = win.timeline._grid
+    return [grid.itemAt(i).widget() for i in range(grid.count()) if grid.itemAt(i).widget() is not None]
+
+
+def grid_positions(win):
+    grid = win.timeline._grid
+    return [grid.getItemPosition(i) for i in range(grid.count()) if grid.itemAt(i).widget() is not None]
 
 
 def card_titles(win):
@@ -88,6 +93,29 @@ def test_timeline_groups_notes_by_day(window):
 
     assert card_titles(window) == ["Launch decision", "Buy milk", "Offline mode", "Old memo"]
     assert list_texts(window) == ["TODAY", "YESTERDAY", day_label(old_day, date.today()).upper()]
+    assert grid_positions(window) == [
+        (0, 0, 1, 2),
+        (1, 0, 1, 1),
+        (1, 1, 1, 1),
+        (2, 0, 1, 2),
+        (3, 0, 1, 1),
+        (4, 0, 1, 2),
+        (5, 0, 1, 1),
+    ]
+
+
+def test_timeline_columns_can_be_configured(window):
+    window.set_columns(2)  # unchanged column count is a no-op
+    window.set_columns(1)
+    assert grid_positions(window) == [
+        (0, 0, 1, 1),
+        (1, 0, 1, 1),
+        (2, 0, 1, 1),
+        (3, 0, 1, 1),
+        (4, 0, 1, 1),
+        (5, 0, 1, 1),
+        (6, 0, 1, 1),
+    ]
 
 
 def test_empty_timeline_invites_recording(qapp):

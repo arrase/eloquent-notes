@@ -61,7 +61,7 @@ The window follows the desktop's light/dark palette; dates are shown in English.
 
 ### Timeline
 
-- Notes are listed newest first and grouped under day headings: **Today**, **Yesterday**, then e.g. **Monday, 19 October** (the year is added for previous years).
+- Notes are listed newest first, grouped under day headings (**Today**, **Yesterday**, then e.g. **Monday, 19 October**; the year is added for previous years) and arranged in a multi-column grid (`notes.columns`, default `2`).
 - Each card shows the time, the type, the title, a preview of the body and the tags.
 - **Type chips** (All, Notes, Tasks, Ideas, Reminders, Questions, Decisions) and the **tag selector** filter the list. Clicking a `#tag` on a card selects that tag.
 - The round **record button** at the bottom starts and stops a new dictation; the text below it shows the current state.

@@ -46,6 +46,7 @@ The dialog has five tabs plus **Restore Defaults**, **Cancel** and **Save** butt
 
 #### 2. Notes
 * **Notes Folder**: folder where each note is saved as a Markdown file (default `~/Documents/Eloquent Notes`). It may point inside an Obsidian vault; files without Eloquent Notes frontmatter are ignored. See [Notes & Search](notes.md).
+* **Timeline Columns**: number of columns in the notes timeline grid (default `2`).
 
 #### 3. AI Settings
 **Ollama & AI Pipeline Settings**
@@ -81,6 +82,7 @@ Default configuration:
 ```yaml
 notes:
   folder: "~/Documents/Eloquent Notes"   # One Markdown file per voice note.
+  columns: 2                             # Number of columns in the timeline grid.
 
 ai:
   ollama_url: "http://localhost:11434"

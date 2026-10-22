@@ -16,6 +16,7 @@ from PyQt6.QtWidgets import (
     QButtonGroup,
     QComboBox,
     QFrame,
+    QGridLayout,
     QHBoxLayout,
     QLabel,
     QLineEdit,
@@ -34,6 +35,8 @@ from eloquent_notes import IDLE, PROCESSING, RECORDING, ui
 from eloquent_notes.notes import NOTE_TYPES, Note, parse_tags
 
 CONTENT_MAX_WIDTH = 720
+COLUMN_WIDTH = 440
+DEFAULT_COLUMNS = 2
 PREVIEW_CHARS = 180
 
 TYPE_COLORS = {
@@ -112,17 +115,25 @@ def _plain(text: str, object_name: str = "") -> QLabel:
 
 
 class Column(QWidget):
-    """Container whose content stays centered and no wider than CONTENT_MAX_WIDTH."""
+    """Container whose content stays centered and no wider than max_width."""
 
-    def __init__(self) -> None:
+    def __init__(self, max_width: int = CONTENT_MAX_WIDTH) -> None:
         super().__init__()
+        self.max_width = max_width
         self.column = QVBoxLayout(self)
         self.column.setSpacing(8)
 
+    def set_max_width(self, max_width: int) -> None:
+        self.max_width = max_width
+        self._update_margins()
+
     def resizeEvent(self, event: QResizeEvent | None) -> None:
-        side = max(20, (self.width() - CONTENT_MAX_WIDTH) // 2)
-        self.column.setContentsMargins(side, 12, side, 12)
+        self._update_margins()
         super().resizeEvent(event)
+
+    def _update_margins(self) -> None:
+        side = max(20, (self.width() - self.max_width) // 2)
+        self.column.setContentsMargins(side, 12, side, 12)
 
 
 class NoteCard(QFrame):
@@ -155,13 +166,16 @@ class NoteCard(QFrame):
             layout.addWidget(_muted(_plain(preview)))
 
         if note.tags:
-            tags = QLabel("&nbsp;&nbsp;".join(
+            tags = QLabel(" &nbsp; ".join(
                 f'<a href="{html.escape(tag)}" style="text-decoration: none;">#{html.escape(tag)}</a>'
                 for tag in note.tags
             ))
+            tags.setWordWrap(True)
             tags.setTextInteractionFlags(Qt.TextInteractionFlag.LinksAccessibleByMouse)
             tags.linkActivated.connect(self.tag_clicked)
             layout.addWidget(tags)
+
+        layout.addStretch()
 
     def mouseReleaseEvent(self, event: QMouseEvent | None) -> None:
         if event is not None and event.button() == Qt.MouseButton.LeftButton:
@@ -177,22 +191,27 @@ class TimelinePage(QWidget):
     search_requested = pyqtSignal(str)
     note_opened = pyqtSignal(object)
 
-    def __init__(self) -> None:
+    def __init__(self, columns: int = DEFAULT_COLUMNS) -> None:
         super().__init__()
+        self._columns = columns
         self._notes: list[Note] = []
         self._type = ""
         self._query = ""
         self._results: list[Note] | None = None
+        self._grid = QGridLayout()
         self._init_ui()
         self.set_state(IDLE)
+
+    def _max_width(self) -> int:
+        return max(CONTENT_MAX_WIDTH, self._columns * COLUMN_WIDTH)
 
     def _init_ui(self) -> None:
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 8, 0, 12)
         layout.setSpacing(0)
 
-        top = Column()
-        top.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
+        self._top = Column(self._max_width())
+        self._top.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 
         header = QHBoxLayout()
         title = QLabel("Eloquent Notes")
@@ -203,7 +222,7 @@ class TimelinePage(QWidget):
         btn_settings.setFlat(True)
         btn_settings.clicked.connect(self.settings_clicked)
         header.addWidget(btn_settings)
-        top.column.addLayout(header)
+        self._top.column.addLayout(header)
 
         self.search = QLineEdit()
         self.search.setObjectName("search")
@@ -211,7 +230,7 @@ class TimelinePage(QWidget):
         self.search.setClearButtonEnabled(True)
         self.search.returnPressed.connect(self._on_search)
         self.search.textChanged.connect(self._on_search_text_changed)
-        top.column.addWidget(self.search)
+        self._top.column.addWidget(self.search)
 
         filters = QHBoxLayout()
         filters.setSpacing(6)
@@ -230,12 +249,12 @@ class TimelinePage(QWidget):
         self.tag_filter.addItem("All tags", "")
         self.tag_filter.currentIndexChanged.connect(self._render)
         filters.addWidget(self.tag_filter)
-        top.column.addLayout(filters)
-        layout.addWidget(top)
+        self._top.column.addLayout(filters)
+        layout.addWidget(self._top)
 
         self._scroll = QScrollArea()
         self._scroll.setWidgetResizable(True)
-        self._scroll.setWidget(Column())
+        self._scroll.setWidget(Column(self._max_width()))
         layout.addWidget(self._scroll, stretch=1)
 
         self.record_button = QPushButton()
@@ -250,6 +269,12 @@ class TimelinePage(QWidget):
         layout.addWidget(self.record_status, alignment=Qt.AlignmentFlag.AlignHCenter)
 
     # --- Public API ------------------------------------------------------
+
+    def set_columns(self, columns: int) -> None:
+        if columns != self._columns:
+            self._columns = columns
+            self._top.set_max_width(self._max_width())
+            self._render()
 
     def set_notes(self, notes: list[Note]) -> None:
         self._notes = notes
@@ -361,10 +386,31 @@ class TimelinePage(QWidget):
         self._show(self._list_widgets())
 
     def _show(self, widgets: list[QWidget]) -> None:
-        """Swap in a freshly built list; setWidget makes the scroll area re-measure it."""
-        column = Column()
+        """Swap in a freshly built grid; setWidget makes the scroll area re-measure it."""
+        column = Column(self._max_width())
+        self._grid = QGridLayout()
+        self._grid.setContentsMargins(0, 0, 0, 0)
+        self._grid.setSpacing(8)
+        for col in range(self._columns):
+            self._grid.setColumnStretch(col, 1)
+
+        row = 0
+        col = 0
         for widget in widgets:
-            column.column.addWidget(widget)
+            if isinstance(widget, NoteCard):
+                self._grid.addWidget(widget, row, col)
+                col += 1
+                if col == self._columns:
+                    row += 1
+                    col = 0
+            else:
+                if col > 0:
+                    row += 1
+                    col = 0
+                self._grid.addWidget(widget, row, 0, 1, self._columns)
+                row += 1
+
+        column.column.addLayout(self._grid)
         column.column.addStretch()
         # Deferred: a card's own signal may have triggered this render.
         self._scroll.takeWidget().deleteLater()  # type: ignore[union-attr]
@@ -478,14 +524,14 @@ class MainWindow(QMainWindow):
     search_requested = pyqtSignal(str)
     settings_clicked = pyqtSignal()
 
-    def __init__(self) -> None:
+    def __init__(self, columns: int = DEFAULT_COLUMNS) -> None:
         super().__init__()
         self.setWindowTitle("Eloquent Notes")
-        self.resize(820, 880)
+        self.resize(960, 880)
         self.setMinimumWidth(720)
         self.setStyleSheet(STYLESHEET)
 
-        self.timeline = TimelinePage()
+        self.timeline = TimelinePage(columns=columns)
         self.reader = ReaderPage()
         self.stack = QStackedWidget()
         self.stack.addWidget(self.timeline)
@@ -500,6 +546,9 @@ class MainWindow(QMainWindow):
         self.reader.dictate_clicked.connect(self._on_dictate)
         self.reader.copy_clicked.connect(self._on_copy)
         self.reader.delete_clicked.connect(self._on_delete)
+
+    def set_columns(self, columns: int) -> None:
+        self.timeline.set_columns(columns)
 
     def set_notes(self, notes: list[Note]) -> None:
         self.timeline.set_notes(notes)

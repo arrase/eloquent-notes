@@ -1,5 +1,6 @@
 notes:
   folder: "~/Documents/Eloquent Notes"   # One Markdown file per voice note.
+  columns: 2                             # Number of columns in the timeline grid.
 
 ai:
   ollama_url: "http://localhost:11434"

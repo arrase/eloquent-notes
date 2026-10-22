@@ -11,6 +11,7 @@ from PyQt6.QtWidgets import (
     QLineEdit,
     QMessageBox,
     QPushButton,
+    QSpinBox,
     QVBoxLayout,
     QWidget,
 )
@@ -49,6 +50,11 @@ class NotesTab(QWidget):
 
         form_layout.addRow(QLabel("Notes Folder:"), path_widget)
 
+        self.spn_columns = QSpinBox()
+        self.spn_columns.setRange(1, 6)
+        self.spn_columns.setToolTip("Number of columns in the notes timeline grid.")
+        form_layout.addRow(QLabel("Timeline Columns:"), self.spn_columns)
+
         layout.addWidget(grp_notes)
         layout.addStretch()
 
@@ -65,6 +71,7 @@ class NotesTab(QWidget):
 
     def load_settings(self, config_data: dict) -> None:
         self.txt_folder.setText(str(config_data["notes"]["folder"]))
+        self.spn_columns.setValue(int(config_data["notes"]["columns"]))
 
     def save_settings(self, config_data: dict) -> bool:
         folder = self.txt_folder.text().strip()
@@ -73,4 +80,5 @@ class NotesTab(QWidget):
             return False
 
         config_data["notes"]["folder"] = folder
+        config_data["notes"]["columns"] = self.spn_columns.value()
         return True
