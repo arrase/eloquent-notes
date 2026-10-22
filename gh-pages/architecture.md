@@ -16,7 +16,7 @@ Eloquent Notes is a Linux tray daemon with one job: turn voice dictations into w
 | `search.py` | `SemanticIndex`: embedding cache and cosine-similarity ranking. |
 | `window.py` | `MainWindow`: timeline and reader pages. A pure view that reports user intent through signals. |
 | `recording_hud.py` | Floating countdown overlay shown while recording (click to stop). |
-| `ui.py` | Tray and dictation state icons drawn with `QPainter`, plus light/dark theme stylesheets. |
+| `ui.py` | Application, tray and dictation state icons drawn with `QPainter`, plus light/dark theme stylesheets. |
 | `config.py` | XDG paths, default file installation, config loading/merging, atomic writes. |
 | `config_gui/` | Configuration dialog (General, Notes, AI Settings, Audio, Prompts tabs). |
 | `autostart.py`, `logging_utils.py` | Autostart desktop entry; rotating XDG log files. |
@@ -123,7 +123,7 @@ The window uses the desktop palette with a small palette-based stylesheet, so it
 
 ## 5. Dynamic In-Memory Icon Generation
 
-State icons are drawn with `QPainter` into a `QPixmap` and wrapped in a cached `QIcon` (`ui.get_qicon(color)`). The same icons are used by the tray and by the dictate button in the window.
+The application window icon (`ui.get_app_icon()`) and state icons (`ui.get_qicon(color)`) are drawn with `QPainter` into a `QPixmap` and wrapped in cached `QIcon` instances. The application icon renders a note sheet and microphone over the accent blue (`#2C4C7E`) rounded tile; the state icons are shared by the system tray and the dictate button in the window.
 
 | State | Circle Color | Glyph |
 | :--- | :--- | :--- |

@@ -63,6 +63,7 @@ class EloquentApp(QObject):
     def __init__(self, qapp, start_recording_immediately=False, open_window_immediately=False, app_config=None):
         super().__init__()
         self.app = qapp
+        self.app.setWindowIcon(ui.get_app_icon())
         self.state = IDLE
         self.config = app_config if app_config is not None else config.load_config()
         self.tray = None

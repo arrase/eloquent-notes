@@ -41,6 +41,21 @@ def test_get_qicon_cached(qapp):
     assert icon1 is icon2
 
 
+def test_app_icon_pixmap_and_cached_qicon(qapp):
+    """Test create_app_icon_pixmap and get_app_icon return a valid cached 64x64 icon."""
+    pixmap = ui.create_app_icon_pixmap()
+    assert not pixmap.isNull()
+    assert pixmap.width() == 64
+    assert pixmap.height() == 64
+    assert pixmap.toImage().pixelColor(32, 32).alpha() == 255
+
+    icon = ui.get_app_icon()
+    assert isinstance(icon, QIcon)
+    assert not icon.isNull()
+    assert ui.get_app_icon() is icon
+
+
+
 def test_theme_selection_and_stylesheets(qapp):
     """Test light and dark theme detection and stylesheet builders."""
     light_palette = QPalette()

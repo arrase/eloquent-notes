@@ -488,6 +488,7 @@ class MainWindow(QMainWindow):
     def __init__(self, columns: int = DEFAULT_COLUMNS) -> None:
         super().__init__()
         self.setWindowTitle("Eloquent Notes")
+        self.setWindowIcon(ui.get_app_icon())
         self.resize(960, 880)
         self.setMinimumWidth(720)
         self._dark = ui.is_dark_theme()

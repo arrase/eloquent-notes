@@ -82,6 +82,7 @@ def test_dialog_init(qapp):
         "Prompts",
     ]
     assert dialog.styleSheet() == ui.dialog_stylesheet(ui.current_theme())
+    assert not dialog.windowIcon().isNull()
     dialog.cleanup_tabs()
 
 

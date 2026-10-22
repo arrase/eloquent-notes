@@ -121,6 +121,7 @@ def test_timeline_columns_can_be_configured(window):
 def test_empty_timeline_invites_recording(qapp):
     win = MainWindow()
     win.set_notes([])
+    assert not win.windowIcon().isNull()
     assert list_texts(win) == ["No notes yet. Click the microphone to record your first one."]
     win.close()
 

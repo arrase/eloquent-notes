@@ -1,4 +1,4 @@
-"""System tray status icons and light/dark theme stylesheets."""
+"""Application and system tray icons and light/dark theme stylesheets."""
 
 from __future__ import annotations
 
@@ -11,6 +11,7 @@ from PyQt6.QtGui import QColor, QGuiApplication, QIcon, QPainter, QPalette, QPen
 COLOR_RED = QColor(220, 38, 38)
 COLOR_ORANGE = QColor(217, 119, 6)
 COLOR_GRAY = QColor(75, 85, 99)
+COLOR_ACCENT = QColor(44, 76, 126)
 COLOR_WHITE = QColor(255, 255, 255)
 
 
@@ -26,6 +27,12 @@ _PEN_WHITE_3 = QPen(
     Qt.PenStyle.SolidLine,
     Qt.PenCapStyle.RoundCap,
     Qt.PenJoinStyle.RoundJoin,
+)
+_PEN_ACCENT_25 = QPen(
+    COLOR_ACCENT,
+    2.5,
+    Qt.PenStyle.SolidLine,
+    Qt.PenCapStyle.RoundCap,
 )
 _HOURGLASS_TOP = QPolygonF([
     QPointF(24.0, 20.0), QPointF(40.0, 20.0), QPointF(32.0, 32.0),
@@ -479,3 +486,46 @@ def create_icon_pixmap(color: str) -> QPixmap:
 def get_qicon(color: str) -> QIcon:
     """Return the cached QIcon for the given state color."""
     return QIcon(create_icon_pixmap(color))
+
+
+def create_app_icon_pixmap() -> QPixmap:
+    """Render the 64x64 application icon: accent tile with a note sheet and microphone."""
+    pixmap = QPixmap(64, 64)
+    pixmap.fill(Qt.GlobalColor.transparent)
+
+    painter = QPainter(pixmap)
+    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+    painter.setPen(Qt.PenStyle.NoPen)
+
+    painter.setBrush(COLOR_ACCENT)
+    painter.drawRoundedRect(QRectF(4.0, 4.0, 56.0, 56.0), 14.0, 14.0)
+
+    painter.setBrush(COLOR_WHITE)
+    painter.drawRoundedRect(QRectF(12.0, 11.0, 26.0, 34.0), 4.0, 4.0)
+
+    painter.setBrush(COLOR_ACCENT)
+    painter.drawEllipse(QRectF(29.0, 24.0, 28.0, 28.0))
+
+    painter.setPen(_PEN_ACCENT_25)
+    painter.drawLine(QPointF(17.0, 19.0), QPointF(33.0, 19.0))
+    painter.drawLine(QPointF(17.0, 25.0), QPointF(31.0, 25.0))
+    painter.drawLine(QPointF(17.0, 31.0), QPointF(26.0, 31.0))
+
+    painter.setPen(Qt.PenStyle.NoPen)
+    painter.setBrush(COLOR_WHITE)
+    painter.drawRoundedRect(QRectF(38.0, 26.0, 10.0, 14.0), 5.0, 5.0)
+    painter.setPen(_PEN_WHITE_3)
+    painter.setBrush(Qt.BrushStyle.NoBrush)
+    painter.drawArc(QRectF(34.0, 31.0, 18.0, 12.0), 180 * 16, 180 * 16)
+    painter.drawLine(QPointF(43.0, 43.0), QPointF(43.0, 49.0))
+    painter.drawLine(QPointF(38.0, 49.0), QPointF(48.0, 49.0))
+
+    painter.end()
+    return pixmap
+
+
+@functools.lru_cache(maxsize=1)
+def get_app_icon() -> QIcon:
+    """Return the cached application window QIcon."""
+    return QIcon(create_app_icon_pixmap())
+

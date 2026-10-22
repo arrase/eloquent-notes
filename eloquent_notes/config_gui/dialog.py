@@ -31,6 +31,7 @@ class ConfigurationDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Eloquent Notes Configuration")
+        self.setWindowIcon(ui.get_app_icon())
         self.setMinimumSize(850, 700)
         try:
             self.config_data = config.load_config()
