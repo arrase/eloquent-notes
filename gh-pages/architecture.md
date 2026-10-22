@@ -102,8 +102,8 @@ While processing, further toggles only show a "System is busy" notification; the
 ## 3. In-Memory Audio Capture & Zero Disk-IO
 
 - **Stream capture:** `sounddevice.InputStream` appends float32 NumPy blocks to an internal chunk list during recording, which is concatenated and encoded once stopped.
-- **Local silence gate:** `AudioRecorder.is_silent` compares the RMS level against a -45 dBFS speech threshold. Silent recordings never reach the model, which would otherwise invent text.
-- **Silence trimming & WAV encoding:** `AudioRecorder.wav_bytes` trims leading/trailing silent blocks, converts to 16-bit PCM and writes a WAV file into an `io.BytesIO` buffer.
+- **Local silence gate:** `AudioRecorder.is_silent` analyzes 20 ms frames in the frequency domain (`85–3500 Hz` voice band concentration, spectral flatness, adaptive SNR and minimum sustained speech duration). Silent or noise-only recordings never reach the model.
+- **Silence trimming & WAV encoding:** `AudioRecorder.wav_bytes` trims leading/trailing non-speech frames and click transients, converts to 16-bit PCM and writes a WAV file into an `io.BytesIO` buffer.
 - **Base64 transmission:** the WAV bytes are base64-encoded and sent in the JSON body of `/api/chat`. No audio file is ever written to disk.
 
 ### Audible Feedback Cues

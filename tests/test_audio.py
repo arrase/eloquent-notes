@@ -9,11 +9,23 @@ import pytest
 
 from eloquent_notes.audio import (
     AudioRecorder,
+    encode_wav_bytes,
     is_silent,
     play_beep,
-    rms_level,
+    speech_frame_mask,
     trim_silence,
 )
+
+SAMPLE_RATE = 16000
+
+
+def _speech_signal(duration_s: float) -> np.ndarray:
+    """Synthesize a harmonic voice-band signal (F0=150 Hz + harmonics)."""
+    num_samples = int(SAMPLE_RATE * duration_s)
+    t = np.linspace(0.0, duration_s, num_samples, endpoint=False, dtype=np.float32)
+    signal = sum(np.sin(2.0 * np.pi * 150.0 * k * t) / k for k in range(1, 8))
+    normalized = (signal / np.max(np.abs(signal))).astype(np.float32)
+    return (normalized * 0.2).reshape(-1, 1)
 
 
 def test_recorder_init():
@@ -83,81 +95,105 @@ def test_callback_enqueues_copy():
 
 
 def test_wav_bytes_without_data_is_empty():
-    recorder = AudioRecorder(sample_rate=16000, channels=1)
+    recorder = AudioRecorder(sample_rate=SAMPLE_RATE, channels=1)
     assert recorder.wav_bytes == b""
+    assert encode_wav_bytes(np.empty(0, dtype=np.float32), SAMPLE_RATE, 1) == b""
 
 
 def test_wav_bytes_encodes_captured_chunks():
-    recorder = AudioRecorder(sample_rate=16000, channels=1)
-    recorder._chunks.append(np.ones((800, 1), dtype=np.float32) * 0.5)
-    recorder._chunks.append(np.ones((800, 1), dtype=np.float32) * -0.5)
+    recorder = AudioRecorder(sample_rate=SAMPLE_RATE, channels=1)
+    speech = _speech_signal(0.3)
+    recorder._chunks.append(speech[:2400])
+    recorder._chunks.append(speech[2400:])
 
     wav_bytes = recorder.wav_bytes
     assert recorder.wav_bytes == wav_bytes
     with wave.open(io.BytesIO(wav_bytes), "rb") as wf:
         assert wf.getnchannels() == 1
         assert wf.getsampwidth() == 2
-        assert wf.getframerate() == 16000
-        assert wf.getnframes() == 1600
+        assert wf.getframerate() == SAMPLE_RATE
+        assert wf.getnframes() == len(speech)
 
 
-def test_rms_level_of_silence_and_tone():
-    assert rms_level(np.zeros((100, 1), dtype=np.float32)) == 0.0
-    assert rms_level(np.empty((0, 1), dtype=np.float32)) == 0.0
-    assert rms_level(np.full((100, 1), 0.5, dtype=np.float32)) == pytest.approx(0.5)
+def test_speech_frame_mask_rejects_short_buffers():
+    assert speech_frame_mask(np.empty(0, dtype=np.float32), SAMPLE_RATE).size == 0
+    assert np.array_equal(
+        speech_frame_mask(np.ones(320, dtype=np.float32), SAMPLE_RATE),
+        np.array([False]),
+    )
 
 
-def test_is_silent_rejects_noise_but_accepts_speech():
+def test_is_silent_rejects_noise_clicks_and_out_of_band_signals():
     rng = np.random.default_rng(0)
-    speech = rng.standard_normal(1600).astype(np.float32) * 0.2
+    t = np.linspace(0.0, 1.0, SAMPLE_RATE, endpoint=False, dtype=np.float32)
 
-    assert is_silent(np.zeros(1600, dtype=np.float32)) is True
-    assert is_silent(rng.standard_normal(1600).astype(np.float32) * 0.001) is True
-    assert is_silent(speech) is False
+    # Silence and loud broadband white noise
+    assert is_silent(np.zeros(SAMPLE_RATE, dtype=np.float32), SAMPLE_RATE) is True
+    assert is_silent(rng.standard_normal(SAMPLE_RATE).astype(np.float32) * 0.1, SAMPLE_RATE) is True
+
+    # Low-frequency desk thump (40 Hz) and high-frequency tone (5000 Hz)
+    low_thump = (np.sin(2.0 * np.pi * 40.0 * t) * 0.4).astype(np.float32)
+    high_tone = (np.sin(2.0 * np.pi * 5000.0 * t) * 0.4).astype(np.float32)
+    assert is_silent(low_thump, SAMPLE_RATE) is True
+    assert is_silent(high_tone, SAMPLE_RATE) is True
+
+    # Mouse click / short transient (< 200 ms of voiced audio)
+    click = np.zeros((SAMPLE_RATE, 1), dtype=np.float32)
+    click[1600:1920] = _speech_signal(0.02)
+    assert is_silent(click, SAMPLE_RATE) is True
+
+    # Sustained speech in the 85-3500 Hz band (clean and with background noise)
+    speech = _speech_signal(0.4)
+    noisy_speech = speech + rng.standard_normal(speech.shape).astype(np.float32) * 0.02
+    assert is_silent(speech, SAMPLE_RATE) is False
+    assert is_silent(noisy_speech, SAMPLE_RATE) is False
 
 
-def test_trim_silence_removes_leading_and_trailing_quiet_blocks():
-    loud = np.full((1600, 1), 0.2, dtype=np.float32)
+def test_trim_silence_removes_leading_and_trailing_quiet_and_clicks():
+    speech = _speech_signal(0.3)
     quiet = np.zeros((1600, 1), dtype=np.float32)
+    click = np.zeros((1600, 1), dtype=np.float32)
+    click[:320] = _speech_signal(0.02)
 
-    trimmed = trim_silence([quiet, quiet, loud, quiet])
-    assert len(trimmed) == 1
-    assert np.array_equal(trimmed[0], loud)
+    data = np.concatenate([click, quiet, speech, quiet, click])
+    trimmed = trim_silence(data, SAMPLE_RATE)
+    assert np.array_equal(trimmed, speech)
 
 
 def test_trim_silence_keeps_interior_pauses():
-    loud = np.full((160, 1), 0.2, dtype=np.float32)
-    quiet = np.zeros((160, 1), dtype=np.float32)
+    part = _speech_signal(0.2)
+    pause = np.zeros((1600, 1), dtype=np.float32)
+    data = np.concatenate([part, pause, part])
 
-    trimmed = trim_silence([loud, quiet, loud])
-    assert len(trimmed) == 3
+    trimmed = trim_silence(data, SAMPLE_RATE)
+    assert np.array_equal(trimmed, data)
 
 
 def test_trim_silence_returns_all_silent_audio_unchanged():
-    quiet = [np.zeros((16, 1), dtype=np.float32) for _ in range(3)]
-    assert len(trim_silence(quiet)) == 3
-    assert trim_silence([]) == []
+    quiet = np.zeros((1600, 1), dtype=np.float32)
+    assert np.array_equal(trim_silence(quiet, SAMPLE_RATE), quiet)
 
 
 def test_recorder_is_silent_for_quiet_and_loud_capture():
-    recorder = AudioRecorder(sample_rate=16000, channels=1)
+    recorder = AudioRecorder(sample_rate=SAMPLE_RATE, channels=1)
     assert recorder.is_silent is True
 
     recorder._chunks.append(np.zeros((1600, 1), dtype=np.float32))
     assert recorder.is_silent is True
 
-    recorder._chunks.append(np.full((1600, 1), 0.2, dtype=np.float32))
+    recorder._chunks.append(_speech_signal(0.3))
     assert recorder.is_silent is False
 
 
 def test_wav_bytes_trims_surrounding_silence():
-    recorder = AudioRecorder(sample_rate=16000, channels=1)
+    recorder = AudioRecorder(sample_rate=SAMPLE_RATE, channels=1)
+    speech = _speech_signal(0.3)
     recorder._chunks.append(np.zeros((1600, 1), dtype=np.float32))
-    recorder._chunks.append(np.full((1600, 1), 0.2, dtype=np.float32))
+    recorder._chunks.append(speech)
     recorder._chunks.append(np.zeros((1600, 1), dtype=np.float32))
 
     with wave.open(io.BytesIO(recorder.wav_bytes), "rb") as wf:
-        assert wf.getnframes() == 1600
+        assert wf.getnframes() == len(speech)
 
 
 @patch("sounddevice.wait")

@@ -16,50 +16,100 @@ PCM16_MIN_INT = -32768
 PCM16_MAX_INT = 32767
 BYTES_PER_SAMPLE_16BIT = 2
 
-# RMS level (0.0-1.0) below which audio is treated as silence. Microphone
-# noise floors sit far lower than speech; -45 dBFS leaves ample headroom for
-# quiet dictation while rejecting true silence and hiss.
-SILENCE_RMS_THRESHOLD = 0.0056
+# Voice activity detection constants (20 ms framing at the configured sample rate).
+FRAME_DURATION_S = 0.02
+SPEECH_LOW_HZ = 85.0
+SPEECH_HIGH_HZ = 3500.0
+SPEECH_RMS_THRESHOLD = 0.012
+SPEECH_SNR_FACTOR = 2.0
+MIN_VOICE_BAND_RATIO = 0.5
+MAX_SPEECH_FLATNESS = 0.25
+MIN_SPEECH_FRAMES = 10
+EPSILON = 1e-12
 
 
-def rms_level(data: np.ndarray) -> float:
-    """Return the root-mean-square amplitude of a float32 audio block."""
-    if data.size == 0:
-        return 0.0
-    return float(np.sqrt(np.mean(np.square(data, dtype=np.float64))))
+def speech_frame_mask(data: np.ndarray, sample_rate: int) -> np.ndarray:
+    """Return a boolean mask of 20 ms frames containing sustained human speech.
+
+    Each frame is evaluated in the frequency domain and must simultaneously:
+    1. Concentrate at least 50% of its AC energy in the 85-3500 Hz voice band
+       (rejecting low-frequency mic bumps/pops and high-frequency clicks/hiss).
+    2. Exhibit harmonic/formant structure via low spectral flatness <= 0.25
+       (rejecting broadband white/pink noise, fan hum and breath noise).
+    3. Exceed both the absolute RMS floor (-38 dBFS) and 2x the recording's
+       adaptive broadband noise floor (+6 dB SNR).
+    Isolated single-frame transients (< 40 ms) are discarded.
+    """
+    mono = data.mean(axis=1) if data.ndim > 1 else data
+    frame_len = int(sample_rate * FRAME_DURATION_S)
+    num_frames = len(mono) // frame_len
+    if num_frames < 2:
+        return np.zeros(num_frames, dtype=bool)
+
+    frames = mono[: num_frames * frame_len].reshape(num_frames, frame_len)
+    spectrum = np.abs(np.fft.rfft(frames, axis=1)) ** 2
+    freqs = np.fft.rfftfreq(frame_len, d=1.0 / sample_rate)
+    band_mask = (freqs >= SPEECH_LOW_HZ) & (freqs <= SPEECH_HIGH_HZ)
+
+    weights = np.full(len(freqs), 2.0 / (frame_len**2))
+    weights[0] = 0.0
+
+    total_power = spectrum @ weights
+    band_power = spectrum[:, band_mask] @ weights[band_mask]
+    band_rms = np.sqrt(band_power)
+    band_ratio = band_power / np.maximum(total_power, EPSILON)
+
+    band_spec = spectrum[:, band_mask] + EPSILON
+    flatness = np.exp(np.mean(np.log(band_spec), axis=1)) / np.mean(band_spec, axis=1)
+
+    noise_estimate = band_rms * np.clip(flatness / MAX_SPEECH_FLATNESS, 0.0, 1.0)
+    noise_floor = float(np.percentile(noise_estimate, 20))
+    threshold = max(SPEECH_RMS_THRESHOLD, noise_floor * SPEECH_SNR_FACTOR)
+
+    active = (
+        (band_rms >= threshold)
+        & (band_ratio >= MIN_VOICE_BAND_RATIO)
+        & (flatness <= MAX_SPEECH_FLATNESS)
+    )
+    pair = active[:-1] & active[1:]
+    sustained = np.zeros_like(active)
+    sustained[:-1] |= pair
+    sustained[1:] |= pair
+    return sustained
 
 
-def is_silent(data: np.ndarray) -> bool:
-    """Report whether an audio block carries no speech-level energy.
+def is_silent(data: np.ndarray, sample_rate: int) -> bool:
+    """Report whether an audio buffer lacks sustained human speech.
 
     The transcription model cannot be trusted to flag empty recordings: given
-    silence it has been observed to answer empty=false and invent text, which
-    the pipeline would then save as a note. This RMS gate decides locally and
-    deterministically, before any audio is sent to the model.
+    silence or noise it frequently answers empty=false and invents text or a
+    refusal, which the pipeline would then save as a note. This gate decides
+    locally and deterministically before any audio is sent to the model.
     """
-    return rms_level(data) < SILENCE_RMS_THRESHOLD
+    return int(np.count_nonzero(speech_frame_mask(data, sample_rate))) < MIN_SPEECH_FRAMES
 
 
-def trim_silence(chunks: list[np.ndarray]) -> list[np.ndarray]:
-    """Drop leading and trailing blocks quieter than the speech threshold.
+def trim_silence(data: np.ndarray, sample_rate: int) -> np.ndarray:
+    """Drop leading and trailing non-speech frames around the spoken segment.
 
-    Trimming reduces the audio the model must encode, which makes it less prone
-    to filling the gaps with invented speech, and saves tokens. Interior
-    pauses are preserved so the model's prosody handling is unchanged.
+    Trimming removes surrounding silence and start/stop click transients so the
+    model encodes only the spoken dictation while keeping interior pauses intact.
     """
-    start = next((i for i, chunk in enumerate(chunks) if not is_silent(chunk)), None)
-    if start is None:
-        return chunks
-    end = next(i for i in range(len(chunks) - 1, -1, -1) if not is_silent(chunks[i]))
-    return chunks[start : end + 1]
+    active = speech_frame_mask(data, sample_rate)
+    if not np.any(active):
+        return data
+
+    frame_len = int(sample_rate * FRAME_DURATION_S)
+    first = int(np.argmax(active))
+    last = len(active) - int(np.argmax(active[::-1]))
+    return data[first * frame_len : last * frame_len]
 
 
-def encode_wav_bytes(chunks: list[np.ndarray], sample_rate: int, channels: int) -> bytes:
-    """Encode captured float32 audio chunks into 16-bit PCM WAV bytes."""
-    if not chunks:
+def encode_wav_bytes(data: np.ndarray, sample_rate: int, channels: int) -> bytes:
+    """Encode captured float32 audio samples into 16-bit PCM WAV bytes."""
+    if data.size == 0:
         return b""
 
-    data = np.concatenate(chunks)
     pcm16 = (data * PCM16_MAX).clip(PCM16_MIN_INT, PCM16_MAX_INT).astype(np.int16)
 
     buffer = io.BytesIO()
@@ -116,18 +166,25 @@ class AudioRecorder:
             stream.close()
 
     @property
+    def _samples(self) -> np.ndarray:
+        if not self._chunks:
+            return np.empty(0, dtype=np.float32)
+        return np.concatenate(self._chunks)
+
+    @property
     def wav_bytes(self) -> bytes:
-        """Encode captured chunks as 16-bit PCM WAV."""
-        return encode_wav_bytes(trim_silence(self._chunks), self.sample_rate, self.channels)
+        """Encode captured speech as 16-bit PCM WAV."""
+        trimmed = trim_silence(self._samples, self.sample_rate)
+        return encode_wav_bytes(trimmed, self.sample_rate, self.channels)
 
     @property
     def is_silent(self) -> bool:
-        """Report whether the recording holds no speech-level energy.
+        """Report whether the recording lacks sustained human speech.
 
-        Checked locally so an accidental trigger in a quiet room never reaches
-        the model, which cannot reliably report empty audio on its own.
+        Checked locally so an accidental trigger, ambient noise or click never
+        reaches the model, which cannot reliably report empty audio on its own.
         """
-        return all(is_silent(chunk) for chunk in self._chunks)
+        return is_silent(self._samples, self.sample_rate)
 
 
 def play_beep(
