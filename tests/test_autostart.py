@@ -31,6 +31,24 @@ def test_get_desktop_and_icon_paths_honor_xdg_data_home(tmp_path, monkeypatch):
     )
 
 
+def test_get_desktop_and_icon_paths_default(monkeypatch):
+    monkeypatch.delenv("XDG_DATA_HOME", raising=False)
+    default_data = os.path.expanduser("~/.local/share")
+    assert autostart.get_desktop_entry_path() == os.path.join(
+        default_data, "applications", "eloquent-notes.desktop"
+    )
+    assert autostart.get_icon_path() == os.path.join(
+        default_data, "icons", "hicolor", "scalable", "apps", "eloquent-notes.svg"
+    )
+
+
+def test_install_app_icon(tmp_path, monkeypatch):
+    monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path))
+    icon_path = autostart.install_app_icon()
+    assert icon_path == autostart.get_icon_path()
+    assert Path(icon_path).read_text(encoding="utf-8") == autostart.APP_ICON_SVG
+
+
 def test_install_desktop_entry(tmp_path, monkeypatch):
     """Test install_desktop_entry writes the SVG icon and application launcher entry."""
     monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path))
@@ -88,6 +106,21 @@ def test_install_autostart_with_found_executable(tmp_path, monkeypatch):
 
     content = Path(filepath).read_text(encoding="utf-8")
     assert f"Exec={mock_bin}\n" in content
+
+
+def test_install_entries_quote_path_with_spaces(tmp_path, monkeypatch):
+    """Test desktop and autostart entries quote executable paths containing spaces."""
+    mock_bin = "/opt/My Apps/eloquent-notes"
+
+    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "config"))
+    monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path / "data"))
+    monkeypatch.setattr("shutil.which", lambda cmd: mock_bin)
+
+    autostart_path = autostart.install_autostart()
+    desktop_path = autostart.get_desktop_entry_path()
+
+    assert f'Exec="{mock_bin}"\n' in Path(autostart_path).read_text(encoding="utf-8")
+    assert f'Exec="{mock_bin}" open\n' in Path(desktop_path).read_text(encoding="utf-8")
 
 
 def test_is_autostart_enabled_and_remove(tmp_path, monkeypatch):

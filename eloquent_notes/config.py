@@ -75,19 +75,38 @@ def init_config_dir():
             shutil.copy(src, dst)
 
 
-def _merge_configs(base, overrides):
+def _merge_configs(base: dict, overrides: dict) -> dict:
     """Recursively merge overrides into base config dict."""
     result = copy.deepcopy(base)
-    for key, value in overrides.items():
-        if isinstance(result.get(key), dict):
-            if not isinstance(value, dict):
+    for k, v in overrides.items():
+        default_val = result.get(k)
+        if isinstance(default_val, dict):
+            if not isinstance(v, dict):
                 raise TypeError(
-                    f"Configuration section '{key}' must be a mapping, got {type(value).__name__}"
+                    f"Configuration section '{k}' must be a mapping, got {type(v).__name__}"
                 )
-            result[key] = _merge_configs(result[key], value)
+            result[k] = _merge_configs(default_val, v)
         else:
-            result[key] = copy.deepcopy(value)
+            if default_val is not None and not (k == "context_length" and v is None):
+                expected = (int, float) if type(default_val) is float else (type(default_val),)
+                if type(v) not in expected:
+                    raise TypeError(f"Invalid configuration value for '{k}'")
+            result[k] = copy.deepcopy(v)
     return result
+
+
+def diff_configs(default: dict, current: dict) -> dict:
+    """Recursively diff current config against defaults, returning only overrides."""
+    overrides = {}
+    for k, default_val in default.items():
+        v = current[k]
+        if isinstance(default_val, dict) and isinstance(v, dict):
+            diff = diff_configs(default_val, v)
+            if diff:
+                overrides[k] = diff
+        elif isinstance(v, bool) != isinstance(default_val, bool) or v != default_val:
+            overrides[k] = v
+    return overrides
 
 
 def load_default_config():

@@ -4,6 +4,7 @@ import pytest
 import yaml
 
 from eloquent_notes import config
+from eloquent_notes.config import diff_configs
 
 
 @pytest.fixture
@@ -14,7 +15,9 @@ def tmp_config_dir(tmp_path):
     config_path = config_dir / "config.yaml"
 
     default_config_src = tmp_path / "default_config.yaml"
-    default_config_src.write_text("audio:\n  device: 0\nai:\n  model: gemma\n", encoding="utf-8")
+    default_config_src.write_text(
+        "audio:\n  sample_rate: 16000\nai:\n  model: gemma\n", encoding="utf-8"
+    )
 
     default_prompt_src = tmp_path / "default_prompt.md"
     default_prompt_src.write_text("System Prompt Content", encoding="utf-8")
@@ -62,36 +65,52 @@ def test_init_config_dir(tmp_config_dir, monkeypatch):
 
 
 def test_merge_configs():
-    """Test recursive merging of base config and overrides."""
+    """Test recursive merging and type validation of base config and overrides."""
     base = {
-        "audio": {"device": 0, "sample_rate": 16000},
-        "ui": {"theme": "dark"},
+        "audio": {"sample_rate": 16000, "channels": 1, "beep_enabled": True},
+        "ai": {"model": "gemma", "context_length": 8192},
+        "search": {"min_similarity": 0.6},
     }
     overrides = {
-        "audio": {"device": 1},
-        "ui": {"theme": "light", "font_size": 12},
-        "new_section": {"key": "val"},
+        "audio": {"sample_rate": 44100},
+        "ai": {"model": "gemma4:e4b", "context_length": None},
+        "search": {"min_similarity": 1},
     }
 
     merged = config._merge_configs(base, overrides)
 
-    assert merged["audio"]["device"] == 1
-    assert merged["audio"]["sample_rate"] == 16000
-    assert merged["ui"]["theme"] == "light"
-    assert merged["ui"]["font_size"] == 12
-    assert merged["new_section"]["key"] == "val"
+    assert merged["audio"]["sample_rate"] == 44100
+    assert merged["audio"]["channels"] == 1
+    assert merged["ai"]["model"] == "gemma4:e4b"
+    assert merged["ai"]["context_length"] is None
+    assert merged["search"]["min_similarity"] == 1
 
     # Verify base was not mutated
-    assert base["audio"]["device"] == 0
+    assert base["audio"]["sample_rate"] == 16000
 
     with pytest.raises(TypeError, match="Configuration section 'audio' must be a mapping"):
         config._merge_configs(base, {"audio": None})
+
+    with pytest.raises(TypeError, match="Invalid configuration value for 'sample_rate'"):
+        config._merge_configs(base, {"audio": {"sample_rate": None}})
+
+    with pytest.raises(TypeError, match="Invalid configuration value for 'sample_rate'"):
+        config._merge_configs(base, {"audio": {"sample_rate": True}})
+
+    with pytest.raises(TypeError, match="Invalid configuration value for 'sample_rate'"):
+        config._merge_configs(base, {"audio": {"sample_rate": "16000"}})
+
+    with pytest.raises(TypeError, match="Invalid configuration value for 'beep_enabled'"):
+        config._merge_configs(base, {"audio": {"beep_enabled": 1}})
+
+    with pytest.raises(TypeError, match="Invalid configuration value for 'model'"):
+        config._merge_configs(base, {"ai": {"model": None}})
 
 
 def test_load_config(tmp_config_dir, monkeypatch):
     """Test load_config merges default config and user config."""
     user_cfg_path = tmp_config_dir["config_path"]
-    user_cfg_content = "audio:\n  device: 5\n"
+    user_cfg_content = "audio:\n  sample_rate: 48000\n"
 
     monkeypatch.setattr(config, "CONFIG_DIR", tmp_config_dir["config_dir"])
     monkeypatch.setattr(config, "PROMPTS_DIR", tmp_config_dir["prompts_dir"])
@@ -104,7 +123,14 @@ def test_load_config(tmp_config_dir, monkeypatch):
         f.write(user_cfg_content)
 
     cfg = config.load_config()
-    assert cfg["audio"]["device"] == 5
+    assert cfg["audio"]["sample_rate"] == 48000
+    assert cfg["ai"]["model"] == "gemma"
+
+    with open(user_cfg_path, "w", encoding="utf-8") as f:
+        f.write("")
+
+    cfg = config.load_config()
+    assert cfg["audio"]["sample_rate"] == 16000
     assert cfg["ai"]["model"] == "gemma"
 
 
@@ -159,7 +185,7 @@ def test_save_config(tmp_config_dir, monkeypatch):
     monkeypatch.setattr(config, "CONFIG_DIR", tmp_config_dir["config_dir"])
     monkeypatch.setattr(config, "CONFIG_PATH", tmp_config_dir["config_path"])
 
-    data = {"test_key": "test_val", "nested": {"a": 1}}
+    data = {"audio": {"sample_rate": 48000}}
     config.save_config(data)
 
     assert os.path.isfile(tmp_config_dir["config_path"])
@@ -169,23 +195,15 @@ def test_save_config(tmp_config_dir, monkeypatch):
     assert loaded_data == data
 
 
-def test_default_config_audio_capture_duration():
-    """Verify that the packaged default config.yaml specifies capture_duration as 30."""
-    with open(config.DEFAULT_CONFIG_SRC, "r", encoding="utf-8") as f:
-        default_config = yaml.safe_load(f)
-    assert "audio" in default_config
+def test_load_default_config():
+    """Verify the packaged default configuration values."""
+    default_config = config.load_default_config()
     assert default_config["audio"]["capture_duration"] == 30
     assert default_config["audio"]["recording_hud_enabled"] is True
-
-
-def test_default_config_notes_and_search():
-    """Verify the packaged defaults for the notes folder and semantic search."""
-    with open(config.DEFAULT_CONFIG_SRC, "r", encoding="utf-8") as f:
-        default_config = yaml.safe_load(f)
-    assert "obsidian" not in default_config
     assert default_config["notes"]["folder"] == "~/Documents/Eloquent Notes"
     assert default_config["notes"]["columns"] == 2
     assert default_config["search"]["embedding_model"] == "embeddinggemma-2:latest"
+    assert default_config["search"]["keep_alive"] == "5m"
     assert default_config["search"]["min_similarity"] == 0.6
 
 
@@ -205,4 +223,43 @@ def test_get_data_home_follows_xdg_data_home(monkeypatch):
     assert config.get_data_home() == os.path.expanduser("~/.local/share")
 
 
+def test_diff_configs_identical():
+    default = {"a": 1, "b": "hello", "c": True}
+    current = {"a": 1, "b": "hello", "c": True}
+    assert diff_configs(default, current) == {}
 
+
+def test_diff_configs_scalar_changes():
+    default = {"a": 1, "b": "hello", "c": True}
+    current = {"a": 2, "b": "world", "c": True}
+    assert diff_configs(default, current) == {"a": 2, "b": "world"}
+
+
+def test_diff_configs_drops_obsolete_keys():
+    default = {"a": 1}
+    current = {"a": 1, "obsolete": 2}
+    assert diff_configs(default, current) == {}
+
+
+def test_diff_configs_bool_vs_int():
+    default = {"flag": 0, "active": True}
+    current = {"flag": False, "active": 1}
+    assert diff_configs(default, current) == {"flag": False, "active": 1}
+
+
+def test_diff_configs_nested_dicts():
+    default = {
+        "ai": {"model": "gemma", "context_length": 8192},
+        "audio": {"sample_rate": 16000},
+    }
+    current = {
+        "ai": {"model": "gemma4:e4b", "context_length": 8192},
+        "audio": {"sample_rate": 16000},
+    }
+    assert diff_configs(default, current) == {"ai": {"model": "gemma4:e4b"}}
+
+
+def test_diff_configs_none_values():
+    default = {"context_length": 8192}
+    current = {"context_length": None}
+    assert diff_configs(default, current) == {"context_length": None}

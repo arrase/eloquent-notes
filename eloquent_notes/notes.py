@@ -6,8 +6,6 @@ never renames its file. Files without the expected frontmatter are ignored,
 which lets the folder live inside an Obsidian vault.
 """
 
-from __future__ import annotations
-
 import logging
 import re
 from dataclasses import dataclass
@@ -86,18 +84,29 @@ def _parse(path: Path) -> Note | None:
         return None
     if not isinstance(meta, dict) or not {"title", "created", "type"} <= meta.keys():
         return None
+    title = meta["title"]
+    if not isinstance(title, str) or not title.strip():
+        return None
     note_type = str(meta["type"]).lower()
     if note_type not in NOTE_TYPES:
         return None
     created = meta["created"]
     if isinstance(created, str):
-        created = datetime.fromisoformat(created)
+        try:
+            created = datetime.fromisoformat(created)
+        except ValueError:
+            return None
+    if not isinstance(created, datetime):
+        return None
+    raw_tags = meta.get("tags")
+    if raw_tags is not None and not isinstance(raw_tags, list):
+        return None
     return Note(
         path=path,
-        title=str(meta["title"]),
+        title=title.strip(),
         created=created.astimezone(),
         type=note_type,
-        tags=[str(tag) for tag in meta.get("tags") or []],
+        tags=normalize_tags([str(tag) for tag in raw_tags or []]),
         body=match.group(2).strip(),
     )
 
@@ -111,19 +120,26 @@ def load_notes(folder: Path) -> list[Note]:
             logger.warning("Ignoring %s: missing or invalid Eloquent Notes frontmatter", path)
             continue
         notes.append(note)
-    return sorted(notes, key=lambda note: note.created, reverse=True)
+    return sorted(notes, key=lambda note: (note.created, note.path.name), reverse=True)
 
 
 def create_note(folder: Path, title: str, note_type: str, tags: list[str], body: str) -> Note:
     """Write a new note timestamped now and return it."""
+    title = title.strip()
     created = datetime.now().astimezone().replace(microsecond=0)
+    path = folder / _filename(created, title)
+    stem = path.stem
+    suffix = 2
+    while path.exists():
+        path = folder / f"{stem} ({suffix}).md"
+        suffix += 1
     note = Note(
-        path=folder / _filename(created, title),
+        path=path,
         title=title,
         created=created,
         type=note_type,
-        tags=tags,
-        body=body,
+        tags=normalize_tags(tags),
+        body=body.strip(),
     )
     save_note(note)
     return note
@@ -136,5 +152,5 @@ def save_note(note: Note) -> None:
 
 def append_to_note(note: Note, text: str) -> None:
     """Append dictated text to the note body as a new paragraph and save it."""
-    note.body = f"{note.body}\n\n{text}".strip()
+    note.body = f"{note.body.strip()}\n\n{text.strip()}".strip()
     save_note(note)

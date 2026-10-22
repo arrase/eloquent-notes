@@ -4,15 +4,12 @@ Displays a modern, non-intrusive floating pill indicator with live countdown,
 visual recording status, and progress bar during audio dictation.
 """
 
-from __future__ import annotations
-
 import math
 from typing import ClassVar
 
 from PyQt6.QtCore import QRectF, Qt, pyqtSignal
 from PyQt6.QtGui import (
     QColor,
-    QCursor,
     QGuiApplication,
     QMouseEvent,
     QPainter,
@@ -37,7 +34,7 @@ _PROGRESS_BAR_QSS = (
 
 
 def _format_time(seconds: float) -> str:
-    secs = max(0, int(seconds))
+    secs = max(0, math.ceil(seconds))
     return f"{secs // 60:02d}:{secs % 60:02d}"
 
 
@@ -53,9 +50,9 @@ class RecordingHUD(QWidget):
         "critical": ("#EF4444", "#EF4444"),
     }
 
-    def __init__(self, parent=None) -> None:
-        super().__init__(parent)
-        self._style_tier: str | None = None
+    def __init__(self) -> None:
+        super().__init__()
+        self._style_tier: str = ""
         self._init_window()
         self._init_ui()
 
@@ -68,7 +65,7 @@ class RecordingHUD(QWidget):
         )
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
         self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating, True)
-        self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setToolTip("Recording in progress — click to stop and process note")
         self.setFixedSize(260, 52)
 
@@ -94,7 +91,6 @@ class RecordingHUD(QWidget):
         header_layout.addStretch()
 
         self.lbl_timer = QLabel("00:30")
-        self.lbl_timer.setStyleSheet(_TIMER_LABEL_QSS.format("#FFFFFF"))
         self.lbl_timer.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
         header_layout.addWidget(self.lbl_timer)
 
@@ -105,9 +101,10 @@ class RecordingHUD(QWidget):
         self.progress_bar.setTextVisible(False)
         self.progress_bar.setRange(0, 1000)
         self.progress_bar.setValue(0)
-        self.progress_bar.setStyleSheet(_PROGRESS_BAR_QSS.format("#E5E7EB"))
         self.progress_bar.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
         layout.addWidget(self.progress_bar)
+
+        self._apply_tier("normal")
 
     def paintEvent(self, event: QPaintEvent | None) -> None:
         """Render antialiased dark rounded pill background and subtle border."""
@@ -144,7 +141,6 @@ class RecordingHUD(QWidget):
     def show_recording(self, total_duration: float) -> None:
         """Show HUD configured for recording with total duration in seconds."""
         self.progress_bar.setValue(0)
-        self._style_tier = None
         self._apply_tier("normal")
         self.lbl_timer.setText(_format_time(total_duration))
         self.reposition()
@@ -161,8 +157,7 @@ class RecordingHUD(QWidget):
         """Update countdown timer, color state, and progress bar."""
         fraction = min(1.0, max(0.0, elapsed_seconds / total_duration))
         self.progress_bar.setValue(int(fraction * 1000))
-        secs_left = max(0, math.ceil(remaining_seconds))
-        self.lbl_timer.setText(_format_time(secs_left))
+        self.lbl_timer.setText(_format_time(remaining_seconds))
 
         if remaining_seconds <= 5.0:
             self._apply_tier("critical")

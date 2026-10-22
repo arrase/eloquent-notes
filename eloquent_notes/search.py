@@ -6,8 +6,6 @@ edited outside the app, or a change of embedding model, therefore trigger
 re-embedding on the next search without any explicit indexing step.
 """
 
-from __future__ import annotations
-
 import hashlib
 import os
 import threading
@@ -51,12 +49,12 @@ class SemanticIndex:
 
     def search(self, notes: list[Note], query: str, cfg: dict[str, Any]) -> list[Note]:
         """Return the notes that best match query, most similar first."""
-        if not notes:
-            return []
         with self._lock:
             self._refresh(notes, cfg)
+            if not notes:
+                return []
             matrix = np.stack([self._entries[note.path.name][1] for note in notes])
-            query_vector = _unit(self._embed([QUERY_PROMPT.format(query)], cfg))[0]
+        query_vector = _unit(self._embed([QUERY_PROMPT.format(query)], cfg))[0]
         scores = matrix @ query_vector
         cutoff = max(cfg["search"]["min_similarity"], float(scores.max()) - RESULT_MARGIN)
         ranked = sorted(zip(scores, notes), key=lambda pair: pair[0], reverse=True)
@@ -71,12 +69,13 @@ class SemanticIndex:
             for name, document in documents.items()
         }
         fresh = {name: entry for name, entry in self._entries.items() if digests.get(name) == entry[0]}
+        dropped = len(fresh) != len(self._entries)
         stale = [name for name in digests if name not in fresh]
         if stale:
             vectors = _unit(self._embed([documents[name] for name in stale], cfg))
             fresh.update({name: (digests[name], vector) for name, vector in zip(stale, vectors)})
         self._entries = fresh
-        if stale:
+        if stale or dropped:
             self._save()
 
     @staticmethod
@@ -90,11 +89,18 @@ class SemanticIndex:
         )
 
     def _save(self) -> None:
+        if not self._entries:
+            if os.path.exists(self._cache_path):
+                os.remove(self._cache_path)
+            return
         os.makedirs(os.path.dirname(self._cache_path), exist_ok=True)
         names = list(self._entries)
-        np.savez(
-            self._cache_path,
-            names=np.array(names),
-            digests=np.array([self._entries[name][0] for name in names]),
-            vectors=np.stack([self._entries[name][1] for name in names]),
-        )
+        tmp_path = f"{self._cache_path}.tmp"
+        with open(tmp_path, "wb") as f:
+            np.savez(
+                f,
+                names=np.array(names),
+                digests=np.array([self._entries[name][0] for name in names]),
+                vectors=np.stack([self._entries[name][1] for name in names]),
+            )
+        os.replace(tmp_path, self._cache_path)

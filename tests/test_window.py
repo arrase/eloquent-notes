@@ -122,7 +122,7 @@ def test_empty_timeline_invites_recording(qapp):
     win = MainWindow()
     win.set_notes([])
     assert not win.windowIcon().isNull()
-    assert list_texts(win) == ["No notes yet. Click the microphone to record your first one."]
+    assert list_texts(win) == ["No notes yet. Click the tray icon to record your first one."]
     win.close()
 
 
@@ -196,18 +196,21 @@ def test_clicking_card_opens_reader(window):
     assert window.reader.title_edit.text() == "Launch decision"
 
 
-def test_set_state_updates_dictate_button(window):
+def test_set_state_updates_dictate_and_delete_buttons(window):
     window.set_state("RECORDING")
     assert window.reader.btn_dictate.text() == "Stop dictation"
     assert window.reader.btn_dictate.isEnabled()
+    assert not window.reader.btn_delete.isEnabled()
 
     window.set_state("PROCESSING")
     assert window.reader.btn_dictate.text() == "Processing…"
     assert not window.reader.btn_dictate.isEnabled()
+    assert not window.reader.btn_delete.isEnabled()
 
     window.set_state("IDLE")
     assert window.reader.btn_dictate.text() == "Add dictation"
     assert window.reader.btn_dictate.isEnabled()
+    assert window.reader.btn_delete.isEnabled()
 
 
 def test_settings_button(window):
@@ -266,6 +269,15 @@ def test_search_without_matches_and_errors(window):
     window.show_search_error("broken", "Ollama is down")
     assert list_texts(window) == ["Search failed: Ollama is down"]
 
+    # Error persists across filter, column, and theme re-renders until search is cleared or re-run
+    chip(window, "Tasks").click()
+    assert list_texts(window) == ["Search failed: Ollama is down"]
+    window.set_columns(1)
+    assert list_texts(window) == ["Search failed: Ollama is down"]
+    chip(window, "All").click()
+    window.timeline.search.clear()
+    assert "TODAY" in list_texts(window)
+
 
 def test_search_results_follow_refreshed_notes(window, sample_notes):
     window.timeline.search.setText("work")
@@ -290,6 +302,20 @@ def test_reader_shows_all_fields(window, sample_notes):
     assert reader.tags_edit.text() == "work, app"
     assert reader.body_edit.toPlainText() == "Queue recordings locally."
     assert reader.date_label.text() == format_time(sample_notes[2].created, "dddd, d MMMM yyyy, HH:mm")
+
+
+def test_set_notes_refreshes_open_reader_note(window, sample_notes):
+    window.show_note(sample_notes[0])
+    updated = notes.Note(
+        sample_notes[0].path, "Updated title", sample_notes[0].created, "task", ["updated"], "New body.",
+    )
+    window.set_notes([updated, *sample_notes[1:]])
+
+    assert window.reader.note is updated
+    assert window.reader.title_edit.text() == "Updated title"
+    assert window.reader.type_box.currentData() == "task"
+    assert window.reader.tags_edit.text() == "updated"
+    assert window.reader.body_edit.toPlainText() == "New body."
 
 
 def test_back_saves_edits(window, sample_notes):

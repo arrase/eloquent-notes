@@ -35,8 +35,8 @@ def _form_label(text: str) -> QLabel:
 class AITab(QWidget):
     """AI and Ollama configuration tab."""
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self):
+        super().__init__()
         self._model_loader = None
         self._running_loaders = set()
         self._init_ui()
@@ -158,6 +158,12 @@ class AITab(QWidget):
         )
         search_layout.addRow(_form_label("Embedding Model:"), self.cmb_embedding_model)
 
+        self.txt_search_keep_alive = QLineEdit()
+        self.txt_search_keep_alive.setToolTip(
+            "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+        )
+        search_layout.addRow(_form_label("Keep Alive Time:"), self.txt_search_keep_alive)
+
         self.spn_min_similarity = QDoubleSpinBox()
         self.spn_min_similarity.setRange(0.0, 1.0)
         self.spn_min_similarity.setSingleStep(0.05)
@@ -194,8 +200,7 @@ class AITab(QWidget):
 
     def _on_loader_finished(self):
         loader = self.sender()
-        if loader:
-            self._running_loaders.discard(loader)
+        self._running_loaders.discard(loader)
         if loader is self._model_loader:
             self._model_loader = None
             self.btn_refresh_models.setEnabled(True)
@@ -268,6 +273,7 @@ class AITab(QWidget):
         if self.cmb_embedding_model.findText(curr_embedding) == -1:
             self.cmb_embedding_model.addItem(curr_embedding)
         self.cmb_embedding_model.setCurrentText(curr_embedding)
+        self.txt_search_keep_alive.setText(str(search_cfg["keep_alive"]))
         self.spn_min_similarity.setValue(float(search_cfg["min_similarity"]))
 
         curr_lang = str(ai_cfg["output_language"])
@@ -309,6 +315,7 @@ class AITab(QWidget):
 
         keep_alive = self.txt_keep_alive.text().strip()
         preload_keep_alive = self.txt_preload_keep_alive.text().strip()
+        search_keep_alive = self.txt_search_keep_alive.text().strip()
 
         if not _DURATION_PATTERN.match(keep_alive):
             QMessageBox.warning(
@@ -323,6 +330,14 @@ class AITab(QWidget):
                 self,
                 VALIDATION_ERROR_TITLE,
                 f"Invalid Preload Keep Alive format: '{preload_keep_alive}'. "
+                "Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+            )
+            return False
+        if not _DURATION_PATTERN.match(search_keep_alive):
+            QMessageBox.warning(
+                self,
+                VALIDATION_ERROR_TITLE,
+                f"Invalid Search Keep Alive format: '{search_keep_alive}'. "
                 "Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
             )
             return False
@@ -342,6 +357,7 @@ class AITab(QWidget):
         })
         config_data["search"].update({
             "embedding_model": embedding_model,
+            "keep_alive": search_keep_alive,
             "min_similarity": round(self.spn_min_similarity.value(), 2),
         })
         return True

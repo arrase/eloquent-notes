@@ -5,10 +5,7 @@ encodes it as 16-bit PCM WAV bytes. play_beep generates short sine-wave
 feedback tones with fade in/out to avoid speaker clicks.
 """
 
-from __future__ import annotations
-
 import io
-import queue
 import wave
 
 import numpy as np
@@ -50,16 +47,11 @@ def trim_silence(chunks: list[np.ndarray]) -> list[np.ndarray]:
     to filling the gaps with invented speech, and saves tokens. Interior
     pauses are preserved so the model's prosody handling is unchanged.
     """
-    if not chunks:
-        return []
-
-    loud = [not is_silent(chunk) for chunk in chunks]
-    if not any(loud):
+    start = next((i for i, chunk in enumerate(chunks) if not is_silent(chunk)), None)
+    if start is None:
         return chunks
-
-    first = loud.index(True)
-    last = len(loud) - loud[::-1].index(True)
-    return chunks[first:last]
+    end = next(i for i in range(len(chunks) - 1, -1, -1) if not is_silent(chunks[i]))
+    return chunks[start : end + 1]
 
 
 def encode_wav_bytes(chunks: list[np.ndarray], sample_rate: int, channels: int) -> bytes:
@@ -85,7 +77,7 @@ class AudioRecorder:
     def __init__(self, sample_rate: int, channels: int) -> None:
         self.sample_rate = sample_rate
         self.channels = channels
-        self._chunks: queue.Queue[np.ndarray] = queue.Queue()
+        self._chunks: list[np.ndarray] = []
         self._stream: sd.InputStream | None = None
 
     def _on_audio(
@@ -96,7 +88,7 @@ class AudioRecorder:
         status: sd.CallbackFlags,
     ) -> None:
         """sounddevice callback — enqueue an immutable copy of each chunk."""
-        self._chunks.put(indata.copy())
+        self._chunks.append(indata.copy())
 
     def start(self) -> None:
         """Open the input stream and begin recording."""
@@ -126,9 +118,7 @@ class AudioRecorder:
     @property
     def wav_bytes(self) -> bytes:
         """Encode captured chunks as 16-bit PCM WAV."""
-        with self._chunks.mutex:
-            chunks = list(self._chunks.queue)
-        return encode_wav_bytes(trim_silence(chunks), self.sample_rate, self.channels)
+        return encode_wav_bytes(trim_silence(self._chunks), self.sample_rate, self.channels)
 
     @property
     def is_silent(self) -> bool:
@@ -137,11 +127,7 @@ class AudioRecorder:
         Checked locally so an accidental trigger in a quiet room never reaches
         the model, which cannot reliably report empty audio on its own.
         """
-        with self._chunks.mutex:
-            chunks = list(self._chunks.queue)
-        if not chunks:
-            return True
-        return all(is_silent(chunk) for chunk in chunks)
+        return all(is_silent(chunk) for chunk in self._chunks)
 
 
 def play_beep(

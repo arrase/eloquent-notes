@@ -169,8 +169,6 @@ class EloquentApp(QObject):
     def _handle_ipc_connection(self):
         while self.server.hasPendingConnections():
             socket = self.server.nextPendingConnection()
-            if socket is None:
-                break
             try:
                 if socket.bytesAvailable() > 0 or socket.waitForReadyRead(50):
                     message = bytes(socket.readAll()).decode("utf-8", errors="replace")
@@ -227,8 +225,8 @@ class EloquentApp(QObject):
             self.window.search_requested.connect(self._start_search)
             self.window.settings_clicked.connect(self.show_config_dialog)
             self.window.set_state(self.state)
-        self._refresh_window()
         self.window.show_timeline()
+        self._refresh_window()
         self.window.show()
         self.window.raise_()
         self.window.activateWindow()
@@ -243,6 +241,8 @@ class EloquentApp(QObject):
         self._refresh_window()
 
     def _on_delete_requested(self, note):
+        if self._append_target is not None and self._append_target.path == note.path:
+            self._append_target = None
         if not QFile.moveToTrash(str(note.path)):
             self._notify("Delete Failed", f"Could not move {note.path.name} to the trash.")
         self._refresh_window()
@@ -250,13 +250,13 @@ class EloquentApp(QObject):
     def _start_search(self, query):
         threading.Thread(
             target=self._run_search,
-            args=(query, notes.load_notes(self._notes_folder()), copy.deepcopy(self.config)),
+            args=(query, self._notes_folder(), copy.deepcopy(self.config)),
             daemon=True,
         ).start()
 
-    def _run_search(self, query, note_list, cfg):
+    def _run_search(self, query, folder, cfg):
         try:
-            results = self._index.search(note_list, query, cfg)
+            results = self._index.search(notes.load_notes(folder), query, cfg)
         except Exception as e:
             logger.exception("Semantic search failed")
             self.search_failed.emit(query, str(e))
@@ -354,7 +354,7 @@ class EloquentApp(QObject):
         if self._hud.isVisible():
             self._hud.update_progress(elapsed, remaining, self._capture_duration)
 
-        if self._capture_duration > 0 and elapsed >= self._capture_duration:
+        if elapsed >= self._capture_duration:
             logger.info("Maximum capture duration reached, stopping recording...")
             self._stop_and_process()
 
@@ -410,7 +410,7 @@ class EloquentApp(QObject):
         )
 
     @staticmethod
-    def _rewrite(ai_cfg, loaded, transcription, language_instruction):
+    def _rewrite(ai_cfg, loaded, transcription, language_instruction, keep_alive):
         user_prompt = loaded[config.REWRITING_USER_PROMPT_PATH].format_map(
             SafeDict(
                 transcription=transcription,
@@ -424,7 +424,7 @@ class EloquentApp(QObject):
             user_prompt=user_prompt,
             retry_prompt=loaded[config.RETRY_PROMPT_PATH],
             context_length=ai_cfg["context_length"],
-            keep_alive=ai_cfg["preload_keep_alive"],
+            keep_alive=keep_alive,
             max_retries=ai_cfg["max_retries"],
             timeout=ai_cfg["request_timeout"],
         )
@@ -434,10 +434,11 @@ class EloquentApp(QObject):
         user_prompt = loaded[config.CLASSIFICATION_USER_PROMPT_PATH].format_map(
             SafeDict(
                 transcription=content,
+                content=content,
                 language_instruction=language_instruction,
             )
         )
-        return llm.classify_transcription(
+        return llm.classify_note(
             ollama_url=ai_cfg["ollama_url"],
             model=ai_cfg["model"],
             system_prompt=loaded[config.CLASSIFICATION_SYSTEM_PROMPT_PATH],
@@ -460,7 +461,7 @@ class EloquentApp(QObject):
         logger.info("Processing recorded audio...")
         loaded = snapshot["_loaded_files"]
         ai_cfg = snapshot["ai"]
-        completed_phase3 = False
+        completed_final_phase = False
         status, detail = "empty", ""
         try:
             if recorder.is_silent:
@@ -480,16 +481,27 @@ class EloquentApp(QObject):
             language_instruction = self._language_instruction(ai_cfg["output_language"])
 
             logger.info("Phase 2: Rewriting transcription...")
-            rewrite = self._rewrite(ai_cfg, loaded, transcription, language_instruction)
-            logger.info("Rewriting: title=%s", rewrite["title"])
+            rewrite = self._rewrite(
+                ai_cfg,
+                loaded,
+                transcription,
+                language_instruction,
+                ai_cfg["keep_alive"] if append else ai_cfg["preload_keep_alive"],
+            )
+            completed_final_phase = append
+            title = rewrite["title"].strip()
+            content = rewrite["content"].strip()
+            if not content or (not append and not title):
+                raise ValueError("Model returned empty note content")
+            logger.info("Rewriting: title=%s", title)
 
             if append:
-                status, detail = "appended", rewrite["content"]
+                status, detail = "appended", content
                 return
 
             logger.info("Phase 3: Classifying note...")
-            classification = self._classify(ai_cfg, loaded, rewrite["content"], language_instruction)
-            completed_phase3 = True
+            classification = self._classify(ai_cfg, loaded, content, language_instruction)
+            completed_final_phase = True
             logger.info(
                 "Classification: type=%s, tags=%s",
                 classification["type"],
@@ -498,17 +510,18 @@ class EloquentApp(QObject):
 
             note = notes.create_note(
                 folder=Path(snapshot["notes"]["folder"]).expanduser(),
-                title=rewrite["title"],
+                title=title,
                 note_type=classification["type"],
                 tags=notes.normalize_tags(classification["tags"]),
-                body=rewrite["content"],
+                body=content,
             )
             status, detail = "success", note.title
         except Exception as e:
             logger.exception("Error during audio processing/saving")
             status, detail = "error", str(e)
         finally:
-            if not completed_phase3 and ai_cfg["keep_alive"] != ai_cfg["preload_keep_alive"]:
+            self.processing_completed.emit(status, detail)
+            if not completed_final_phase and ai_cfg["keep_alive"] != ai_cfg["preload_keep_alive"]:
                 if self._preload_thread is not None and self._preload_thread.is_alive():
                     self._preload_thread.join(timeout=ai_cfg["preload_timeout"])
                 try:
@@ -521,7 +534,6 @@ class EloquentApp(QObject):
                     )
                 except (requests.RequestException, ValueError) as e:
                     logger.warning("Model keep_alive reset skipped: %s", e)
-            self.processing_completed.emit(status, detail)
 
     # --- Completion, reload and shutdown -----------------------------------
 
@@ -551,15 +563,16 @@ class EloquentApp(QObject):
 
     def _append_dictation(self, target, text):
         """Append dictated text to target, keeping any edits pending in the reader."""
+        if target is None or not target.path.exists():
+            return
         if self.window is not None:
             self.window.save_open_note()
+            if self.window.stack.currentWidget() is self.window.reader and self.window.reader.note.path == target.path:
+                target = self.window.reader.note
         notes.append_to_note(target, text)
         logger.info("Dictation appended to %s", target.path.name)
         self._notify("Dictation Added", target.title)
-        if self.window is not None:
-            self._refresh_window()
-            if self.window.reader.note is target:
-                self.window.reader.show_note(target)
+        self._refresh_window()
 
     def reload_config(self):
         """Reload configuration from disk."""

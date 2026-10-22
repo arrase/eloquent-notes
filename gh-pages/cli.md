@@ -20,7 +20,7 @@ eloquent-notes [command] [options]
 | `toggle` | `-t`, `--toggle` | Toggles recording (IDLE $\rightarrow$ RECORDING or RECORDING $\rightarrow$ PROCESSING). |
 | `open` | | Opens the notes window. |
 | `config` | | Opens the configuration dialog. |
-| `install-autostart` | | Installs the desktop autostart entry into `~/.config/autostart/`. |
+| `install-autostart` | | Installs the desktop autostart entry (`~/.config/autostart/`), application launcher (`~/.local/share/applications/`), and SVG icon (`~/.local/share/icons/`). |
 | `--version` | | Prints the installed version and exits. |
 
 ---
@@ -81,27 +81,28 @@ The daemon accepts three IPC messages:
 | `reload` | `eloquent-notes config` after **Save** | `reload_config()`: reload settings, prompts and logging. |
 
 ```
-                  +--------------------------+
-                  |  eloquent-notes [open |  |
-                  |          toggle]         |
-                  +-------------+------------+
-                                |
-                   QCoreApplication (Headless)
-                                |
-                     QLocalSocket ("eloquent_notes_ipc")
-                                |
-           +--------------------+--------------------+
-           | (Socket Connected)                      | (Connection Failed)
-           v                                         v
-   Send "toggle" / "open"                  os.execv(sys.executable, ...)
-   to Running Daemon (<5ms)                Spawn Daemon Process
+                  +-------------------------------+
+                  | eloquent-notes [open | toggle]|
+                  +---------------+---------------+
+                                  |
+                     QCoreApplication (Headless)
+                                  |
+                       QLocalSocket ("eloquent_notes_ipc")
+                                  |
+             +--------------------+--------------------+
+             | (Socket Connected)                      | (Connection Failed)
+             v                                         v
+     Send "toggle" / "open"                os.execv(sys.executable, ...)
+     to Running Daemon (<5ms)              Spawn Daemon Process:
+                                           - no command: start quietly in tray
+                                           - toggle / open: record or open window
 ```
 
 ### Key Architectural Benefits
 
 1. **Headless Core App (`QCoreApplication`)**: When executing `eloquent-notes`, `toggle` or `open`, `run_cli()` instantiates a headless `QCoreApplication` rather than `QApplication` or any GUI dialogs, avoiding display server window initialization and keeping the IPC client fast.
 2. **Unix Domain Socket (`QLocalSocket`)**: Communication between the CLI process and daemon occurs over named Unix local sockets (`eloquent_notes_ipc`). The IPC handshake, message transfer (`"toggle"`), and socket disconnection complete in under 5 milliseconds.
-3. **Automatic Daemon Spawning (`os.execv`)**: If `QLocalSocket.connectToServer()` fails or times out after 500 ms, `main.py` detects that the background daemon is inactive. It replaces the current process image using `os.execv(sys.executable, daemon_args)` to start `eloquent_notes.app` directly, passing `toggle` or `open` so the new daemon performs the requested action once its event loop starts.
+3. **Automatic Daemon Spawning (`os.execv`)**: If `QLocalSocket.connectToServer()` fails or times out after 500 ms, `main.py` detects that the background daemon is inactive. It replaces the current process image using `os.execv(sys.executable, daemon_args)` to start `eloquent_notes.app` directly — with no argument to start quietly in the tray, or passing `toggle` / `open` so the new daemon starts recording or opens the window immediately once its event loop starts.
 
 ---
 

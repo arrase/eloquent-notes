@@ -12,7 +12,7 @@ from PyQt6.QtWidgets import (
 )
 
 from eloquent_notes import config, ui
-from eloquent_notes.config_gui.constants import PROMPTS
+from eloquent_notes.config import diff_configs
 from eloquent_notes.config_gui.tabs import (
     AITab,
     AudioTab,
@@ -20,7 +20,6 @@ from eloquent_notes.config_gui.tabs import (
     NotesTab,
     TextFilesTab,
 )
-from eloquent_notes.config_gui.utils import diff_configs
 
 RESTORE_DEFAULTS_TITLE = "Restore Defaults"
 
@@ -28,26 +27,27 @@ RESTORE_DEFAULTS_TITLE = "Restore Defaults"
 class ConfigurationDialog(QDialog):
     """Dialogue window for full application settings management."""
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self):
+        super().__init__()
         self.setWindowTitle("Eloquent Notes Configuration")
         self.setWindowIcon(ui.get_app_icon())
         self.setMinimumSize(850, 700)
+        self._dark = ui.is_dark_theme()
+        self.setStyleSheet(ui.dialog_stylesheet(ui.current_theme()))
+        self._tabs = []
+        self._init_ui()
+
         try:
             self.config_data = config.load_config()
-        except (OSError, yaml.YAMLError, TypeError) as e:
+            self.load_settings_to_ui()
+        except (OSError, yaml.YAMLError, TypeError, ValueError, KeyError) as e:
             QMessageBox.warning(
                 self,
                 "Configuration Error",
                 f"Failed to load user configuration: {e}\n\nLoaded default settings.",
             )
             self.config_data = config.load_default_config()
-
-        self._dark = ui.is_dark_theme()
-        self.setStyleSheet(ui.dialog_stylesheet(ui.current_theme()))
-        self._tabs = []
-        self._init_ui()
-        self.load_settings_to_ui()
+            self.load_settings_to_ui()
 
     def changeEvent(self, event):
         """Update theme stylesheet when the system palette changes."""
@@ -70,9 +70,7 @@ class ConfigurationDialog(QDialog):
         self.notes_tab = NotesTab()
         self.ai_tab = AITab()
         self.audio_tab = AudioTab()
-        self.prompts_tab = TextFilesTab(
-            PROMPTS, "Prompt Content:", "Select a prompt to edit..."
-        )
+        self.prompts_tab = TextFilesTab()
 
         self._tabs = [
             (self.general_tab, "General"),
@@ -123,29 +121,24 @@ class ConfigurationDialog(QDialog):
         if confirm != QMessageBox.StandardButton.Yes:
             return
 
-        try:
-            default_data = config.load_default_config()
-            self.config_data = default_data
+        default_data = config.load_default_config()
+        self.config_data = default_data
 
-            for tab_widget in (
-                self.general_tab,
-                self.notes_tab,
-                self.ai_tab,
-                self.audio_tab,
-            ):
-                tab_widget.load_settings(default_data)
+        for tab_widget in (
+            self.general_tab,
+            self.notes_tab,
+            self.ai_tab,
+            self.audio_tab,
+        ):
+            tab_widget.load_settings(default_data)
+        self.general_tab.chk_autostart.setChecked(False)
+        self.prompts_tab.restore_defaults()
 
-            self.prompts_tab.restore_defaults()
-
-            QMessageBox.information(
-                self,
-                RESTORE_DEFAULTS_TITLE,
-                "Defaults restored. Click 'Save' to apply changes to disk.",
-            )
-        except (OSError, yaml.YAMLError) as e:
-            QMessageBox.critical(
-                self, "Error", f"Failed to restore defaults: {e}"
-            )
+        QMessageBox.information(
+            self,
+            RESTORE_DEFAULTS_TITLE,
+            "Defaults restored. Click 'Save' to apply changes to disk.",
+        )
 
     def save_settings_from_ui(self):
         """Gather settings from widgets and persist them to files on disk."""
@@ -179,8 +172,7 @@ class ConfigurationDialog(QDialog):
 
     def closeEvent(self, event):
         """Ensure background threads and resources are cleaned up on window close."""
-        if not self.isVisible():
-            self.cleanup_tabs()
+        self.cleanup_tabs()
         super().closeEvent(event)
 
     def reject(self):

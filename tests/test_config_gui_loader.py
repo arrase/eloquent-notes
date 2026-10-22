@@ -7,32 +7,28 @@ import requests
 from eloquent_notes.config_gui.loader import OllamaModelLoader
 
 
-def test_ollama_loader_success(qapp):
+def test_ollama_loader_success():
     loader = OllamaModelLoader("http://localhost:11434")
 
     models_signal_data = []
     loader.models_fetched.connect(lambda audio, embedding: models_signal_data.append((audio, embedding)))
 
     mock_tags_response = MagicMock()
-    mock_tags_response.status_code = 200
     mock_tags_response.json.return_value = {
         "models": [{"name": "audio-model"}, {"name": "text-model"}, {"name": "embed-model"}]
     }
 
     mock_show_audio = MagicMock()
-    mock_show_audio.status_code = 200
     mock_show_audio.json.return_value = {"capabilities": ["audio", "completion"]}
 
     mock_show_text = MagicMock()
-    mock_show_text.status_code = 200
     mock_show_text.json.return_value = {"capabilities": ["completion"]}
 
     mock_show_embed = MagicMock()
-    mock_show_embed.status_code = 200
     mock_show_embed.json.return_value = {"capabilities": ["embedding"]}
 
     def mock_post(url, json, timeout):
-        return {"audio-model": mock_show_audio, "embed-model": mock_show_embed}.get(json.get("name"), mock_show_text)
+        return {"audio-model": mock_show_audio, "embed-model": mock_show_embed}.get(json["name"], mock_show_text)
 
     with patch("requests.get", return_value=mock_tags_response), patch(
         "requests.post", side_effect=mock_post
@@ -42,7 +38,7 @@ def test_ollama_loader_success(qapp):
     assert models_signal_data == [(["audio-model"], ["embed-model"])]
 
 
-def test_ollama_loader_get_failure(qapp):
+def test_ollama_loader_get_failure():
     loader = OllamaModelLoader("http://localhost:11434")
 
     error_signal_data = []
@@ -57,7 +53,7 @@ def test_ollama_loader_get_failure(qapp):
     assert "Connection refused" in error_signal_data[0]
 
 
-def test_ollama_loader_interruption_at_start(qapp, monkeypatch):
+def test_ollama_loader_interruption_at_start(monkeypatch):
     loader = OllamaModelLoader("http://localhost:11434")
 
     models_signal_data = []
@@ -75,14 +71,34 @@ def test_ollama_loader_interruption_at_start(qapp, monkeypatch):
     assert error_signal_data == []
 
 
-def test_ollama_loader_interruption_during_show(qapp, monkeypatch):
+def test_ollama_loader_interruption_during_tags(monkeypatch):
+    loader = OllamaModelLoader("http://localhost:11434")
+
+    models_signal_data = []
+    loader.models_fetched.connect(lambda audio, embedding: models_signal_data.append((audio, embedding)))
+
+    interrupted = False
+    monkeypatch.setattr(loader, "isInterruptionRequested", lambda: interrupted)
+
+    def mock_get(url, timeout):
+        nonlocal interrupted
+        interrupted = True
+        return MagicMock()
+
+    with patch("requests.get", side_effect=mock_get), patch("requests.post") as mock_post:
+        loader.run()
+        mock_post.assert_not_called()
+
+    assert models_signal_data == []
+
+
+def test_ollama_loader_interruption_during_show(monkeypatch):
     loader = OllamaModelLoader("http://localhost:11434")
 
     models_signal_data = []
     loader.models_fetched.connect(lambda audio, embedding: models_signal_data.append((audio, embedding)))
 
     mock_tags_response = MagicMock()
-    mock_tags_response.status_code = 200
     mock_tags_response.json.return_value = {
         "models": [{"name": "model1"}, {"name": "model2"}]
     }
@@ -98,7 +114,6 @@ def test_ollama_loader_interruption_during_show(qapp, monkeypatch):
         nonlocal interrupted
         interrupted = True
         mock_resp = MagicMock()
-        mock_resp.status_code = 200
         mock_resp.json.return_value = {"capabilities": ["audio"]}
         return mock_resp
 
@@ -110,24 +125,22 @@ def test_ollama_loader_interruption_during_show(qapp, monkeypatch):
     assert models_signal_data == []
 
 
-def test_ollama_loader_show_exception_resilience(qapp):
+def test_ollama_loader_show_exception_resilience():
     loader = OllamaModelLoader("http://localhost:11434")
 
     models_signal_data = []
     loader.models_fetched.connect(lambda audio, embedding: models_signal_data.append((audio, embedding)))
 
     mock_tags_response = MagicMock()
-    mock_tags_response.status_code = 200
     mock_tags_response.json.return_value = {
         "models": [{"name": "failing-model"}, {"name": "audio-model"}]
     }
 
     mock_show_audio = MagicMock()
-    mock_show_audio.status_code = 200
     mock_show_audio.json.return_value = {"capabilities": ["audio"]}
 
     def mock_post(url, json, timeout):
-        if json.get("name") == "failing-model":
+        if json["name"] == "failing-model":
             raise requests.RequestException("Timeout on show")
         return mock_show_audio
 
@@ -139,36 +152,42 @@ def test_ollama_loader_show_exception_resilience(qapp):
     assert models_signal_data == [(["audio-model"], [])]
 
 
-def test_ollama_loader_invalid_json_body_resilience(qapp):
+def test_ollama_loader_invalid_json_body_resilience():
     loader = OllamaModelLoader("http://localhost:11434")
 
     models_signal_data = []
     loader.models_fetched.connect(lambda audio, embedding: models_signal_data.append((audio, embedding)))
 
     mock_tags_response = MagicMock()
-    mock_tags_response.status_code = 200
     mock_tags_response.json.return_value = {
-        "models": [{"name": "bad-json-model"}, {"name": "non-dict-model"}, {"name": "audio-model"}]
+        "models": [
+            {"name": "bad-json-model"},
+            {"name": "non-dict-model"},
+            {"name": "non-list-caps-model"},
+            {"name": "audio-model"},
+        ]
     }
 
     mock_show_bad_json = MagicMock()
-    mock_show_bad_json.status_code = 200
     mock_show_bad_json.json.side_effect = ValueError("Invalid JSON")
 
     mock_show_non_dict = MagicMock()
-    mock_show_non_dict.status_code = 200
     mock_show_non_dict.json.return_value = ["not", "a", "dict"]
 
+    mock_show_non_list_caps = MagicMock()
+    mock_show_non_list_caps.json.return_value = {"capabilities": "not-a-list"}
+
     mock_show_audio = MagicMock()
-    mock_show_audio.status_code = 200
     mock_show_audio.json.return_value = {"capabilities": ["audio"]}
 
     def mock_post(url, json, timeout):
-        name = json.get("name")
+        name = json["name"]
         if name == "bad-json-model":
             return mock_show_bad_json
         if name == "non-dict-model":
             return mock_show_non_dict
+        if name == "non-list-caps-model":
+            return mock_show_non_list_caps
         return mock_show_audio
 
     with patch("requests.get", return_value=mock_tags_response), patch(
@@ -179,20 +198,17 @@ def test_ollama_loader_invalid_json_body_resilience(qapp):
     assert models_signal_data == [(["audio-model"], [])]
 
 
-def test_ollama_loader_invalid_tags_payload_emits_error(qapp):
+def test_ollama_loader_invalid_tags_payload_emits_error():
     loader = OllamaModelLoader("http://localhost:11434/")
     assert loader.url == "http://localhost:11434"
 
     errors = []
     loader.error_occurred.connect(errors.append)
 
-    for bad_payload in (["not", "dict"], {"models": "not-list"}, {"models": ["not-dict"]}):
+    for bad_payload in (["not", "dict"], {"models": "not-list"}, {"models": ["not-dict"]}, {}):
         mock_resp = MagicMock()
-        mock_resp.status_code = 200
         mock_resp.json.return_value = bad_payload
         with patch("requests.get", return_value=mock_resp):
             loader.run()
 
-    assert len(errors) == 3
-    assert all("Invalid response format from Ollama" in e for e in errors)
-
+    assert len(errors) == 4

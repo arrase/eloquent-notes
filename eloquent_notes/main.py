@@ -85,11 +85,10 @@ def run_cli(cli_args=None, launcher=os.execv):
             send_ipc_command("reload", timeout_ms=200)
         return
 
-    if not QCoreApplication.instance():
-        QCoreApplication(sys.argv)
+    _app = QCoreApplication.instance() or QCoreApplication(sys.argv)
 
     message = "toggle" if wants_toggle else "open"
-    if send_ipc_command(message, timeout_ms=500):
+    if send_ipc_command(message):
         return
 
     daemon_args = [sys.executable, "-m", "eloquent_notes.app"]

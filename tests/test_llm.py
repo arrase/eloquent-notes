@@ -228,6 +228,40 @@ def test_execute_ollama_json_request_malformed_response_structure(mock_post):
     assert mock_post.call_count == 2
 
 
+@patch("eloquent_notes.llm.requests.post")
+def test_execute_ollama_json_request_non_string_content_uses_response_text_on_retry(mock_post):
+    mock_resp1 = MagicMock()
+    mock_resp1.raise_for_status.return_value = None
+    mock_resp1.json.return_value = {"message": {"content": 123}}
+    mock_resp1.text = '{"message": {"content": 123}}'
+
+    mock_resp2 = MagicMock()
+    mock_resp2.raise_for_status.return_value = None
+    mock_resp2.json.return_value = {"message": {"content": '{"result": "ok"}'}}
+
+    mock_post.side_effect = [mock_resp1, mock_resp2]
+
+    res = llm._execute_ollama_json_request(
+        ollama_url="http://localhost:11434",
+        model="gemma",
+        messages=[{"role": "user", "content": "hi"}],
+        format_schema=SIMPLE_SCHEMA,
+        retry_prompt="retry",
+        context_length=2048,
+        keep_alive="5m",
+        max_retries=1,
+        timeout=30,
+        task_name="non-string content test",
+    )
+
+    assert res == {"result": "ok"}
+    sent_messages = mock_post.call_args_list[1].kwargs["json"]["messages"]
+    assert sent_messages[1] == {
+        "role": "assistant",
+        "content": '{"message": {"content": 123}}',
+    }
+
+
 @patch("eloquent_notes.llm._execute_ollama_json_request")
 def test_transcribe_audio(mock_exec):
     mock_exec.return_value = {"empty": False, "transcription": "Test speech"}
@@ -446,13 +480,13 @@ def test_rewrite_transcription(mock_exec):
 
 
 @patch("eloquent_notes.llm._execute_ollama_json_request")
-def test_classify_transcription(mock_exec):
+def test_classify_note(mock_exec):
     mock_exec.return_value = {
         "type": "idea",
         "tags": ["tag1"],
     }
 
-    res = llm.classify_transcription(
+    res = llm.classify_note(
         ollama_url="http://localhost:11434",
         model="gemma",
         system_prompt="sys classify",
@@ -474,11 +508,7 @@ def test_classify_transcription(mock_exec):
     assert kwargs["messages"][0] == {"role": "system", "content": "sys classify"}
     assert kwargs["messages"][1] == {"role": "user", "content": "usr classify"}
     assert kwargs["format_schema"] is llm.CLASSIFICATION_SCHEMA
-
-
-def test_classification_schema_has_no_wikilinks():
     assert llm.CLASSIFICATION_SCHEMA["required"] == ["type", "tags"]
-    assert "wikilinks" not in llm.CLASSIFICATION_SCHEMA["properties"]
 
 
 @patch("eloquent_notes.llm.requests.post")

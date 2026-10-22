@@ -8,7 +8,7 @@ and the optional login autostart entry in $XDG_CONFIG_HOME/autostart/.
 import os
 import shutil
 
-from eloquent_notes.config import get_config_home, get_data_home
+from eloquent_notes.config import atomic_write, get_config_home, get_data_home
 
 APP_ICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
   <rect x="4" y="4" width="56" height="56" rx="14" fill="#2C4C7E"/>
@@ -61,29 +61,25 @@ def remove_autostart():
 def install_app_icon():
     """Install the Eloquent Notes SVG icon into the user hicolor icon theme."""
     icon_path = get_icon_path()
-    os.makedirs(os.path.dirname(icon_path), exist_ok=True)
-    with open(icon_path, "w", encoding="utf-8") as f:
-        f.write(APP_ICON_SVG)
+    atomic_write(icon_path, APP_ICON_SVG)
     return icon_path
 
 
 def _write_desktop_file(path, content):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(content)
+    atomic_write(path, content)
     os.chmod(path, 0o600)
     return path
 
 
-def install_desktop_entry():
-    """Install the application launcher desktop entry for Eloquent Notes.
-
-    Returns:
-        str: Path to the installed desktop entry file.
-    """
+def _resolve_launcher():
     icon_path = install_app_icon()
     exec_path = shutil.which("eloquent-notes") or "eloquent-notes"
+    if " " in exec_path:
+        exec_path = f'"{exec_path}"'
+    return icon_path, exec_path
 
+
+def _write_desktop_entry(icon_path, exec_path):
     content = f"""[Desktop Entry]
 Type=Application
 Exec={exec_path} open
@@ -98,15 +94,24 @@ StartupWMClass=eloquent-notes
     return _write_desktop_file(get_desktop_entry_path(), content)
 
 
+def install_desktop_entry():
+    """Install the application launcher desktop entry for Eloquent Notes.
+
+    Returns:
+        str: Path to the installed desktop entry file.
+    """
+    icon_path, exec_path = _resolve_launcher()
+    return _write_desktop_entry(icon_path, exec_path)
+
+
 def install_autostart():
     """Install the autostart desktop entry for Eloquent Notes.
 
     Returns:
         str: Path to the installed desktop entry file.
     """
-    install_desktop_entry()
-    icon_path = get_icon_path()
-    exec_path = shutil.which("eloquent-notes") or "eloquent-notes"
+    icon_path, exec_path = _resolve_launcher()
+    _write_desktop_entry(icon_path, exec_path)
 
     content = f"""[Desktop Entry]
 Type=Application

@@ -1,6 +1,6 @@
 # System Tray & Shortcuts
 
-Eloquent Notes runs in your desktop panel. Recording is controlled from the tray icon, the notes window, the floating HUD or a global keyboard shortcut; notes are browsed and edited in the notes window.
+Eloquent Notes runs in your desktop panel. New recordings are started and stopped from the tray icon, the floating HUD, or a global keyboard shortcut, while the note reader in the notes window provides **Add dictation** to append to an existing note.
 
 ---
 
@@ -35,12 +35,12 @@ Clicking a desktop notification (e.g. **Note Saved**) opens the notes window. Wh
 
 ## Notes Window
 
-The window shows a single centered column:
+The window uses a two-page layout — a day-grouped multi-column timeline grid (configurable via `notes.columns`) and a note reader:
 
 * **Header**: app title and a **Settings** button.
 * **Search box**: press <kbd>Enter</kbd> to search notes by meaning; clear it to return to the timeline.
 * **Filters**: type chips (All, Notes, Tasks, Ideas, Reminders, Questions, Decisions) and a tag selector.
-* **Timeline**: note cards grouped by day (Today, Yesterday, "Monday, 19 October"). Click a card to open it; click a `#tag` to filter by it.
+* **Timeline**: note cards arranged in a multi-column grid grouped by day (Today, Yesterday, "Monday, 19 October"). When no notes exist yet, it displays `"No notes yet. Click the tray icon to record your first one."` Click a card to open it in the reader; click a `#tag` to filter by it.
 
 In the **reader**, title, type, tags and body are editable. The toolbar offers **← Back** (<kbd>Esc</kbd>), **Add dictation** (becomes *Stop dictation* while recording), **Copy** and **Delete**. See [Notes & Search](notes.md) for details.
 

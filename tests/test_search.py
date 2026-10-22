@@ -119,12 +119,14 @@ def test_deleted_notes_are_dropped_from_cache(tmp_path, note_list):
     index = SemanticIndex(str(cache_path))
     with patch("eloquent_notes.search.llm.embed", side_effect=fake_embed):
         index.search(note_list, "food", CFG)
-        note_list[1].body = "Changed body"
         results = index.search(note_list[1:], "food", CFG)
 
     assert [note.title for note in results] == ["Groceries"]
     with np.load(cache_path) as cache:
         assert sorted(cache["names"]) == ["Groceries.md", "Holidays.md"]
+
+    assert index.search([], "food", CFG) == []
+    assert not cache_path.exists()
 
 
 def test_search_without_notes_skips_ollama(tmp_path):

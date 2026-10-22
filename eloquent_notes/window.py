@@ -5,8 +5,6 @@ controller and reports user intent through signals; all file, audio and
 model work happens in EloquentApp.
 """
 
-from __future__ import annotations
-
 import html
 from datetime import date, datetime, timedelta
 
@@ -61,18 +59,11 @@ def day_label(day: date, today: date) -> str:
     return _UI_LOCALE.toString(day, "dddd, d MMMM" if day.year == today.year else "dddd, d MMMM yyyy")
 
 
-def _muted(label: QLabel) -> QLabel:
-    if not label.objectName():
-        label.setObjectName("mutedLabel")
-    return label
-
-
-def _plain(text: str, object_name: str = "") -> QLabel:
+def _plain(text: str, object_name: str) -> QLabel:
     label = QLabel(text)
+    label.setObjectName(object_name)
     label.setTextFormat(Qt.TextFormat.PlainText)
     label.setWordWrap(True)
-    if object_name:
-        label.setObjectName(object_name)
     return label
 
 
@@ -112,10 +103,11 @@ class NoteCard(QFrame):
 
         when = format_time(note.created, "d MMM yyyy, HH:mm" if show_date else "HH:mm")
         type_color = theme.type_colors[note.type]
-        meta = _muted(QLabel(
+        meta = QLabel(
             f'{when} &nbsp;·&nbsp; <span style="color: {type_color}; font-weight: 600;">'
             f"● {note.type.capitalize()}</span>"
-        ))
+        )
+        meta.setObjectName("mutedLabel")
         layout.addWidget(meta)
         layout.addWidget(_plain(note.title, "cardTitle"))
 
@@ -158,8 +150,8 @@ class TimelinePage(QWidget):
         self._notes: list[Note] = []
         self._type = ""
         self._query = ""
+        self._error = ""
         self._results: list[Note] | None = None
-        self._grid = QGridLayout()
         self._init_ui()
 
     def _init_ui(self) -> None:
@@ -235,13 +227,15 @@ class TimelinePage(QWidget):
 
     def show_search_results(self, query: str, results: list[Note]) -> None:
         if query == self._query:
+            self._error = ""
             self._results = results
             self._render()
 
     def show_search_error(self, query: str, message: str) -> None:
         if query == self._query:
+            self._error = message
             self._results = []
-            self._show([self._message(f"Search failed: {message}")])
+            self._render()
 
     def select_tag(self, tag: str) -> None:
         self.tag_filter.setCurrentIndex(self.tag_filter.findData(tag))
@@ -252,6 +246,7 @@ class TimelinePage(QWidget):
         query = self.search.text().strip()
         if query:
             self._query = query
+            self._error = ""
             self._results = None
             self._render()
             self.search_requested.emit(query)
@@ -259,6 +254,7 @@ class TimelinePage(QWidget):
     def _on_search_text_changed(self, text: str) -> None:
         if not text.strip() and self._query:
             self._query = ""
+            self._error = ""
             self._results = None
             self._render()
 
@@ -284,7 +280,7 @@ class TimelinePage(QWidget):
 
     @staticmethod
     def _message(text: str) -> QLabel:
-        label = _muted(_plain(text))
+        label = _plain(text, "mutedLabel")
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         label.setContentsMargins(0, 32, 0, 32)
         return label
@@ -298,6 +294,8 @@ class TimelinePage(QWidget):
     def _list_widgets(self) -> list[QWidget]:
         if not self._query:
             source = self._notes
+        elif self._error:
+            return [self._message(f"Search failed: {self._error}")]
         elif self._results is None:
             return [self._message("Searching…")]
         else:
@@ -309,10 +307,10 @@ class TimelinePage(QWidget):
                 return [self._message("No matching notes.")]
             if self._notes:
                 return [self._message("No notes match these filters.")]
-            return [self._message("No notes yet. Click the microphone to record your first one.")]
+            return [self._message("No notes yet. Click the tray icon to record your first one.")]
 
         if self._query:
-            header = _muted(_plain(f"{len(notes)} result{'' if len(notes) == 1 else 's'}", "dayHeader"))
+            header = _plain(f"{len(notes)} result{'' if len(notes) == 1 else 's'}", "dayHeader")
             return [header, *(self._card(note, show_date=True) for note in notes)]
 
         widgets: list[QWidget] = []
@@ -322,7 +320,7 @@ class TimelinePage(QWidget):
             day = note.created.date()
             if day != current_day:
                 current_day = day
-                widgets.append(_muted(_plain(day_label(day, today).upper(), "dayHeader")))
+                widgets.append(_plain(day_label(day, today).upper(), "dayHeader"))
             widgets.append(self._card(note, show_date=False))
         return widgets
 
@@ -365,7 +363,7 @@ class TimelinePage(QWidget):
 class ReaderPage(QWidget):
     """Editable view of a single note."""
 
-    note: Note  # set by show_note before the page is ever displayed
+    note: Note
 
     back_clicked = pyqtSignal()
     dictate_clicked = pyqtSignal()
@@ -398,11 +396,11 @@ class ReaderPage(QWidget):
         btn_copy.setCursor(Qt.CursorShape.PointingHandCursor)
         btn_copy.clicked.connect(self.copy_clicked)
         toolbar.addWidget(btn_copy)
-        btn_delete = QPushButton("Delete")
-        btn_delete.setObjectName("dangerButton")
-        btn_delete.setCursor(Qt.CursorShape.PointingHandCursor)
-        btn_delete.clicked.connect(self.delete_clicked)
-        toolbar.addWidget(btn_delete)
+        self.btn_delete = QPushButton("Delete")
+        self.btn_delete.setObjectName("dangerButton")
+        self.btn_delete.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_delete.clicked.connect(self.delete_clicked)
+        toolbar.addWidget(self.btn_delete)
         layout.addLayout(toolbar)
 
         card = QFrame()
@@ -419,7 +417,8 @@ class ReaderPage(QWidget):
             self.type_box.addItem(note_type.capitalize(), note_type)
         meta.addWidget(self.type_box)
         meta.addStretch()
-        self.date_label = _muted(QLabel())
+        self.date_label = QLabel()
+        self.date_label.setObjectName("mutedLabel")
         meta.addWidget(self.date_label)
         sheet.addLayout(meta)
 
@@ -474,6 +473,7 @@ class ReaderPage(QWidget):
         self.btn_dictate.setText(label)
         self.btn_dictate.setIcon(ui.get_qicon(color))
         self.btn_dictate.setEnabled(state != PROCESSING)
+        self.btn_delete.setEnabled(state == IDLE)
 
 
 class MainWindow(QMainWindow):
@@ -523,6 +523,11 @@ class MainWindow(QMainWindow):
 
     def set_notes(self, notes: list[Note]) -> None:
         self.timeline.set_notes(notes)
+        if self.stack.currentWidget() is self.reader:
+            for note in notes:
+                if note.path == self.reader.note.path:
+                    self.reader.show_note(note)
+                    break
 
     def show_search_results(self, query: str, results: list[Note]) -> None:
         self.timeline.show_search_results(query, results)

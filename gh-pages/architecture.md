@@ -11,14 +11,14 @@ Eloquent Notes is a Linux tray daemon with one job: turn voice dictations into w
 | `main.py` | CLI entry point: `install-autostart`, `toggle`, `open`, `config`; single-instance IPC client; launches the daemon. |
 | `app.py` | `EloquentApp` controller: tray icon and menu, IPC server, recording lifecycle, processing pipeline, notes window wiring, config reload. |
 | `audio.py` | In-memory recording (`AudioRecorder`), silence detection and trimming, WAV encoding, beeps. |
-| `llm.py` | Ollama client: model preload, the three pipeline phases with JSON-schema output and retries, `/api/embed`. |
+| `llm.py` | Ollama client: model preload, the three pipeline phases (`transcribe_audio`, `rewrite_note`, `classify_note`) with JSON-schema output and retries, `/api/embed`. |
 | `notes.py` | Note storage: `Note` dataclass, load / create / save / append, frontmatter parsing, tag normalization. |
 | `search.py` | `SemanticIndex`: embedding cache and cosine-similarity ranking. |
 | `window.py` | `MainWindow`: timeline and reader pages. A pure view that reports user intent through signals. |
 | `recording_hud.py` | Floating countdown overlay shown while recording (click to stop). |
-| `ui.py` | Application, tray and dictation state icons drawn with `QPainter`, plus light/dark theme stylesheets. |
-| `config.py` | XDG paths, default file installation, config loading/merging, atomic writes. |
-| `config_gui/` | Configuration dialog (General, Notes, AI Settings, Audio, Prompts tabs). |
+| `ui.py` | Application, tray and dictation state icons drawn with `QPainter`, plus explicit light/dark `Theme` palettes (`window_stylesheet`, `dialog_stylesheet`). |
+| `config.py` | XDG paths, default file installation, config loading/merging, diffing (`diff_configs`), atomic writes. |
+| `config_gui/` | Configuration dialog (`dialog.py`, `tabs/`, `loader.py` for General, Notes, AI Settings, Audio, Prompts tabs). |
 | `autostart.py`, `logging_utils.py` | Application launcher, SVG icon and autostart desktop entries; rotating XDG log files. |
 
 ### Boundaries
@@ -77,7 +77,7 @@ The CLI entry point (`eloquent_notes.main`) works as a lightweight client:
 1. It creates a headless `QCoreApplication` (no display connection, no windows).
 2. It connects to the named local socket `eloquent_notes_ipc` with `QLocalSocket`.
 3. **If the daemon is running**, it writes `toggle` (for `toggle`/`-t`) or `open` (no command, or `open`) and exits. The daemon's `QLocalServer` dispatches `toggle` → `toggle_action()`, `open` → `show_window()`, `reload` → `reload_config()`.
-4. **If no daemon is running**, it replaces its process with `python -m eloquent_notes.app [toggle|open]` via `os.execv`, so the new daemon starts recording or opens the window immediately.
+4. **If no daemon is running**, it replaces its process with `python -m eloquent_notes.app` via `os.execv` (passing `toggle` or `open` if requested, or no argument to start quietly in the system tray).
 
 `eloquent-notes config` opens the dialog in its own process and sends `reload` after a successful save.
 
@@ -101,7 +101,7 @@ While processing, further toggles only show a "System is busy" notification; the
 
 ## 3. In-Memory Audio Capture & Zero Disk-IO
 
-- **Stream capture:** `sounddevice.InputStream` enqueues float32 NumPy blocks into a `queue.Queue`.
+- **Stream capture:** `sounddevice.InputStream` appends float32 NumPy blocks to an internal chunk list during recording, which is concatenated and encoded once stopped.
 - **Local silence gate:** `AudioRecorder.is_silent` compares the RMS level against a -45 dBFS speech threshold. Silent recordings never reach the model, which would otherwise invent text.
 - **Silence trimming & WAV encoding:** `AudioRecorder.wav_bytes` trims leading/trailing silent blocks, converts to 16-bit PCM and writes a WAV file into an `io.BytesIO` buffer.
 - **Base64 transmission:** the WAV bytes are base64-encoded and sent in the JSON body of `/api/chat`. No audio file is ever written to disk.
@@ -117,7 +117,7 @@ Notes are plain Markdown files with YAML frontmatter in `notes.folder`; `notes.p
 
 The controller reloads the folder (`notes.load_notes`) whenever the window is shown, a note is created, edited, appended to or deleted, or the configuration is reloaded, and passes the list to `MainWindow.set_notes()`. Edits made in the reader are committed into the `Note` object and emitted as `note_edited`; the controller saves the file. Deletion uses `QFile.moveToTrash`.
 
-The window uses the desktop palette with a small palette-based stylesheet, so it follows the system light/dark theme.
+The window and dialogs use explicit light and dark `Theme` palettes in `ui.py` (`window_stylesheet`, `dialog_stylesheet`) and react to `QEvent.Type.PaletteChange` to follow the system theme.
 
 ---
 
@@ -175,7 +175,7 @@ flowchart TB
 
     subgraph Record ["Recording"]
         R1["Start beep"]
-        R2["AudioRecorder (in-memory queue)"]
+        R2["AudioRecorder (in-memory chunks)"]
         R3["Preload model thread"]
         D3 --> R1 --> R2
         D3 --> R3

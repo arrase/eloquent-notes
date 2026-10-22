@@ -20,8 +20,8 @@ from PyQt6.QtWidgets import (
 class NotesTab(QWidget):
     """Notes folder configuration tab."""
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self):
+        super().__init__()
         self._init_ui()
 
     def _init_ui(self):

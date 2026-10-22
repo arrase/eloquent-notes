@@ -77,7 +77,7 @@ def test_callback_enqueues_copy():
     chunk = np.zeros((100, 1), dtype=np.float32)
     recorder._on_audio(chunk, 100, None, None)
 
-    queued_chunk = recorder._chunks.get_nowait()
+    queued_chunk = recorder._chunks[0]
     assert np.array_equal(queued_chunk, chunk)
     assert queued_chunk is not chunk
 
@@ -89,8 +89,8 @@ def test_wav_bytes_without_data_is_empty():
 
 def test_wav_bytes_encodes_captured_chunks():
     recorder = AudioRecorder(sample_rate=16000, channels=1)
-    recorder._chunks.put(np.ones((800, 1), dtype=np.float32) * 0.5)
-    recorder._chunks.put(np.ones((800, 1), dtype=np.float32) * -0.5)
+    recorder._chunks.append(np.ones((800, 1), dtype=np.float32) * 0.5)
+    recorder._chunks.append(np.ones((800, 1), dtype=np.float32) * -0.5)
 
     wav_bytes = recorder.wav_bytes
     assert recorder.wav_bytes == wav_bytes
@@ -143,18 +143,18 @@ def test_recorder_is_silent_for_quiet_and_loud_capture():
     recorder = AudioRecorder(sample_rate=16000, channels=1)
     assert recorder.is_silent is True
 
-    recorder._chunks.put(np.zeros((1600, 1), dtype=np.float32))
+    recorder._chunks.append(np.zeros((1600, 1), dtype=np.float32))
     assert recorder.is_silent is True
 
-    recorder._chunks.put(np.full((1600, 1), 0.2, dtype=np.float32))
+    recorder._chunks.append(np.full((1600, 1), 0.2, dtype=np.float32))
     assert recorder.is_silent is False
 
 
 def test_wav_bytes_trims_surrounding_silence():
     recorder = AudioRecorder(sample_rate=16000, channels=1)
-    recorder._chunks.put(np.zeros((1600, 1), dtype=np.float32))
-    recorder._chunks.put(np.full((1600, 1), 0.2, dtype=np.float32))
-    recorder._chunks.put(np.zeros((1600, 1), dtype=np.float32))
+    recorder._chunks.append(np.zeros((1600, 1), dtype=np.float32))
+    recorder._chunks.append(np.full((1600, 1), 0.2, dtype=np.float32))
+    recorder._chunks.append(np.zeros((1600, 1), dtype=np.float32))
 
     with wave.open(io.BytesIO(recorder.wav_bytes), "rb") as wf:
         assert wf.getnframes() == 1600

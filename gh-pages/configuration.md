@@ -61,6 +61,7 @@ The dialog has five tabs plus **Restore Defaults**, **Cancel** and **Save** butt
 
 **Semantic Search**
 * **Embedding Model**: Ollama embedding model used for search (default `embeddinggemma-2:latest`). **Refresh** also lists installed models that report the `embedding` capability.
+* **Keep Alive Time**: how long the embedding model (`search.keep_alive`) stays loaded between searches (default `"5m"`).
 * **Minimum Similarity**: cosine similarity below which search results are hidden (default `0.6`).
 
 #### 4. Audio

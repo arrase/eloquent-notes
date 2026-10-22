@@ -16,14 +16,8 @@ Extract:
 
 ## Examples
 
-Input: "Tengo que reconfigurar Prometheus y eliminar las métricas duplicadas"
+Input: "Reconfigurar Prometheus y eliminar las métricas duplicadas."
 Output: {"type": "task", "tags": ["prometheus", "monitorizacion", "configuracion"]}
 
-Input: "I was thinking we could use Redis as a cache for the slow Postgres queries"
+Input: "Consider using Redis as a caching layer to avoid hitting Postgres directly on slow queries."
 Output: {"type": "idea", "tags": ["redis", "caching", "performance"]}
-
-Input: "Necesito comprobar si el certificado SSL caduca antes del viernes"
-Output: {"type": "reminder", "tags": ["ssl", "seguridad", "plazo"]}
-
-Input: "Next week I start my vacation, I will be away for two weeks"
-Output: {"type": "note", "tags": ["vacation", "time-off"]}

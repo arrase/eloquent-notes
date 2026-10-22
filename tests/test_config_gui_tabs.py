@@ -3,6 +3,7 @@
 import os
 from unittest.mock import MagicMock, patch
 
+from eloquent_notes.config_gui.tabs import text_files
 from eloquent_notes.config_gui.tabs.ai import AITab
 from eloquent_notes.config_gui.tabs.audio import AudioTab
 from eloquent_notes.config_gui.tabs.general import GeneralTab
@@ -10,6 +11,7 @@ from eloquent_notes.config_gui.tabs.notes import NotesTab
 from eloquent_notes.config_gui.tabs.text_files import TextFilesTab
 
 # --- AI TAB TESTS ---
+
 
 def test_ai_tab_load_and_save_valid(qapp):
     with patch.object(AITab, "_fetch_models"):
@@ -19,7 +21,7 @@ def test_ai_tab_load_and_save_valid(qapp):
         "ai": {
             "ollama_url": "http://localhost:11434/",
             "model": "gemma",
-            "output_language": "French",
+            "output_language": "Japanese",
             "context_length": 8192,
             "keep_alive": "10m",
             "preload_keep_alive": "5m",
@@ -27,7 +29,11 @@ def test_ai_tab_load_and_save_valid(qapp):
             "preload_timeout": 50,
             "request_timeout": 100,
         },
-        "search": {"embedding_model": "embeddinggemma-2:latest", "keep_alive": "5m", "min_similarity": 0.3},
+        "search": {
+            "embedding_model": "embeddinggemma-2:latest",
+            "keep_alive": "5m",
+            "min_similarity": 0.3,
+        },
     }
 
     with patch.object(AITab, "_fetch_models"):
@@ -35,23 +41,29 @@ def test_ai_tab_load_and_save_valid(qapp):
 
     assert tab.txt_ollama_url.text() == "http://localhost:11434/"
     assert tab.cmb_model.currentText() == "gemma"
-    assert tab.cmb_language.currentText() == "French"
+    assert tab.cmb_language.currentText() == "Japanese"
     assert tab.spn_context_length.value() == 8192
     assert not tab.chk_context_default.isChecked()
     assert tab.spn_preload_timeout.value() == 50
     assert tab.spn_request_timeout.value() == 100
 
     assert tab.cmb_embedding_model.currentText() == "embeddinggemma-2:latest"
+    assert tab.txt_search_keep_alive.text() == "5m"
     assert tab.spn_min_similarity.value() == 0.3
 
     tab.cmb_embedding_model.setCurrentText("other-embed")
+    tab.txt_search_keep_alive.setText("15m")
     tab.spn_min_similarity.setValue(0.45)
     res = tab.save_settings(config_data)
     assert res is True
     assert config_data["ai"]["ollama_url"] == "http://localhost:11434"
     assert config_data["ai"]["keep_alive"] == "10m"
-    assert config_data["ai"]["output_language"] == "French"
-    assert config_data["search"] == {"embedding_model": "other-embed", "keep_alive": "5m", "min_similarity": 0.45}
+    assert config_data["ai"]["output_language"] == "Japanese"
+    assert config_data["search"] == {
+        "embedding_model": "other-embed",
+        "keep_alive": "15m",
+        "min_similarity": 0.45,
+    }
 
     tab.cleanup()
 
@@ -72,7 +84,11 @@ def test_ai_tab_context_default_toggle(qapp):
             "preload_timeout": 60,
             "request_timeout": 120,
         },
-        "search": {"embedding_model": "embeddinggemma-2:latest", "keep_alive": "5m", "min_similarity": 0.3},
+        "search": {
+            "embedding_model": "embeddinggemma-2:latest",
+            "keep_alive": "5m",
+            "min_similarity": 0.3,
+        },
     }
 
     with patch.object(AITab, "_fetch_models"):
@@ -106,7 +122,11 @@ def test_ai_tab_save_validation_failures(qapp):
             "preload_timeout": 60,
             "request_timeout": 120,
         },
-        "search": {"embedding_model": "embeddinggemma-2:latest", "keep_alive": "5m", "min_similarity": 0.3},
+        "search": {
+            "embedding_model": "embeddinggemma-2:latest",
+            "keep_alive": "5m",
+            "min_similarity": 0.3,
+        },
     }
     with patch.object(AITab, "_fetch_models"):
         tab.load_settings(config_data)
@@ -151,19 +171,49 @@ def test_ai_tab_save_validation_failures(qapp):
     with patch("PyQt6.QtWidgets.QMessageBox.warning"):
         assert tab.save_settings(config_data) is False
 
+    # Invalid search keep alive format
+    tab.txt_preload_keep_alive.setText("5m")
+    tab.txt_search_keep_alive.setText("invalid_search")
+    with patch("PyQt6.QtWidgets.QMessageBox.warning"):
+        assert tab.save_settings(config_data) is False
+
     tab.cleanup()
 
 
-def test_ai_tab_model_loader_callbacks(qapp):
+def test_ai_tab_fetch_models_and_loader_lifecycle(qapp):
     with patch.object(AITab, "_fetch_models"):
         tab = AITab()
 
-    # Mock running loader
-    mock_loader = MagicMock()
-    tab._model_loader = mock_loader
-    tab._running_loaders.add(mock_loader)
+    # Empty URL does not start a loader
+    tab.txt_ollama_url.setText("   ")
+    tab._fetch_models()
+    assert tab.lbl_model_status.text() == "Ollama URL is empty."
+    assert tab._model_loader is None
 
-    with patch.object(tab, "sender", return_value=mock_loader):
+    # Starting a loader when a previous one is running interrupts the previous one
+    prev_loader = MagicMock()
+    prev_loader.isRunning.return_value = True
+    tab._model_loader = prev_loader
+
+    new_loader = MagicMock()
+    tab.txt_ollama_url.setText("http://localhost:11434")
+    with patch("eloquent_notes.config_gui.tabs.ai.OllamaModelLoader", return_value=new_loader):
+        tab._fetch_models()
+
+    prev_loader.requestInterruption.assert_called_once()
+    assert tab._model_loader is new_loader
+    assert new_loader in tab._running_loaders
+    assert not tab.btn_refresh_models.isEnabled()
+    new_loader.start.assert_called_once()
+
+    # Stale loader signals are ignored
+    with patch.object(tab, "sender", return_value=prev_loader):
+        tab._on_models_fetched(["stale-model"], ["stale-embed"])
+        tab._on_models_fetch_failed("Stale error")
+        assert tab.lbl_model_status.text() == "Fetching models..."
+
+    # Active loader callbacks update UI
+    with patch.object(tab, "sender", return_value=new_loader):
         tab._on_models_fetched(["model_a", "model_b"], ["embed_a"])
         assert tab.cmb_model.count() == 2
         assert tab.cmb_embedding_model.count() == 1
@@ -178,6 +228,21 @@ def test_ai_tab_model_loader_callbacks(qapp):
         tab._on_models_fetch_failed("Server error 500")
         assert "Connection failed: Server error 500" in tab.lbl_model_status.text()
 
+        # _on_loader_finished cleans up active loader and re-enables refresh button
+        tab._on_loader_finished()
+        assert tab._model_loader is None
+        assert new_loader not in tab._running_loaders
+        assert tab.btn_refresh_models.isEnabled()
+
+
+def test_ai_tab_cleanup_disconnects_and_waits(qapp):
+    with patch.object(AITab, "_fetch_models"):
+        tab = AITab()
+
+    mock_loader = MagicMock()
+    tab._model_loader = mock_loader
+    tab._running_loaders.add(mock_loader)
+
     tab.cleanup()
     mock_loader.models_fetched.disconnect.assert_called_once_with(tab._on_models_fetched)
     mock_loader.error_occurred.disconnect.assert_called_once_with(tab._on_models_fetch_failed)
@@ -187,6 +252,7 @@ def test_ai_tab_model_loader_callbacks(qapp):
 
 
 # --- AUDIO TAB TESTS ---
+
 
 def test_audio_tab_load_and_save(qapp):
     tab = AudioTab()
@@ -208,18 +274,25 @@ def test_audio_tab_load_and_save(qapp):
     assert tab.spn_capture_duration.value() == 45
     assert not tab.chk_recording_hud_enabled.isChecked()
     assert not tab.chk_beep_enabled.isChecked()
+    assert not tab.spn_beep_freq.isEnabled()
+    assert not tab.spn_beep_duration.isEnabled()
     assert tab.spn_beep_freq.value() == 1200
     assert tab.spn_beep_duration.value() == 0.25
+
+    tab.chk_beep_enabled.setChecked(True)
+    assert tab.spn_beep_freq.isEnabled()
+    assert tab.spn_beep_duration.isEnabled()
 
     res = tab.save_settings(config_data)
     assert res is True
     assert config_data["audio"]["channels"] == 2
     assert config_data["audio"]["capture_duration"] == 45
     assert config_data["audio"]["recording_hud_enabled"] is False
-    assert config_data["audio"]["beep_enabled"] is False
+    assert config_data["audio"]["beep_enabled"] is True
 
 
 # --- GENERAL TAB TESTS ---
+
 
 def test_general_tab_load_and_save(qapp):
     tab = GeneralTab()
@@ -292,6 +365,7 @@ def test_general_tab_lowercase_log_level(qapp):
 
 # --- NOTES TAB TESTS ---
 
+
 def test_notes_tab_load_and_save(qapp):
     tab = NotesTab()
     config_data = {"notes": {"folder": "~/Notes", "columns": 2}}
@@ -336,7 +410,8 @@ def test_notes_tab_browse_folder(qapp, tmp_path):
 
 # --- TEXT FILES TAB TESTS ---
 
-def test_text_files_tab_flow(qapp, tmp_path):
+
+def test_text_files_tab_flow(qapp, tmp_path, monkeypatch):
     f1 = str(tmp_path / "prompt1.md")
     f2 = str(tmp_path / "prompt2.md")
     def1 = str(tmp_path / "def1.md")
@@ -350,7 +425,8 @@ def test_text_files_tab_flow(qapp, tmp_path):
         f.write("Default Prompt 2")
 
     items = [("Prompt 1", f1, def1), ("Prompt 2", f2, def2)]
-    tab = TextFilesTab(items, "Edit Prompt:", "Select item...")
+    monkeypatch.setattr(text_files, "PROMPTS", items)
+    tab = TextFilesTab()
 
     config_data = {}
     tab.load_settings(config_data)
@@ -358,20 +434,28 @@ def test_text_files_tab_flow(qapp, tmp_path):
     assert tab.lst_items.count() == 2
     assert tab.loaded_contents[f1] == "Custom Prompt 1"
     assert tab.loaded_contents[f2] == "Default Prompt 2"
-
-    # Select item 0
-    tab.lst_items.setCurrentRow(0)
     assert tab.editor.toPlainText() == "Custom Prompt 1"
 
-    # Edit text
+    # Switch to item 1 and back to 0 to verify _on_item_changed caching
     tab.editor.setPlainText("Modified Prompt 1")
-    tab.commit_active_editor()
+    tab.lst_items.setCurrentRow(1)
     assert tab.loaded_contents[f1] == "Modified Prompt 1"
+    assert tab.editor.toPlainText() == "Default Prompt 2"
 
-    # Save settings writes file
+    # Save settings writes modified f1 and missing f2
     with patch("eloquent_notes.config.atomic_write") as mock_write:
         tab.save_settings(config_data)
         assert mock_write.call_count == 2
+
+    # When both files already exist on disk with identical content, save_settings skips writing
+    with open(f1, "w") as f:
+        f.write("Modified Prompt 1")
+    with open(f2, "w") as f:
+        f.write("Default Prompt 2")
+
+    with patch("eloquent_notes.config.atomic_write") as mock_write:
+        tab.save_settings(config_data)
+        mock_write.assert_not_called()
 
     # Restore defaults
     tab.restore_defaults()
@@ -379,13 +463,13 @@ def test_text_files_tab_flow(qapp, tmp_path):
     assert tab.loaded_contents[f2] == "Default Prompt 2"
 
 
-def test_text_files_tab_load_settings_row0_already_selected(qapp, tmp_path):
+def test_text_files_tab_load_settings_row0_already_selected(qapp, tmp_path, monkeypatch):
     f1 = str(tmp_path / "prompt1.md")
     with open(f1, "w") as f:
         f.write("Initial Text")
 
-    items = [("Prompt 1", f1, f1)]
-    tab = TextFilesTab(items, "Edit Prompt:", "Select item...")
+    monkeypatch.setattr(text_files, "PROMPTS", [("Prompt 1", f1, f1)])
+    tab = TextFilesTab()
     tab.load_settings({})
     assert tab.lst_items.currentRow() == 0
     assert tab.editor.toPlainText() == "Initial Text"

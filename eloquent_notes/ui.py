@@ -1,7 +1,5 @@
 """Application and system tray icons and light/dark theme stylesheets."""
 
-from __future__ import annotations
-
 import functools
 from dataclasses import dataclass
 
@@ -144,22 +142,6 @@ def current_theme() -> Theme:
 
 def _common_controls_qss(t: Theme) -> str:
     return f"""
-    QTextEdit, QPlainTextEdit, QListWidget {{
-        background-color: {t.input_bg};
-        color: {t.text};
-        border: 1px solid {t.border};
-        border-radius: 6px;
-        padding: 6px 10px;
-        selection-background-color: {t.accent};
-        selection-color: {t.accent_text};
-    }}
-    QTextEdit:focus {{
-        border: 1px solid {t.accent};
-    }}
-    QTextEdit:disabled {{
-        background-color: {t.window};
-        color: {t.text_muted};
-    }}
     QPushButton {{
         background-color: {t.subtle};
         color: {t.text};
@@ -179,22 +161,6 @@ def _common_controls_qss(t: Theme) -> str:
         background-color: {t.window};
         color: {t.text_muted};
         border-color: {t.border};
-    }}
-    QPushButton#btnSave {{
-        background-color: {t.accent};
-        color: {t.accent_text};
-        border: 1px solid {t.accent};
-        font-weight: 600;
-        padding: 5px 18px;
-    }}
-    QPushButton#btnSave:hover {{
-        background-color: {t.accent_hover};
-        border-color: {t.accent_hover};
-    }}
-    QPushButton#dangerButton:hover {{
-        background-color: {t.danger_bg};
-        color: {t.danger_text};
-        border-color: {t.danger_border};
     }}
     QScrollBar:vertical {{
         background: transparent;
@@ -237,6 +203,11 @@ def window_stylesheet(t: Theme) -> str:
     QMainWindow, QStackedWidget, QWidget#timelinePage, QWidget#readerPage, QWidget#columnContainer {{
         background-color: {t.window};
         color: {t.text};
+    }}
+    QPushButton#dangerButton:hover {{
+        background-color: {t.danger_bg};
+        color: {t.danger_text};
+        border-color: {t.danger_border};
     }}
     QScrollArea {{
         border: none;
@@ -379,6 +350,33 @@ def dialog_stylesheet(t: Theme) -> str:
     QLabel#statusHint {{
         color: {t.text_muted};
         font-size: 12px;
+    }}
+    QTextEdit, QListWidget {{
+        background-color: {t.input_bg};
+        color: {t.text};
+        border: 1px solid {t.border};
+        border-radius: 6px;
+        padding: 6px 10px;
+        selection-background-color: {t.accent};
+        selection-color: {t.accent_text};
+    }}
+    QTextEdit:focus {{
+        border: 1px solid {t.accent};
+    }}
+    QTextEdit:disabled {{
+        background-color: {t.window};
+        color: {t.text_muted};
+    }}
+    QPushButton#btnSave {{
+        background-color: {t.accent};
+        color: {t.accent_text};
+        border: 1px solid {t.accent};
+        font-weight: 600;
+        padding: 5px 18px;
+    }}
+    QPushButton#btnSave:hover {{
+        background-color: {t.accent_hover};
+        border-color: {t.accent_hover};
     }}
     QTabWidget::pane {{
         background-color: {t.surface};

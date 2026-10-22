@@ -62,11 +62,11 @@ Phase 1 takes the raw WAV audio bytes captured during dictation, base64 encodes 
   "properties": {
     "transcription": {
       "type": "string",
-      "description": "Clean transcription of spoken words, or empty string if audio is empty."
+      "description": "Clean transcription of the spoken words in their original spoken language (never translate), or empty string if audio is empty."
     },
     "empty": {
       "type": "boolean",
-      "description": "True if audio contains only silence, background noise, or no spoken words."
+      "description": "True if audio contains only silence, background noise, or no spoken words; False otherwise."
     }
   },
   "required": ["transcription", "empty"]
@@ -80,7 +80,7 @@ Under constrained decoding Ollama emits properties in the order the schema decla
 
 The model cannot be trusted to recognise silence. Asked to label an empty recording it frequently answers `"empty": false` and invents text — in testing, a clip of pure digital silence came back as `empty: false` with a fluent Spanish sentence about time, which the pipeline would then have saved as a note.
 
-Eloquent Notes therefore decides emptiness locally, in `audio.is_silent()`, by comparing the recording's RMS amplitude against a speech threshold of -45 dBFS. The threshold sits far above a microphone's noise floor while leaving ample headroom for quiet dictation. If the recording carries no speech-level energy, `_process_audio()` emits the `empty` signal without contacting the model at all, so an accidental trigger in a quiet room costs nothing and cannot produce a fabricated note. The model's own `empty` flag is retained in the schema and honoured, but treated as advisory.
+Eloquent Notes therefore decides emptiness locally via `AudioRecorder.is_silent`, which checks whether all captured audio blocks fall below the `-45 dBFS` RMS speech threshold via `audio.is_silent()`. The threshold sits far above a microphone's noise floor while leaving ample headroom for quiet dictation. If the recording carries no speech-level energy, `_process_audio()` emits the `empty` signal without contacting the model at all, so an accidental trigger in a quiet room costs nothing and cannot produce a fabricated note. The model's own `empty` flag is retained in the schema and honoured, but treated as advisory.
 
 ### Silence Trimming
 
@@ -122,7 +122,7 @@ Phase 2 converts the raw transcribed text from Phase 1 into clean, direct, first
 
 ## 3. Phase 3: Classification
 
-Phase 3 reads only the rewritten content from Phase 2 and returns the note's type and tags. It has no knowledge of other notes.
+Phase 3 (`llm.classify_note()`) reads only the rewritten content from Phase 2 and returns the note's type and tags. It has no knowledge of other notes.
 
 ### Goals
 - **Type Classification:** one of six fixed English keys:
@@ -170,7 +170,7 @@ The worker then emits `processing_completed("success", title)`; the main thread 
 
 ## Add Dictation (Phases 1-2 Only)
 
-**Add dictation** in the reader starts a recording targeted at the open note. Processing runs Phase 1 and Phase 2 only, then emits `processing_completed("appended", content)`. On the main thread the controller saves any pending reader edits, appends the rewritten content to the note body as a new paragraph (`notes.append_to_note()`), and shows a **Dictation Added** notification. The Phase 2 title is discarded; the note keeps its title, type and tags.
+**Add dictation** in the reader starts a recording targeted at the open note. Processing runs Phase 1 and Phase 2 only (passing `ai.keep_alive` directly to Phase 2 since Phase 3 is skipped), then emits `processing_completed("appended", content)`. On the main thread the controller saves any pending reader edits, appends the rewritten content to the note body as a new paragraph (`notes.append_to_note()`), and shows a **Dictation Added** notification. The Phase 2 title is discarded; the note keeps its title, type and tags.
 
 ---
 
@@ -204,7 +204,7 @@ To completely eliminate this delay when recording finishes, Eloquent Notes start
 
 ### Keep-Alive Handover
 
-Phases 1 and 2 run with `preload_keep_alive` so the model stays loaded between phases. Phase 3 runs with `keep_alive` (default `"0"`), so the model is unloaded right after a new note is written. When processing ends before Phase 3 (silence, empty transcription, add-dictation or an error) and the two values differ, a final preload request re-applies `keep_alive` so the model is not left resident for `preload_keep_alive`.
+For a new note, Phases 1 and 2 run with `preload_keep_alive` so the model stays loaded between phases, and Phase 3 (`classify_note()`) runs with `keep_alive` (default `"0"`), so the model is unloaded right after the note is written. On **Add Dictation** (`append=True`), Phase 2 passes `ai.keep_alive` directly since Phase 3 is skipped. When processing ends before Phase 2/3 completes (silence, empty transcription or an error) and the two values differ, a final preload request re-applies `keep_alive` so the model is not left resident for `preload_keep_alive`.
 
 ---
 
