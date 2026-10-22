@@ -52,7 +52,7 @@ def test_install_app_icon(tmp_path, monkeypatch):
 def test_install_desktop_entry(tmp_path, monkeypatch):
     """Test install_desktop_entry writes the SVG icon and application launcher entry."""
     monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path))
-    monkeypatch.setattr("shutil.which", lambda cmd: "/usr/local/bin/eloquent-notes")
+    monkeypatch.setattr("sys.executable", "/usr/local/bin/python3")
 
     filepath = autostart.install_desktop_entry()
     icon_path = autostart.get_icon_path()
@@ -72,10 +72,10 @@ def test_install_desktop_entry(tmp_path, monkeypatch):
 
 
 def test_install_autostart(tmp_path, monkeypatch):
-    """Test install_autostart creates the desktop entry with safe defaults."""
+    """Test install_autostart creates the desktop entry using the current environment binary."""
     monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "config"))
     monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path / "data"))
-    monkeypatch.setattr("shutil.which", lambda cmd: None)
+    monkeypatch.setattr("sys.executable", "/usr/local/bin/python3")
 
     filepath = autostart.install_autostart()
 
@@ -86,7 +86,7 @@ def test_install_autostart(tmp_path, monkeypatch):
 
     content = Path(filepath).read_text(encoding="utf-8")
     assert "[Desktop Entry]" in content
-    assert "Exec=eloquent-notes\n" in content
+    assert "Exec=/usr/local/bin/eloquent-notes\n" in content
     assert "Name=Eloquent Notes" in content
     assert f"Icon={autostart.get_icon_path()}" in content
 
@@ -94,33 +94,17 @@ def test_install_autostart(tmp_path, monkeypatch):
     assert stat.S_IMODE(st_mode) == 0o600
 
 
-def test_install_autostart_with_found_executable(tmp_path, monkeypatch):
-    """Test install_autostart uses the absolute executable path found in PATH."""
-    mock_bin = "/usr/local/bin/eloquent-notes"
-
-    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "config"))
-    monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path / "data"))
-    monkeypatch.setattr("shutil.which", lambda cmd: mock_bin)
-
-    filepath = autostart.install_autostart()
-
-    content = Path(filepath).read_text(encoding="utf-8")
-    assert f"Exec={mock_bin}\n" in content
-
-
 def test_install_entries_quote_path_with_spaces(tmp_path, monkeypatch):
     """Test desktop and autostart entries quote executable paths containing spaces."""
-    mock_bin = "/opt/My Apps/eloquent-notes"
-
     monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "config"))
     monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path / "data"))
-    monkeypatch.setattr("shutil.which", lambda cmd: mock_bin)
+    monkeypatch.setattr("sys.executable", "/opt/My Apps/bin/python3")
 
     autostart_path = autostart.install_autostart()
     desktop_path = autostart.get_desktop_entry_path()
 
-    assert f'Exec="{mock_bin}"\n' in Path(autostart_path).read_text(encoding="utf-8")
-    assert f'Exec="{mock_bin}" open\n' in Path(desktop_path).read_text(encoding="utf-8")
+    assert 'Exec="/opt/My Apps/bin/eloquent-notes"\n' in Path(autostart_path).read_text(encoding="utf-8")
+    assert 'Exec="/opt/My Apps/bin/eloquent-notes" open\n' in Path(desktop_path).read_text(encoding="utf-8")
 
 
 def test_is_autostart_enabled_and_remove(tmp_path, monkeypatch):

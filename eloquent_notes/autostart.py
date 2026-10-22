@@ -6,7 +6,8 @@ and the optional login autostart entry in $XDG_CONFIG_HOME/autostart/.
 """
 
 import os
-import shutil
+import sys
+from pathlib import Path
 
 from eloquent_notes.config import atomic_write, get_config_home, get_data_home
 
@@ -73,7 +74,7 @@ def _write_desktop_file(path, content):
 
 def _resolve_launcher():
     icon_path = install_app_icon()
-    exec_path = shutil.which("eloquent-notes") or "eloquent-notes"
+    exec_path = str(Path(sys.executable).with_name("eloquent-notes"))
     if " " in exec_path:
         exec_path = f'"{exec_path}"'
     return icon_path, exec_path
