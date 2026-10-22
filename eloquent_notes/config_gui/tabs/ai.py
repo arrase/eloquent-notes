@@ -2,7 +2,7 @@
 
 import re
 
-from PyQt6.QtCore import QCoreApplication
+from PyQt6.QtCore import QCoreApplication, Qt
 from PyQt6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -23,6 +23,13 @@ from eloquent_notes.config_gui.loader import OllamaModelLoader
 
 _DURATION_PATTERN = re.compile(r"^-?\d+[smh]?$")
 VALIDATION_ERROR_TITLE = "Validation Error"
+_LABEL_WIDTH = 140
+
+
+def _form_label(text: str) -> QLabel:
+    label = QLabel(text)
+    label.setMinimumWidth(_LABEL_WIDTH)
+    return label
 
 
 class AITab(QWidget):
@@ -45,7 +52,7 @@ class AITab(QWidget):
 
         self.txt_ollama_url = QLineEdit()
         self.txt_ollama_url.setToolTip("URL of your local or remote Ollama server.")
-        form_layout.addRow(QLabel("Ollama URL:"), self.txt_ollama_url)
+        form_layout.addRow(_form_label("Ollama URL:"), self.txt_ollama_url)
 
         model_widget = QWidget()
         model_layout = QVBoxLayout(model_widget)
@@ -54,6 +61,7 @@ class AITab(QWidget):
 
         model_row = QHBoxLayout()
         model_row.setContentsMargins(0, 0, 0, 0)
+        model_row.setSpacing(6)
 
         self.cmb_model = QComboBox()
         self.cmb_model.setEditable(True)
@@ -71,7 +79,11 @@ class AITab(QWidget):
 
         model_layout.addLayout(model_row)
         model_layout.addWidget(self.lbl_model_status)
-        form_layout.addRow(QLabel("AI Model (Audio):"), model_widget)
+
+        lbl_ai_model = _form_label("AI Model (Audio):")
+        lbl_ai_model.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        lbl_ai_model.setContentsMargins(0, 6, 0, 0)
+        form_layout.addRow(lbl_ai_model, model_widget)
 
         context_widget = QWidget()
         context_layout = QHBoxLayout(context_widget)
@@ -94,37 +106,36 @@ class AITab(QWidget):
         )
         self.chk_context_default.toggled.connect(self._toggle_context_default)
 
-        context_layout.addWidget(self.spn_context_length)
+        context_layout.addWidget(self.spn_context_length, 1)
         context_layout.addWidget(self.chk_context_default)
-        context_layout.addStretch()
-        form_layout.addRow(QLabel("Context Length:"), context_widget)
+        form_layout.addRow(_form_label("Context Length:"), context_widget)
 
         self.txt_keep_alive = QLineEdit()
         self.txt_keep_alive.setToolTip(
             "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
         )
-        form_layout.addRow(QLabel("Keep Alive Time:"), self.txt_keep_alive)
+        form_layout.addRow(_form_label("Keep Alive Time:"), self.txt_keep_alive)
 
         self.txt_preload_keep_alive = QLineEdit()
         self.txt_preload_keep_alive.setToolTip(
             "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
         )
-        form_layout.addRow(QLabel("Preload Keep Alive:"), self.txt_preload_keep_alive)
+        form_layout.addRow(_form_label("Preload Keep Alive:"), self.txt_preload_keep_alive)
 
         self.spn_max_retries = QSpinBox()
         self.spn_max_retries.setRange(0, 10)
         self.spn_max_retries.setToolTip("Number of retry attempts if LLM output fails JSON parsing.")
-        form_layout.addRow(QLabel("Max Retries:"), self.spn_max_retries)
+        form_layout.addRow(_form_label("Max Retries:"), self.spn_max_retries)
 
         self.spn_preload_timeout = QSpinBox()
         self.spn_preload_timeout.setRange(10, 1000)
         self.spn_preload_timeout.setSuffix(" sec")
-        form_layout.addRow(QLabel("Preload Timeout:"), self.spn_preload_timeout)
+        form_layout.addRow(_form_label("Preload Timeout:"), self.spn_preload_timeout)
 
         self.spn_request_timeout = QSpinBox()
         self.spn_request_timeout.setRange(10, 1000)
         self.spn_request_timeout.setSuffix(" sec")
-        form_layout.addRow(QLabel("Request Timeout:"), self.spn_request_timeout)
+        form_layout.addRow(_form_label("Request Timeout:"), self.spn_request_timeout)
 
         self.cmb_language = QComboBox()
         self.cmb_language.setEditable(True)
@@ -132,7 +143,7 @@ class AITab(QWidget):
         self.cmb_language.setToolTip(
             "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
         )
-        form_layout.addRow(QLabel("Output Language:"), self.cmb_language)
+        form_layout.addRow(_form_label("Output Language:"), self.cmb_language)
 
         layout.addWidget(grp_ai)
 
@@ -145,13 +156,13 @@ class AITab(QWidget):
         self.cmb_embedding_model.setToolTip(
             "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
         )
-        search_layout.addRow(QLabel("Embedding Model:"), self.cmb_embedding_model)
+        search_layout.addRow(_form_label("Embedding Model:"), self.cmb_embedding_model)
 
         self.spn_min_similarity = QDoubleSpinBox()
         self.spn_min_similarity.setRange(0.0, 1.0)
         self.spn_min_similarity.setSingleStep(0.05)
         self.spn_min_similarity.setToolTip("Search results below this cosine similarity are hidden.")
-        search_layout.addRow(QLabel("Minimum Similarity:"), self.spn_min_similarity)
+        search_layout.addRow(_form_label("Minimum Similarity:"), self.spn_min_similarity)
 
         layout.addWidget(grp_search)
         layout.addStretch()

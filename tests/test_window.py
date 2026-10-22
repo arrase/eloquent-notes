@@ -9,7 +9,7 @@ from PyQt6.QtGui import QGuiApplication, QMouseEvent
 from PyQt6.QtWidgets import QLabel, QMessageBox
 
 from eloquent_notes import notes, ui
-from eloquent_notes.window import MainWindow, NoteCard, day_label, format_time
+from eloquent_notes.window import PAGE_MARGIN, MainWindow, NoteCard, day_label, format_time
 
 
 @pytest.fixture
@@ -382,3 +382,15 @@ def test_window_palette_change_updates_theme(qapp, sample_notes):
     card = next(w for w in list_widgets(win) if isinstance(w, NoteCard) and w.note.title == "Launch decision")
     assert ui.DARK_THEME.type_colors["decision"] in card.findChildren(QLabel)[0].text()
     win.close()
+
+
+def test_scroll_content_aligns_right_margin_with_scrollbar(window):
+    scroll = window.timeline._scroll
+    content = scroll.widget()
+    scroll.resize(960, 600)
+    content.resize(952, 600)
+    content.resizeEvent(None)
+
+    margins = content.column.contentsMargins()
+    assert margins.left() == PAGE_MARGIN
+    assert margins.right() == PAGE_MARGIN - 8

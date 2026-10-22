@@ -340,7 +340,9 @@ def window_stylesheet(t: Theme) -> str:
         selection-background-color: {t.accent};
         selection-color: {t.accent_text};
     }}
-    QLineEdit#titleEdit:focus, QLineEdit#tagsEdit:focus, QPlainTextEdit#bodyEdit:focus {{
+    QLineEdit#titleEdit:hover, QLineEdit#titleEdit:focus,
+    QLineEdit#tagsEdit:hover, QLineEdit#tagsEdit:focus,
+    QPlainTextEdit#bodyEdit:focus {{
         border: none;
     }}
     QLineEdit#tagsEdit {{
@@ -385,6 +387,7 @@ def dialog_stylesheet(t: Theme) -> str:
         background-color: {t.surface};
         border: 1px solid {t.border};
         border-radius: 8px;
+        border-top-left-radius: 0px;
         top: -1px;
     }}
     QTabBar::tab {{

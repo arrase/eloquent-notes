@@ -25,7 +25,6 @@ from PyQt6.QtWidgets import (
     QPlainTextEdit,
     QPushButton,
     QScrollArea,
-    QSizePolicy,
     QStackedWidget,
     QVBoxLayout,
     QWidget,
@@ -34,8 +33,7 @@ from PyQt6.QtWidgets import (
 from eloquent_notes import IDLE, PROCESSING, RECORDING, ui
 from eloquent_notes.notes import NOTE_TYPES, Note, parse_tags
 
-CONTENT_MAX_WIDTH = 720
-COLUMN_WIDTH = 440
+PAGE_MARGIN = 20
 DEFAULT_COLUMNS = 2
 PREVIEW_CHARS = 180
 
@@ -84,27 +82,21 @@ def _plain(text: str, object_name: str = "") -> QLabel:
     return label
 
 
-class Column(QWidget):
-    """Container whose content stays centered and no wider than max_width."""
+class _ScrollContent(QWidget):
+    """Scroll area body that keeps its right edge aligned with the header when the scrollbar appears."""
 
-    def __init__(self, max_width: int = CONTENT_MAX_WIDTH) -> None:
+    def __init__(self, scroll: QScrollArea) -> None:
         super().__init__()
         self.setObjectName("columnContainer")
-        self.max_width = max_width
+        self._scroll = scroll
         self.column = QVBoxLayout(self)
+        self.column.setContentsMargins(PAGE_MARGIN, 14, PAGE_MARGIN, 14)
         self.column.setSpacing(10)
 
-    def set_max_width(self, max_width: int) -> None:
-        self.max_width = max_width
-        self._update_margins()
-
     def resizeEvent(self, event: QResizeEvent | None) -> None:
-        self._update_margins()
+        right = max(0, PAGE_MARGIN - max(0, self._scroll.width() - self.width()))
+        self.column.setContentsMargins(PAGE_MARGIN, 14, right, 14)
         super().resizeEvent(event)
-
-    def _update_margins(self) -> None:
-        side = max(20, (self.width() - self.max_width) // 2)
-        self.column.setContentsMargins(side, 12, side, 12)
 
 
 class NoteCard(QFrame):
@@ -138,6 +130,8 @@ class NoteCard(QFrame):
             preview = flat if len(flat) <= PREVIEW_CHARS else f"{flat[:PREVIEW_CHARS].rstrip()}…"
             layout.addWidget(_plain(preview, "cardPreview"))
 
+        layout.addStretch()
+
         if note.tags:
             tags = QLabel(" &nbsp; ".join(
                 f'<a href="{html.escape(tag)}" style="text-decoration: none; color: {theme.tag}; font-weight: 500;">'
@@ -149,8 +143,6 @@ class NoteCard(QFrame):
             tags.setTextInteractionFlags(Qt.TextInteractionFlag.LinksAccessibleByMouse)
             tags.linkActivated.connect(self.tag_clicked)
             layout.addWidget(tags)
-
-        layout.addStretch()
 
     def mouseReleaseEvent(self, event: QMouseEvent | None) -> None:
         if event is not None and event.button() == Qt.MouseButton.LeftButton:
@@ -178,16 +170,14 @@ class TimelinePage(QWidget):
         self._init_ui()
         self.set_state(IDLE)
 
-    def _max_width(self) -> int:
-        return max(CONTENT_MAX_WIDTH, self._columns * COLUMN_WIDTH)
-
     def _init_ui(self) -> None:
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 8, 0, 14)
+        layout.setContentsMargins(0, 0, 0, 14)
         layout.setSpacing(0)
 
-        self._top = Column(self._max_width())
-        self._top.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
+        top = QVBoxLayout()
+        top.setContentsMargins(PAGE_MARGIN, 16, PAGE_MARGIN, 14)
+        top.setSpacing(10)
 
         header = QHBoxLayout()
         title = QLabel("Eloquent Notes")
@@ -198,7 +188,7 @@ class TimelinePage(QWidget):
         btn_settings.setCursor(Qt.CursorShape.PointingHandCursor)
         btn_settings.clicked.connect(self.settings_clicked)
         header.addWidget(btn_settings)
-        self._top.column.addLayout(header)
+        top.addLayout(header)
 
         self.search = QLineEdit()
         self.search.setObjectName("search")
@@ -206,7 +196,7 @@ class TimelinePage(QWidget):
         self.search.setClearButtonEnabled(True)
         self.search.returnPressed.connect(self._on_search)
         self.search.textChanged.connect(self._on_search_text_changed)
-        self._top.column.addWidget(self.search)
+        top.addWidget(self.search)
 
         filters = QHBoxLayout()
         filters.setSpacing(6)
@@ -227,12 +217,13 @@ class TimelinePage(QWidget):
         self.tag_filter.addItem("All tags", "")
         self.tag_filter.currentIndexChanged.connect(self._render)
         filters.addWidget(self.tag_filter)
-        self._top.column.addLayout(filters)
-        layout.addWidget(self._top)
+        top.addLayout(filters)
+        layout.addLayout(top)
 
         self._scroll = QScrollArea()
         self._scroll.setWidgetResizable(True)
-        self._scroll.setWidget(Column(self._max_width()))
+        self._scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self._scroll.setWidget(QWidget())
         layout.addWidget(self._scroll, stretch=1)
 
         layout.addSpacing(8)
@@ -253,7 +244,6 @@ class TimelinePage(QWidget):
     def set_columns(self, columns: int) -> None:
         if columns != self._columns:
             self._columns = columns
-            self._top.set_max_width(self._max_width())
             self._render()
 
     def set_notes(self, notes: list[Note]) -> None:
@@ -323,6 +313,7 @@ class TimelinePage(QWidget):
     def _message(text: str) -> QLabel:
         label = _muted(_plain(text))
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        label.setContentsMargins(0, 32, 0, 32)
         return label
 
     def _card(self, note: Note, show_date: bool) -> NoteCard:
@@ -367,7 +358,8 @@ class TimelinePage(QWidget):
 
     def _show(self, widgets: list[QWidget]) -> None:
         """Swap in a freshly built grid; setWidget makes the scroll area re-measure it."""
-        column = Column(self._max_width())
+        content = _ScrollContent(self._scroll)
+
         self._grid = QGridLayout()
         self._grid.setContentsMargins(0, 0, 0, 0)
         self._grid.setSpacing(12)
@@ -390,11 +382,11 @@ class TimelinePage(QWidget):
                 self._grid.addWidget(widget, row, 0, 1, self._columns)
                 row += 1
 
-        column.column.addLayout(self._grid)
-        column.column.addStretch()
+        content.column.addLayout(self._grid)
+        content.column.addStretch(1)
         # Deferred: a card's own signal may have triggered this render.
         self._scroll.takeWidget().deleteLater()  # type: ignore[union-attr]
-        self._scroll.setWidget(column)
+        self._scroll.setWidget(content)
 
 
 class ReaderPage(QWidget):
@@ -414,9 +406,8 @@ class ReaderPage(QWidget):
 
     def _init_ui(self) -> None:
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 8, 0, 16)
-        content = Column()
-        layout.addWidget(content)
+        layout.setContentsMargins(PAGE_MARGIN, 16, PAGE_MARGIN, PAGE_MARGIN)
+        layout.setSpacing(12)
 
         toolbar = QHBoxLayout()
         toolbar.setSpacing(8)
@@ -439,12 +430,12 @@ class ReaderPage(QWidget):
         btn_delete.setCursor(Qt.CursorShape.PointingHandCursor)
         btn_delete.clicked.connect(self.delete_clicked)
         toolbar.addWidget(btn_delete)
-        content.column.addLayout(toolbar)
+        layout.addLayout(toolbar)
 
         card = QFrame()
         card.setObjectName("readerCard")
         sheet = QVBoxLayout(card)
-        sheet.setContentsMargins(28, 24, 28, 24)
+        sheet.setContentsMargins(24, 20, 24, 20)
         sheet.setSpacing(10)
 
         meta = QHBoxLayout()
@@ -454,9 +445,9 @@ class ReaderPage(QWidget):
         for note_type in NOTE_TYPES:
             self.type_box.addItem(note_type.capitalize(), note_type)
         meta.addWidget(self.type_box)
+        meta.addStretch()
         self.date_label = _muted(QLabel())
         meta.addWidget(self.date_label)
-        meta.addStretch()
         sheet.addLayout(meta)
 
         self.title_edit = QLineEdit()
@@ -476,9 +467,10 @@ class ReaderPage(QWidget):
 
         self.body_edit = QPlainTextEdit()
         self.body_edit.setObjectName("bodyEdit")
+        self.body_edit.document().setDocumentMargin(0)  # type: ignore[union-attr]
         sheet.addWidget(self.body_edit, stretch=1)
 
-        content.column.addWidget(card, stretch=1)
+        layout.addWidget(card, stretch=1)
 
         QShortcut(QKeySequence(Qt.Key.Key_Escape), self).activated.connect(self.back_clicked)
 
