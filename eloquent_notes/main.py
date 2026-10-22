@@ -23,7 +23,7 @@ def parse_args(cli_args=None):
         prog="eloquent-notes",
         description=(
             "Eloquent Notes - Linux system tray utility"
-            " for offline dictation into Obsidian."
+            " that turns offline voice dictations into organized notes."
         ),
     )
     parser.add_argument(
@@ -34,11 +34,11 @@ def parse_args(cli_args=None):
     parser.add_argument(
         "command",
         nargs="?",
-        choices=["install-autostart", "toggle", "config"],
+        choices=["install-autostart", "toggle", "open", "config"],
         metavar="command",
         help=(
             "Command to execute: 'install-autostart', 'toggle',"
-            " or 'config' (open configuration GUI)."
+            " 'open' (show the notes window), or 'config' (open configuration GUI)."
         ),
     )
     parser.add_argument(
@@ -78,21 +78,24 @@ def run_cli(cli_args=None, launcher=os.execv):
 
     if args.command == "config":
         _app = QApplication.instance() or QApplication(sys.argv)
+        _app.setApplicationName("eloquent-notes")
+        QApplication.setDesktopFileName("eloquent-notes")
         dialog = ConfigurationDialog()
         if dialog.exec() == QDialog.DialogCode.Accepted:
             send_ipc_command("reload", timeout_ms=200)
         return
 
-    if not QCoreApplication.instance():
-        QCoreApplication(sys.argv)
+    _app = QCoreApplication.instance() or QCoreApplication(sys.argv)
 
-    message = "toggle" if wants_toggle else "notify_running"
-    if send_ipc_command(message, timeout_ms=500):
+    message = "toggle" if wants_toggle else "open"
+    if send_ipc_command(message):
         return
 
     daemon_args = [sys.executable, "-m", "eloquent_notes.app"]
     if wants_toggle:
         daemon_args.append("toggle")
+    elif args.command == "open":
+        daemon_args.append("open")
 
     launcher(sys.executable, daemon_args)
 

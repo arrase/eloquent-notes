@@ -1,8 +1,9 @@
-"""Ollama API client for the three-phase dictation pipeline.
+"""Ollama API client for the three-phase dictation pipeline and search.
 
 Phase 1 (transcription): multimodal audio -> text.
 Phase 2 (rewriting): transcription -> clean note prose and title.
-Phase 3 (classification): rewritten note -> type, wikilinks and tags.
+Phase 3 (classification): rewritten note -> type and tags.
+Embeddings (/api/embed) power semantic search over saved notes.
 
 Every phase requests structured output through Ollama's ``format`` JSON
 schema. If a response still cannot be parsed or lacks required keys
@@ -23,14 +24,14 @@ silence, the model frequently answers false and invents text instead, so
 :mod:`eloquent_notes.audio` decides silence locally before any audio is sent.
 """
 
-from __future__ import annotations
-
 import base64
 import json
 import logging
 from typing import Any
 
 import requests
+
+from eloquent_notes.notes import NOTE_TYPES
 
 logger = logging.getLogger("eloquent_notes.llm")
 
@@ -83,19 +84,8 @@ CLASSIFICATION_SCHEMA: dict[str, Any] = {
     "properties": {
         "type": {
             "type": "string",
-            "enum": [
-                "task", "idea", "note", "reminder",
-                "question", "decision",
-            ],
+            "enum": list(NOTE_TYPES),
             "description": "Classification of the note content.",
-        },
-        "wikilinks": {
-            "type": "array",
-            "items": {"type": "string"},
-            "description": (
-                "Key concepts, tools, or proper nouns in the requested"
-                " output language that deserve linked notes."
-            ),
         },
         "tags": {
             "type": "array",
@@ -103,12 +93,29 @@ CLASSIFICATION_SCHEMA: dict[str, Any] = {
             "description": "2 to 5 relevant tags, lowercase, in the requested output language.",
         },
     },
-    "required": ["type", "wikilinks", "tags"],
+    "required": ["type", "tags"],
 }
 
 
 def _chat_url(ollama_url: str) -> str:
     return f"{ollama_url.rstrip('/')}/api/chat"
+
+
+def embed(
+    ollama_url: str,
+    model: str,
+    texts: list[str],
+    keep_alive: str,
+    timeout: int,
+) -> list[list[float]]:
+    """Return one embedding vector per input text."""
+    response = requests.post(
+        f"{ollama_url.rstrip('/')}/api/embed",
+        json={"model": model, "input": texts, "keep_alive": keep_alive},
+        timeout=timeout,
+    )
+    response.raise_for_status()
+    return response.json()["embeddings"]
 
 
 def preload_model(
@@ -143,8 +150,8 @@ def preload_model(
 def _parse_json_response(content: str, format_schema: dict[str, Any]) -> dict[str, Any]:
     """Validate an Ollama reply against the requested JSON schema.
 
-    Raises TypeError, ValueError or KeyError on anything malformed so the
-    caller can treat every failure mode alike and retry.
+    Raises TypeError or ValueError on anything malformed so the caller
+    can treat every failure mode alike and retry.
     """
     result = json.loads(content)
     if not isinstance(result, dict):
@@ -230,15 +237,15 @@ def _execute_ollama_json_request(
             content = response.json()["message"]["content"]
             return _parse_json_response(content, format_schema)
         except (KeyError, TypeError, ValueError):
-            logger.exception(
-                "Invalid JSON output for %s (attempt %d): %r",
-                task_name, attempt, content,
+            logger.warning(
+                "Invalid JSON output for %s (attempt %d/%d): %r",
+                task_name, attempt + 1, max_retries + 1, content,
             )
             if attempt >= max_retries:
                 raise
             conversation.append({
                 "role": "assistant",
-                "content": content if content is not None else response.text,
+                "content": content if isinstance(content, str) else response.text,
             })
             conversation.append({
                 "role": "user",
@@ -315,7 +322,7 @@ def rewrite_transcription(
     )
 
 
-def classify_transcription(
+def classify_note(
     ollama_url: str,
     model: str,
     system_prompt: str,
@@ -326,9 +333,9 @@ def classify_transcription(
     max_retries: int,
     timeout: int,
 ) -> dict[str, Any]:
-    """Classify and extract metadata from the transcription (Phase 3).
+    """Classify and extract metadata from a rewritten note (Phase 3).
 
-    Returns a dict with keys: 'type', 'wikilinks', and 'tags'.
+    Returns a dict with keys: 'type' and 'tags'.
     """
     messages: list[dict[str, Any]] = [
         {"role": "system", "content": system_prompt},

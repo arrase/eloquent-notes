@@ -31,6 +31,9 @@ def test_parse_args():
     args = main.parse_args(["toggle"])
     assert args.command == "toggle"
 
+    args = main.parse_args(["open"])
+    assert args.command == "open"
+
     args = main.parse_args(["-t"])
     assert args.toggle is True
 
@@ -126,19 +129,35 @@ def test_run_cli_config_rejected(monkeypatch, qapp):
 
 def test_run_cli_daemon_already_running(monkeypatch):
     """Test run_cli notifies running daemon via IPC if daemon is already active."""
-    mock_send_ipc = MagicMock(return_value=True)
+    created_apps = []
+
+    def fake_core_app(argv):
+        app = MagicMock()
+        created_apps.append(app)
+        return app
+
+    mock_core_app_cls = MagicMock(side_effect=fake_core_app)
+    mock_core_app_cls.instance.return_value = None
+
+    def check_app_alive(cmd):
+        assert len(created_apps) == 1
+        assert sys.getrefcount(created_apps[0]) > 2
+        return True
+
+    mock_send_ipc = MagicMock(side_effect=check_app_alive)
     mock_launcher = MagicMock()
 
+    monkeypatch.setattr("eloquent_notes.main.QCoreApplication", mock_core_app_cls)
     monkeypatch.setattr("eloquent_notes.main.send_ipc_command", mock_send_ipc)
 
     main.run_cli(["-t"], launcher=mock_launcher)
 
-    mock_send_ipc.assert_called_once_with("toggle", timeout_ms=500)
+    mock_send_ipc.assert_called_once_with("toggle")
     mock_launcher.assert_not_called()
 
 
 def test_run_cli_default_no_args_already_running(monkeypatch):
-    """Test run_cli sends notify_running when launched with no args and daemon is running."""
+    """Test run_cli asks the running daemon to open the notes window when launched with no args."""
     mock_send_ipc = MagicMock(return_value=True)
     mock_launcher = MagicMock()
 
@@ -146,7 +165,7 @@ def test_run_cli_default_no_args_already_running(monkeypatch):
 
     main.run_cli([], launcher=mock_launcher)
 
-    mock_send_ipc.assert_called_once_with("notify_running", timeout_ms=500)
+    mock_send_ipc.assert_called_once_with("open")
     mock_launcher.assert_not_called()
 
 
@@ -159,7 +178,7 @@ def test_run_cli_launch_daemon(monkeypatch):
 
     main.run_cli(["toggle"], launcher=mock_launcher)
 
-    mock_send_ipc.assert_called_once_with("toggle", timeout_ms=500)
+    mock_send_ipc.assert_called_once_with("toggle")
     mock_launcher.assert_called_once_with(
         sys.executable,
         [sys.executable, "-m", "eloquent_notes.app", "toggle"]
@@ -175,7 +194,7 @@ def test_run_cli_launch_daemon_default_no_args(monkeypatch):
 
     main.run_cli([], launcher=mock_launcher)
 
-    mock_send_ipc.assert_called_once_with("notify_running", timeout_ms=500)
+    mock_send_ipc.assert_called_once_with("open")
     mock_launcher.assert_called_once_with(
         sys.executable,
         [sys.executable, "-m", "eloquent_notes.app"]
@@ -189,3 +208,19 @@ def test_main_function(monkeypatch):
 
     main.main()
     mock_run_cli.assert_called_once()
+
+
+def test_run_cli_open_launches_daemon_with_window(monkeypatch):
+    """Test 'open' starts the daemon with the notes window when no instance is running."""
+    mock_send_ipc = MagicMock(return_value=False)
+    mock_launcher = MagicMock()
+
+    monkeypatch.setattr("eloquent_notes.main.send_ipc_command", mock_send_ipc)
+
+    main.run_cli(["open"], launcher=mock_launcher)
+
+    mock_send_ipc.assert_called_once_with("open")
+    mock_launcher.assert_called_once_with(
+        sys.executable,
+        [sys.executable, "-m", "eloquent_notes.app", "open"]
+    )

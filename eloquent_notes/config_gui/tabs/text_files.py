@@ -16,18 +16,47 @@ from PyQt6.QtWidgets import (
 
 from eloquent_notes import config
 
+PROMPTS = [
+    (
+        "Transcription - System Prompt",
+        config.TRANSCRIPTION_SYSTEM_PROMPT_PATH,
+        config.DEFAULT_TRANSCRIPTION_SYSTEM_SRC,
+    ),
+    (
+        "Transcription - User Prompt",
+        config.TRANSCRIPTION_USER_PROMPT_PATH,
+        config.DEFAULT_TRANSCRIPTION_USER_SRC,
+    ),
+    (
+        "Rewriting - System Prompt",
+        config.REWRITING_SYSTEM_PROMPT_PATH,
+        config.DEFAULT_REWRITING_SYSTEM_SRC,
+    ),
+    (
+        "Rewriting - User Prompt",
+        config.REWRITING_USER_PROMPT_PATH,
+        config.DEFAULT_REWRITING_USER_SRC,
+    ),
+    (
+        "Classification - System Prompt",
+        config.CLASSIFICATION_SYSTEM_PROMPT_PATH,
+        config.DEFAULT_CLASSIFICATION_SYSTEM_SRC,
+    ),
+    (
+        "Classification - User Prompt",
+        config.CLASSIFICATION_USER_PROMPT_PATH,
+        config.DEFAULT_CLASSIFICATION_USER_SRC,
+    ),
+    ("Retry Prompt", config.RETRY_PROMPT_PATH, config.DEFAULT_RETRY_PROMPT_SRC),
+]
+
 
 class TextFilesTab(QWidget):
-    """Generic tab for editing a list of text files (prompts or templates)."""
+    """Tab for editing prompt files."""
 
-    def __init__(self, items, editor_label, placeholder, parent=None):
-        super().__init__(parent)
-        self.items = items
-        self._block_cache = False
+    def __init__(self):
+        super().__init__()
         self.loaded_contents = {}
-        self.current_item = None
-        self.editor_label_text = editor_label
-        self.placeholder_text = placeholder
         self._init_ui()
 
     def _init_ui(self):
@@ -36,26 +65,32 @@ class TextFilesTab(QWidget):
         layout.setSpacing(10)
 
         splitter = QSplitter(Qt.Orientation.Horizontal)
+        splitter.setHandleWidth(12)
+
+        left_widget = QWidget()
+        left_layout = QVBoxLayout(left_widget)
+        left_layout.setContentsMargins(0, 0, 0, 0)
+        left_layout.addWidget(QLabel("Prompts:"))
 
         self.lst_items = QListWidget()
-        for label, path, _ in self.items:
+        for label, path, _ in PROMPTS:
             item = QListWidgetItem(label)
             item.setData(Qt.ItemDataRole.UserRole, path)
             self.lst_items.addItem(item)
 
-        splitter.addWidget(self.lst_items)
+        left_layout.addWidget(self.lst_items)
+        splitter.addWidget(left_widget)
 
         editor_widget = QWidget()
         editor_layout = QVBoxLayout(editor_widget)
         editor_layout.setContentsMargins(0, 0, 0, 0)
 
-        lbl = QLabel(self.editor_label_text)
+        lbl = QLabel("Prompt Content:")
         self.editor = QTextEdit()
         font = QFont("Courier New", 10)
         font.setStyleHint(QFont.StyleHint.Monospace)
         self.editor.setFont(font)
-        self.editor.setPlaceholderText(self.placeholder_text)
-        self.editor.setEnabled(False)
+        self.editor.setPlaceholderText("Select a prompt to edit...")
 
         editor_layout.addWidget(lbl)
         editor_layout.addWidget(self.editor)
@@ -67,36 +102,28 @@ class TextFilesTab(QWidget):
         self.lst_items.currentItemChanged.connect(self._on_item_changed)
 
     def _on_item_changed(self, current, previous):
-        if previous and not self._block_cache:
+        if previous:
             prev_path = previous.data(Qt.ItemDataRole.UserRole)
             self.loaded_contents[prev_path] = self.editor.toPlainText()
 
         if current:
             path = current.data(Qt.ItemDataRole.UserRole)
             self.editor.setPlainText(self.loaded_contents[path])
-            self.editor.setEnabled(True)
-            self.current_item = current
-        else:
-            self.editor.clear()
-            self.editor.setEnabled(False)
-            self.current_item = None
 
     def commit_active_editor(self):
         """Commit current editor contents to memory cache."""
-        if self.current_item:
-            path = self.current_item.data(Qt.ItemDataRole.UserRole)
+        current = self.lst_items.currentItem()
+        if current:
+            path = current.data(Qt.ItemDataRole.UserRole)
             self.loaded_contents[path] = self.editor.toPlainText()
 
-    @staticmethod
-    def _read_file_or_default(path, default_path):
-        return config.load_file(path if os.path.exists(path) else default_path)
-
     def load_settings(self, config_data: dict) -> None:
-        self._block_cache = True
+        self.lst_items.blockSignals(True)
         self.loaded_contents.clear()
 
-        for _, path, default_path in self.items:
-            self.loaded_contents[path] = self._read_file_or_default(path, default_path)
+        for _, path, default_path in PROMPTS:
+            src = path if os.path.exists(path) else default_path
+            self.loaded_contents[path] = config.load_file(src)
 
         if self.lst_items.count() > 0:
             self.lst_items.setCurrentRow(0)
@@ -105,22 +132,22 @@ class TextFilesTab(QWidget):
         if current:
             path = current.data(Qt.ItemDataRole.UserRole)
             self.editor.setPlainText(self.loaded_contents[path])
-            self.editor.setEnabled(True)
-            self.current_item = current
 
-        self._block_cache = False
+        self.lst_items.blockSignals(False)
 
     def restore_defaults(self) -> None:
         self.loaded_contents.clear()
-        for _, path, default_path in self.items:
+        for _, path, default_path in PROMPTS:
             self.loaded_contents[path] = config.load_file(default_path)
-        if self.current_item:
-            path = self.current_item.data(Qt.ItemDataRole.UserRole)
+        current = self.lst_items.currentItem()
+        if current:
+            path = current.data(Qt.ItemDataRole.UserRole)
             self.editor.setPlainText(self.loaded_contents[path])
 
     def save_settings(self, config_data: dict) -> bool:
         self.commit_active_editor()
-        for _, path, _ in self.items:
+        for _, path, _ in PROMPTS:
             content = self.loaded_contents[path]
-            config.atomic_write(path, content)
+            if not os.path.exists(path) or config.load_file(path) != content:
+                config.atomic_write(path, content)
         return True

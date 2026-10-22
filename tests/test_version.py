@@ -24,7 +24,7 @@ def _pyproject_version() -> str:
         return tomllib.load(f)["project"]["version"]
 
 
-def _latest_release_tag() -> str | None:
+def _latest_release_tag():
     """Newest v* tag reachable from any local ref, or None if unavailable."""
     result = subprocess.run(
         ["git", "tag", "--list", "v*", "--sort=-v:refname"],

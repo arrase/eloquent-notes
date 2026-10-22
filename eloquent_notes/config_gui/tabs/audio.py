@@ -16,8 +16,8 @@ from PyQt6.QtWidgets import (
 class AudioTab(QWidget):
     """Audio configuration tab."""
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self):
+        super().__init__()
         self._init_ui()
 
     def _init_ui(self):
@@ -34,7 +34,7 @@ class AudioTab(QWidget):
         self.spn_sample_rate.setSingleStep(8000)
         self.spn_sample_rate.setSuffix(" Hz")
         self.spn_sample_rate.setToolTip(
-            "Sample rate for microphone recording (16000 Hz is recommended for whisper/dictation models)."
+            "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
         )
         form_layout.addRow(QLabel("Sample Rate:"), self.spn_sample_rate)
 
@@ -60,6 +60,7 @@ class AudioTab(QWidget):
 
         self.chk_beep_enabled = QCheckBox("Play beep on recording start and stop")
         self.chk_beep_enabled.setToolTip("Audible feedback beeps when starting/stopping recording.")
+        self.chk_beep_enabled.toggled.connect(self._toggle_beep_controls)
         form_layout.addRow(self.chk_beep_enabled)
 
         self.spn_beep_freq = QSpinBox()
@@ -77,13 +78,19 @@ class AudioTab(QWidget):
         layout.addWidget(grp_audio)
         layout.addStretch()
 
+    def _toggle_beep_controls(self, checked: bool) -> None:
+        self.spn_beep_freq.setEnabled(checked)
+        self.spn_beep_duration.setEnabled(checked)
+
     def load_settings(self, config_data: dict) -> None:
         audio_cfg = config_data["audio"]
         self.spn_sample_rate.setValue(int(audio_cfg["sample_rate"]))
         self.cmb_channels.setCurrentIndex(0 if audio_cfg["channels"] == 1 else 1)
         self.spn_capture_duration.setValue(int(audio_cfg["capture_duration"]))
         self.chk_recording_hud_enabled.setChecked(bool(audio_cfg["recording_hud_enabled"]))
-        self.chk_beep_enabled.setChecked(bool(audio_cfg["beep_enabled"]))
+        beep_enabled = bool(audio_cfg["beep_enabled"])
+        self.chk_beep_enabled.setChecked(beep_enabled)
+        self._toggle_beep_controls(beep_enabled)
         self.spn_beep_freq.setValue(int(audio_cfg["beep_frequency"]))
         self.spn_beep_duration.setValue(float(audio_cfg["beep_duration"]))
 
@@ -95,7 +102,7 @@ class AudioTab(QWidget):
             "recording_hud_enabled": self.chk_recording_hud_enabled.isChecked(),
             "beep_enabled": self.chk_beep_enabled.isChecked(),
             "beep_frequency": self.spn_beep_freq.value(),
-            "beep_duration": self.spn_beep_duration.value(),
+            "beep_duration": round(self.spn_beep_duration.value(), 2),
         })
         return True
 

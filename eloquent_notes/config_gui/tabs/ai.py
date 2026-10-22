@@ -2,10 +2,11 @@
 
 import re
 
-from PyQt6.QtCore import QCoreApplication
+from PyQt6.QtCore import QCoreApplication, Qt
 from PyQt6.QtWidgets import (
     QCheckBox,
     QComboBox,
+    QDoubleSpinBox,
     QFormLayout,
     QGroupBox,
     QHBoxLayout,
@@ -22,13 +23,20 @@ from eloquent_notes.config_gui.loader import OllamaModelLoader
 
 _DURATION_PATTERN = re.compile(r"^-?\d+[smh]?$")
 VALIDATION_ERROR_TITLE = "Validation Error"
+_LABEL_WIDTH = 140
+
+
+def _form_label(text: str) -> QLabel:
+    label = QLabel(text)
+    label.setMinimumWidth(_LABEL_WIDTH)
+    return label
 
 
 class AITab(QWidget):
     """AI and Ollama configuration tab."""
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self):
+        super().__init__()
         self._model_loader = None
         self._running_loaders = set()
         self._init_ui()
@@ -38,13 +46,13 @@ class AITab(QWidget):
         layout.setContentsMargins(15, 15, 15, 15)
         layout.setSpacing(15)
 
-        grp_ai = QGroupBox("Ollama & AI Pipeline Settings")
+        grp_ai = QGroupBox("Ollama && AI Pipeline Settings")
         form_layout = QFormLayout(grp_ai)
         form_layout.setSpacing(10)
 
         self.txt_ollama_url = QLineEdit()
         self.txt_ollama_url.setToolTip("URL of your local or remote Ollama server.")
-        form_layout.addRow(QLabel("Ollama URL:"), self.txt_ollama_url)
+        form_layout.addRow(_form_label("Ollama URL:"), self.txt_ollama_url)
 
         model_widget = QWidget()
         model_layout = QVBoxLayout(model_widget)
@@ -53,6 +61,7 @@ class AITab(QWidget):
 
         model_row = QHBoxLayout()
         model_row.setContentsMargins(0, 0, 0, 0)
+        model_row.setSpacing(6)
 
         self.cmb_model = QComboBox()
         self.cmb_model.setEditable(True)
@@ -62,15 +71,19 @@ class AITab(QWidget):
         self.btn_refresh_models = QPushButton("Refresh")
         self.btn_refresh_models.clicked.connect(self._fetch_models)
 
-        model_row.addWidget(self.cmb_model)
+        model_row.addWidget(self.cmb_model, 1)
         model_row.addWidget(self.btn_refresh_models)
 
         self.lbl_model_status = QLabel("Ready")
-        self.lbl_model_status.setStyleSheet("color: #7f849c; font-size: 11px;")
+        self.lbl_model_status.setObjectName("statusHint")
 
         model_layout.addLayout(model_row)
         model_layout.addWidget(self.lbl_model_status)
-        form_layout.addRow(QLabel("AI Model (Audio):"), model_widget)
+
+        lbl_ai_model = _form_label("AI Model (Audio):")
+        lbl_ai_model.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        lbl_ai_model.setContentsMargins(0, 6, 0, 0)
+        form_layout.addRow(lbl_ai_model, model_widget)
 
         context_widget = QWidget()
         context_layout = QHBoxLayout(context_widget)
@@ -83,7 +96,7 @@ class AITab(QWidget):
         self.spn_context_length.setValue(8192)
         self.spn_context_length.setToolTip(
             "Context length in tokens to pass to Ollama. "
-            "Larger values allow more vault context but use more memory."
+            "Larger values allow longer dictations but use more memory."
         )
 
         self.chk_context_default = QCheckBox("Use default context length")
@@ -93,46 +106,71 @@ class AITab(QWidget):
         )
         self.chk_context_default.toggled.connect(self._toggle_context_default)
 
-        context_layout.addWidget(self.spn_context_length)
+        context_layout.addWidget(self.spn_context_length, 1)
         context_layout.addWidget(self.chk_context_default)
-        form_layout.addRow(QLabel("Context Length:"), context_widget)
+        form_layout.addRow(_form_label("Context Length:"), context_widget)
 
         self.txt_keep_alive = QLineEdit()
         self.txt_keep_alive.setToolTip(
             "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
         )
-        form_layout.addRow(QLabel("Keep Alive Time:"), self.txt_keep_alive)
+        form_layout.addRow(_form_label("Keep Alive Time:"), self.txt_keep_alive)
 
         self.txt_preload_keep_alive = QLineEdit()
         self.txt_preload_keep_alive.setToolTip(
             "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
         )
-        form_layout.addRow(QLabel("Preload Keep Alive:"), self.txt_preload_keep_alive)
+        form_layout.addRow(_form_label("Preload Keep Alive:"), self.txt_preload_keep_alive)
 
         self.spn_max_retries = QSpinBox()
         self.spn_max_retries.setRange(0, 10)
         self.spn_max_retries.setToolTip("Number of retry attempts if LLM output fails JSON parsing.")
-        form_layout.addRow(QLabel("Max Retries:"), self.spn_max_retries)
+        form_layout.addRow(_form_label("Max Retries:"), self.spn_max_retries)
 
         self.spn_preload_timeout = QSpinBox()
         self.spn_preload_timeout.setRange(10, 1000)
         self.spn_preload_timeout.setSuffix(" sec")
-        form_layout.addRow(QLabel("Preload Timeout:"), self.spn_preload_timeout)
+        form_layout.addRow(_form_label("Preload Timeout:"), self.spn_preload_timeout)
 
         self.spn_request_timeout = QSpinBox()
         self.spn_request_timeout.setRange(10, 1000)
         self.spn_request_timeout.setSuffix(" sec")
-        form_layout.addRow(QLabel("Request Timeout:"), self.spn_request_timeout)
+        form_layout.addRow(_form_label("Request Timeout:"), self.spn_request_timeout)
 
         self.cmb_language = QComboBox()
         self.cmb_language.setEditable(True)
         self.cmb_language.addItems(["English", "Spanish", "French", "German", "Italian", "Portuguese"])
         self.cmb_language.setToolTip(
-            "Target language for rewritten notes, titles, wikilinks, and tags (e.g. English, Spanish)."
+            "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
         )
-        form_layout.addRow(QLabel("Output Language:"), self.cmb_language)
+        form_layout.addRow(_form_label("Output Language:"), self.cmb_language)
 
         layout.addWidget(grp_ai)
+
+        grp_search = QGroupBox("Semantic Search")
+        search_layout = QFormLayout(grp_search)
+        search_layout.setSpacing(10)
+
+        self.cmb_embedding_model = QComboBox()
+        self.cmb_embedding_model.setEditable(True)
+        self.cmb_embedding_model.setToolTip(
+            "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+        )
+        search_layout.addRow(_form_label("Embedding Model:"), self.cmb_embedding_model)
+
+        self.txt_search_keep_alive = QLineEdit()
+        self.txt_search_keep_alive.setToolTip(
+            "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+        )
+        search_layout.addRow(_form_label("Keep Alive Time:"), self.txt_search_keep_alive)
+
+        self.spn_min_similarity = QDoubleSpinBox()
+        self.spn_min_similarity.setRange(0.0, 1.0)
+        self.spn_min_similarity.setSingleStep(0.05)
+        self.spn_min_similarity.setToolTip("Search results below this cosine similarity are hidden.")
+        search_layout.addRow(_form_label("Minimum Similarity:"), self.spn_min_similarity)
+
+        layout.addWidget(grp_search)
         layout.addStretch()
 
     def _toggle_context_default(self, checked):
@@ -144,8 +182,7 @@ class AITab(QWidget):
             self.lbl_model_status.setText("Ollama URL is empty.")
             return
 
-        self.lbl_model_status.setText("Fetching audio models...")
-        self.lbl_model_status.setStyleSheet("color: #7f849c; font-size: 11px;")
+        self.lbl_model_status.setText("Fetching models...")
         self.btn_refresh_models.setEnabled(False)
 
         if self._model_loader is not None and self._model_loader.isRunning():
@@ -163,42 +200,37 @@ class AITab(QWidget):
 
     def _on_loader_finished(self):
         loader = self.sender()
-        if loader:
-            self._running_loaders.discard(loader)
+        self._running_loaders.discard(loader)
         if loader is self._model_loader:
             self._model_loader = None
             self.btn_refresh_models.setEnabled(True)
 
-    def _on_models_fetched(self, models):
+    @staticmethod
+    def _fill_models(combo, models):
+        """Replace combo items with models, keeping the current selection."""
+        current_text = combo.currentText()
+        combo.clear()
+        combo.addItems(models)
+        if current_text and current_text not in models:
+            combo.addItem(current_text)
+        combo.setCurrentText(current_text)
+
+    def _on_models_fetched(self, audio_models, embedding_models):
         if self.sender() is not self._model_loader:
             return
 
-        current_text = self.cmb_model.currentText()
-        self.cmb_model.clear()
+        self._fill_models(self.cmb_model, audio_models)
+        self._fill_models(self.cmb_embedding_model, embedding_models)
 
-        if not models:
+        if not audio_models:
             self.lbl_model_status.setText("No audio-capable models found.")
-            self.lbl_model_status.setStyleSheet("color: #f38ba8; font-size: 11px;")
-            if current_text:
-                self.cmb_model.addItem(current_text)
-                self.cmb_model.setCurrentText(current_text)
-            return
-
-        self.cmb_model.addItems(models)
-        if current_text in models:
-            self.cmb_model.setCurrentText(current_text)
-        elif current_text:
-            self.cmb_model.addItem(current_text)
-            self.cmb_model.setCurrentText(current_text)
-
-        self.lbl_model_status.setText("Audio models loaded successfully.")
-        self.lbl_model_status.setStyleSheet("color: #a6e3a1; font-size: 11px;")
+        else:
+            self.lbl_model_status.setText("Models loaded successfully.")
 
     def _on_models_fetch_failed(self, error_msg):
         if self.sender() is not self._model_loader:
             return
         self.lbl_model_status.setText(f"Connection failed: {error_msg}")
-        self.lbl_model_status.setStyleSheet("color: #f38ba8; font-size: 11px;")
 
     def cleanup(self):
         """Asynchronously cancel active loaders and wait with a timeout."""
@@ -236,6 +268,14 @@ class AITab(QWidget):
         self.spn_preload_timeout.setValue(int(ai_cfg["preload_timeout"]))
         self.spn_request_timeout.setValue(int(ai_cfg["request_timeout"]))
 
+        search_cfg = config_data["search"]
+        curr_embedding = str(search_cfg["embedding_model"])
+        if self.cmb_embedding_model.findText(curr_embedding) == -1:
+            self.cmb_embedding_model.addItem(curr_embedding)
+        self.cmb_embedding_model.setCurrentText(curr_embedding)
+        self.txt_search_keep_alive.setText(str(search_cfg["keep_alive"]))
+        self.spn_min_similarity.setValue(float(search_cfg["min_similarity"]))
+
         curr_lang = str(ai_cfg["output_language"])
         if self.cmb_language.findText(curr_lang) == -1:
             self.cmb_language.addItem(curr_lang)
@@ -263,6 +303,11 @@ class AITab(QWidget):
             QMessageBox.warning(self, VALIDATION_ERROR_TITLE, "AI Model cannot be empty.")
             return False
 
+        embedding_model = self.cmb_embedding_model.currentText().strip()
+        if not embedding_model:
+            QMessageBox.warning(self, VALIDATION_ERROR_TITLE, "Embedding Model cannot be empty.")
+            return False
+
         output_lang = self.cmb_language.currentText().strip()
         if not output_lang:
             QMessageBox.warning(self, VALIDATION_ERROR_TITLE, "Output Language cannot be empty.")
@@ -270,6 +315,7 @@ class AITab(QWidget):
 
         keep_alive = self.txt_keep_alive.text().strip()
         preload_keep_alive = self.txt_preload_keep_alive.text().strip()
+        search_keep_alive = self.txt_search_keep_alive.text().strip()
 
         if not _DURATION_PATTERN.match(keep_alive):
             QMessageBox.warning(
@@ -287,6 +333,14 @@ class AITab(QWidget):
                 "Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
             )
             return False
+        if not _DURATION_PATTERN.match(search_keep_alive):
+            QMessageBox.warning(
+                self,
+                VALIDATION_ERROR_TITLE,
+                f"Invalid Search Keep Alive format: '{search_keep_alive}'. "
+                "Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+            )
+            return False
 
         context_len = None if self.chk_context_default.isChecked() else self.spn_context_length.value()
 
@@ -300,6 +354,11 @@ class AITab(QWidget):
             "max_retries": self.spn_max_retries.value(),
             "preload_timeout": self.spn_preload_timeout.value(),
             "request_timeout": self.spn_request_timeout.value(),
+        })
+        config_data["search"].update({
+            "embedding_model": embedding_model,
+            "keep_alive": search_keep_alive,
+            "min_similarity": round(self.spn_min_similarity.value(), 2),
         })
         return True
 

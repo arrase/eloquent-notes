@@ -1,5 +1,5 @@
 site_name: Eloquent Notes
-site_description: Lightweight, system-tray-centric utility for Linux dictation into Obsidian powered by Gemma 4 via Ollama.
+site_description: Linux system tray app that turns voice dictations into well-structured, well-ordered Markdown notes with a local Gemma 4 pipeline via Ollama.
 site_author: Arrase
 site_url: https://arrase.github.io/eloquent-notes/
 docs_dir: gh-pages
@@ -11,8 +11,8 @@ nav:
   - Overview: index.md
   - Architecture & Design: architecture.md
   - Three-Phase AI Pipeline: pipeline.md
-  - Obsidian Vault Integration: obsidian.md
-  - Configuration & Templates: configuration.md
+  - Notes & Search: notes.md
+  - Configuration: configuration.md
   - System Tray & Shortcuts: usage-shortcuts.md
   - CLI & Logging: cli.md
   - Installation & Setup: installation.md

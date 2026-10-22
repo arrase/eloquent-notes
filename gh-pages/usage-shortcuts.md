@@ -1,42 +1,68 @@
 # System Tray & Shortcuts
 
-Eloquent Notes is designed as a background Linux system tray utility. It runs unobtrusively in your desktop panel and can be controlled either via system tray mouse clicks or global system-wide keyboard shortcuts.
+Eloquent Notes runs in your desktop panel. New recordings are started and stopped from the tray icon, the floating HUD, or a global keyboard shortcut, while the note reader in the notes window provides **Add dictation** to append to an existing note.
 
 ---
 
 ## System Tray Interaction Flow
 
-The system tray icon provides immediate visual status feedback and quick access to application controls.
-
 ### Mouse Interactions
 
-* **Left Click (Trigger)**: Toggles recording state.
-  * If **Idle** $\rightarrow$ Starts audio recording.
-  * If **Recording** $\rightarrow$ Stops audio recording and initiates background LLM processing.
-  * If **Processing** $\rightarrow$ Shows a DBus desktop notification informing that the system is busy.
-* **Right Click (Context Menu)**: Opens the context menu with the following options:
-  * **Start/Stop Recording** *(Bold)*: Toggles dictation recording.
-  * **Configuration**: Opens the PyQt6 Configuration GUI dialog.
-  * **Reload Configuration**: Dynamically reloads settings from `config.yaml` without restarting the daemon.
-  * **Quit**: Safely stops ongoing recordings/threads, closes IPC servers, and exits the application.
+* **Left Click**: Toggles recording.
+  * If **Idle** $\rightarrow$ Starts recording a new note.
+  * If **Recording** $\rightarrow$ Stops recording and starts background processing.
+  * If **Processing** $\rightarrow$ Shows a "System is busy" notification.
+* **Middle Click**: Shows the notes window, or closes it if it is visible.
+* **Right Click (Context Menu)**:
+  * **Start/Stop Recording** *(Bold)*: Toggles recording.
+  * **Open Notes**: Shows the notes window.
+  * **Configuration**: Opens the configuration dialog.
+  * **Reload Configuration**: Reloads `config.yaml` and prompts without restarting the daemon.
+  * **Quit**: Stops any recording, waits briefly for processing, closes the IPC server and exits.
+
+Clicking a desktop notification (e.g. **Note Saved**) opens the notes window. While recording, clicking the floating HUD also stops the recording.
+
+### Notifications
+
+| Notification | When |
+| :--- | :--- |
+| **Note Saved** | A new note was written (shows its title). |
+| **Dictation Added** | An add-dictation was appended to a note. |
+| **Dictation Empty** | The recording was silent or the transcription empty; nothing was saved. |
+| **Processing Error** / **Delete Failed** / **Configuration Error** | Something failed; the message contains the reason. |
+
+---
+
+## Notes Window
+
+The window uses a two-page layout — a day-grouped multi-column timeline grid (configurable via `notes.columns`) and a note reader:
+
+* **Header**: app title and a **Settings** button.
+* **Search box**: press <kbd>Enter</kbd> to search notes by meaning; clear it to return to the timeline.
+* **Filters**: type chips (All, Notes, Tasks, Ideas, Reminders, Questions, Decisions) and a tag selector.
+* **Timeline**: note cards arranged in a multi-column grid grouped by day (Today, Yesterday, "Monday, 19 October"). When no notes exist yet, it displays `"No notes yet. Click the tray icon to record your first one."` Click a card to open it in the reader; click a `#tag` to filter by it.
+
+In the **reader**, title, type, tags and body are editable. The toolbar offers **← Back** (<kbd>Esc</kbd>), **Add dictation** (becomes *Stop dictation* while recording), **Copy** and **Delete**. See [Notes & Search](notes.md) for details.
 
 ---
 
 ## Visual Status Indicators
 
-The tray icon dynamically changes color and symbol to indicate the active state:
+The tray icon changes color and symbol to indicate the active state:
 
 | Status | Icon Appearance | Tooltip Label | Description |
 | :--- | :--- | :--- | :--- |
-| **Idle** | Gray Circle + White Microphone | `Eloquent Notes (Idle)` | The daemon is listening for input commands. No audio input is active. |
-| **Recording** | Red Circle + White Recording Dot | `Eloquent Notes (Recording...)` | Audio input stream is open. Microphone audio is being recorded into memory buffer. Model preloading is dispatched. |
-| **Processing** | Orange Circle + White Hourglass | `Eloquent Notes (Processing...)` | Audio recording is closed. The 3-phase Ollama AI pipeline is executing (transcription, rewriting, classification). |
+| **Idle** | Gray Circle + White Microphone | `Eloquent Notes (Idle)` | Waiting for input. No audio input is active. |
+| **Recording** | Red Circle + White Recording Dot | `Eloquent Notes (Recording...)` | Microphone audio is recorded into memory; the model is preloaded in the background. |
+| **Processing** | Orange Circle + White Hourglass | `Eloquent Notes (Processing...)` | The Ollama pipeline is writing the note (transcription, rewriting, classification). |
+
+The same icons appear on the **Add dictation** button in the notes window.
 
 ---
 
 ## Audible Feedback Beeps
 
-To allow seamless hands-free dictation without looking at your desktop tray icon, Eloquent Notes provides audible tone feedback when recording starts and stops.
+Eloquent Notes plays a short tone when recording starts and stops, so you know the state without looking at the screen.
 
 ### Technical Implementation
 
@@ -103,3 +129,7 @@ bindsym $mod+Mod1+r exec eloquent-notes toggle
 ```
 
 Reload your window manager configuration (`$mod+Shift+r` for i3 or `swaymsg reload`). Pressing the shortcut will instantly start or stop dictation.
+
+### Opening the Notes Window
+
+Bind `eloquent-notes open` the same way to show the notes window from anywhere. Both commands start the daemon first if it is not running.

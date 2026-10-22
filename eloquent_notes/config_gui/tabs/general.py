@@ -2,7 +2,7 @@
 
 import os
 
-from PyQt6.QtCore import QUrl
+from PyQt6.QtCore import Qt, QUrl
 from PyQt6.QtGui import QDesktopServices
 from PyQt6.QtWidgets import (
     QCheckBox,
@@ -22,14 +22,14 @@ from eloquent_notes.autostart import (
     is_autostart_enabled,
     remove_autostart,
 )
-from eloquent_notes.logging_utils import get_log_file_path
+from eloquent_notes.logging_utils import _LOG_LEVELS, get_log_file_path
 
 
 class GeneralTab(QWidget):
     """General settings and logs tab."""
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self):
+        super().__init__()
         self._init_ui()
 
     def _init_ui(self):
@@ -51,7 +51,7 @@ class GeneralTab(QWidget):
         form_layout.setSpacing(10)
 
         self.cmb_log_level = QComboBox()
-        self.cmb_log_level.addItems(["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
+        self.cmb_log_level.addItems(list(_LOG_LEVELS))
         self.cmb_log_level.setToolTip("Verbosity level for app logging.")
         form_layout.addRow(QLabel("Logging Level:"), self.cmb_log_level)
 
@@ -73,7 +73,7 @@ class GeneralTab(QWidget):
             "Open the background daemon log file in your system editor."
         )
         self.btn_view_logs.clicked.connect(self._view_log_file)
-        layout.addWidget(self.btn_view_logs)
+        layout.addWidget(self.btn_view_logs, alignment=Qt.AlignmentFlag.AlignLeft)
 
         layout.addStretch()
 
@@ -104,16 +104,9 @@ class GeneralTab(QWidget):
             "backup_count": self.spn_log_backups.value(),
         })
 
-        try:
-            if self.chk_autostart.isChecked():
-                install_autostart()
-            else:
-                remove_autostart()
-        except OSError as e:
-            QMessageBox.critical(
-                self, "Error", f"Failed to update autostart setting: {e}"
-            )
-            return False
+        if self.chk_autostart.isChecked():
+            install_autostart()
         else:
-            return True
+            remove_autostart()
+        return True
 

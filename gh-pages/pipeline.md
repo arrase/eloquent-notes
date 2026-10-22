@@ -2,7 +2,7 @@
 
 Eloquent Notes utilizes a modular three-phase LLM processing pipeline powered by local models via the Ollama REST API (default model: `gemma4:e4b-it-qat`).
 
-Rather than attempting to force a single small LLM call to simultaneously transcribe multimodal audio, clean up prose, generate titles, analyze Obsidian vault context, and classify metadata, Eloquent Notes breaks down note processing into three specialized sequential phases.
+Rather than forcing a single small LLM call to transcribe audio, clean up prose, write a title and classify the note at once, Eloquent Notes splits processing into three specialized sequential phases. The output is one structured Markdown note (see [Notes & Search](notes.md)).
 
 ---
 
@@ -31,13 +31,18 @@ Rather than attempting to force a single small LLM call to simultaneously transc
                                        │
                                        ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ Phase 3: Note Classification & Context Analysis                             │
-│ - Inputs: Phase 2 Rewritten Content + Vault Topic Context + Prompts         │
-│ - Tasks: Classifies note type, extracts wikilinks, generates tags in        │
-│          the configured output_language.                                    │
-│ - Output JSON: {"type": string, "wikilinks": list, "tags": list}            │
-└─────────────────────────────────────────────────────────────────────────────┘
+│ Phase 3: Note Classification                                                │
+│ - Inputs: Phase 2 Rewritten Content + System & User Prompts                 │
+│ - Tasks: Classifies note type and generates tags in the configured          │
+│          output_language.                                                   │
+│ - Output JSON: {"type": string, "tags": list}                               │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │
+                                       ▼
+                   notes.create_note → "YYYY-MM-DD HHMMSS Title.md"
 ```
+
+When the dictation was started with **Add dictation** on an existing note, the pipeline stops after Phase 2 (see [Add Dictation](#add-dictation-phases-1-2-only)).
 
 ---
 
@@ -57,11 +62,11 @@ Phase 1 takes the raw WAV audio bytes captured during dictation, base64 encodes 
   "properties": {
     "transcription": {
       "type": "string",
-      "description": "Clean transcription of spoken words, or empty string if audio is empty."
+      "description": "Clean transcription of the spoken words in their original spoken language (never translate), or empty string if audio is empty."
     },
     "empty": {
       "type": "boolean",
-      "description": "True if audio contains only silence, background noise, or no spoken words."
+      "description": "True if audio contains only silence, background noise, or no spoken words; False otherwise."
     }
   },
   "required": ["transcription", "empty"]
@@ -75,11 +80,11 @@ Under constrained decoding Ollama emits properties in the order the schema decla
 
 The model cannot be trusted to recognise silence. Asked to label an empty recording it frequently answers `"empty": false` and invents text — in testing, a clip of pure digital silence came back as `empty: false` with a fluent Spanish sentence about time, which the pipeline would then have saved as a note.
 
-Eloquent Notes therefore decides emptiness locally, in `audio.is_silent()`, by comparing the recording's RMS amplitude against a speech threshold of -45 dBFS. The threshold sits far above a microphone's noise floor while leaving ample headroom for quiet dictation. If the recording carries no speech-level energy, `_process_audio()` emits the `empty` signal without contacting the model at all, so an accidental trigger in a quiet room costs nothing and cannot produce a fabricated note. The model's own `empty` flag is retained in the schema and honoured, but treated as advisory.
+Eloquent Notes therefore decides emptiness locally via `AudioRecorder.is_silent` (`audio.is_silent()`), which slices the recording into 20 ms frames and evaluates them in the frequency domain via `audio.speech_frame_mask()`. To qualify as speech, frames must concentrate at least 50% of their AC energy in the `85–3500 Hz` human voice band, exhibit harmonic/formant structure (`flatness <= 0.25`), and exceed both `-38 dBFS` RMS and 2x the recording's adaptive broadband noise floor (+6 dB SNR) for at least 200 ms of sustained speech. If the recording lacks sustained speech, `_process_audio()` emits the `empty` signal without contacting the model at all, so an accidental trigger, ambient fan noise or mouse click cannot produce a fabricated note. The model's own `empty` flag is retained in the schema and honoured, but treated as advisory.
 
 ### Silence Trimming
 
-`AudioRecorder.wav_bytes` additionally trims leading and trailing blocks below the same threshold before encoding, keeping interior pauses intact. This shortens the audio the model must encode, which makes it less likely to fill the gaps with invented speech and reduces the token cost. A recording of 4 s of silence, 1.8 s of dictation and 4 s of silence is sent as 1.8 s.
+`AudioRecorder.wav_bytes` additionally trims leading and trailing non-speech frames (including isolated start/stop click transients) before encoding, keeping interior pauses intact. This shortens the audio the model must encode, which makes it less likely to fill the gaps with invented speech and reduces the token cost. A recording of 4 s of silence, 1.8 s of dictation and 4 s of silence is sent as 1.8 s.
 
 ### Early Exit Safeguard
 If Phase 1 returns `"empty": true` or a blank transcription string, processing terminates immediately. The application fires an `"empty"` signal, displays a desktop notification ("Dictation Empty"), resets the tray icon to gray, and saves no file to disk.
@@ -88,10 +93,10 @@ If Phase 1 returns `"empty": true` or a blank transcription string, processing t
 
 ## 2. Phase 2: Note Rewriting
 
-Phase 2 converts the raw transcribed text from Phase 1 into structured, direct, first-person prose suitable for personal knowledge management.
+Phase 2 converts the raw transcribed text from Phase 1 into clean, direct, first-person prose and a title.
 
 ### Goals
-- Rephrase awkward oral phrasing into polished written Markdown prose.
+- Rephrase awkward oral phrasing into polished written prose (bullet and numbered lists allowed; no headers, bold or other decoration).
 - Preserve the user's authentic first-person voice and core meaning without adding unsolicited commentary or external assumptions.
 - Synthesize a concise title (maximum 8 words) summarizing the note's subject matter.
 
@@ -115,20 +120,19 @@ Phase 2 converts the raw transcribed text from Phase 1 into structured, direct, 
 
 ---
 
-## 3. Phase 3: Classification & Wikilink Extraction
+## 3. Phase 3: Classification
 
-Phase 3 analyzes the rewritten note content from Phase 2 alongside existing vault topics to extract metadata and categorize the note.
+Phase 3 (`llm.classify_note()`) reads only the rewritten content from Phase 2 and returns the note's type and tags. It has no knowledge of other notes.
 
 ### Goals
-- **Vault Topic Matching:** Scans your Obsidian vault for existing note names to construct a context list. If a phrase matches an existing note topic, it is flagged as a candidate `[[Wikilink]]`.
-- **Type Classification:** Categorizes the entry into one of six core note types:
-  - `task` → Action items, to-dos, or actionable chores.
-  - `idea` → Insights, creative concepts, or brain dumps.
-  - `reminder` → Time-sensitive alerts or items to keep in mind.
-  - `question` → Unresolved inquiries or topics requiring research.
-  - `decision` → Architectural decisions or agreed outcomes.
-  - `note` → Standard informational observations or general prose.
-- **Tag Generation:** Generates 2 to 5 relevant lowercase tags in the configured `output_language` for vault categorization (e.g., `["python", "architecture", "pyqt6"]`).
+- **Type Classification:** one of six fixed English keys:
+  - `task` → Action items, things to do.
+  - `idea` → Proposals, creative thoughts, suggestions.
+  - `note` → Information, observations, explanations.
+  - `reminder` → Things to remember, deadlines.
+  - `question` → Things to investigate or research.
+  - `decision` → Choices made, conclusions reached.
+- **Tag Generation:** 2 to 5 lowercase, single-word or hyphenated tags in the configured `output_language` (e.g., `["redis", "caching", "performance"]`).
 
 ### JSON Format Schema
 ```json
@@ -140,20 +144,39 @@ Phase 3 analyzes the rewritten note content from Phase 2 alongside existing vaul
       "enum": ["task", "idea", "note", "reminder", "question", "decision"],
       "description": "Classification of the note content."
     },
-    "wikilinks": {
-      "type": "array",
-      "items": { "type": "string" },
-      "description": "Key concepts, tools, or proper nouns in the requested output language that deserve linked notes."
-    },
     "tags": {
       "type": "array",
       "items": { "type": "string" },
       "description": "2 to 5 relevant tags, lowercase, in the requested output language."
     }
   },
-  "required": ["type", "wikilinks", "tags"]
+  "required": ["type", "tags"]
 }
 ```
+
+---
+
+## Saving the Note
+
+After Phase 3, `notes.create_note()` writes the note into `notes.folder`:
+
+- **Title** and **body** come from Phase 2, **type** from Phase 3.
+- **Tags** are normalized with `notes.normalize_tags()`: lowercased, leading `#` stripped, blanks and duplicates removed.
+- `created` is the current local time with UTC offset; the file is named `YYYY-MM-DD HHMMSS Title.md` and written atomically.
+
+The worker then emits `processing_completed("success", title)`; the main thread shows a **Note Saved** notification and refreshes the notes window.
+
+---
+
+## Add Dictation (Phases 1-2 Only)
+
+**Add dictation** in the reader starts a recording targeted at the open note. Processing runs Phase 1 and Phase 2 only (passing `ai.keep_alive` directly to Phase 2 since Phase 3 is skipped), then emits `processing_completed("appended", content)`. On the main thread the controller saves any pending reader edits, appends the rewritten content to the note body as a new paragraph (`notes.append_to_note()`), and shows a **Dictation Added** notification. The Phase 2 title is discarded; the note keeps its title, type and tags.
+
+---
+
+## Language Control
+
+Every text phase receives a `{language_instruction}` built from `ai.output_language`, asking the model to write the title, content and tags in that language and to translate if necessary. Phase 1 always transcribes in the spoken language. The `type` values stay fixed English keys regardless of language.
 
 ---
 
@@ -178,6 +201,10 @@ To completely eliminate this delay when recording finishes, Eloquent Notes start
    )
    ```
 3. By the time you click to stop recording, Ollama already has the Gemma 4 model fully loaded in VRAM, allowing Phase 1 execution to begin instantly without cold-start delay.
+
+### Keep-Alive Handover
+
+For a new note, Phases 1 and 2 run with `preload_keep_alive` so the model stays loaded between phases, and Phase 3 (`classify_note()`) runs with `keep_alive` (default `"0"`), so the model is unloaded right after the note is written. On **Add Dictation** (`append=True`), Phase 2 passes `ai.keep_alive` directly since Phase 3 is skipped. When processing ends before Phase 2/3 completes (silence, empty transcription or an error) and the two values differ, a final preload request re-applies `keep_alive` so the model is not left resident for `preload_keep_alive`.
 
 ---
 

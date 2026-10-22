@@ -1,7 +1,7 @@
 """Configuration management for Eloquent Notes.
 
-Handles loading and merging of default and user configuration files,
-prompt templates, and note templates from ~/.config/eloquent-notes/.
+Handles loading and merging of default and user configuration files
+and prompt files from ~/.config/eloquent-notes/.
 """
 
 import copy
@@ -16,11 +16,21 @@ def get_config_home():
     return os.environ.get("XDG_CONFIG_HOME") or os.path.expanduser("~/.config")
 
 
+def get_cache_home():
+    """Return the XDG base directory for user cache files."""
+    return os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache")
+
+
+def get_data_home():
+    """Return the XDG base directory for user data files."""
+    return os.environ.get("XDG_DATA_HOME") or os.path.expanduser("~/.local/share")
+
+
 CONFIG_DIR = os.path.join(get_config_home(), "eloquent-notes")
 CONFIG_PATH = os.path.join(CONFIG_DIR, "config.yaml")
+CACHE_DIR = os.path.join(get_cache_home(), "eloquent-notes")
 
 PROMPTS_DIR = os.path.join(CONFIG_DIR, "prompts")
-TEMPLATES_DIR = os.path.join(CONFIG_DIR, "templates")
 
 PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_CONFIG_SRC = os.path.join(PACKAGE_DIR, "config.yaml")
@@ -41,14 +51,6 @@ DEFAULT_REWRITING_USER_SRC = os.path.join(PACKAGE_DIR, "prompts", "rewriting_use
 DEFAULT_CLASSIFICATION_SYSTEM_SRC = os.path.join(PACKAGE_DIR, "prompts", "classification_system.md")
 DEFAULT_CLASSIFICATION_USER_SRC = os.path.join(PACKAGE_DIR, "prompts", "classification_user.md")
 
-STANDALONE_TEMPLATE_PATH = os.path.join(TEMPLATES_DIR, "standalone.md")
-DAILY_NEW_TEMPLATE_PATH = os.path.join(TEMPLATES_DIR, "daily_new.md")
-DAILY_APPEND_TEMPLATE_PATH = os.path.join(TEMPLATES_DIR, "daily_append.md")
-
-DEFAULT_STANDALONE_TEMPLATE_SRC = os.path.join(PACKAGE_DIR, "templates", "standalone.md")
-DEFAULT_DAILY_NEW_TEMPLATE_SRC = os.path.join(PACKAGE_DIR, "templates", "daily_new.md")
-DEFAULT_DAILY_APPEND_TEMPLATE_SRC = os.path.join(PACKAGE_DIR, "templates", "daily_append.md")
-
 _FILES_TO_COPY = (
     (DEFAULT_CONFIG_SRC, CONFIG_PATH),
     (DEFAULT_RETRY_PROMPT_SRC, RETRY_PROMPT_PATH),
@@ -58,38 +60,53 @@ _FILES_TO_COPY = (
     (DEFAULT_REWRITING_USER_SRC, REWRITING_USER_PROMPT_PATH),
     (DEFAULT_CLASSIFICATION_SYSTEM_SRC, CLASSIFICATION_SYSTEM_PROMPT_PATH),
     (DEFAULT_CLASSIFICATION_USER_SRC, CLASSIFICATION_USER_PROMPT_PATH),
-    (DEFAULT_STANDALONE_TEMPLATE_SRC, STANDALONE_TEMPLATE_PATH),
-    (DEFAULT_DAILY_NEW_TEMPLATE_SRC, DAILY_NEW_TEMPLATE_PATH),
-    (DEFAULT_DAILY_APPEND_TEMPLATE_SRC, DAILY_APPEND_TEMPLATE_PATH),
 )
 
-PROMPT_AND_TEMPLATE_PATHS = tuple(dst for _, dst in _FILES_TO_COPY[1:])
+PROMPT_PATHS = tuple(dst for _, dst in _FILES_TO_COPY[1:])
 
 
 def init_config_dir():
     """Create config directories and copy default files if they don't exist."""
     os.makedirs(CONFIG_DIR, exist_ok=True)
     os.makedirs(PROMPTS_DIR, exist_ok=True)
-    os.makedirs(TEMPLATES_DIR, exist_ok=True)
 
     for src, dst in _FILES_TO_COPY:
         if not os.path.exists(dst):
             shutil.copy(src, dst)
 
 
-def _merge_configs(base, overrides):
+def _merge_configs(base: dict, overrides: dict) -> dict:
     """Recursively merge overrides into base config dict."""
     result = copy.deepcopy(base)
-    for key, value in overrides.items():
-        if isinstance(result.get(key), dict):
-            if not isinstance(value, dict):
+    for k, v in overrides.items():
+        default_val = result.get(k)
+        if isinstance(default_val, dict):
+            if not isinstance(v, dict):
                 raise TypeError(
-                    f"Configuration section '{key}' must be a mapping, got {type(value).__name__}"
+                    f"Configuration section '{k}' must be a mapping, got {type(v).__name__}"
                 )
-            result[key] = _merge_configs(result[key], value)
+            result[k] = _merge_configs(default_val, v)
         else:
-            result[key] = copy.deepcopy(value)
+            if default_val is not None and not (k == "context_length" and v is None):
+                expected = (int, float) if type(default_val) is float else (type(default_val),)
+                if type(v) not in expected:
+                    raise TypeError(f"Invalid configuration value for '{k}'")
+            result[k] = copy.deepcopy(v)
     return result
+
+
+def diff_configs(default: dict, current: dict) -> dict:
+    """Recursively diff current config against defaults, returning only overrides."""
+    overrides = {}
+    for k, default_val in default.items():
+        v = current[k]
+        if isinstance(default_val, dict) and isinstance(v, dict):
+            diff = diff_configs(default_val, v)
+            if diff:
+                overrides[k] = diff
+        elif isinstance(v, bool) != isinstance(default_val, bool) or v != default_val:
+            overrides[k] = v
+    return overrides
 
 
 def load_default_config():

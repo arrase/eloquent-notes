@@ -3,13 +3,13 @@
 from .ai import AITab
 from .audio import AudioTab
 from .general import GeneralTab
-from .obsidian import ObsidianTab
+from .notes import NotesTab
 from .text_files import TextFilesTab
 
 __all__ = [
     "AITab",
     "AudioTab",
     "GeneralTab",
-    "ObsidianTab",
+    "NotesTab",
     "TextFilesTab",
 ]
