@@ -7,15 +7,13 @@ import pytest
 import requests
 from PyQt6.QtWidgets import QSystemTrayIcon
 
-from eloquent_notes import config
+from eloquent_notes import config, notes
 from eloquent_notes.app import EloquentApp
 from eloquent_notes.app import main as app_main
 
 
 @pytest.fixture
 def mock_config(tmp_path):
-    vault_dir = tmp_path / "vault"
-    vault_dir.mkdir()
     return {
         "ai": {
             "ollama_url": "http://localhost:11434",
@@ -37,12 +35,13 @@ def mock_config(tmp_path):
             "beep_duration": 0.1,
             "recording_hud_enabled": True,
         },
-        "obsidian": {
-            "vault_path": str(vault_dir),
-            "folder": "Notes",
-            "folder_organization": "none",
-            "daily_notes": False,
-            "vault_context": False,
+        "notes": {
+            "folder": str(tmp_path / "notes"),
+        },
+        "search": {
+            "embedding_model": "embed",
+            "keep_alive": "5m",
+            "min_similarity": 0.3,
         },
         "logging": {
             "level": "INFO",
@@ -94,9 +93,9 @@ def test_toggle_from_idle_starts_recording(qapp, mock_config):
     assert eloquent_app._tick_timer.isActive()
     assert eloquent_app._capture_duration == 30.0
 
-    # Prompts/templates are snapshotted at recording start
+    # Prompts are snapshotted at recording start
     loaded = eloquent_app._snapshot["_loaded_files"]
-    assert set(loaded) == set(config.PROMPT_AND_TEMPLATE_PATHS)
+    assert set(loaded) == set(config.PROMPT_PATHS)
 
     # A single background thread (model preload) is spawned with the snapshot
     mock_thread_cls.assert_called_once()
@@ -231,7 +230,7 @@ def test_toggle_from_recording_stops_and_processes(qapp):
     recorder.stop.assert_called_once()
     assert eloquent_app._processing_thread is mock_thread_cls.return_value
     assert mock_thread_cls.call_args.kwargs["target"] == eloquent_app._process_audio
-    assert mock_thread_cls.call_args.kwargs["args"] == (recorder, snapshot)
+    assert mock_thread_cls.call_args.kwargs["args"] == (recorder, snapshot, False)
 
 
 def test_stop_recording_failure_resets_to_idle(qapp):
@@ -287,7 +286,7 @@ def test_ipc_connection_handling(qapp):
     eloquent_app = EloquentApp(qapp)
     eloquent_app.toggle_action = MagicMock()
     eloquent_app.reload_config = MagicMock()
-    eloquent_app._notify = MagicMock()
+    eloquent_app.show_window = MagicMock()
 
     mock_server = MagicMock()
     eloquent_app.server = mock_server
@@ -301,7 +300,7 @@ def test_ipc_connection_handling(qapp):
     sockets = [
         make_socket("toggle"),
         make_socket("reload"),
-        make_socket("notify_running"),
+        make_socket("open"),
     ]
     mock_server.hasPendingConnections.side_effect = [True, True, True, False]
     mock_server.nextPendingConnection.side_effect = [*sockets, None]
@@ -310,10 +309,7 @@ def test_ipc_connection_handling(qapp):
 
     eloquent_app.toggle_action.assert_called_once()
     eloquent_app.reload_config.assert_called_once()
-    eloquent_app._notify.assert_called_once_with(
-        "Eloquent Notes",
-        "Eloquent Notes is already running in the background.",
-    )
+    eloquent_app.show_window.assert_called_once()
     for socket in sockets:
         socket.disconnectFromServer.assert_called_once()
 
@@ -334,24 +330,6 @@ def test_update_icon_and_notify(qapp):
     )
 
 
-def test_build_vault_context_disabled():
-    obs_cfg = {"vault_context": False, "vault_path": "/tmp"}
-    assert EloquentApp._build_vault_context(obs_cfg) == ""
-
-
-def test_build_vault_context_enabled():
-    obs_cfg = {"vault_context": True, "vault_path": "/tmp/vault"}
-
-    with patch(
-        "eloquent_notes.app.obsidian.scan_vault_topics",
-        return_value=["TopicA", "TopicB"],
-    ):
-        ctx = EloquentApp._build_vault_context(obs_cfg)
-
-    assert "TopicA, TopicB" in ctx
-    assert "Known topics in the vault" in ctx
-
-
 def test_process_audio_empty_wav(qapp):
     eloquent_app = make_app(qapp)
     eloquent_app.processing_completed = MagicMock()
@@ -362,7 +340,7 @@ def test_process_audio_empty_wav(qapp):
     snapshot = _pipeline_snapshot()
 
     with patch("eloquent_notes.app.llm.preload_model") as mock_preload:
-        eloquent_app._process_audio(recorder, snapshot)
+        eloquent_app._process_audio(recorder, snapshot, False)
 
     eloquent_app.processing_completed.emit.assert_called_once_with("empty", "")
     mock_preload.assert_called_once_with(
@@ -387,25 +365,18 @@ def _pipeline_snapshot():
             "keep_alive": "0",
             "output_language": "English",
         },
-        "obsidian": {
-            "vault_path": "/tmp/vault",
-            "folder": "Notes",
-            "folder_organization": "none",
-            "daily_notes": False,
-            "vault_context": False,
+        "notes": {
+            "folder": "/tmp/notes",
         },
         "_loaded_files": {
             config.RETRY_PROMPT_PATH: "retry prompt",
-            config.STANDALONE_TEMPLATE_PATH: "template",
-            config.DAILY_NEW_TEMPLATE_PATH: "daily new",
-            config.DAILY_APPEND_TEMPLATE_PATH: "daily append",
             config.REWRITING_SYSTEM_PROMPT_PATH: "sys rewrite",
             config.REWRITING_USER_PROMPT_PATH: (
                 "{transcription}\n{language_instruction}"
             ),
             config.CLASSIFICATION_SYSTEM_PROMPT_PATH: "sys class",
             config.CLASSIFICATION_USER_PROMPT_PATH: (
-                "{transcription}\n{vault_context}\n{language_instruction}"
+                "{transcription}\n{language_instruction}"
             ),
             config.TRANSCRIPTION_SYSTEM_PROMPT_PATH: "sys trans",
             config.TRANSCRIPTION_USER_PROMPT_PATH: "usr trans",
@@ -429,7 +400,7 @@ def test_process_audio_empty_transcription(qapp):
         "eloquent_notes.app.llm.transcribe_audio",
         return_value={"empty": False, "transcription": "   "},
     ) as mock_transcribe, patch("eloquent_notes.app.llm.preload_model") as mock_preload:
-        eloquent_app._process_audio(recorder, snapshot)
+        eloquent_app._process_audio(recorder, snapshot, False)
 
     preload_thread.join.assert_called_once_with(timeout=10)
     eloquent_app.processing_completed.emit.assert_called_once_with("empty", "")
@@ -449,7 +420,7 @@ def test_process_audio_empty_transcription(qapp):
         "eloquent_notes.app.llm.transcribe_audio",
         return_value={"empty": True, "transcription": ""},
     ), patch("eloquent_notes.app.llm.preload_model"):
-        eloquent_app._process_audio(recorder, snapshot)
+        eloquent_app._process_audio(recorder, snapshot, False)
     eloquent_app.processing_completed.emit.assert_called_once_with("empty", "")
 
 
@@ -467,7 +438,7 @@ def test_process_audio_local_silence_never_reaches_model(qapp):
     with patch("eloquent_notes.app.llm.transcribe_audio") as mock_transcribe, patch(
         "eloquent_notes.app.llm.preload_model"
     ) as mock_preload:
-        eloquent_app._process_audio(recorder, snapshot)
+        eloquent_app._process_audio(recorder, snapshot, False)
 
     wav_prop.assert_not_called()
     eloquent_app.processing_completed.emit.assert_called_once_with("empty", "")
@@ -489,8 +460,7 @@ def test_process_audio_full_pipeline_success(qapp, tmp_path):
     recorder.wav_bytes = b"RIFF" + b"\x00" * 100
     recorder.is_silent = False
     snapshot = _pipeline_snapshot()
-    snapshot["obsidian"]["vault_path"] = str(tmp_path / "vault")
-    saved_path = str(tmp_path / "vault" / "Dictation-1.md")
+    snapshot["notes"]["folder"] = str(tmp_path / "notes")
 
     with patch(
         "eloquent_notes.app.llm.transcribe_audio",
@@ -500,13 +470,11 @@ def test_process_audio_full_pipeline_success(qapp, tmp_path):
         return_value={"title": "Note Title", "content": "Clean note"},
     ), patch(
         "eloquent_notes.app.llm.classify_transcription",
-        return_value={"type": "idea", "wikilinks": ["Link"], "tags": ["tag1"]},
-    ) as mock_classify, patch(
-        "eloquent_notes.app.obsidian.save_note", return_value=saved_path,
-    ) as mock_save, patch("eloquent_notes.app.llm.preload_model") as mock_preload:
-        eloquent_app._process_audio(recorder, snapshot)
+        return_value={"type": "idea", "tags": ["#Tag1", "tag1", "two"]},
+    ) as mock_classify, patch("eloquent_notes.app.llm.preload_model") as mock_preload:
+        eloquent_app._process_audio(recorder, snapshot, False)
 
-    eloquent_app.processing_completed.emit.assert_called_once_with("success", saved_path)
+    eloquent_app.processing_completed.emit.assert_called_once_with("success", "Note Title")
 
     # Audio bytes are forwarded to phase 1
     assert mock_transcribe.call_args.kwargs["audio_bytes"] == recorder.wav_bytes
@@ -518,11 +486,35 @@ def test_process_audio_full_pipeline_success(qapp, tmp_path):
     # Since Phase 3 completed, preload_model is not called in finally
     mock_preload.assert_not_called()
 
-    # Rewritten content is formatted (idea -> tip callout) before saving
-    saved_text = mock_save.call_args.kwargs["text"]
-    assert "Clean note" in saved_text
-    assert "[!tip]" in saved_text
-    assert mock_save.call_args.kwargs["title"] == "Note Title"
+    # The note is written to the notes folder with normalized tags
+    [saved] = notes.load_notes(tmp_path / "notes")
+    assert (saved.title, saved.type, saved.tags, saved.body) == ("Note Title", "idea", ["tag1", "two"], "Clean note")
+
+
+def test_process_audio_append_stops_after_rewriting(qapp):
+    eloquent_app = make_app(qapp)
+    eloquent_app.processing_completed = MagicMock()
+
+    recorder = MagicMock()
+    recorder.is_silent = False
+    snapshot = _pipeline_snapshot()
+
+    with patch(
+        "eloquent_notes.app.llm.transcribe_audio",
+        return_value={"empty": False, "transcription": "more"},
+    ), patch(
+        "eloquent_notes.app.llm.rewrite_transcription",
+        return_value={"title": "Ignored", "content": "More text"},
+    ), patch("eloquent_notes.app.llm.classify_transcription") as mock_classify, patch(
+        "eloquent_notes.app.notes.create_note",
+    ) as mock_create, patch("eloquent_notes.app.llm.preload_model") as mock_preload:
+        eloquent_app._process_audio(recorder, snapshot, True)
+
+    eloquent_app.processing_completed.emit.assert_called_once_with("appended", "More text")
+    mock_classify.assert_not_called()
+    mock_create.assert_not_called()
+    # Phase 3 never ran, so the model keep_alive is reset afterwards
+    mock_preload.assert_called_once()
 
 
 def test_process_audio_exception_emits_error(qapp):
@@ -541,7 +533,7 @@ def test_process_audio_exception_emits_error(qapp):
         "eloquent_notes.app.llm.preload_model",
         side_effect=requests.RequestException("Unload failed"),
     ) as mock_preload:
-        eloquent_app._process_audio(recorder, snapshot)
+        eloquent_app._process_audio(recorder, snapshot, False)
 
     eloquent_app.processing_completed.emit.assert_called_once_with(
         "error", "Ollama failed",
@@ -553,10 +545,9 @@ def test_user_prompts_preserve_literal_braces(qapp):
     eloquent_app = make_app(qapp)
     snapshot = _pipeline_snapshot()
     ai_cfg = snapshot["ai"]
-    obs_cfg = snapshot["obsidian"]
     loaded = snapshot["_loaded_files"]
     loaded[config.REWRITING_USER_PROMPT_PATH] = "JSON example: {{\"a\": 1}} {unknown_key} {transcription} {language_instruction}"
-    loaded[config.CLASSIFICATION_USER_PROMPT_PATH] = "Rule {custom_brace}: {transcription} {vault_context} {language_instruction}"
+    loaded[config.CLASSIFICATION_USER_PROMPT_PATH] = "Rule {custom_brace}: {transcription} {language_instruction}"
 
     lang_inst = EloquentApp._language_instruction("Spanish")
     assert "translating from the transcription language if necessary" in lang_inst
@@ -568,7 +559,7 @@ def test_user_prompts_preserve_literal_braces(qapp):
         assert "Hola" in prompt
 
     with patch("eloquent_notes.app.llm.classify_transcription") as mock_classify:
-        eloquent_app._classify(ai_cfg, obs_cfg, loaded, "Rewritten text", lang_inst)
+        eloquent_app._classify(ai_cfg, loaded, "Rewritten text", lang_inst)
         prompt = mock_classify.call_args.kwargs["user_prompt"]
         assert "{custom_brace}" in prompt
         assert "Rewritten text" in prompt
@@ -579,12 +570,10 @@ def test_on_processing_completed_branches(qapp):
 
     # Success branch
     eloquent_app.state = "PROCESSING"
-    eloquent_app._on_processing_completed("success", "/path/to/Note.md")
+    eloquent_app._on_processing_completed("success", "Note Title")
     assert eloquent_app.state == "IDLE"
     assert eloquent_app._recorder is None
-    eloquent_app._notify.assert_called_with(
-        "Dictation Saved", "Saved dictation to Obsidian (Note.md)",
-    )
+    eloquent_app._notify.assert_called_with("Note Saved", "Note Title")
 
     # Empty branch
     eloquent_app.state = "PROCESSING"
@@ -750,7 +739,7 @@ def test_app_main_entry_point(monkeypatch):
     monkeypatch.setattr("eloquent_notes.app.QApplication", lambda args: mock_qapp)
     monkeypatch.setattr(
         "eloquent_notes.app.EloquentApp",
-        lambda app, start_recording_immediately, **kwargs: mock_eloquent_app,
+        lambda app, start_recording_immediately, open_window_immediately, **kwargs: mock_eloquent_app,
     )
     monkeypatch.setattr("eloquent_notes.app.setup_logging", MagicMock())
     monkeypatch.setattr(sys, "argv", ["eloquent-notes", "toggle"])
@@ -759,3 +748,193 @@ def test_app_main_entry_point(monkeypatch):
 
     mock_qapp.setQuitOnLastWindowClosed.assert_called_once_with(False)
     mock_eloquent_app.run.assert_called_once()
+
+
+# --- Notes window integration -------------------------------------------------
+
+
+def _write_note(folder, title="Groceries", body="Buy milk."):
+    return notes.create_note(folder, title, "task", ["shopping"], body)
+
+
+def test_show_window_creates_window_once_and_loads_notes(qapp, mock_config, tmp_path):
+    _write_note(tmp_path / "notes")
+    eloquent_app = make_app(qapp)
+
+    eloquent_app.show_window()
+    window = eloquent_app.window
+    eloquent_app.show_window()
+
+    assert eloquent_app.window is window
+    assert [note.title for note in window.timeline._notes] == ["Groceries"]
+    window.close()
+
+
+def test_window_record_button_toggles_recording(qapp):
+    eloquent_app = make_app(qapp)
+    eloquent_app.toggle_action = MagicMock()
+    eloquent_app.show_window()
+
+    eloquent_app.window.timeline.record_button.click()
+
+    eloquent_app.toggle_action.assert_called_once()
+    eloquent_app.window.close()
+
+
+def test_note_edited_is_saved_and_listed(qapp, tmp_path):
+    note = _write_note(tmp_path / "notes")
+    eloquent_app = make_app(qapp)
+    eloquent_app.show_window()
+
+    note.title = "Groceries for Sunday"
+    eloquent_app.window.note_edited.emit(note)
+
+    [saved] = notes.load_notes(tmp_path / "notes")
+    assert saved.title == "Groceries for Sunday"
+    assert eloquent_app.window.timeline._notes[0].title == "Groceries for Sunday"
+    eloquent_app.window.close()
+
+
+def test_delete_requested_moves_note_to_trash(qapp, tmp_path):
+    note = _write_note(tmp_path / "notes")
+    eloquent_app = make_app(qapp)
+    eloquent_app.show_window()
+
+    with patch("eloquent_notes.app.QFile.moveToTrash", return_value=True) as mock_trash:
+        eloquent_app.window.delete_requested.emit(note)
+
+    mock_trash.assert_called_once_with(str(note.path))
+    eloquent_app._notify.assert_not_called()
+    eloquent_app.window.close()
+
+
+def test_delete_failure_notifies(qapp, tmp_path):
+    note = _write_note(tmp_path / "notes")
+    eloquent_app = make_app(qapp)
+
+    with patch("eloquent_notes.app.QFile.moveToTrash", return_value=False):
+        eloquent_app._on_delete_requested(note)
+
+    assert eloquent_app._notify.call_args.args[0] == "Delete Failed"
+
+
+def test_dictate_into_records_with_append_target(qapp, tmp_path):
+    note = _write_note(tmp_path / "notes")
+    eloquent_app = make_app(qapp)
+    eloquent_app._start_recording = MagicMock()
+
+    eloquent_app.dictate_into(note)
+
+    assert eloquent_app._append_target is note
+    eloquent_app._start_recording.assert_called_once()
+
+    eloquent_app.state = "RECORDING"
+    eloquent_app._stop_and_process = MagicMock()
+    eloquent_app.dictate_into(note)
+    eloquent_app._stop_and_process.assert_called_once()
+
+
+def test_toggle_action_clears_append_target(qapp, tmp_path):
+    eloquent_app = make_app(qapp)
+    eloquent_app._append_target = _write_note(tmp_path / "notes")
+    eloquent_app._start_recording = MagicMock()
+
+    eloquent_app.toggle_action()
+
+    assert eloquent_app._append_target is None
+
+
+def test_appended_dictation_keeps_reader_edits(qapp, tmp_path):
+    note = _write_note(tmp_path / "notes")
+    eloquent_app = make_app(qapp)
+    eloquent_app.show_window()
+    window = eloquent_app.window
+    window.show_note(note)
+    window.reader.title_edit.setText("Edited while recording")
+    eloquent_app._append_target = note
+    eloquent_app.state = "PROCESSING"
+
+    eloquent_app._on_processing_completed("appended", "Also eggs.")
+
+    [saved] = notes.load_notes(tmp_path / "notes")
+    assert saved.title == "Edited while recording"
+    assert saved.body == "Buy milk.\n\nAlso eggs."
+    assert window.reader.body_edit.toPlainText() == "Buy milk.\n\nAlso eggs."
+    assert eloquent_app._append_target is None
+    eloquent_app._notify.assert_called_with("Dictation Added", "Edited while recording")
+    window.close()
+
+
+def test_appended_dictation_without_window(qapp, tmp_path):
+    note = _write_note(tmp_path / "notes")
+    eloquent_app = make_app(qapp)
+    eloquent_app._append_target = note
+
+    eloquent_app._on_processing_completed("appended", "Also eggs.")
+
+    assert notes.load_notes(tmp_path / "notes")[0].body == "Buy milk.\n\nAlso eggs."
+
+
+def test_search_runs_in_background_and_reports_results(qapp, tmp_path):
+    note = _write_note(tmp_path / "notes")
+    eloquent_app = make_app(qapp)
+    eloquent_app.show_window()
+    eloquent_app._index = MagicMock()
+    eloquent_app._index.search.return_value = [note]
+    eloquent_app.window.show_search_results = MagicMock()
+
+    with patch("eloquent_notes.app.threading.Thread") as mock_thread_cls:
+        eloquent_app._start_search("milk")
+    query, note_list, cfg = mock_thread_cls.call_args.kwargs["args"]
+    eloquent_app._run_search(query, note_list, cfg)
+
+    assert [n.title for n in eloquent_app._index.search.call_args.args[0]] == ["Groceries"]
+    eloquent_app.window.show_search_results.assert_called_once_with("milk", [note])
+    eloquent_app.window.close()
+
+
+def test_search_failure_reaches_window(qapp):
+    eloquent_app = make_app(qapp)
+    eloquent_app.show_window()
+    eloquent_app._index = MagicMock()
+    eloquent_app._index.search.side_effect = requests.ConnectionError("Ollama down")
+    eloquent_app.window.show_search_error = MagicMock()
+
+    eloquent_app._run_search("milk", [], {})
+
+    eloquent_app.window.show_search_error.assert_called_once_with("milk", "Ollama down")
+    eloquent_app.window.close()
+
+
+def test_tray_middle_click_toggles_window(qapp):
+    eloquent_app = make_app(qapp)
+
+    eloquent_app._on_tray_activated(QSystemTrayIcon.ActivationReason.MiddleClick)
+    assert eloquent_app.window.isVisible()
+
+    eloquent_app._on_tray_activated(QSystemTrayIcon.ActivationReason.MiddleClick)
+    assert not eloquent_app.window.isVisible()
+
+
+def test_update_icon_syncs_window_state(qapp):
+    eloquent_app = EloquentApp(qapp)
+    eloquent_app.show_window()
+    eloquent_app.state = "PROCESSING"
+
+    eloquent_app._update_icon("orange", "Processing")
+
+    assert not eloquent_app.window.timeline.record_button.isEnabled()
+    eloquent_app.window.close()
+
+
+def test_run_schedules_window_when_requested(qapp):
+    with patch("eloquent_notes.app.QTimer.singleShot") as mock_single_shot:
+        eloquent_app = EloquentApp(qapp, open_window_immediately=True)
+        eloquent_app.app = MagicMock()
+        eloquent_app.app.exec.return_value = 0
+        with patch("eloquent_notes.app.QSystemTrayIcon"), patch.object(
+            eloquent_app, "_init_ipc_server",
+        ), patch.object(eloquent_app, "_init_tray_ui"), pytest.raises(SystemExit):
+            eloquent_app.run()
+
+        mock_single_shot.assert_called_once_with(100, eloquent_app.show_window)

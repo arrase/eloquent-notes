@@ -45,12 +45,13 @@ def _make_valid_config(overrides=None):
             "max_mb": 5,
             "backup_count": 3,
         },
-        "obsidian": {
-            "vault_path": "/tmp/vault",
-            "folder": "Dictations",
-            "folder_organization": "none",
-            "daily_notes": True,
-            "vault_context": True,
+        "notes": {
+            "folder": "/tmp/notes",
+        },
+        "search": {
+            "embedding_model": "embeddinggemma-2:latest",
+            "keep_alive": "5m",
+            "min_similarity": 0.3,
         },
     }
     if overrides:
@@ -68,16 +69,16 @@ def test_dialog_init(qapp):
     with patch("eloquent_notes.config.load_config", return_value=dummy_config):
         dialog = ConfigurationDialog()
 
-    assert dialog.tab_widget.count() == 6
-    titles = [dialog.tab_widget.tabText(i) for i in range(6)]
+    assert dialog.tab_widget.count() == 5
+    titles = [dialog.tab_widget.tabText(i) for i in range(5)]
     assert titles == [
         "General",
-        "Obsidian",
+        "Notes",
         "AI Settings",
         "Audio",
         "Prompts",
-        "Templates",
     ]
+    assert dialog.styleSheet() == ""
     dialog.cleanup_tabs()
 
 
@@ -120,13 +121,8 @@ def test_dialog_load_settings(qapp):
             "beep_duration": 0.2,
         },
         "logging": {"level": "DEBUG", "max_mb": 20, "backup_count": 2},
-        "obsidian": {
-            "vault_path": "/home/user/vault",
-            "folder": "MyNotes",
-            "folder_organization": "month",
-            "daily_notes": False,
-            "vault_context": False,
-        },
+        "notes": {"folder": "/home/user/notes"},
+        "search": {"embedding_model": "my-embed", "min_similarity": 0.5},
     })
 
     with patch("eloquent_notes.config.load_config", return_value=dummy_config):
@@ -137,9 +133,9 @@ def test_dialog_load_settings(qapp):
     assert dialog.ai_tab.cmb_language.currentText() == "Spanish"
     assert dialog.audio_tab.spn_sample_rate.value() == 44100
     assert dialog.general_tab.cmb_log_level.currentText() == "DEBUG"
-    assert dialog.obsidian_tab.txt_vault_path.text() == "/home/user/vault"
-    assert dialog.obsidian_tab.txt_obs_folder.text() == "MyNotes"
-    assert dialog.obsidian_tab.cmb_folder_organization.currentData() == "month"
+    assert dialog.notes_tab.txt_folder.text() == "/home/user/notes"
+    assert dialog.ai_tab.cmb_embedding_model.currentText() == "my-embed"
+    assert dialog.ai_tab.spn_min_similarity.value() == 0.5
 
     dialog.cleanup_tabs()
 
@@ -156,7 +152,7 @@ def test_dialog_restore_defaults(qapp):
     # User accepts prompt
     default_data = _make_valid_config({
         "ai": {"ollama_url": "http://default:11434", "model": "def-model"},
-        "obsidian": {"vault_path": "/default/vault"},
+        "notes": {"folder": "/default/notes"},
     })
 
     with patch(
@@ -169,6 +165,7 @@ def test_dialog_restore_defaults(qapp):
         dialog.restore_defaults()
 
     assert dialog.ai_tab.txt_ollama_url.text() == "http://default:11434"
+    assert dialog.notes_tab.txt_folder.text() == "/default/notes"
     dialog.cleanup_tabs()
 
 

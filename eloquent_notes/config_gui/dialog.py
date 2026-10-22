@@ -11,13 +11,12 @@ from PyQt6.QtWidgets import (
 )
 
 from eloquent_notes import config
-from eloquent_notes.config_gui.constants import PROMPTS, TEMPLATES
-from eloquent_notes.config_gui.styles import QSS_STYLESHEET
+from eloquent_notes.config_gui.constants import PROMPTS
 from eloquent_notes.config_gui.tabs import (
     AITab,
     AudioTab,
     GeneralTab,
-    ObsidianTab,
+    NotesTab,
     TextFilesTab,
 )
 from eloquent_notes.config_gui.utils import diff_configs
@@ -47,9 +46,7 @@ class ConfigurationDialog(QDialog):
         self.load_settings_to_ui()
 
     def _init_ui(self):
-        """Build the GUI widgets and apply the styling QSS."""
-        self.setStyleSheet(QSS_STYLESHEET)
-
+        """Build the GUI widgets."""
         layout = QVBoxLayout(self)
         layout.setContentsMargins(15, 15, 15, 15)
         layout.setSpacing(15)
@@ -57,23 +54,19 @@ class ConfigurationDialog(QDialog):
         self.tab_widget = QTabWidget()
 
         self.general_tab = GeneralTab()
-        self.obsidian_tab = ObsidianTab()
+        self.notes_tab = NotesTab()
         self.ai_tab = AITab()
         self.audio_tab = AudioTab()
         self.prompts_tab = TextFilesTab(
             PROMPTS, "Prompt Content:", "Select a prompt to edit..."
         )
-        self.templates_tab = TextFilesTab(
-            TEMPLATES, "Template Content:", "Select a template to edit..."
-        )
 
         self._tabs = [
             (self.general_tab, "General"),
-            (self.obsidian_tab, "Obsidian"),
+            (self.notes_tab, "Notes"),
             (self.ai_tab, "AI Settings"),
             (self.audio_tab, "Audio"),
             (self.prompts_tab, "Prompts"),
-            (self.templates_tab, "Templates"),
         ]
 
         for tab_widget, title in self._tabs:
@@ -110,7 +103,7 @@ class ConfigurationDialog(QDialog):
             self,
             RESTORE_DEFAULTS_TITLE,
             "Are you sure you want to restore all configuration settings,"
-            " prompts, and templates to their default values?\n\nThis will"
+            " and prompts to their default values?\n\nThis will"
             " overwrite current edits.",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
         )
@@ -123,14 +116,13 @@ class ConfigurationDialog(QDialog):
 
             for tab_widget in (
                 self.general_tab,
-                self.obsidian_tab,
+                self.notes_tab,
                 self.ai_tab,
                 self.audio_tab,
             ):
                 tab_widget.load_settings(default_data)
 
-            for tab_widget in (self.prompts_tab, self.templates_tab):
-                tab_widget.restore_defaults()
+            self.prompts_tab.restore_defaults()
 
             QMessageBox.information(
                 self,
@@ -145,12 +137,11 @@ class ConfigurationDialog(QDialog):
     def save_settings_from_ui(self):
         """Gather settings from widgets and persist them to files on disk."""
         save_order = (
-            self.obsidian_tab,
+            self.notes_tab,
             self.ai_tab,
             self.audio_tab,
             self.general_tab,
             self.prompts_tab,
-            self.templates_tab,
         )
         try:
             for tab_widget in save_order:

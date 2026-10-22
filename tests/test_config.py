@@ -11,7 +11,6 @@ def tmp_config_dir(tmp_path):
     """Fixture providing a temporary directory for config files."""
     config_dir = tmp_path / "config"
     prompts_dir = config_dir / "prompts"
-    templates_dir = config_dir / "templates"
     config_path = config_dir / "config.yaml"
 
     default_config_src = tmp_path / "default_config.yaml"
@@ -30,7 +29,6 @@ def tmp_config_dir(tmp_path):
     return {
         "config_dir": str(config_dir),
         "prompts_dir": str(prompts_dir),
-        "templates_dir": str(templates_dir),
         "config_path": str(config_path),
         "default_config_src": str(default_config_src),
         "files_to_copy": files_to_copy,
@@ -41,14 +39,12 @@ def test_init_config_dir(tmp_config_dir, monkeypatch):
     """Test init_config_dir creates directories and copies default files."""
     monkeypatch.setattr(config, "CONFIG_DIR", tmp_config_dir["config_dir"])
     monkeypatch.setattr(config, "PROMPTS_DIR", tmp_config_dir["prompts_dir"])
-    monkeypatch.setattr(config, "TEMPLATES_DIR", tmp_config_dir["templates_dir"])
     monkeypatch.setattr(config, "_FILES_TO_COPY", tmp_config_dir["files_to_copy"])
 
     config.init_config_dir()
 
     assert os.path.isdir(tmp_config_dir["config_dir"])
     assert os.path.isdir(tmp_config_dir["prompts_dir"])
-    assert os.path.isdir(tmp_config_dir["templates_dir"])
     assert os.path.isfile(tmp_config_dir["config_path"])
 
     with open(tmp_config_dir["config_path"], "r", encoding="utf-8") as f:
@@ -99,7 +95,6 @@ def test_load_config(tmp_config_dir, monkeypatch):
 
     monkeypatch.setattr(config, "CONFIG_DIR", tmp_config_dir["config_dir"])
     monkeypatch.setattr(config, "PROMPTS_DIR", tmp_config_dir["prompts_dir"])
-    monkeypatch.setattr(config, "TEMPLATES_DIR", tmp_config_dir["templates_dir"])
     monkeypatch.setattr(config, "CONFIG_PATH", user_cfg_path)
     monkeypatch.setattr(config, "DEFAULT_CONFIG_SRC", tmp_config_dir["default_config_src"])
     monkeypatch.setattr(config, "_FILES_TO_COPY", [])
@@ -119,7 +114,6 @@ def test_load_config_non_dict_user_config(tmp_config_dir, monkeypatch):
 
     monkeypatch.setattr(config, "CONFIG_DIR", tmp_config_dir["config_dir"])
     monkeypatch.setattr(config, "PROMPTS_DIR", tmp_config_dir["prompts_dir"])
-    monkeypatch.setattr(config, "TEMPLATES_DIR", tmp_config_dir["templates_dir"])
     monkeypatch.setattr(config, "CONFIG_PATH", user_cfg_path)
     monkeypatch.setattr(config, "DEFAULT_CONFIG_SRC", tmp_config_dir["default_config_src"])
     monkeypatch.setattr(config, "_FILES_TO_COPY", [])
@@ -184,12 +178,23 @@ def test_default_config_audio_capture_duration():
     assert default_config["audio"]["recording_hud_enabled"] is True
 
 
-def test_default_config_obsidian_folder_organization():
-    """Verify that the packaged default config.yaml specifies folder_organization as 'none'."""
+def test_default_config_notes_and_search():
+    """Verify the packaged defaults for the notes folder and semantic search."""
     with open(config.DEFAULT_CONFIG_SRC, "r", encoding="utf-8") as f:
         default_config = yaml.safe_load(f)
-    assert "obsidian" in default_config
-    assert default_config["obsidian"]["folder_organization"] == "none"
+    assert "obsidian" not in default_config
+    assert default_config["notes"]["folder"] == "~/Documents/Eloquent Notes"
+    assert default_config["search"]["embedding_model"] == "embeddinggemma-2:latest"
+    assert default_config["search"]["min_similarity"] == 0.6
+
+
+def test_prompt_paths_cover_every_copied_prompt():
+    assert config.PROMPT_PATHS == tuple(dst for _, dst in config._FILES_TO_COPY[1:])
+    assert all(path.startswith(config.PROMPTS_DIR) for path in config.PROMPT_PATHS)
+
+
+def test_cache_dir_follows_xdg_cache_home():
+    assert config.CACHE_DIR == os.path.join(os.environ["XDG_CACHE_HOME"], "eloquent-notes")
 
 
 

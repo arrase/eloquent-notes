@@ -304,30 +304,30 @@ def test_parse_json_response_validates_field_types_and_enum():
     # Enum violation
     with pytest.raises(ValueError, match="field 'type' has invalid value 'invalid_type'"):
         llm._parse_json_response(
-            '{"type": "invalid_type", "wikilinks": [], "tags": []}',
+            '{"type": "invalid_type", "tags": []}',
             llm.CLASSIFICATION_SCHEMA,
         )
 
     # Array type mismatch (not a list)
-    with pytest.raises(TypeError, match="field 'wikilinks' must be a list of strings"):
+    with pytest.raises(TypeError, match="field 'tags' must be a list of strings"):
         llm._parse_json_response(
-            '{"type": "note", "wikilinks": "not-a-list", "tags": []}',
+            '{"type": "note", "tags": "not-a-list"}',
             llm.CLASSIFICATION_SCHEMA,
         )
 
     # Array item type mismatch (list contains non-string)
     with pytest.raises(TypeError, match="field 'tags' must be a list of strings"):
         llm._parse_json_response(
-            '{"type": "note", "wikilinks": ["A"], "tags": ["ok", 42]}',
+            '{"type": "note", "tags": ["ok", 42]}',
             llm.CLASSIFICATION_SCHEMA,
         )
 
     # Valid classification payload
     parsed = llm._parse_json_response(
-        '{"type": "task", "wikilinks": ["Redis"], "tags": ["cache"]}',
+        '{"type": "task", "tags": ["cache"]}',
         llm.CLASSIFICATION_SCHEMA,
     )
-    assert parsed == {"type": "task", "wikilinks": ["Redis"], "tags": ["cache"]}
+    assert parsed == {"type": "task", "tags": ["cache"]}
 
 
 def test_execute_ollama_json_request_rejects_json_array():
@@ -449,7 +449,6 @@ def test_rewrite_transcription(mock_exec):
 def test_classify_transcription(mock_exec):
     mock_exec.return_value = {
         "type": "idea",
-        "wikilinks": ["Link1"],
         "tags": ["tag1"],
     }
 
@@ -467,7 +466,6 @@ def test_classify_transcription(mock_exec):
 
     assert res == {
         "type": "idea",
-        "wikilinks": ["Link1"],
         "tags": ["tag1"],
     }
     mock_exec.assert_called_once()
@@ -476,3 +474,29 @@ def test_classify_transcription(mock_exec):
     assert kwargs["messages"][0] == {"role": "system", "content": "sys classify"}
     assert kwargs["messages"][1] == {"role": "user", "content": "usr classify"}
     assert kwargs["format_schema"] is llm.CLASSIFICATION_SCHEMA
+
+
+def test_classification_schema_has_no_wikilinks():
+    assert llm.CLASSIFICATION_SCHEMA["required"] == ["type", "tags"]
+    assert "wikilinks" not in llm.CLASSIFICATION_SCHEMA["properties"]
+
+
+@patch("eloquent_notes.llm.requests.post")
+def test_embed(mock_post):
+    mock_post.return_value.json.return_value = {"embeddings": [[0.1, 0.2], [0.3, 0.4]]}
+
+    vectors = llm.embed(
+        ollama_url="http://localhost:11434/",
+        model="embeddinggemma-2:latest",
+        texts=["a", "b"],
+        keep_alive="5m",
+        timeout=30,
+    )
+
+    assert vectors == [[0.1, 0.2], [0.3, 0.4]]
+    mock_post.assert_called_once_with(
+        "http://localhost:11434/api/embed",
+        json={"model": "embeddinggemma-2:latest", "input": ["a", "b"], "keep_alive": "5m"},
+        timeout=30,
+    )
+    mock_post.return_value.raise_for_status.assert_called_once()

@@ -1,14 +1,12 @@
-"""Unit tests for configuration GUI tabs (AITab, AudioTab, GeneralTab, ObsidianTab, TextFilesTab)."""
+"""Unit tests for configuration GUI tabs (AITab, AudioTab, GeneralTab, NotesTab, TextFilesTab)."""
 
 import os
 from unittest.mock import MagicMock, patch
 
-from PyQt6.QtWidgets import QMessageBox
-
 from eloquent_notes.config_gui.tabs.ai import AITab
 from eloquent_notes.config_gui.tabs.audio import AudioTab
 from eloquent_notes.config_gui.tabs.general import GeneralTab
-from eloquent_notes.config_gui.tabs.obsidian import ObsidianTab
+from eloquent_notes.config_gui.tabs.notes import NotesTab
 from eloquent_notes.config_gui.tabs.text_files import TextFilesTab
 
 # --- AI TAB TESTS ---
@@ -28,7 +26,8 @@ def test_ai_tab_load_and_save_valid(qapp):
             "max_retries": 4,
             "preload_timeout": 50,
             "request_timeout": 100,
-        }
+        },
+        "search": {"embedding_model": "embeddinggemma-2:latest", "keep_alive": "5m", "min_similarity": 0.3},
     }
 
     with patch.object(AITab, "_fetch_models"):
@@ -42,11 +41,17 @@ def test_ai_tab_load_and_save_valid(qapp):
     assert tab.spn_preload_timeout.value() == 50
     assert tab.spn_request_timeout.value() == 100
 
+    assert tab.cmb_embedding_model.currentText() == "embeddinggemma-2:latest"
+    assert tab.spn_min_similarity.value() == 0.3
+
+    tab.cmb_embedding_model.setCurrentText("other-embed")
+    tab.spn_min_similarity.setValue(0.45)
     res = tab.save_settings(config_data)
     assert res is True
     assert config_data["ai"]["ollama_url"] == "http://localhost:11434"
     assert config_data["ai"]["keep_alive"] == "10m"
     assert config_data["ai"]["output_language"] == "French"
+    assert config_data["search"] == {"embedding_model": "other-embed", "keep_alive": "5m", "min_similarity": 0.45}
 
     tab.cleanup()
 
@@ -66,7 +71,8 @@ def test_ai_tab_context_default_toggle(qapp):
             "max_retries": 3,
             "preload_timeout": 60,
             "request_timeout": 120,
-        }
+        },
+        "search": {"embedding_model": "embeddinggemma-2:latest", "keep_alive": "5m", "min_similarity": 0.3},
     }
 
     with patch.object(AITab, "_fetch_models"):
@@ -99,7 +105,8 @@ def test_ai_tab_save_validation_failures(qapp):
             "max_retries": 3,
             "preload_timeout": 60,
             "request_timeout": 120,
-        }
+        },
+        "search": {"embedding_model": "embeddinggemma-2:latest", "keep_alive": "5m", "min_similarity": 0.3},
     }
     with patch.object(AITab, "_fetch_models"):
         tab.load_settings(config_data)
@@ -120,8 +127,14 @@ def test_ai_tab_save_validation_failures(qapp):
     with patch("PyQt6.QtWidgets.QMessageBox.warning"):
         assert tab.save_settings(config_data) is False
 
-    # Empty output language
+    # Empty embedding model
     tab.cmb_model.setCurrentText("gemma")
+    tab.cmb_embedding_model.setCurrentText("   ")
+    with patch("PyQt6.QtWidgets.QMessageBox.warning"):
+        assert tab.save_settings(config_data) is False
+
+    # Empty output language
+    tab.cmb_embedding_model.setCurrentText("embeddinggemma-2:latest")
     tab.cmb_language.setCurrentText("   ")
     with patch("PyQt6.QtWidgets.QMessageBox.warning"):
         assert tab.save_settings(config_data) is False
@@ -151,9 +164,16 @@ def test_ai_tab_model_loader_callbacks(qapp):
     tab._running_loaders.add(mock_loader)
 
     with patch.object(tab, "sender", return_value=mock_loader):
-        tab._on_models_fetched(["model_a", "model_b"])
+        tab._on_models_fetched(["model_a", "model_b"], ["embed_a"])
         assert tab.cmb_model.count() == 2
-        assert tab.lbl_model_status.text() == "Audio models loaded successfully."
+        assert tab.cmb_embedding_model.count() == 1
+        assert tab.lbl_model_status.text() == "Models loaded successfully."
+
+        # Unknown current selections are kept alongside the fetched models
+        tab.cmb_model.setCurrentText("custom-model")
+        tab._on_models_fetched([], ["embed_a"])
+        assert tab.lbl_model_status.text() == "No audio-capable models found."
+        assert tab.cmb_model.currentText() == "custom-model"
 
         tab._on_models_fetch_failed("Server error 500")
         assert "Connection failed: Server error 500" in tab.lbl_model_status.text()
@@ -270,67 +290,45 @@ def test_general_tab_lowercase_log_level(qapp):
     assert tab.cmb_log_level.currentText() == "DEBUG"
 
 
-# --- OBSIDIAN TAB TESTS ---
+# --- NOTES TAB TESTS ---
 
-def test_obsidian_tab_load_and_save(qapp, tmp_path):
-    tab = ObsidianTab()
-    vault_dir = str(tmp_path / "MyVault")
-    os.makedirs(vault_dir, exist_ok=True)
-
-    config_data = {
-        "obsidian": {
-            "vault_path": vault_dir,
-            "folder": "Daily",
-            "folder_organization": "week",
-            "daily_notes": True,
-            "vault_context": True,
-        }
-    }
+def test_notes_tab_load_and_save(qapp):
+    tab = NotesTab()
+    config_data = {"notes": {"folder": "~/Notes"}}
 
     tab.load_settings(config_data)
-    assert tab.txt_vault_path.text() == vault_dir
-    assert tab.txt_obs_folder.text() == "Daily"
-    assert tab.cmb_folder_organization.currentData() == "week"
-    assert tab.chk_daily_notes.isChecked()
-    assert tab.chk_vault_context.isChecked()
+    assert tab.txt_folder.text() == "~/Notes"
 
-    month_week_idx = tab.cmb_folder_organization.findData("month_week")
-    tab.cmb_folder_organization.setCurrentIndex(month_week_idx)
-
-    res = tab.save_settings(config_data)
-    assert res is True
-    assert config_data["obsidian"]["folder"] == "Daily"
-    assert config_data["obsidian"]["folder_organization"] == "month_week"
+    tab.txt_folder.setText("  ~/Voice Notes  ")
+    assert tab.save_settings(config_data) is True
+    assert config_data["notes"]["folder"] == "~/Voice Notes"
 
 
-def test_obsidian_tab_empty_and_nonexistent_vault(qapp):
-    tab = ObsidianTab()
-    config_data = {
-        "obsidian": {
-            "vault_path": "",
-            "folder": "Notes",
-            "folder_organization": "none",
-            "daily_notes": False,
-            "vault_context": False,
-        }
-    }
+def test_notes_tab_rejects_empty_folder(qapp):
+    tab = NotesTab()
+    config_data = {"notes": {"folder": "~/Notes"}}
+    tab.txt_folder.setText("  ")
 
-    tab.txt_vault_path.setText("")
-    with patch("PyQt6.QtWidgets.QMessageBox.warning"):
+    with patch("PyQt6.QtWidgets.QMessageBox.warning") as mock_warn:
         assert tab.save_settings(config_data) is False
-
-    tab.txt_vault_path.setText("/nonexistent/vault/path")
-    with patch("PyQt6.QtWidgets.QMessageBox.question", return_value=QMessageBox.StandardButton.No):
-        assert tab.save_settings(config_data) is False
+    mock_warn.assert_called_once()
+    assert config_data["notes"]["folder"] == "~/Notes"
 
 
-def test_obsidian_tab_browse_vault(qapp, tmp_path):
-    tab = ObsidianTab()
-    tab.txt_vault_path.setText(str(tmp_path))
+def test_notes_tab_browse_folder(qapp, tmp_path):
+    tab = NotesTab()
+    tab.txt_folder.setText(str(tmp_path))
 
-    with patch("PyQt6.QtWidgets.QFileDialog.getExistingDirectory", return_value="/selected/vault"):
-        tab._browse_vault_path()
-        assert tab.txt_vault_path.text() == "/selected/vault"
+    with patch("PyQt6.QtWidgets.QFileDialog.getExistingDirectory", return_value="/selected/notes") as mock_dialog:
+        tab._browse_folder()
+    assert tab.txt_folder.text() == "/selected/notes"
+    assert mock_dialog.call_args.args[2] == str(tmp_path)
+
+    tab.txt_folder.setText("/nonexistent/folder")
+    with patch("PyQt6.QtWidgets.QFileDialog.getExistingDirectory", return_value="") as mock_dialog:
+        tab._browse_folder()
+    assert tab.txt_folder.text() == "/nonexistent/folder"
+    assert mock_dialog.call_args.args[2] == os.path.expanduser("~/")
 
 
 # --- TEXT FILES TAB TESTS ---

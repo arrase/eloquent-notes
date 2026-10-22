@@ -35,21 +35,3 @@ PROMPTS = [
     ),
     ("Retry Prompt", config.RETRY_PROMPT_PATH, config.DEFAULT_RETRY_PROMPT_SRC),
 ]
-
-TEMPLATES = [
-    (
-        "Standalone Note Template",
-        config.STANDALONE_TEMPLATE_PATH,
-        config.DEFAULT_STANDALONE_TEMPLATE_SRC,
-    ),
-    (
-        "Daily Note - New",
-        config.DAILY_NEW_TEMPLATE_PATH,
-        config.DEFAULT_DAILY_NEW_TEMPLATE_SRC,
-    ),
-    (
-        "Daily Note - Append",
-        config.DAILY_APPEND_TEMPLATE_PATH,
-        config.DEFAULT_DAILY_APPEND_TEMPLATE_SRC,
-    ),
-]

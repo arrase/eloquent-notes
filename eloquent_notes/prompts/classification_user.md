@@ -1,4 +1,4 @@
-{vault_context}Classify this transcription and extract metadata:
+Classify this note and extract metadata:
 
 <<<
 {transcription}

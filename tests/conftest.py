@@ -1,9 +1,13 @@
 import os
 import sys
+import tempfile
 from unittest.mock import MagicMock
 
 import pytest
 from PyQt6.QtWidgets import QApplication
+
+# Keep the embedding cache of the user's real session out of reach.
+os.environ["XDG_CACHE_HOME"] = tempfile.mkdtemp(prefix="eloquent-notes-cache-")
 
 if "sounddevice" not in sys.modules:
     sd_mock = MagicMock()

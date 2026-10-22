@@ -5,17 +5,21 @@ from PyQt6.QtCore import QThread, pyqtSignal
 
 
 class OllamaModelLoader(QThread):
-    """Background thread to query Ollama model names asynchronously."""
+    """Background thread to query Ollama model names asynchronously.
 
-    models_fetched = pyqtSignal(list)
+    Emits the audio-capable models (for dictation) and the embedding models
+    (for semantic search) found on the server.
+    """
+
+    models_fetched = pyqtSignal(list, list)
     error_occurred = pyqtSignal(str)
 
     def __init__(self, url: str, parent=None):
         super().__init__(parent)
         self.url = url.rstrip("/")
 
-    def _supports_audio(self, name: str) -> bool:
-        """Check whether the given model supports audio capabilities."""
+    def _capabilities(self, name: str) -> list:
+        """Return the capabilities Ollama reports for the given model."""
         try:
             show_r = requests.post(
                 f"{self.url}/api/show",
@@ -23,15 +27,16 @@ class OllamaModelLoader(QThread):
                 timeout=2.0,
             )
             if self.isInterruptionRequested():
-                return False
+                return []
             if show_r.status_code == 200:
                 show_data = show_r.json()
                 if isinstance(show_data, dict):
                     caps = show_data.get("capabilities", [])
-                    return isinstance(caps, list) and "audio" in caps
+                    if isinstance(caps, list):
+                        return caps
         except (requests.RequestException, ValueError):
             pass
-        return False
+        return []
 
     def run(self) -> None:
         """Fetch model names from Ollama API."""
@@ -56,14 +61,18 @@ class OllamaModelLoader(QThread):
             ]
 
             audio_models = []
+            embedding_models = []
             for name in all_models:
                 if self.isInterruptionRequested():
                     return
-                if self._supports_audio(name):
+                caps = self._capabilities(name)
+                if "audio" in caps:
                     audio_models.append(name)
+                if "embedding" in caps:
+                    embedding_models.append(name)
 
             if not self.isInterruptionRequested():
-                self.models_fetched.emit(audio_models)
+                self.models_fetched.emit(audio_models, embedding_models)
         except (requests.RequestException, ValueError) as e:
             if not self.isInterruptionRequested():
                 self.error_occurred.emit(str(e))

@@ -18,7 +18,7 @@ from eloquent_notes import config
 
 
 class TextFilesTab(QWidget):
-    """Generic tab for editing a list of text files (prompts or templates)."""
+    """Generic tab for editing a list of text files such as prompts."""
 
     def __init__(self, items, editor_label, placeholder, parent=None):
         super().__init__(parent)

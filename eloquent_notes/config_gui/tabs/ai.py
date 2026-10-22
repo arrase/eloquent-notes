@@ -6,6 +6,7 @@ from PyQt6.QtCore import QCoreApplication
 from PyQt6.QtWidgets import (
     QCheckBox,
     QComboBox,
+    QDoubleSpinBox,
     QFormLayout,
     QGroupBox,
     QHBoxLayout,
@@ -38,7 +39,7 @@ class AITab(QWidget):
         layout.setContentsMargins(15, 15, 15, 15)
         layout.setSpacing(15)
 
-        grp_ai = QGroupBox("Ollama & AI Pipeline Settings")
+        grp_ai = QGroupBox("Ollama && AI Pipeline Settings")
         form_layout = QFormLayout(grp_ai)
         form_layout.setSpacing(10)
 
@@ -66,7 +67,6 @@ class AITab(QWidget):
         model_row.addWidget(self.btn_refresh_models)
 
         self.lbl_model_status = QLabel("Ready")
-        self.lbl_model_status.setStyleSheet("color: #7f849c; font-size: 11px;")
 
         model_layout.addLayout(model_row)
         model_layout.addWidget(self.lbl_model_status)
@@ -83,7 +83,7 @@ class AITab(QWidget):
         self.spn_context_length.setValue(8192)
         self.spn_context_length.setToolTip(
             "Context length in tokens to pass to Ollama. "
-            "Larger values allow more vault context but use more memory."
+            "Larger values allow longer dictations but use more memory."
         )
 
         self.chk_context_default = QCheckBox("Use default context length")
@@ -128,11 +128,30 @@ class AITab(QWidget):
         self.cmb_language.setEditable(True)
         self.cmb_language.addItems(["English", "Spanish", "French", "German", "Italian", "Portuguese"])
         self.cmb_language.setToolTip(
-            "Target language for rewritten notes, titles, wikilinks, and tags (e.g. English, Spanish)."
+            "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
         )
         form_layout.addRow(QLabel("Output Language:"), self.cmb_language)
 
         layout.addWidget(grp_ai)
+
+        grp_search = QGroupBox("Semantic Search")
+        search_layout = QFormLayout(grp_search)
+        search_layout.setSpacing(10)
+
+        self.cmb_embedding_model = QComboBox()
+        self.cmb_embedding_model.setEditable(True)
+        self.cmb_embedding_model.setToolTip(
+            "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+        )
+        search_layout.addRow(QLabel("Embedding Model:"), self.cmb_embedding_model)
+
+        self.spn_min_similarity = QDoubleSpinBox()
+        self.spn_min_similarity.setRange(0.0, 1.0)
+        self.spn_min_similarity.setSingleStep(0.05)
+        self.spn_min_similarity.setToolTip("Search results below this cosine similarity are hidden.")
+        search_layout.addRow(QLabel("Minimum Similarity:"), self.spn_min_similarity)
+
+        layout.addWidget(grp_search)
         layout.addStretch()
 
     def _toggle_context_default(self, checked):
@@ -144,8 +163,7 @@ class AITab(QWidget):
             self.lbl_model_status.setText("Ollama URL is empty.")
             return
 
-        self.lbl_model_status.setText("Fetching audio models...")
-        self.lbl_model_status.setStyleSheet("color: #7f849c; font-size: 11px;")
+        self.lbl_model_status.setText("Fetching models...")
         self.btn_refresh_models.setEnabled(False)
 
         if self._model_loader is not None and self._model_loader.isRunning():
@@ -169,36 +187,32 @@ class AITab(QWidget):
             self._model_loader = None
             self.btn_refresh_models.setEnabled(True)
 
-    def _on_models_fetched(self, models):
+    @staticmethod
+    def _fill_models(combo, models):
+        """Replace combo items with models, keeping the current selection."""
+        current_text = combo.currentText()
+        combo.clear()
+        combo.addItems(models)
+        if current_text and current_text not in models:
+            combo.addItem(current_text)
+        combo.setCurrentText(current_text)
+
+    def _on_models_fetched(self, audio_models, embedding_models):
         if self.sender() is not self._model_loader:
             return
 
-        current_text = self.cmb_model.currentText()
-        self.cmb_model.clear()
+        self._fill_models(self.cmb_model, audio_models)
+        self._fill_models(self.cmb_embedding_model, embedding_models)
 
-        if not models:
+        if not audio_models:
             self.lbl_model_status.setText("No audio-capable models found.")
-            self.lbl_model_status.setStyleSheet("color: #f38ba8; font-size: 11px;")
-            if current_text:
-                self.cmb_model.addItem(current_text)
-                self.cmb_model.setCurrentText(current_text)
-            return
-
-        self.cmb_model.addItems(models)
-        if current_text in models:
-            self.cmb_model.setCurrentText(current_text)
-        elif current_text:
-            self.cmb_model.addItem(current_text)
-            self.cmb_model.setCurrentText(current_text)
-
-        self.lbl_model_status.setText("Audio models loaded successfully.")
-        self.lbl_model_status.setStyleSheet("color: #a6e3a1; font-size: 11px;")
+        else:
+            self.lbl_model_status.setText("Models loaded successfully.")
 
     def _on_models_fetch_failed(self, error_msg):
         if self.sender() is not self._model_loader:
             return
         self.lbl_model_status.setText(f"Connection failed: {error_msg}")
-        self.lbl_model_status.setStyleSheet("color: #f38ba8; font-size: 11px;")
 
     def cleanup(self):
         """Asynchronously cancel active loaders and wait with a timeout."""
@@ -236,6 +250,13 @@ class AITab(QWidget):
         self.spn_preload_timeout.setValue(int(ai_cfg["preload_timeout"]))
         self.spn_request_timeout.setValue(int(ai_cfg["request_timeout"]))
 
+        search_cfg = config_data["search"]
+        curr_embedding = str(search_cfg["embedding_model"])
+        if self.cmb_embedding_model.findText(curr_embedding) == -1:
+            self.cmb_embedding_model.addItem(curr_embedding)
+        self.cmb_embedding_model.setCurrentText(curr_embedding)
+        self.spn_min_similarity.setValue(float(search_cfg["min_similarity"]))
+
         curr_lang = str(ai_cfg["output_language"])
         if self.cmb_language.findText(curr_lang) == -1:
             self.cmb_language.addItem(curr_lang)
@@ -261,6 +282,11 @@ class AITab(QWidget):
         model = self.cmb_model.currentText().strip()
         if not model:
             QMessageBox.warning(self, VALIDATION_ERROR_TITLE, "AI Model cannot be empty.")
+            return False
+
+        embedding_model = self.cmb_embedding_model.currentText().strip()
+        if not embedding_model:
+            QMessageBox.warning(self, VALIDATION_ERROR_TITLE, "Embedding Model cannot be empty.")
             return False
 
         output_lang = self.cmb_language.currentText().strip()
@@ -300,6 +326,10 @@ class AITab(QWidget):
             "max_retries": self.spn_max_retries.value(),
             "preload_timeout": self.spn_preload_timeout.value(),
             "request_timeout": self.spn_request_timeout.value(),
+        })
+        config_data["search"].update({
+            "embedding_model": embedding_model,
+            "min_similarity": round(self.spn_min_similarity.value(), 2),
         })
         return True
 

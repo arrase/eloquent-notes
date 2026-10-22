@@ -1,7 +1,7 @@
 """Configuration management for Eloquent Notes.
 
-Handles loading and merging of default and user configuration files,
-prompt templates, and note templates from ~/.config/eloquent-notes/.
+Handles loading and merging of default and user configuration files
+and prompt files from ~/.config/eloquent-notes/.
 """
 
 import copy
@@ -16,11 +16,16 @@ def get_config_home():
     return os.environ.get("XDG_CONFIG_HOME") or os.path.expanduser("~/.config")
 
 
+def get_cache_home():
+    """Return the XDG base directory for user cache files."""
+    return os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache")
+
+
 CONFIG_DIR = os.path.join(get_config_home(), "eloquent-notes")
 CONFIG_PATH = os.path.join(CONFIG_DIR, "config.yaml")
+CACHE_DIR = os.path.join(get_cache_home(), "eloquent-notes")
 
 PROMPTS_DIR = os.path.join(CONFIG_DIR, "prompts")
-TEMPLATES_DIR = os.path.join(CONFIG_DIR, "templates")
 
 PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_CONFIG_SRC = os.path.join(PACKAGE_DIR, "config.yaml")
@@ -41,14 +46,6 @@ DEFAULT_REWRITING_USER_SRC = os.path.join(PACKAGE_DIR, "prompts", "rewriting_use
 DEFAULT_CLASSIFICATION_SYSTEM_SRC = os.path.join(PACKAGE_DIR, "prompts", "classification_system.md")
 DEFAULT_CLASSIFICATION_USER_SRC = os.path.join(PACKAGE_DIR, "prompts", "classification_user.md")
 
-STANDALONE_TEMPLATE_PATH = os.path.join(TEMPLATES_DIR, "standalone.md")
-DAILY_NEW_TEMPLATE_PATH = os.path.join(TEMPLATES_DIR, "daily_new.md")
-DAILY_APPEND_TEMPLATE_PATH = os.path.join(TEMPLATES_DIR, "daily_append.md")
-
-DEFAULT_STANDALONE_TEMPLATE_SRC = os.path.join(PACKAGE_DIR, "templates", "standalone.md")
-DEFAULT_DAILY_NEW_TEMPLATE_SRC = os.path.join(PACKAGE_DIR, "templates", "daily_new.md")
-DEFAULT_DAILY_APPEND_TEMPLATE_SRC = os.path.join(PACKAGE_DIR, "templates", "daily_append.md")
-
 _FILES_TO_COPY = (
     (DEFAULT_CONFIG_SRC, CONFIG_PATH),
     (DEFAULT_RETRY_PROMPT_SRC, RETRY_PROMPT_PATH),
@@ -58,19 +55,15 @@ _FILES_TO_COPY = (
     (DEFAULT_REWRITING_USER_SRC, REWRITING_USER_PROMPT_PATH),
     (DEFAULT_CLASSIFICATION_SYSTEM_SRC, CLASSIFICATION_SYSTEM_PROMPT_PATH),
     (DEFAULT_CLASSIFICATION_USER_SRC, CLASSIFICATION_USER_PROMPT_PATH),
-    (DEFAULT_STANDALONE_TEMPLATE_SRC, STANDALONE_TEMPLATE_PATH),
-    (DEFAULT_DAILY_NEW_TEMPLATE_SRC, DAILY_NEW_TEMPLATE_PATH),
-    (DEFAULT_DAILY_APPEND_TEMPLATE_SRC, DAILY_APPEND_TEMPLATE_PATH),
 )
 
-PROMPT_AND_TEMPLATE_PATHS = tuple(dst for _, dst in _FILES_TO_COPY[1:])
+PROMPT_PATHS = tuple(dst for _, dst in _FILES_TO_COPY[1:])
 
 
 def init_config_dir():
     """Create config directories and copy default files if they don't exist."""
     os.makedirs(CONFIG_DIR, exist_ok=True)
     os.makedirs(PROMPTS_DIR, exist_ok=True)
-    os.makedirs(TEMPLATES_DIR, exist_ok=True)
 
     for src, dst in _FILES_TO_COPY:
         if not os.path.exists(dst):

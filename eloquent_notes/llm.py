@@ -1,8 +1,9 @@
-"""Ollama API client for the three-phase dictation pipeline.
+"""Ollama API client for the three-phase dictation pipeline and search.
 
 Phase 1 (transcription): multimodal audio -> text.
 Phase 2 (rewriting): transcription -> clean note prose and title.
-Phase 3 (classification): rewritten note -> type, wikilinks and tags.
+Phase 3 (classification): rewritten note -> type and tags.
+Embeddings (/api/embed) power semantic search over saved notes.
 
 Every phase requests structured output through Ollama's ``format`` JSON
 schema. If a response still cannot be parsed or lacks required keys
@@ -89,26 +90,35 @@ CLASSIFICATION_SCHEMA: dict[str, Any] = {
             ],
             "description": "Classification of the note content.",
         },
-        "wikilinks": {
-            "type": "array",
-            "items": {"type": "string"},
-            "description": (
-                "Key concepts, tools, or proper nouns in the requested"
-                " output language that deserve linked notes."
-            ),
-        },
         "tags": {
             "type": "array",
             "items": {"type": "string"},
             "description": "2 to 5 relevant tags, lowercase, in the requested output language.",
         },
     },
-    "required": ["type", "wikilinks", "tags"],
+    "required": ["type", "tags"],
 }
 
 
 def _chat_url(ollama_url: str) -> str:
     return f"{ollama_url.rstrip('/')}/api/chat"
+
+
+def embed(
+    ollama_url: str,
+    model: str,
+    texts: list[str],
+    keep_alive: str,
+    timeout: int,
+) -> list[list[float]]:
+    """Return one embedding vector per input text."""
+    response = requests.post(
+        f"{ollama_url.rstrip('/')}/api/embed",
+        json={"model": model, "input": texts, "keep_alive": keep_alive},
+        timeout=timeout,
+    )
+    response.raise_for_status()
+    return response.json()["embeddings"]
 
 
 def preload_model(
@@ -328,7 +338,7 @@ def classify_transcription(
 ) -> dict[str, Any]:
     """Classify and extract metadata from the transcription (Phase 3).
 
-    Returns a dict with keys: 'type', 'wikilinks', and 'tags'.
+    Returns a dict with keys: 'type' and 'tags'.
     """
     messages: list[dict[str, Any]] = [
         {"role": "system", "content": system_prompt},

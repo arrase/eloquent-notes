@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "eloquent-notes"
 version = "0.3.1"
-description = "A Linux system tray utility for offline dictation into Obsidian using Gemma 4."
+description = "A Linux system tray utility that turns offline voice dictations into organized Markdown notes using Gemma 4."
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [
@@ -43,7 +43,7 @@ where = ["."]
 include = ["eloquent_notes*"]
 
 [tool.setuptools.package-data]
-eloquent_notes = ["config.yaml", "prompts/*.md", "templates/*.md"]
+eloquent_notes = ["config.yaml", "prompts/*.md"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
