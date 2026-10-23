@@ -86,6 +86,7 @@ def run_cli(cli_args=None, launcher=os.execv):
         return
 
     _app = QCoreApplication.instance() or QCoreApplication(sys.argv)
+    _app.setApplicationName("eloquent-notes")
 
     message = "toggle" if wants_toggle else "open"
     if send_ipc_command(message):

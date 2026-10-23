@@ -75,6 +75,14 @@ def init_config_dir():
             shutil.copy(src, dst)
 
 
+def _validate_override(key: str, value, default_val) -> None:
+    if default_val is None or (key == "context_length" and value is None):
+        return
+    expected = (int, float) if type(default_val) is float else (type(default_val),)
+    if type(value) not in expected:
+        raise TypeError(f"Invalid configuration value for '{key}'")
+
+
 def _merge_configs(base: dict, overrides: dict) -> dict:
     """Recursively merge overrides into base config dict."""
     result = copy.deepcopy(base)
@@ -87,10 +95,7 @@ def _merge_configs(base: dict, overrides: dict) -> dict:
                 )
             result[k] = _merge_configs(default_val, v)
         else:
-            if default_val is not None and not (k == "context_length" and v is None):
-                expected = (int, float) if type(default_val) is float else (type(default_val),)
-                if type(v) not in expected:
-                    raise TypeError(f"Invalid configuration value for '{k}'")
+            _validate_override(k, v, default_val)
             result[k] = copy.deepcopy(v)
     return result
 

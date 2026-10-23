@@ -234,7 +234,7 @@ class AITab(QWidget):
 
     def cleanup(self):
         """Asynchronously cancel active loaders and wait with a timeout."""
-        for loader in list(self._running_loaders):
+        for loader in self._running_loaders:
             loader.models_fetched.disconnect(self._on_models_fetched)
             loader.error_occurred.disconnect(self._on_models_fetch_failed)
             loader.finished.disconnect(self._on_loader_finished)

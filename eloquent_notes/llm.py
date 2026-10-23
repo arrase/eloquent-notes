@@ -147,6 +147,24 @@ def preload_model(
     response.raise_for_status()
 
 
+def _validate_property(key: str, val: Any, prop_schema: dict[str, Any]) -> None:
+    prop_type = prop_schema["type"]
+    if prop_type == "string":
+        if not isinstance(val, str):
+            raise TypeError(f"field {key!r} must be a string, got {type(val).__name__}")
+        if "enum" in prop_schema and val not in prop_schema["enum"]:
+            raise ValueError(
+                f"field {key!r} has invalid value {val!r}, "
+                f"expected one of {prop_schema['enum']}"
+            )
+    elif prop_type == "boolean":
+        if not isinstance(val, bool):
+            raise TypeError(f"field {key!r} must be a boolean, got {type(val).__name__}")
+    elif prop_type == "array":
+        if not isinstance(val, list) or not all(isinstance(item, str) for item in val):
+            raise TypeError(f"field {key!r} must be a list of strings")
+
+
 def _parse_json_response(content: str, format_schema: dict[str, Any]) -> dict[str, Any]:
     """Validate an Ollama reply against the requested JSON schema.
 
@@ -161,22 +179,7 @@ def _parse_json_response(content: str, format_schema: dict[str, Any]) -> dict[st
         raise ValueError(f"missing required keys: {missing}")
 
     for key, prop_schema in format_schema["properties"].items():
-        val = result[key]
-        prop_type = prop_schema["type"]
-        if prop_type == "string":
-            if not isinstance(val, str):
-                raise TypeError(f"field {key!r} must be a string, got {type(val).__name__}")
-            if "enum" in prop_schema and val not in prop_schema["enum"]:
-                raise ValueError(
-                    f"field {key!r} has invalid value {val!r}, "
-                    f"expected one of {prop_schema['enum']}"
-                )
-        elif prop_type == "boolean":
-            if not isinstance(val, bool):
-                raise TypeError(f"field {key!r} must be a boolean, got {type(val).__name__}")
-        elif prop_type == "array":
-            if not isinstance(val, list) or not all(isinstance(item, str) for item in val):
-                raise TypeError(f"field {key!r} must be a list of strings")
+        _validate_property(key, result[key], prop_schema)
 
     return result
 

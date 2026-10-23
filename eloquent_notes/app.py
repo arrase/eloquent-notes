@@ -450,6 +450,20 @@ class EloquentApp(QObject):
             timeout=ai_cfg["request_timeout"],
         )
 
+    def _reset_keep_alive(self, ai_cfg):
+        if self._preload_thread is not None and self._preload_thread.is_alive():
+            self._preload_thread.join(timeout=ai_cfg["preload_timeout"])
+        try:
+            llm.preload_model(
+                ollama_url=ai_cfg["ollama_url"],
+                model=ai_cfg["model"],
+                context_length=ai_cfg["context_length"],
+                keep_alive=ai_cfg["keep_alive"],
+                timeout=ai_cfg["preload_timeout"],
+            )
+        except (requests.RequestException, ValueError) as e:
+            logger.warning("Model keep_alive reset skipped: %s", e)
+
     def _process_audio(self, recorder, snapshot, append):
         """Run the pipeline over the recorded audio.
 
@@ -522,18 +536,7 @@ class EloquentApp(QObject):
         finally:
             self.processing_completed.emit(status, detail)
             if not completed_final_phase and ai_cfg["keep_alive"] != ai_cfg["preload_keep_alive"]:
-                if self._preload_thread is not None and self._preload_thread.is_alive():
-                    self._preload_thread.join(timeout=ai_cfg["preload_timeout"])
-                try:
-                    llm.preload_model(
-                        ollama_url=ai_cfg["ollama_url"],
-                        model=ai_cfg["model"],
-                        context_length=ai_cfg["context_length"],
-                        keep_alive=ai_cfg["keep_alive"],
-                        timeout=ai_cfg["preload_timeout"],
-                    )
-                except (requests.RequestException, ValueError) as e:
-                    logger.warning("Model keep_alive reset skipped: %s", e)
+                self._reset_keep_alive(ai_cfg)
 
     # --- Completion, reload and shutdown -----------------------------------
 

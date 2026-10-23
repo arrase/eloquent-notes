@@ -169,7 +169,8 @@ def test_card_shows_type_preview_and_tags(window):
 
     assert "● Idea" in texts[0]
     assert texts[1:3] == ["Offline mode", "Queue recordings locally."]
-    assert "#work" in texts[3] and "#app" in texts[3]
+    assert "#work" in texts[3]
+    assert "#app" in texts[3]
 
 
 def test_card_preview_is_truncated(qapp, tmp_path):
