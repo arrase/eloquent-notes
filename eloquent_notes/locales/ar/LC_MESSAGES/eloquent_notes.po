@@ -37,6 +37,9 @@ msgstr "الكل"
 msgid "All tags"
 msgstr "كل الوسوم"
 
+msgid "Appearance"
+msgstr "المظهر"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "هل أنت متأكد من أنك تريد استعادة جميع إعدادات التكوين والموجهات إلى قيمها الافتراضية؟\n\nسيؤدي هذا إلى الكتابة فوق التعديلات الحالية."
 
@@ -274,6 +277,9 @@ msgstr "ملاحظة"
 msgid "Note Saved"
 msgstr "تم حفظ الملاحظة"
 
+msgid "Note Type Colors"
+msgstr "ألوان أنواع الملاحظات"
+
 msgid "Notes"
 msgstr "الملاحظات"
 
@@ -477,6 +483,9 @@ msgstr "وقت إبقاء نموذج التضمين محملاً بعد البح
 
 msgid "Timeline Columns:"
 msgstr "أعمدة الجدول الزمني:"
+
+msgid "Timeline Layout"
+msgstr "تخطيط الجدول الزمني"
 
 msgid "Title"
 msgstr "العنوان"

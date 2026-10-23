@@ -6,11 +6,14 @@ and prompt files from ~/.config/eloquent-notes/.
 
 import copy
 import os
+import re
 import shutil
 
 import yaml
 
 from eloquent_notes.i18n import _
+
+_HEX_COLOR_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
 
 
 def get_config_home():
@@ -83,6 +86,8 @@ def _validate_override(key: str, value, default_val) -> None:
     expected = (int, float) if type(default_val) is float else (type(default_val),)
     if type(value) not in expected:
         raise TypeError(_("Invalid configuration value for '{key}'").format(key=key))
+    if isinstance(default_val, str) and default_val.startswith("#") and not _HEX_COLOR_RE.match(value):
+        raise ValueError(_("Invalid configuration value for '{key}'").format(key=key))
 
 
 def _merge_configs(base: dict, overrides: dict) -> dict:

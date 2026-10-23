@@ -37,6 +37,9 @@ msgstr "Semua"
 msgid "All tags"
 msgstr "Semua tag"
 
+msgid "Appearance"
+msgstr "Penampilan"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "Adakah anda pasti mahu memulihkan semua tetapan konfigurasi dan prompt kepada nilai lalai?\n\nIni akan menulis ganti suntingan semasa."
 
@@ -274,6 +277,9 @@ msgstr "Nota"
 msgid "Note Saved"
 msgstr "Nota Disimpan"
 
+msgid "Note Type Colors"
+msgstr "Warna Jenis Nota"
+
 msgid "Notes"
 msgstr "Nota"
 
@@ -477,6 +483,9 @@ msgstr "Masa untuk memastikan model pembenaman kekal dimuatkan selepas carian (c
 
 msgid "Timeline Columns:"
 msgstr "Lajur Garis Masa:"
+
+msgid "Timeline Layout"
+msgstr "Susun Atur Garis Masa"
 
 msgid "Title"
 msgstr "Tajuk"

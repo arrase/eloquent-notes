@@ -40,6 +40,16 @@ _HOURGLASS_BOTTOM = QPolygonF([
 ])
 
 
+DEFAULT_TYPE_COLORS = {
+    "note": "#64748B",
+    "task": "#3B76B6",
+    "idea": "#C27821",
+    "reminder": "#C94A4D",
+    "question": "#8258B8",
+    "decision": "#2A8567",
+}
+
+
 @dataclass(frozen=True)
 class Theme:
     """Sober, professional color palette tokens for a UI theme."""
@@ -64,7 +74,6 @@ class Theme:
     danger_bg: str
     scrollbar: str
     scrollbar_hover: str
-    type_colors: dict[str, str]
 
 
 LIGHT_THEME = Theme(
@@ -88,14 +97,6 @@ LIGHT_THEME = Theme(
     danger_bg="#FEF3F2",
     scrollbar="#CBD5E1",
     scrollbar_hover="#94A3B8",
-    type_colors={
-        "note": "#52606D",
-        "task": "#2B5B84",
-        "idea": "#9E6316",
-        "reminder": "#A8383B",
-        "question": "#634A87",
-        "decision": "#236B52",
-    },
 )
 
 DARK_THEME = Theme(
@@ -119,14 +120,6 @@ DARK_THEME = Theme(
     danger_bg="#2C1A1D",
     scrollbar="#2E3646",
     scrollbar_hover="#475569",
-    type_colors={
-        "note": "#94A3B8",
-        "task": "#6FA1D2",
-        "idea": "#D49B4B",
-        "reminder": "#D67477",
-        "question": "#A58AD1",
-        "decision": "#5EAE92",
-    },
 )
 
 

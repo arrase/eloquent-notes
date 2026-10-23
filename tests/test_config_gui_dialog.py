@@ -25,11 +25,12 @@ def test_dialog_init(qapp):
     with patch("eloquent_notes.config.load_config", return_value=dummy_config):
         dialog = ConfigurationDialog()
 
-    assert dialog.tab_widget.count() == 5
-    titles = [dialog.tab_widget.tabText(i) for i in range(5)]
+    assert dialog.tab_widget.count() == 6
+    titles = [dialog.tab_widget.tabText(i) for i in range(6)]
     assert titles == [
         "General",
         "Notes",
+        "Appearance",
         "AI Settings",
         "Audio",
         "Prompts",
@@ -96,6 +97,8 @@ def test_dialog_load_settings(qapp):
     })
     dummy_config["logging"].update({"level": "DEBUG", "max_mb": 20, "backup_count": 2})
     dummy_config["notes"]["folder"] = "/home/user/notes"
+    dummy_config["notes"]["columns"] = 3
+    dummy_config["notes"]["type_colors"]["idea"] = "#112233"
     dummy_config["search"].update({"embedding_model": "my-embed", "keep_alive": "15m", "min_similarity": 0.5})
 
     with patch("eloquent_notes.config.load_config", return_value=dummy_config):
@@ -107,6 +110,8 @@ def test_dialog_load_settings(qapp):
     assert dialog.audio_tab.spn_sample_rate.value() == 44100
     assert dialog.general_tab.cmb_log_level.currentText() == "DEBUG"
     assert dialog.notes_tab.txt_folder.text() == "/home/user/notes"
+    assert dialog.appearance_tab.spn_columns.value() == 3
+    assert dialog.appearance_tab.color_buttons["idea"].text() == "#112233"
     assert dialog.ai_tab.cmb_embedding_model.currentText() == "my-embed"
     assert dialog.ai_tab.txt_search_keep_alive.text() == "15m"
     assert dialog.ai_tab.spn_min_similarity.value() == 0.5
@@ -120,6 +125,7 @@ def test_dialog_restore_defaults(qapp):
         dialog = ConfigurationDialog()
 
     dialog.general_tab.chk_autostart.setChecked(True)
+    dialog.appearance_tab.spn_columns.setValue(4)
 
     # User declines prompt
     with patch("PyQt6.QtWidgets.QMessageBox.question", return_value=QMessageBox.StandardButton.No):
@@ -144,6 +150,8 @@ def test_dialog_restore_defaults(qapp):
 
     assert dialog.ai_tab.txt_ollama_url.text() == "http://default:11434"
     assert dialog.notes_tab.txt_folder.text() == "/default/notes"
+    assert dialog.appearance_tab.spn_columns.value() == 2
+    assert dialog.appearance_tab.color_buttons["idea"].text() == ui.DEFAULT_TYPE_COLORS["idea"]
     assert dialog.general_tab.chk_autostart.isChecked() is False
     dialog.cleanup_tabs()
 

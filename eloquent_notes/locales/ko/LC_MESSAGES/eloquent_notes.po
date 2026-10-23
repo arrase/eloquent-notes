@@ -37,6 +37,9 @@ msgstr "전체"
 msgid "All tags"
 msgstr "모든 태그"
 
+msgid "Appearance"
+msgstr "모양"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "모든 구성 설정과 프롬프트를 기본값으로 복원하시겠습니까?\n\n현재 수정 사항이 덮어쓰여집니다."
 
@@ -274,6 +277,9 @@ msgstr "노트"
 msgid "Note Saved"
 msgstr "노트 저장됨"
 
+msgid "Note Type Colors"
+msgstr "노트 유형 색상"
+
 msgid "Notes"
 msgstr "노트"
 
@@ -477,6 +483,9 @@ msgstr "검색 후 임베딩 모델을 메모리에 유지하는 시간입니다
 
 msgid "Timeline Columns:"
 msgstr "타임라인 열 개수:"
+
+msgid "Timeline Layout"
+msgstr "타임라인 레이아웃"
 
 msgid "Title"
 msgstr "제목"

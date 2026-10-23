@@ -37,6 +37,9 @@ msgstr "Tất cả"
 msgid "All tags"
 msgstr "Tất cả thẻ"
 
+msgid "Appearance"
+msgstr "Giao diện"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "Bạn có chắc chắn muốn khôi phục tất cả cài đặt cấu hình và lời nhắc về giá trị mặc định không?\n\nThao tác này sẽ ghi đè các chỉnh sửa hiện tại."
 
@@ -274,6 +277,9 @@ msgstr "Ghi chú"
 msgid "Note Saved"
 msgstr "Đã lưu ghi chú"
 
+msgid "Note Type Colors"
+msgstr "Màu loại ghi chú"
+
 msgid "Notes"
 msgstr "Ghi chú"
 
@@ -477,6 +483,9 @@ msgstr "Thời gian giữ mô hình nhúng trong bộ nhớ sau khi tìm kiếm 
 
 msgid "Timeline Columns:"
 msgstr "Số cột dòng thời gian:"
+
+msgid "Timeline Layout"
+msgstr "Bố cục dòng thời gian"
 
 msgid "Title"
 msgstr "Tiêu đề"

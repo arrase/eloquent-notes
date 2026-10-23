@@ -35,6 +35,9 @@ msgstr ""
 msgid "All tags"
 msgstr ""
 
+msgid "Appearance"
+msgstr ""
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr ""
 
@@ -272,6 +275,9 @@ msgstr ""
 msgid "Note Saved"
 msgstr ""
 
+msgid "Note Type Colors"
+msgstr ""
+
 msgid "Notes"
 msgstr ""
 
@@ -474,6 +480,9 @@ msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0'
 msgstr ""
 
 msgid "Timeline Columns:"
+msgstr ""
+
+msgid "Timeline Layout"
 msgstr ""
 
 msgid "Title"

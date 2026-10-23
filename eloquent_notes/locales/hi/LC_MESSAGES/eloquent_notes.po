@@ -37,6 +37,9 @@ msgstr "सभी"
 msgid "All tags"
 msgstr "सभी टैग"
 
+msgid "Appearance"
+msgstr "दिखावट"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "क्या आप वाकई सभी कॉन्फ़िगरेशन सेटिंग्स और प्रॉम्प्ट्स को उनके डिफ़ॉल्ट मानों पर पुनर्स्थापित करना चाहते हैं?\n\nयह वर्तमान बदलावों को अधिलेखित कर देगा।"
 
@@ -274,6 +277,9 @@ msgstr "नोट"
 msgid "Note Saved"
 msgstr "नोट सहेजा गया"
 
+msgid "Note Type Colors"
+msgstr "नोट प्रकार के रंग"
+
 msgid "Notes"
 msgstr "नोट्स"
 
@@ -477,6 +483,9 @@ msgstr "खोज के बाद एम्बेडिंग मॉडल क�
 
 msgid "Timeline Columns:"
 msgstr "टाइमलाइन कॉलम:"
+
+msgid "Timeline Layout"
+msgstr "टाइमलाइन लेआउट"
 
 msgid "Title"
 msgstr "शीर्षक"

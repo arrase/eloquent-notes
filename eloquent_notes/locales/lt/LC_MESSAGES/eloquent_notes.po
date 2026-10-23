@@ -37,6 +37,9 @@ msgstr "Visi"
 msgid "All tags"
 msgstr "Visos žymos"
 
+msgid "Appearance"
+msgstr "Išvaizda"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "Ar tikrai norite atkurti visus konfigūracijos nustatymus ir užklausas į numatytąsias reikšmes?\n\nTai perrašys dabartinius pakeitimus."
 
@@ -274,6 +277,9 @@ msgstr "Užrašas"
 msgid "Note Saved"
 msgstr "Užrašas išsaugotas"
 
+msgid "Note Type Colors"
+msgstr "Užrašų tipų spalvos"
+
 msgid "Notes"
 msgstr "Užrašai"
 
@@ -477,6 +483,9 @@ msgstr "Laikas, kurį įterpimo modelis laikomas įkeltas po paieškos (pvz., '5
 
 msgid "Timeline Columns:"
 msgstr "Laiko juostos stulpeliai:"
+
+msgid "Timeline Layout"
+msgstr "Laiko juostos išdėstymas"
 
 msgid "Title"
 msgstr "Pavadinimas"

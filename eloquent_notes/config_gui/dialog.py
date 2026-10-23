@@ -15,6 +15,7 @@ from eloquent_notes import config, ui
 from eloquent_notes.config import diff_configs
 from eloquent_notes.config_gui.tabs import (
     AITab,
+    AppearanceTab,
     AudioTab,
     GeneralTab,
     NotesTab,
@@ -69,6 +70,7 @@ class ConfigurationDialog(QDialog):
 
         self.general_tab = GeneralTab()
         self.notes_tab = NotesTab()
+        self.appearance_tab = AppearanceTab()
         self.ai_tab = AITab()
         self.audio_tab = AudioTab()
         self.prompts_tab = TextFilesTab()
@@ -76,6 +78,7 @@ class ConfigurationDialog(QDialog):
         self._tabs = [
             (self.general_tab, _("General")),
             (self.notes_tab, _("Notes")),
+            (self.appearance_tab, _("Appearance")),
             (self.ai_tab, _("AI Settings")),
             (self.audio_tab, _("Audio")),
             (self.prompts_tab, _("Prompts")),
@@ -130,6 +133,7 @@ class ConfigurationDialog(QDialog):
         for tab_widget in (
             self.general_tab,
             self.notes_tab,
+            self.appearance_tab,
             self.ai_tab,
             self.audio_tab,
         ):
@@ -147,6 +151,7 @@ class ConfigurationDialog(QDialog):
         """Gather settings from widgets and persist them to files on disk."""
         save_order = (
             self.notes_tab,
+            self.appearance_tab,
             self.ai_tab,
             self.audio_tab,
             self.general_tab,

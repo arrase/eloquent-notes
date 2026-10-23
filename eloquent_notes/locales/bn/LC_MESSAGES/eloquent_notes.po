@@ -37,6 +37,9 @@ msgstr "সব"
 msgid "All tags"
 msgstr "সব ট্যাগ"
 
+msgid "Appearance"
+msgstr "চেহারা"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "আপনি কি নিশ্চিত যে আপনি সমস্ত কনফিগারেশন সেটিংস এবং প্রম্পটগুলি তাদের ডিফল্ট মানে ফিরিয়ে আনতে চান?\n\nএটি বর্তমান সম্পাদনাগুলিকে ওভাররাইট করবে।"
 
@@ -274,6 +277,9 @@ msgstr "নোট"
 msgid "Note Saved"
 msgstr "নোট সংরক্ষিত হয়েছে"
 
+msgid "Note Type Colors"
+msgstr "নোটের ধরনের রঙ"
+
 msgid "Notes"
 msgstr "নোটসমূহ"
 
@@ -477,6 +483,9 @@ msgstr "অনুসন্ধানের পরে এমবেডিং মড
 
 msgid "Timeline Columns:"
 msgstr "টাইমলাইন কলাম:"
+
+msgid "Timeline Layout"
+msgstr "টাইমলাইন লেআউট"
 
 msgid "Title"
 msgstr "শিরোনাম"

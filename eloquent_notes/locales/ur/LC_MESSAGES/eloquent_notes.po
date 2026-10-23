@@ -37,6 +37,9 @@ msgstr "سب"
 msgid "All tags"
 msgstr "تمام ٹیگز"
 
+msgid "Appearance"
+msgstr "ظاہری شکل"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "کیا آپ واقعی تمام کنفیگریشن ترتیبات اور پرامپٹس کو ان کی طے شدہ اقدار پر بحال کرنا چاہتے ہیں؟\n\nاس سے موجودہ تبدیلیاں ختم ہو جائیں گی۔"
 
@@ -274,6 +277,9 @@ msgstr "نوٹ"
 msgid "Note Saved"
 msgstr "نوٹ محفوظ ہو گیا"
 
+msgid "Note Type Colors"
+msgstr "نوٹ کی اقسام کے رنگ"
+
 msgid "Notes"
 msgstr "نوٹس"
 
@@ -477,6 +483,9 @@ msgstr "تلاش کے بعد ایمبیڈنگ ماڈل کو لوڈ رکھنے ک
 
 msgid "Timeline Columns:"
 msgstr "ٹائم لائن کالم:"
+
+msgid "Timeline Layout"
+msgstr "ٹائم لائن لے آؤٹ"
 
 msgid "Title"
 msgstr "عنوان"

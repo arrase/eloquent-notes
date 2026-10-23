@@ -37,6 +37,9 @@ msgstr "Visas"
 msgid "All tags"
 msgstr "Visas birkas"
 
+msgid "Appearance"
+msgstr "Izskats"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "Vai tiešām vēlaties atjaunot visus konfigurācijas iestatījumus un uzvednes uz to noklusējuma vērtībām?\n\nTas pārrakstīs pašreizējās izmaiņas."
 
@@ -274,6 +277,9 @@ msgstr "Piezīme"
 msgid "Note Saved"
 msgstr "Piezīme saglabāta"
 
+msgid "Note Type Colors"
+msgstr "Piezīmju veidu krāsas"
+
 msgid "Notes"
 msgstr "Piezīmes"
 
@@ -477,6 +483,9 @@ msgstr "Laiks, cik ilgi paturēt iegulšanas modeli ielādētu pēc meklēšanas
 
 msgid "Timeline Columns:"
 msgstr "Laika skalas kolonnas:"
+
+msgid "Timeline Layout"
+msgstr "Laika skalas izkārtojums"
 
 msgid "Title"
 msgstr "Virsraksts"

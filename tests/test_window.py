@@ -118,6 +118,13 @@ def test_timeline_columns_can_be_configured(window):
     ]
 
 
+def test_timeline_type_colors_can_be_configured(window):
+    window.set_type_colors(dict(ui.DEFAULT_TYPE_COLORS))
+    window.set_type_colors({**ui.DEFAULT_TYPE_COLORS, "decision": "#112233"})
+    card = next(w for w in list_widgets(window) if isinstance(w, NoteCard) and w.note.title == "Launch decision")
+    assert "#112233" in card.findChildren(QLabel)[0].text()
+
+
 def test_empty_timeline_invites_recording(qapp):
     win = MainWindow()
     win.set_notes([])
@@ -175,7 +182,7 @@ def test_card_shows_type_preview_and_tags(window):
 
 def test_card_preview_is_truncated(qapp, tmp_path):
     note = notes.Note(tmp_path / "x.md", "Long", datetime.now().astimezone(), "note", [], "word " * 100)
-    card = NoteCard(note, show_date=True)
+    card = NoteCard(note, show_date=True, type_color=ui.DEFAULT_TYPE_COLORS["note"])
     preview = card.findChildren(QLabel)[2].text()
     assert preview.endswith("…")
     assert len(preview) <= 181
@@ -183,7 +190,7 @@ def test_card_preview_is_truncated(qapp, tmp_path):
 
 def test_card_title_is_plain_text(qapp, tmp_path):
     note = notes.Note(tmp_path / "x.md", "<b>bold</b>", datetime.now().astimezone(), "note", [], "")
-    card = NoteCard(note, show_date=False)
+    card = NoteCard(note, show_date=False, type_color=ui.DEFAULT_TYPE_COLORS["note"])
     title = card.findChildren(QLabel)[1]
     assert title.textFormat() == Qt.TextFormat.PlainText
 
@@ -402,7 +409,7 @@ def test_window_palette_change_updates_theme(qapp, sample_notes):
 
     assert win.styleSheet() == ui.window_stylesheet(ui.DARK_THEME)
     card = next(w for w in list_widgets(win) if isinstance(w, NoteCard) and w.note.title == "Launch decision")
-    assert ui.DARK_THEME.type_colors["decision"] in card.findChildren(QLabel)[0].text()
+    assert ui.DEFAULT_TYPE_COLORS["decision"] in card.findChildren(QLabel)[0].text()
     win.close()
 
 

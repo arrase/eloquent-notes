@@ -37,6 +37,9 @@ msgstr "Все"
 msgid "All tags"
 msgstr "Все теги"
 
+msgid "Appearance"
+msgstr "Внешний вид"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "Вы уверены, что хотите восстановить все параметры конфигурации и промпты до значений по умолчанию?\n\nЭто перезапишет текущие изменения."
 
@@ -274,6 +277,9 @@ msgstr "Заметка"
 msgid "Note Saved"
 msgstr "Заметка сохранена"
 
+msgid "Note Type Colors"
+msgstr "Цвета типов заметок"
+
 msgid "Notes"
 msgstr "Заметки"
 
@@ -477,6 +483,9 @@ msgstr "Время удержания модели эмбеддингов в п�
 
 msgid "Timeline Columns:"
 msgstr "Столбцов в ленте:"
+
+msgid "Timeline Layout"
+msgstr "Макет ленты"
 
 msgid "Title"
 msgstr "Заголовок"

@@ -37,6 +37,9 @@ msgstr "Vše"
 msgid "All tags"
 msgstr "Všechny štítky"
 
+msgid "Appearance"
+msgstr "Vzhled"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "Opravdu chcete obnovit všechna nastavení konfigurace a prompty na výchozí hodnoty?\n\nTímto přepíšete aktuální úpravy."
 
@@ -274,6 +277,9 @@ msgstr "Poznámka"
 msgid "Note Saved"
 msgstr "Poznámka uložena"
 
+msgid "Note Type Colors"
+msgstr "Barvy typů poznámek"
+
 msgid "Notes"
 msgstr "Poznámky"
 
@@ -477,6 +483,9 @@ msgstr "Doba ponechání modelu vnořování v paměti po vyhledávání (např.
 
 msgid "Timeline Columns:"
 msgstr "Sloupce časové osy:"
+
+msgid "Timeline Layout"
+msgstr "Rozvržení časové osy"
 
 msgid "Title"
 msgstr "Název"

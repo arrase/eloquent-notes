@@ -37,6 +37,9 @@ msgstr "全部"
 msgid "All tags"
 msgstr "所有标签"
 
+msgid "Appearance"
+msgstr "外观"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "确定要将所有配置设置和提示词恢复为默认值吗？\n\n这将覆盖当前的修改。"
 
@@ -274,6 +277,9 @@ msgstr "笔记"
 msgid "Note Saved"
 msgstr "笔记已保存"
 
+msgid "Note Type Colors"
+msgstr "笔记类型颜色"
+
 msgid "Notes"
 msgstr "笔记"
 
@@ -477,6 +483,9 @@ msgstr "搜索后保持嵌入模型加载的时间（例如 '5m' 或 '0'）。"
 
 msgid "Timeline Columns:"
 msgstr "时间线列数："
+
+msgid "Timeline Layout"
+msgstr "时间线布局"
 
 msgid "Title"
 msgstr "标题"

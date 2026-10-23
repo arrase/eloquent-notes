@@ -107,7 +107,7 @@ class NoteCard(QFrame):
     opened = pyqtSignal(object)
     tag_clicked = pyqtSignal(str)
 
-    def __init__(self, note: Note, show_date: bool) -> None:
+    def __init__(self, note: Note, show_date: bool, type_color: str) -> None:
         super().__init__()
         self.note = note
         self.setObjectName("card")
@@ -119,7 +119,6 @@ class NoteCard(QFrame):
         layout.setSpacing(6)
 
         when = format_time(note.created, "d MMM yyyy, HH:mm" if show_date else "HH:mm")
-        type_color = theme.type_colors[note.type]
         meta = QLabel(
             f'{when} &nbsp;·&nbsp; <span style="color: {type_color}; font-weight: 600;">'
             f"● {_(_TYPE_LABELS[note.type])}</span>"
@@ -160,10 +159,15 @@ class TimelinePage(QWidget):
     search_requested = pyqtSignal(str)
     note_opened = pyqtSignal(object)
 
-    def __init__(self, columns: int = DEFAULT_COLUMNS) -> None:
+    def __init__(
+        self,
+        columns: int = DEFAULT_COLUMNS,
+        type_colors: dict[str, str] = ui.DEFAULT_TYPE_COLORS,
+    ) -> None:
         super().__init__()
         self.setObjectName("timelinePage")
         self._columns = columns
+        self._type_colors = dict(type_colors)
         self._notes: list[Note] = []
         self._type = ""
         self._query = ""
@@ -232,6 +236,11 @@ class TimelinePage(QWidget):
     def set_columns(self, columns: int) -> None:
         if columns != self._columns:
             self._columns = columns
+            self._render()
+
+    def set_type_colors(self, type_colors: dict[str, str]) -> None:
+        if type_colors != self._type_colors:
+            self._type_colors = dict(type_colors)
             self._render()
 
     def set_notes(self, notes: list[Note]) -> None:
@@ -303,7 +312,7 @@ class TimelinePage(QWidget):
         return label
 
     def _card(self, note: Note, show_date: bool) -> NoteCard:
-        card = NoteCard(note, show_date)
+        card = NoteCard(note, show_date, self._type_colors[note.type])
         card.opened.connect(self.note_opened)
         card.tag_clicked.connect(self.select_tag)
         return card
@@ -506,7 +515,11 @@ class MainWindow(QMainWindow):
     search_requested = pyqtSignal(str)
     settings_clicked = pyqtSignal()
 
-    def __init__(self, columns: int = DEFAULT_COLUMNS) -> None:
+    def __init__(
+        self,
+        columns: int = DEFAULT_COLUMNS,
+        type_colors: dict[str, str] = ui.DEFAULT_TYPE_COLORS,
+    ) -> None:
         super().__init__()
         self.setWindowTitle("Eloquent Notes")
         self.setWindowIcon(ui.get_app_icon())
@@ -515,7 +528,7 @@ class MainWindow(QMainWindow):
         self._dark = ui.is_dark_theme()
         self.setStyleSheet(ui.window_stylesheet(ui.current_theme()))
 
-        self.timeline = TimelinePage(columns=columns)
+        self.timeline = TimelinePage(columns=columns, type_colors=type_colors)
         self.reader = ReaderPage()
         self.stack = QStackedWidget()
         self.stack.addWidget(self.timeline)
@@ -541,6 +554,9 @@ class MainWindow(QMainWindow):
 
     def set_columns(self, columns: int) -> None:
         self.timeline.set_columns(columns)
+
+    def set_type_colors(self, type_colors: dict[str, str]) -> None:
+        self.timeline.set_type_colors(type_colors)
 
     def set_notes(self, notes: list[Note]) -> None:
         self.timeline.set_notes(notes)

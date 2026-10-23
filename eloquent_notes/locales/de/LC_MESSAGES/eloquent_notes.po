@@ -37,6 +37,9 @@ msgstr "Alle"
 msgid "All tags"
 msgstr "Alle Tags"
 
+msgid "Appearance"
+msgstr "Erscheinungsbild"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "Möchten Sie wirklich alle Konfigurationseinstellungen und Prompts auf die Standardwerte zurücksetzen?\n\nDadurch werden aktuelle Änderungen überschrieben."
 
@@ -274,6 +277,9 @@ msgstr "Notiz"
 msgid "Note Saved"
 msgstr "Notiz gespeichert"
 
+msgid "Note Type Colors"
+msgstr "Notiztyp-Farben"
+
 msgid "Notes"
 msgstr "Notizen"
 
@@ -477,6 +483,9 @@ msgstr "Zeit, für die das Embedding-Modell nach einer Suche geladen bleibt (z. 
 
 msgid "Timeline Columns:"
 msgstr "Zeitachsen-Spalten:"
+
+msgid "Timeline Layout"
+msgstr "Zeitachsen-Layout"
 
 msgid "Title"
 msgstr "Titel"

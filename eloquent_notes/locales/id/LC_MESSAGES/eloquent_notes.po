@@ -37,6 +37,9 @@ msgstr "Semua"
 msgid "All tags"
 msgstr "Semua tag"
 
+msgid "Appearance"
+msgstr "Tampilan"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "Apakah Anda yakin ingin memulihkan semua pengaturan konfigurasi dan prompt ke nilai bawaannya?\n\nTindakan ini akan menimpa suntingan saat ini."
 
@@ -274,6 +277,9 @@ msgstr "Catatan"
 msgid "Note Saved"
 msgstr "Catatan Disimpan"
 
+msgid "Note Type Colors"
+msgstr "Warna Jenis Catatan"
+
 msgid "Notes"
 msgstr "Catatan"
 
@@ -477,6 +483,9 @@ msgstr "Waktu untuk tetap memuat model embedding setelah pencarian (mis., '5m' a
 
 msgid "Timeline Columns:"
 msgstr "Kolom Lini Masa:"
+
+msgid "Timeline Layout"
+msgstr "Tata Letak Lini Masa"
 
 msgid "Title"
 msgstr "Judul"

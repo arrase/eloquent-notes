@@ -37,6 +37,9 @@ msgstr "Toutes"
 msgid "All tags"
 msgstr "Tous les tags"
 
+msgid "Appearance"
+msgstr "Apparence"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "Voulez-vous vraiment restaurer tous les paramètres de configuration et les prompts à leurs valeurs par défaut ?\n\nCela écrasera les modifications actuelles."
 
@@ -274,6 +277,9 @@ msgstr "Note"
 msgid "Note Saved"
 msgstr "Note enregistrée"
 
+msgid "Note Type Colors"
+msgstr "Couleurs des types de notes"
+
 msgid "Notes"
 msgstr "Notes"
 
@@ -477,6 +483,9 @@ msgstr "Durée de maintien du modèle de plongement en mémoire après une reche
 
 msgid "Timeline Columns:"
 msgstr "Colonnes de la chronologie :"
+
+msgid "Timeline Layout"
+msgstr "Disposition de la chronologie"
 
 msgid "Title"
 msgstr "Titre"
