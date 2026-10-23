@@ -57,7 +57,7 @@ Notes edited by other programs are picked up the next time the window refreshes 
 
 Open the window with a middle click on the tray icon, **Open Notes** in the tray menu, clicking a notification, `eloquent-notes open`, or running `eloquent-notes` while the daemon is already running. Closing the window keeps the daemon running in the tray.
 
-The window follows the desktop's light and dark color scheme (`ui.LIGHT_THEME` and `ui.DARK_THEME`) and updates live when the system palette changes; dates are shown in English.
+The window follows the desktop's light and dark color scheme (`ui.LIGHT_THEME` and `ui.DARK_THEME`) and updates live when the system palette changes; UI strings and dates follow the detected system locale (falling back to English).
 
 ### Timeline
 

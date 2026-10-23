@@ -1,0 +1,524 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: lt\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgid " Hz"
+msgstr " Hz"
+
+msgid " MB"
+msgstr " MB"
+
+msgid " sec"
+msgstr " sek."
+
+msgid "AI Model (Audio):"
+msgstr "DI modelis (garso):"
+
+msgid "AI Model cannot be empty."
+msgstr "DI modelis negali būti tuščias."
+
+msgid "AI Settings"
+msgstr "DI nustatymai"
+
+msgid "Add dictation"
+msgstr "Pridėti diktavimą"
+
+msgid "Alias for 'toggle' command."
+msgstr "Komandos 'toggle' sinonimas."
+
+msgid "All"
+msgstr "Visi"
+
+msgid "All tags"
+msgstr "Visos žymos"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "Ar tikrai norite atkurti visus konfigūracijos nustatymus ir užklausas į numatytąsias reikšmes?\n\nTai perrašys dabartinius pakeitimus."
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "Garsiniai signalai pradedant ir stabdant įrašymą."
+
+msgid "Audio"
+msgstr "Garsas"
+
+msgid "Audio Capture Settings"
+msgstr "Garso įrašymo nustatymai"
+
+msgid "Audio Channels:"
+msgstr "Garso kanalai:"
+
+msgid "Backup Count:"
+msgstr "Atsarginių kopijų skaičius:"
+
+msgid "Beep Duration:"
+msgstr "Pyptelėjimo trukmė:"
+
+msgid "Beep Frequency:"
+msgstr "Pyptelėjimo dažnis:"
+
+msgid "Browse..."
+msgstr "Naršyti..."
+
+msgid "Cancel"
+msgstr "Atšaukti"
+
+msgid "Capture Duration:"
+msgstr "Įrašymo trukmė:"
+
+msgid "Classification - System Prompt"
+msgstr "Klasifikavimas – sisteminė užklausa"
+
+msgid "Classification - User Prompt"
+msgstr "Klasifikavimas – naudotojo užklausa"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "Vykdytina komanda: 'install-autostart', 'toggle', 'open' (rodyti užrašų langą) arba 'config' (atidaryti konfigūracijos sąsają)."
+
+msgid "Configuration"
+msgstr "Konfigūracija"
+
+msgid "Configuration Error"
+msgstr "Konfigūracijos klaida"
+
+msgid "Configuration reloaded successfully."
+msgstr "Konfigūracija sėkmingai įkelta iš naujo."
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "Konfigūracijos sekcija '{key}' turi būti atvaizdis, gauta {type_name}"
+
+msgid "Connection failed: {error}"
+msgstr "Nepavyko prisijungti: {error}"
+
+msgid "Context Length:"
+msgstr "Konteksto ilgis:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "Konteksto ilgis žetonais, perduodamas „Ollama“. Didesnės reikšmės leidžia ilgesnius diktavimus, bet naudoja daugiau atminties."
+
+msgid "Copy"
+msgstr "Kopijuoti"
+
+msgid "Could not move {name} to the trash."
+msgstr "Nepavyko perkelti {name} į šiukšlinę."
+
+msgid "Could not start recording: {error}"
+msgstr "Nepavyko pradėti įrašymo: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "Nepavyko sustabdyti įrašymo: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "Sukuria darbalaukio automatinio paleidimo įrašą XDG automatinio paleidimo kataloge"
+
+msgid "Decision"
+msgstr "Sprendimas"
+
+msgid "Decisions"
+msgstr "Sprendimai"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "Numatytosios reikšmės atkurtos. Spustelėkite „Išsaugoti“, kad pritaikytumėte pakeitimus diske."
+
+msgid "Delete"
+msgstr "Ištrinti"
+
+msgid "Delete Failed"
+msgstr "Ištrinti nepavyko"
+
+msgid "Delete Note"
+msgstr "Ištrinti užrašą"
+
+msgid "Dictation Added"
+msgstr "Diktavimas pridėtas"
+
+msgid "Dictation Empty"
+msgstr "Diktavimas tuščias"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "Diktuojant rodo slankiąją kapsulės perdangą su atgalinio skaičiavimo laikmačiu ir eigos juosta."
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (Laukia)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (Apdorojama...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (Įrašoma...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes – „Linux“ sistemos dėklo įrankis, paverčiantis balso diktavimus tvarkingais užrašais."
+
+msgid "Eloquent Notes Configuration"
+msgstr "Eloquent Notes konfigūracija"
+
+msgid "Eloquent Notes Daemon"
+msgstr "Eloquent Notes tarnyba"
+
+msgid "Embedding Model cannot be empty."
+msgstr "Įterpimo modelis negali būti tuščias."
+
+msgid "Embedding Model:"
+msgstr "Įterpimo modelis:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "Klaida apdorojant diktavimą: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "Nepavyko įkelti naudotojo konfigūracijos: {error}\n\nĮkelti numatytieji nustatymai."
+
+msgid "Failed to reload configuration: {error}"
+msgstr "Nepavyko iš naujo įkelti konfigūracijos: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "Nepavyko išsaugoti nustatymų: {error}"
+
+msgid "Fetching models..."
+msgstr "Gaunami modeliai..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "Aplankas, kuriame kiekvienas balso užrašas išsaugomas kaip „Markdown“ failas. Nurodykite „Obsidian“ saugyklą, kad matytumėte užrašus ir ten."
+
+msgid "General"
+msgstr "Bendra"
+
+msgid "Idea"
+msgstr "Idėja"
+
+msgid "Ideas"
+msgstr "Idėjos"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "Jei pažymėta, nustato context_length į null (arba palieka nenustatytą), nurodant „Ollama“ naudoti numatytąjį maksimalų modelio konteksto ilgį."
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Netinkamas palaikymo atmintyje formatas: '{value}'. Turi būti sveikasis skaičius arba trukmė (pvz., 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Netinkamas išankstinio įkėlimo palaikymo formatas: '{value}'. Turi būti sveikasis skaičius arba trukmė (pvz., 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Netinkamas paieškos palaikymo formatas: '{value}'. Turi būti sveikasis skaičius arba trukmė (pvz., 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "Netinkama konfigūracijos reikšmė raktui '{key}'"
+
+msgid "Keep Alive Time:"
+msgstr "Palaikymo atmintyje laikas:"
+
+msgid "Log File"
+msgstr "Žurnalo failas"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "Žurnalo failo dar nėra. Pirmiausia atlikite kelis diktavimus!"
+
+msgid "Logging Level:"
+msgstr "Registravimo lygis:"
+
+msgid "Logging Settings"
+msgstr "Registravimo nustatymai"
+
+msgid "Max Log File Size:"
+msgstr "Maks. žurnalo failo dydis:"
+
+msgid "Max Retries:"
+msgstr "Maks. bandymų skaičius:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "Maksimali garso įrašymo trukmė sekundėmis prieš automatinį apdorojimą."
+
+msgid "Maximum size of the log file before rotating."
+msgstr "Maksimalus žurnalo failo dydis prieš rotaciją."
+
+msgid "Minimum Similarity:"
+msgstr "Minimalus panašumas:"
+
+msgid "Model returned empty note content"
+msgstr "Modelis grąžino tuščią užrašo turinį"
+
+msgid "Models loaded successfully."
+msgstr "Modeliai sėkmingai įkelti."
+
+msgid "Mono (1 channel)"
+msgstr "Mono (1 kanalas)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "Perkelti „{title}“ į šiukšlinę?"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "„Ollama“ LLM modelio pavadinimas diktavimo užduotims vykdyti (pvz., gemma4:e4b-it-qat)."
+
+msgid "No audio-capable models found."
+msgstr "Nerasta garsą palaikančių modelių."
+
+msgid "No matching notes."
+msgstr "Atitinkančių užrašų nerasta."
+
+msgid "No note was created because the audio was empty."
+msgstr "Užrašas nesukurtas, nes garso įrašas buvo tuščias."
+
+msgid "No notes match these filters."
+msgstr "Šiuos filtrus atitinkančių užrašų nėra."
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "Užrašų dar nėra. Spustelėkite dėklo piktogramą, kad įrašytumėte pirmąjį."
+
+msgid "Note"
+msgstr "Užrašas"
+
+msgid "Note Saved"
+msgstr "Užrašas išsaugotas"
+
+msgid "Notes"
+msgstr "Užrašai"
+
+msgid "Notes Folder cannot be empty."
+msgstr "Užrašų aplankas negali būti tuščias."
+
+msgid "Notes Folder:"
+msgstr "Užrašų aplankas:"
+
+msgid "Notes Storage"
+msgstr "Užrašų saugykla"
+
+msgid "Number of audio input channels."
+msgstr "Garso įvesties kanalų skaičius."
+
+msgid "Number of backup log files to retain."
+msgstr "Saugomų atsarginių žurnalo failų skaičius."
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "Stulpelių skaičius užrašų laiko juostos tinklelyje."
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "Pakartotinių bandymų skaičius, jei LLM išvesties nepavyksta apdoroti kaip JSON."
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "Ollama && DI konvejerio nustatymai"
+
+msgid "Ollama URL cannot be empty."
+msgstr "„Ollama“ URL negali būti tuščias."
+
+msgid "Ollama URL is empty."
+msgstr "„Ollama“ URL yra tuščias."
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "„Ollama“ URL turi prasidėti http:// arba https://."
+
+msgid "Ollama URL:"
+msgstr "„Ollama“ URL:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "„Ollama“ įterpimo modelis, naudojamas ieškoti užrašų pagal prasmę (pvz., embeddinggemma-2:latest)."
+
+msgid "Open Notes"
+msgstr "Atidaryti užrašus"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "Atidaryti foninės tarnybos žurnalo failą sistemos redaktoriuje."
+
+msgid "Output Language cannot be empty."
+msgstr "Išvesties kalba negali būti tuščia."
+
+msgid "Output Language:"
+msgstr "Išvesties kalba:"
+
+msgid "Play beep on recording start and stop"
+msgstr "Leisti garsinį signalą pradedant ir stabdant įrašymą"
+
+msgid "Preload Keep Alive:"
+msgstr "Išankstinio įkėlimo palaikymas:"
+
+msgid "Preload Timeout:"
+msgstr "Išankstinio įkėlimo skirtasis laikas:"
+
+msgid "Processing Error"
+msgstr "Apdorojimo klaida"
+
+msgid "Processing…"
+msgstr "Apdorojama…"
+
+msgid "Prompt Content:"
+msgstr "Užklausos turinys:"
+
+msgid "Prompts"
+msgstr "Užklausos"
+
+msgid "Prompts:"
+msgstr "Užklausos:"
+
+msgid "Question"
+msgstr "Klausimas"
+
+msgid "Questions"
+msgstr "Klausimai"
+
+msgid "Quit"
+msgstr "Išeiti"
+
+msgid "Ready"
+msgstr "Paruošta"
+
+msgid "Recording Note..."
+msgstr "Įrašomas užrašas..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "Vyksta įrašymas — spustelėkite, kad sustabdytumėte ir apdorotumėte užrašą"
+
+msgid "Refresh"
+msgstr "Atnaujinti"
+
+msgid "Reload Configuration"
+msgstr "Įkelti konfigūraciją iš naujo"
+
+msgid "Reminder"
+msgstr "Priminimas"
+
+msgid "Reminders"
+msgstr "Priminimai"
+
+msgid "Request Timeout:"
+msgstr "Užklausos skirtasis laikas:"
+
+msgid "Restore Defaults"
+msgstr "Atkurti numatytuosius"
+
+msgid "Retry Prompt"
+msgstr "Pakartotinio bandymo užklausa"
+
+msgid "Rewriting - System Prompt"
+msgstr "Perrašymas – sisteminė užklausa"
+
+msgid "Rewriting - User Prompt"
+msgstr "Perrašymas – naudotojo užklausa"
+
+msgid "Sample Rate:"
+msgstr "Diskretizavimo dažnis:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "Mikrofono įrašymo diskretizavimo dažnis (kalbos diktavimo modeliams rekomenduojama 16000 Hz)."
+
+msgid "Save"
+msgstr "Išsaugoti"
+
+msgid "Save Error"
+msgstr "Išsaugojimo klaida"
+
+msgid "Search failed: {error}"
+msgstr "Paieška nepavyko: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "Paieškos rezultatai, kurių kosinuso panašumas mažesnis už šį, yra paslepiami."
+
+msgid "Search your notes by meaning…"
+msgstr "Ieškokite užrašų pagal prasmę…"
+
+msgid "Searching…"
+msgstr "Ieškoma…"
+
+msgid "Select Notes Folder"
+msgstr "Pasirinkti užrašų aplanką"
+
+msgid "Select a prompt to edit..."
+msgstr "Pasirinkite užklausą redagavimui..."
+
+msgid "Semantic Search"
+msgstr "Semantinė paieška"
+
+msgid "Settings"
+msgstr "Nustatymai"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "Įrašymo metu rodyti slankiąją atgalinio skaičiavimo HUD perdangą"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "Automatiškai paleisti „Eloquent Notes“ prisijungus"
+
+msgid "Start/Stop Recording"
+msgstr "Pradėti / sustabdyti įrašymą"
+
+msgid "Startup Options"
+msgstr "Paleidimo parinktys"
+
+msgid "Stereo (2 channels)"
+msgstr "Stereo (2 kanalai)"
+
+msgid "Stop dictation"
+msgstr "Sustabdyti diktavimą"
+
+msgid "System is busy. Please wait."
+msgstr "Sistema užimta. Palaukite."
+
+msgid "Tags, separated by commas"
+msgstr "Žymos, atskirtos kableliais"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "Tikslinė perrašytų užrašų, pavadinimų ir žymų kalba (pvz., English, Lithuanian)."
+
+msgid "Task"
+msgstr "Užduotis"
+
+msgid "Tasks"
+msgstr "Užduotys"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "Laikas, kurį modelis laikomas įkeltas sugeneravus užrašą (pvz., '0' iškrauti iš karto arba '5m')."
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "Laikas, kurį modelio svoriai laikomi įkelti VRAM įrašymo metu, siekiant sumažinti delsą (pvz., '5m')."
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "Laikas, kurį įterpimo modelis laikomas įkeltas po paieškos (pvz., '5m' arba '0')."
+
+msgid "Timeline Columns:"
+msgstr "Laiko juostos stulpeliai:"
+
+msgid "Title"
+msgstr "Pavadinimas"
+
+msgid "Today"
+msgstr "Šiandien"
+
+msgid "Transcription - System Prompt"
+msgstr "Transkripcija – sisteminė užklausa"
+
+msgid "Transcription - User Prompt"
+msgstr "Transkripcija – naudotojo užklausa"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "Vietinio arba nuotolinio „Ollama“ serverio URL."
+
+msgid "Use default context length"
+msgstr "Naudoti numatytąjį konteksto ilgį"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "Naudotojo konfigūracija kelyje {path} nėra tinkamas YAML atvaizdis"
+
+msgid "Validation Error"
+msgstr "Tikrinimo klaida"
+
+msgid "Verbosity level for app logging."
+msgstr "Programos žurnalo išsamumo lygis."
+
+msgid "View Log File"
+msgstr "Peržiūrėti žurnalo failą"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "Balso diktavimai, paversti tvarkingais užrašais"
+
+msgid "Yesterday"
+msgstr "Vakar"
+
+msgid "← Back"
+msgstr "← Atgal"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} rezultatas"
+msgstr[1] "{count} rezultatai"
+msgstr[2] "{count} rezultatų"

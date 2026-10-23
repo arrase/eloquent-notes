@@ -1,0 +1,524 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: sr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgid " Hz"
+msgstr " Hz"
+
+msgid " MB"
+msgstr " MB"
+
+msgid " sec"
+msgstr " сек"
+
+msgid "AI Model (Audio):"
+msgstr "АИ модел (Аудио):"
+
+msgid "AI Model cannot be empty."
+msgstr "АИ модел не може бити празан."
+
+msgid "AI Settings"
+msgstr "АИ подешавања"
+
+msgid "Add dictation"
+msgstr "Додај диктат"
+
+msgid "Alias for 'toggle' command."
+msgstr "Алијас за команду 'toggle'."
+
+msgid "All"
+msgstr "Све"
+
+msgid "All tags"
+msgstr "Све ознаке"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "Да ли сте сигурни да желите да вратите сва подешавања конфигурације и упите на подразумеване вредности?\n\nОво ће преписати тренутне измене."
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "Звучни сигнал при покретању и заустављању снимања."
+
+msgid "Audio"
+msgstr "Звук"
+
+msgid "Audio Capture Settings"
+msgstr "Подешавања снимања звука"
+
+msgid "Audio Channels:"
+msgstr "Аудио канали:"
+
+msgid "Backup Count:"
+msgstr "Број резервних копија:"
+
+msgid "Beep Duration:"
+msgstr "Трајање звучног сигнала:"
+
+msgid "Beep Frequency:"
+msgstr "Фреквенција звучног сигнала:"
+
+msgid "Browse..."
+msgstr "Прегледај..."
+
+msgid "Cancel"
+msgstr "Откажи"
+
+msgid "Capture Duration:"
+msgstr "Трајање снимања:"
+
+msgid "Classification - System Prompt"
+msgstr "Класификација – Системски упит"
+
+msgid "Classification - User Prompt"
+msgstr "Класификација – Кориснички упит"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "Команда за извршавање: 'install-autostart', 'toggle', 'open' (прикажи прозор са белешкама) или 'config' (отвори подешавања)."
+
+msgid "Configuration"
+msgstr "Конфигурација"
+
+msgid "Configuration Error"
+msgstr "Грешка у конфигурацији"
+
+msgid "Configuration reloaded successfully."
+msgstr "Конфигурација је успешно поново учитана."
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "Одељак конфигурације '{key}' мора бити мапирање, добијено је {type_name}"
+
+msgid "Connection failed: {error}"
+msgstr "Повезивање није успело: {error}"
+
+msgid "Context Length:"
+msgstr "Дужина контекста:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "Дужина контекста у токенима која се прослеђује у Ollama. Веће вредности омогућавају дуже диктате, али користе више меморије."
+
+msgid "Copy"
+msgstr "Копирај"
+
+msgid "Could not move {name} to the trash."
+msgstr "Није могуће преместити {name} у корпу за отпатке."
+
+msgid "Could not start recording: {error}"
+msgstr "Није могуће покренути снимање: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "Није могуће зауставити снимање: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "Креира ставку аутоматског покретања у XDG autostart директоријуму"
+
+msgid "Decision"
+msgstr "Одлука"
+
+msgid "Decisions"
+msgstr "Одлуке"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "Подразумеване вредности су враћене. Кликните на „Сачувај” да примените измене на диск."
+
+msgid "Delete"
+msgstr "Обриши"
+
+msgid "Delete Failed"
+msgstr "Брисање није успело"
+
+msgid "Delete Note"
+msgstr "Обриши белешку"
+
+msgid "Dictation Added"
+msgstr "Диктат је додат"
+
+msgid "Dictation Empty"
+msgstr "Диктат је празан"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "Приказује елегантан плутајући панел са одбројавањем и траком напретка током диктирања."
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (Мировање)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (Обрада...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (Снимање...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes – Алат системске касете за Linux који офлајн гласовне диктате претвара у организоване белешке."
+
+msgid "Eloquent Notes Configuration"
+msgstr "Eloquent Notes конфигурација"
+
+msgid "Eloquent Notes Daemon"
+msgstr "Eloquent Notes позадински сервис"
+
+msgid "Embedding Model cannot be empty."
+msgstr "Модел уграђивања (embedding) не може бити празан."
+
+msgid "Embedding Model:"
+msgstr "Модел уграђивања:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "Грешка при обради диктата: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "Учитавање корисничке конфигурације није успело: {error}\n\nУчитана су подразумевана подешавања."
+
+msgid "Failed to reload configuration: {error}"
+msgstr "Поновно учитавање конфигурације није успело: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "Чување подешавања није успело: {error}"
+
+msgid "Fetching models..."
+msgstr "Преузимање модела..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "Фасцикла у којој се свака гласовна белешка чува као Markdown датотека. Усмерите је у Obsidian трезор да бисте видели своје белешке и тамо."
+
+msgid "General"
+msgstr "Опште"
+
+msgid "Idea"
+msgstr "Идеја"
+
+msgid "Ideas"
+msgstr "Идеје"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "Ако је означено, поставља context_length на null (или оставља непостављено), налажући Ollama да користи подразумевану максималну дужину контекста модела."
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Неисправан Keep Alive формат: '{value}'. Мора бити цео број или трајање (нпр. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Неисправан Preload Keep Alive формат: '{value}'. Мора бити цео број или трајање (нпр. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Неисправан Search Keep Alive формат: '{value}'. Мора бити цео број или трајање (нпр. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "Неисправна вредност конфигурације за '{key}'"
+
+msgid "Keep Alive Time:"
+msgstr "Keep Alive време:"
+
+msgid "Log File"
+msgstr "Датотека дневника"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "Датотека дневника још не постоји. Прво снимите неколико диктата!"
+
+msgid "Logging Level:"
+msgstr "Ниво бележења:"
+
+msgid "Logging Settings"
+msgstr "Подешавања бележења"
+
+msgid "Max Log File Size:"
+msgstr "Макс. величина дневника:"
+
+msgid "Max Retries:"
+msgstr "Макс. број покушаја:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "Максимално трајање снимања звука у секундама пре аутоматске обраде."
+
+msgid "Maximum size of the log file before rotating."
+msgstr "Максимална величина датотеке дневника пре ротације."
+
+msgid "Minimum Similarity:"
+msgstr "Минимална сличност:"
+
+msgid "Model returned empty note content"
+msgstr "Модел је вратио празан садржај белешке"
+
+msgid "Models loaded successfully."
+msgstr "Модели су успешно учитани."
+
+msgid "Mono (1 channel)"
+msgstr "Моно (1 канал)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "Преместити „{title}” у корпу за отпатке?"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "Назив Ollama LLM модела за задатке диктирања (нпр. gemma4:e4b-it-qat)."
+
+msgid "No audio-capable models found."
+msgstr "Нису пронађени модели који подржавају звук."
+
+msgid "No matching notes."
+msgstr "Нема одговарајућих белешки."
+
+msgid "No note was created because the audio was empty."
+msgstr "Белешка није направљена јер је аудио снимак био празан."
+
+msgid "No notes match these filters."
+msgstr "Ниједна белешка не одговара овим филтерима."
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "Још нема белешки. Кликните на икону у системској касети да снимите прву."
+
+msgid "Note"
+msgstr "Белешка"
+
+msgid "Note Saved"
+msgstr "Белешка је сачувана"
+
+msgid "Notes"
+msgstr "Белешке"
+
+msgid "Notes Folder cannot be empty."
+msgstr "Фасцикла за белешке не може бити празна."
+
+msgid "Notes Folder:"
+msgstr "Фасцикла за белешке:"
+
+msgid "Notes Storage"
+msgstr "Складиште белешки"
+
+msgid "Number of audio input channels."
+msgstr "Број улазних аудио канала."
+
+msgid "Number of backup log files to retain."
+msgstr "Број резервних датотека дневника које се чувају."
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "Број колона у мрежи временске линије белешки."
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "Број поновних покушаја ако LLM излаз не успе при JSON парсирању."
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "Подешавања за Ollama && АИ цевовод"
+
+msgid "Ollama URL cannot be empty."
+msgstr "Ollama URL не може бити празан."
+
+msgid "Ollama URL is empty."
+msgstr "Ollama URL је празан."
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "Ollama URL мора почињати са http:// или https://."
+
+msgid "Ollama URL:"
+msgstr "Ollama URL:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "Ollama модел уграђивања који се користи за претрагу белешки по значењу (нпр. embeddinggemma-2:latest)."
+
+msgid "Open Notes"
+msgstr "Отвори белешке"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "Отвори датотеку дневника позадинског сервиса у системском уређивачу."
+
+msgid "Output Language cannot be empty."
+msgstr "Излазни језик не може бити празан."
+
+msgid "Output Language:"
+msgstr "Излазни језик:"
+
+msgid "Play beep on recording start and stop"
+msgstr "Репродукуј звучни сигнал на почетку и крају снимања"
+
+msgid "Preload Keep Alive:"
+msgstr "Preload Keep Alive:"
+
+msgid "Preload Timeout:"
+msgstr "Временско ограничење предучитавања:"
+
+msgid "Processing Error"
+msgstr "Грешка у обради"
+
+msgid "Processing…"
+msgstr "Обрада…"
+
+msgid "Prompt Content:"
+msgstr "Садржај упита:"
+
+msgid "Prompts"
+msgstr "Упити"
+
+msgid "Prompts:"
+msgstr "Упити:"
+
+msgid "Question"
+msgstr "Питање"
+
+msgid "Questions"
+msgstr "Питања"
+
+msgid "Quit"
+msgstr "Изађи"
+
+msgid "Ready"
+msgstr "Спремно"
+
+msgid "Recording Note..."
+msgstr "Снимање белешке..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "Снимање је у току — кликните да зауставите и обрадите белешку"
+
+msgid "Refresh"
+msgstr "Освежи"
+
+msgid "Reload Configuration"
+msgstr "Поново учитај конфигурацију"
+
+msgid "Reminder"
+msgstr "Подсетник"
+
+msgid "Reminders"
+msgstr "Подсетници"
+
+msgid "Request Timeout:"
+msgstr "Временско ограничење захтева:"
+
+msgid "Restore Defaults"
+msgstr "Врати подразумевано"
+
+msgid "Retry Prompt"
+msgstr "Упит за поновни покушај"
+
+msgid "Rewriting - System Prompt"
+msgstr "Преобликовање – Системски упит"
+
+msgid "Rewriting - User Prompt"
+msgstr "Преобликовање – Кориснички упит"
+
+msgid "Sample Rate:"
+msgstr "Фреквенција узорковања:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "Фреквенција узорковања за снимање микрофоном (16000 Hz се препоручује за моделе гласовног диктирања)."
+
+msgid "Save"
+msgstr "Сачувај"
+
+msgid "Save Error"
+msgstr "Грешка при чувању"
+
+msgid "Search failed: {error}"
+msgstr "Претрага није успела: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "Резултати претраге испод ове косинусне сличности су сакривени."
+
+msgid "Search your notes by meaning…"
+msgstr "Претражите своје белешке по значењу…"
+
+msgid "Searching…"
+msgstr "Претрага…"
+
+msgid "Select Notes Folder"
+msgstr "Изабери фасциклу за белешке"
+
+msgid "Select a prompt to edit..."
+msgstr "Изаберите упит за уређивање..."
+
+msgid "Semantic Search"
+msgstr "Семантичка претрага"
+
+msgid "Settings"
+msgstr "Подешавања"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "Прикажи плутајући HUD панел са одбројавањем током снимања"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "Аутоматски покрени Eloquent Notes при пријави"
+
+msgid "Start/Stop Recording"
+msgstr "Покрени/заустави снимање"
+
+msgid "Startup Options"
+msgstr "Опције покретања"
+
+msgid "Stereo (2 channels)"
+msgstr "Стерео (2 канала)"
+
+msgid "Stop dictation"
+msgstr "Заустави диктирање"
+
+msgid "System is busy. Please wait."
+msgstr "Систем је заузет. Молимо сачекајте."
+
+msgid "Tags, separated by commas"
+msgstr "Ознаке, одвојене зарезима"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "Циљни језик за преобликоване белешке, наслове и ознаке (нпр. English, Serbian)."
+
+msgid "Task"
+msgstr "Задатак"
+
+msgid "Tasks"
+msgstr "Задаци"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "Време задржавања модела у меморији након генерисања белешке (нпр. '0' за тренутно уклањање или '5m')."
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "Време задржавања тежина модела у VRAM-у током снимања ради смањења кашњења (нпр. '5m')."
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "Време задржавања модела уграђивања у меморији након претраге (нпр. '5m' или '0')."
+
+msgid "Timeline Columns:"
+msgstr "Колоне временске линије:"
+
+msgid "Title"
+msgstr "Наслов"
+
+msgid "Today"
+msgstr "Данас"
+
+msgid "Transcription - System Prompt"
+msgstr "Транскрипција – Системски упит"
+
+msgid "Transcription - User Prompt"
+msgstr "Транскрипција – Кориснички упит"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "URL вашег локалног или удаљеног Ollama сервера."
+
+msgid "Use default context length"
+msgstr "Користи подразумевану дужину контекста"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "Корисничка конфигурација на {path} није исправно YAML мапирање"
+
+msgid "Validation Error"
+msgstr "Грешка при провери"
+
+msgid "Verbosity level for app logging."
+msgstr "Ниво опширности дневника апликације."
+
+msgid "View Log File"
+msgstr "Прикажи датотеку дневника"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "Гласовни диктати претворени у организоване белешке"
+
+msgid "Yesterday"
+msgstr "Јуче"
+
+msgid "← Back"
+msgstr "← Назад"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} резултат"
+msgstr[1] "{count} резултата"
+msgstr[2] "{count} резултата"

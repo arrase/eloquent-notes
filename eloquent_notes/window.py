@@ -8,7 +8,7 @@ model work happens in EloquentApp.
 import html
 from datetime import date, datetime, timedelta
 
-from PyQt6.QtCore import QDateTime, QEvent, QLocale, Qt, pyqtSignal
+from PyQt6.QtCore import QDateTime, QEvent, Qt, pyqtSignal
 from PyQt6.QtGui import QCloseEvent, QGuiApplication, QKeySequence, QMouseEvent, QResizeEvent, QShortcut
 from PyQt6.QtWidgets import (
     QButtonGroup,
@@ -29,14 +29,12 @@ from PyQt6.QtWidgets import (
 )
 
 from eloquent_notes import IDLE, PROCESSING, RECORDING, ui
+from eloquent_notes.i18n import _, ngettext, ui_locale
 from eloquent_notes.notes import NOTE_TYPES, Note, parse_tags
 
 PAGE_MARGIN = 20
 DEFAULT_COLUMNS = 2
 PREVIEW_CHARS = 180
-
-# Dates follow the English UI rather than the system locale.
-_UI_LOCALE = QLocale(QLocale.Language.English, QLocale.Country.UnitedKingdom)
 
 DICTATE_STATES = {
     IDLE: ("gray", "Add dictation"),
@@ -44,19 +42,38 @@ DICTATE_STATES = {
     PROCESSING: ("orange", "Processing…"),
 }
 
+_TYPE_LABELS = {
+    "note": "Note",
+    "task": "Task",
+    "idea": "Idea",
+    "reminder": "Reminder",
+    "question": "Question",
+    "decision": "Decision",
+}
+
+_TYPE_FILTER_LABELS = (
+    ("", "All"),
+    ("note", "Notes"),
+    ("task", "Tasks"),
+    ("idea", "Ideas"),
+    ("reminder", "Reminders"),
+    ("question", "Questions"),
+    ("decision", "Decisions"),
+)
+
 
 def format_time(moment: datetime, pattern: str) -> str:
     """Format a datetime with a Qt date-time pattern in the UI locale."""
-    return _UI_LOCALE.toString(QDateTime.fromSecsSinceEpoch(int(moment.timestamp())), pattern)
+    return ui_locale().toString(QDateTime.fromSecsSinceEpoch(int(moment.timestamp())), pattern)
 
 
 def day_label(day: date, today: date) -> str:
     """Human-friendly heading for a timeline day."""
     if day == today:
-        return "Today"
+        return _("Today")
     if day == today - timedelta(days=1):
-        return "Yesterday"
-    return _UI_LOCALE.toString(day, "dddd, d MMMM" if day.year == today.year else "dddd, d MMMM yyyy")
+        return _("Yesterday")
+    return ui_locale().toString(day, "dddd, d MMMM" if day.year == today.year else "dddd, d MMMM yyyy")
 
 
 def _plain(text: str, object_name: str) -> QLabel:
@@ -105,7 +122,7 @@ class NoteCard(QFrame):
         type_color = theme.type_colors[note.type]
         meta = QLabel(
             f'{when} &nbsp;·&nbsp; <span style="color: {type_color}; font-weight: 600;">'
-            f"● {note.type.capitalize()}</span>"
+            f"● {_(_TYPE_LABELS[note.type])}</span>"
         )
         meta.setObjectName("mutedLabel")
         layout.addWidget(meta)
@@ -168,7 +185,7 @@ class TimelinePage(QWidget):
         title.setObjectName("appTitle")
         header.addWidget(title)
         header.addStretch()
-        btn_settings = QPushButton("Settings")
+        btn_settings = QPushButton(_("Settings"))
         btn_settings.setCursor(Qt.CursorShape.PointingHandCursor)
         btn_settings.clicked.connect(self.settings_clicked)
         header.addWidget(btn_settings)
@@ -176,7 +193,7 @@ class TimelinePage(QWidget):
 
         self.search = QLineEdit()
         self.search.setObjectName("search")
-        self.search.setPlaceholderText("Search your notes by meaning…")
+        self.search.setPlaceholderText(_("Search your notes by meaning…"))
         self.search.setClearButtonEnabled(True)
         self.search.returnPressed.connect(self._on_search)
         self.search.textChanged.connect(self._on_search_text_changed)
@@ -185,8 +202,8 @@ class TimelinePage(QWidget):
         filters = QHBoxLayout()
         filters.setSpacing(6)
         self.type_filter = QButtonGroup(self)
-        for note_type, label in [("", "All"), *((t, f"{t.capitalize()}s") for t in NOTE_TYPES)]:
-            chip = QPushButton(label)
+        for note_type, label in _TYPE_FILTER_LABELS:
+            chip = QPushButton(_(label))
             chip.setObjectName("chip")
             chip.setCheckable(True)
             chip.setChecked(not note_type)
@@ -198,7 +215,7 @@ class TimelinePage(QWidget):
         filters.addStretch()
         self.tag_filter = QComboBox()
         self.tag_filter.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.tag_filter.addItem("All tags", "")
+        self.tag_filter.addItem(_("All tags"), "")
         self.tag_filter.currentIndexChanged.connect(self._render)
         filters.addWidget(self.tag_filter)
         top.addLayout(filters)
@@ -266,7 +283,7 @@ class TimelinePage(QWidget):
         current = self.tag_filter.currentData()
         self.tag_filter.blockSignals(True)
         self.tag_filter.clear()
-        self.tag_filter.addItem("All tags", "")
+        self.tag_filter.addItem(_("All tags"), "")
         for tag in sorted({tag for note in self._notes for tag in note.tags}):
             self.tag_filter.addItem(f"#{tag}", tag)
         self.tag_filter.setCurrentIndex(max(0, self.tag_filter.findData(current)))
@@ -295,22 +312,26 @@ class TimelinePage(QWidget):
         if not self._query:
             source = self._notes
         elif self._error:
-            return [self._message(f"Search failed: {self._error}")]
+            return [self._message(_("Search failed: {error}").format(error=self._error))]
         elif self._results is None:
-            return [self._message("Searching…")]
+            return [self._message(_("Searching…"))]
         else:
             source = self._results
 
         notes = [note for note in source if self._matches(note)]
         if not notes:
             if self._query:
-                return [self._message("No matching notes.")]
+                return [self._message(_("No matching notes."))]
             if self._notes:
-                return [self._message("No notes match these filters.")]
-            return [self._message("No notes yet. Click the tray icon to record your first one.")]
+                return [self._message(_("No notes match these filters."))]
+            return [self._message(_("No notes yet. Click the tray icon to record your first one."))]
 
         if self._query:
-            header = _plain(f"{len(notes)} result{'' if len(notes) == 1 else 's'}", "dayHeader")
+            count = len(notes)
+            header = _plain(
+                ngettext("{count} result", "{count} results", count).format(count=count),
+                "dayHeader",
+            )
             return [header, *(self._card(note, show_date=True) for note in notes)]
 
         widgets: list[QWidget] = []
@@ -383,7 +404,7 @@ class ReaderPage(QWidget):
 
         toolbar = QHBoxLayout()
         toolbar.setSpacing(8)
-        btn_back = QPushButton("← Back")
+        btn_back = QPushButton(_("← Back"))
         btn_back.setCursor(Qt.CursorShape.PointingHandCursor)
         btn_back.clicked.connect(self.back_clicked)
         toolbar.addWidget(btn_back)
@@ -392,11 +413,11 @@ class ReaderPage(QWidget):
         self.btn_dictate.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_dictate.clicked.connect(self.dictate_clicked)
         toolbar.addWidget(self.btn_dictate)
-        btn_copy = QPushButton("Copy")
+        btn_copy = QPushButton(_("Copy"))
         btn_copy.setCursor(Qt.CursorShape.PointingHandCursor)
         btn_copy.clicked.connect(self.copy_clicked)
         toolbar.addWidget(btn_copy)
-        self.btn_delete = QPushButton("Delete")
+        self.btn_delete = QPushButton(_("Delete"))
         self.btn_delete.setObjectName("dangerButton")
         self.btn_delete.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_delete.clicked.connect(self.delete_clicked)
@@ -414,7 +435,7 @@ class ReaderPage(QWidget):
         self.type_box = QComboBox()
         self.type_box.setCursor(Qt.CursorShape.PointingHandCursor)
         for note_type in NOTE_TYPES:
-            self.type_box.addItem(note_type.capitalize(), note_type)
+            self.type_box.addItem(_(_TYPE_LABELS[note_type]), note_type)
         meta.addWidget(self.type_box)
         meta.addStretch()
         self.date_label = QLabel()
@@ -424,12 +445,12 @@ class ReaderPage(QWidget):
 
         self.title_edit = QLineEdit()
         self.title_edit.setObjectName("titleEdit")
-        self.title_edit.setPlaceholderText("Title")
+        self.title_edit.setPlaceholderText(_("Title"))
         sheet.addWidget(self.title_edit)
 
         self.tags_edit = QLineEdit()
         self.tags_edit.setObjectName("tagsEdit")
-        self.tags_edit.setPlaceholderText("Tags, separated by commas")
+        self.tags_edit.setPlaceholderText(_("Tags, separated by commas"))
         sheet.addWidget(self.tags_edit)
 
         separator = QFrame()
@@ -470,7 +491,7 @@ class ReaderPage(QWidget):
 
     def set_state(self, state: str) -> None:
         color, label = DICTATE_STATES[state]
-        self.btn_dictate.setText(label)
+        self.btn_dictate.setText(_(label))
         self.btn_dictate.setIcon(ui.get_qicon(color))
         self.btn_dictate.setEnabled(state != PROCESSING)
         self.btn_delete.setEnabled(state == IDLE)
@@ -562,7 +583,11 @@ class MainWindow(QMainWindow):
 
     def _on_delete(self) -> None:
         note = self.reader.note
-        confirm = QMessageBox.question(self, "Delete Note", f"Move “{note.title}” to the trash?")
+        confirm = QMessageBox.question(
+            self,
+            _("Delete Note"),
+            _("Move “{title}” to the trash?").format(title=note.title),
+        )
         if confirm == QMessageBox.StandardButton.Yes:
             self.stack.setCurrentWidget(self.timeline)
             self.delete_requested.emit(note)

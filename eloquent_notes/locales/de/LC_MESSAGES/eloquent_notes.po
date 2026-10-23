@@ -1,0 +1,523 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid " Hz"
+msgstr " Hz"
+
+msgid " MB"
+msgstr " MB"
+
+msgid " sec"
+msgstr " Sek."
+
+msgid "AI Model (Audio):"
+msgstr "KI-Modell (Audio):"
+
+msgid "AI Model cannot be empty."
+msgstr "Das KI-Modell darf nicht leer sein."
+
+msgid "AI Settings"
+msgstr "KI-Einstellungen"
+
+msgid "Add dictation"
+msgstr "Diktat hinzufügen"
+
+msgid "Alias for 'toggle' command."
+msgstr "Alias für den Befehl 'toggle'."
+
+msgid "All"
+msgstr "Alle"
+
+msgid "All tags"
+msgstr "Alle Tags"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "Möchten Sie wirklich alle Konfigurationseinstellungen und Prompts auf die Standardwerte zurücksetzen?\n\nDadurch werden aktuelle Änderungen überschrieben."
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "Akustische Signaltöne beim Starten und Stoppen der Aufnahme."
+
+msgid "Audio"
+msgstr "Audio"
+
+msgid "Audio Capture Settings"
+msgstr "Audioaufnahme-Einstellungen"
+
+msgid "Audio Channels:"
+msgstr "Audiokanäle:"
+
+msgid "Backup Count:"
+msgstr "Anzahl Sicherungen:"
+
+msgid "Beep Duration:"
+msgstr "Signalton-Dauer:"
+
+msgid "Beep Frequency:"
+msgstr "Signalton-Frequenz:"
+
+msgid "Browse..."
+msgstr "Durchsuchen..."
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Capture Duration:"
+msgstr "Aufnahmedauer:"
+
+msgid "Classification - System Prompt"
+msgstr "Klassifizierung - System-Prompt"
+
+msgid "Classification - User Prompt"
+msgstr "Klassifizierung - Benutzer-Prompt"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "Auszuführender Befehl: 'install-autostart', 'toggle', 'open' (Notizenfenster anzeigen) oder 'config' (Konfigurationsfenster öffnen)."
+
+msgid "Configuration"
+msgstr "Konfiguration"
+
+msgid "Configuration Error"
+msgstr "Konfigurationsfehler"
+
+msgid "Configuration reloaded successfully."
+msgstr "Konfiguration erfolgreich neu geladen."
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "Konfigurationsabschnitt '{key}' muss eine Zuordnung sein, erhalten: {type_name}"
+
+msgid "Connection failed: {error}"
+msgstr "Verbindung fehlgeschlagen: {error}"
+
+msgid "Context Length:"
+msgstr "Kontextlänge:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "Kontextlänge in Tokens für Ollama. Größere Werte ermöglichen längere Diktate, benötigen aber mehr Speicher."
+
+msgid "Copy"
+msgstr "Kopieren"
+
+msgid "Could not move {name} to the trash."
+msgstr "{name} konnte nicht in den Papierkorb verschoben werden."
+
+msgid "Could not start recording: {error}"
+msgstr "Aufnahme konnte nicht gestartet werden: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "Aufnahme konnte nicht gestoppt werden: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "Erstellt einen Desktop-Autostart-Eintrag im XDG-Autostart-Verzeichnis"
+
+msgid "Decision"
+msgstr "Entscheidung"
+
+msgid "Decisions"
+msgstr "Entscheidungen"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "Standardwerte wiederhergestellt. Klicken Sie auf 'Speichern', um die Änderungen auf der Festplatte zu übernehmen."
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Delete Failed"
+msgstr "Löschen fehlgeschlagen"
+
+msgid "Delete Note"
+msgstr "Notiz löschen"
+
+msgid "Dictation Added"
+msgstr "Diktat hinzugefügt"
+
+msgid "Dictation Empty"
+msgstr "Diktat leer"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "Zeigt während des Diktierens ein schwebendes Overlay mit Live-Countdown und Fortschrittsbalken an."
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (Bereit)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (Verarbeitung...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (Aufnahme...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes - Linux-Systemleisten-Programm, das Offline-Sprachdiktate in organisierte Notizen verwandelt."
+
+msgid "Eloquent Notes Configuration"
+msgstr "Eloquent Notes-Konfiguration"
+
+msgid "Eloquent Notes Daemon"
+msgstr "Eloquent Notes-Hintergrunddienst"
+
+msgid "Embedding Model cannot be empty."
+msgstr "Das Embedding-Modell darf nicht leer sein."
+
+msgid "Embedding Model:"
+msgstr "Embedding-Modell:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "Fehler beim Verarbeiten des Diktats: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "Benutzerkonfiguration konnte nicht geladen werden: {error}\n\nStandardeinstellungen wurden geladen."
+
+msgid "Failed to reload configuration: {error}"
+msgstr "Konfiguration konnte nicht neu geladen werden: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "Einstellungen konnten nicht gespeichert werden: {error}"
+
+msgid "Fetching models..."
+msgstr "Modelle werden abgerufen..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "Ordner, in dem jede Sprachnotiz als Markdown-Datei gespeichert wird. Wählen Sie einen Ordner in einem Obsidian-Vault, um Ihre Notizen auch dort zu sehen."
+
+msgid "General"
+msgstr "Allgemein"
+
+msgid "Idea"
+msgstr "Idee"
+
+msgid "Ideas"
+msgstr "Ideen"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "Wenn aktiviert, wird context_length auf null gesetzt (oder leer gelassen), sodass Ollama die standardmäßige maximale Kontextlänge des Modells verwendet."
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Ungültiges Keep-Alive-Format: '{value}'. Muss eine Ganzzahl oder Dauer sein (z. B. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Ungültiges Vorlade-Keep-Alive-Format: '{value}'. Muss eine Ganzzahl oder Dauer sein (z. B. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Ungültiges Such-Keep-Alive-Format: '{value}'. Muss eine Ganzzahl oder Dauer sein (z. B. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "Ungültiger Konfigurationswert für '{key}'"
+
+msgid "Keep Alive Time:"
+msgstr "Keep-Alive-Zeit:"
+
+msgid "Log File"
+msgstr "Protokolldatei"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "Die Protokolldatei existiert noch nicht. Führen Sie zuerst einige Diktate aus!"
+
+msgid "Logging Level:"
+msgstr "Protokollierungsstufe:"
+
+msgid "Logging Settings"
+msgstr "Protokollierungseinstellungen"
+
+msgid "Max Log File Size:"
+msgstr "Max. Protokolldateigröße:"
+
+msgid "Max Retries:"
+msgstr "Max. Wiederholungen:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "Maximale Dauer in Sekunden für die Audioaufnahme vor der automatischen Verarbeitung."
+
+msgid "Maximum size of the log file before rotating."
+msgstr "Maximale Größe der Protokolldatei vor der Rotation."
+
+msgid "Minimum Similarity:"
+msgstr "Mindestähnlichkeit:"
+
+msgid "Model returned empty note content"
+msgstr "Modell hat leeren Notizinhalt zurückgegeben"
+
+msgid "Models loaded successfully."
+msgstr "Modelle erfolgreich geladen."
+
+msgid "Mono (1 channel)"
+msgstr "Mono (1 Kanal)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "„{title}“ in den Papierkorb verschieben?"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "Name des Ollama-LLM-Modells für Diktieraufgaben (z. B. gemma4:e4b-it-qat)."
+
+msgid "No audio-capable models found."
+msgstr "Keine audiofähigen Modelle gefunden."
+
+msgid "No matching notes."
+msgstr "Keine passenden Notizen."
+
+msgid "No note was created because the audio was empty."
+msgstr "Es wurde keine Notiz erstellt, da die Audioaufnahme leer war."
+
+msgid "No notes match these filters."
+msgstr "Keine Notizen entsprechen diesen Filtern."
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "Noch keine Notizen. Klicken Sie auf das Symbol in der Systemleiste, um Ihre erste aufzunehmen."
+
+msgid "Note"
+msgstr "Notiz"
+
+msgid "Note Saved"
+msgstr "Notiz gespeichert"
+
+msgid "Notes"
+msgstr "Notizen"
+
+msgid "Notes Folder cannot be empty."
+msgstr "Der Notizenordner darf nicht leer sein."
+
+msgid "Notes Folder:"
+msgstr "Notizenordner:"
+
+msgid "Notes Storage"
+msgstr "Notizenspeicher"
+
+msgid "Number of audio input channels."
+msgstr "Anzahl der Audio-Eingangskanäle."
+
+msgid "Number of backup log files to retain."
+msgstr "Anzahl der aufzubewahrenden Sicherungs-Protokolldateien."
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "Anzahl der Spalten im Zeitachsen-Raster der Notizen."
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "Anzahl der Wiederholungsversuche, wenn das JSON-Parsing der LLM-Ausgabe fehlschlägt."
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "Ollama- && KI-Pipeline-Einstellungen"
+
+msgid "Ollama URL cannot be empty."
+msgstr "Die Ollama-URL darf nicht leer sein."
+
+msgid "Ollama URL is empty."
+msgstr "Die Ollama-URL ist leer."
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "Die Ollama-URL muss mit http:// oder https:// beginnen."
+
+msgid "Ollama URL:"
+msgstr "Ollama-URL:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "Ollama-Embedding-Modell für die bedeutungsgesteuerte Suche in Notizen (z. B. embeddinggemma-2:latest)."
+
+msgid "Open Notes"
+msgstr "Notizen öffnen"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "Die Protokolldatei des Hintergrunddienstes im Systemeditor öffnen."
+
+msgid "Output Language cannot be empty."
+msgstr "Die Ausgabesprache darf nicht leer sein."
+
+msgid "Output Language:"
+msgstr "Ausgabesprache:"
+
+msgid "Play beep on recording start and stop"
+msgstr "Signalton beim Starten und Stoppen der Aufnahme abspielen"
+
+msgid "Preload Keep Alive:"
+msgstr "Vorlade-Keep-Alive:"
+
+msgid "Preload Timeout:"
+msgstr "Vorlade-Zeitlimit:"
+
+msgid "Processing Error"
+msgstr "Verarbeitungsfehler"
+
+msgid "Processing…"
+msgstr "Verarbeitung…"
+
+msgid "Prompt Content:"
+msgstr "Prompt-Inhalt:"
+
+msgid "Prompts"
+msgstr "Prompts"
+
+msgid "Prompts:"
+msgstr "Prompts:"
+
+msgid "Question"
+msgstr "Frage"
+
+msgid "Questions"
+msgstr "Fragen"
+
+msgid "Quit"
+msgstr "Beenden"
+
+msgid "Ready"
+msgstr "Bereit"
+
+msgid "Recording Note..."
+msgstr "Notizaufnahme..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "Aufnahme läuft — klicken zum Stoppen und Verarbeiten der Notiz"
+
+msgid "Refresh"
+msgstr "Aktualisieren"
+
+msgid "Reload Configuration"
+msgstr "Konfiguration neu laden"
+
+msgid "Reminder"
+msgstr "Erinnerung"
+
+msgid "Reminders"
+msgstr "Erinnerungen"
+
+msgid "Request Timeout:"
+msgstr "Anfrage-Zeitlimit:"
+
+msgid "Restore Defaults"
+msgstr "Standardwerte wiederherstellen"
+
+msgid "Retry Prompt"
+msgstr "Wiederholungs-Prompt"
+
+msgid "Rewriting - System Prompt"
+msgstr "Umschreiben - System-Prompt"
+
+msgid "Rewriting - User Prompt"
+msgstr "Umschreiben - Benutzer-Prompt"
+
+msgid "Sample Rate:"
+msgstr "Abtastrate:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "Abtastrate für die Mikrofonaufnahme (16000 Hz wird für Sprachdiktiermodelle empfohlen)."
+
+msgid "Save"
+msgstr "Speichern"
+
+msgid "Save Error"
+msgstr "Speicherfehler"
+
+msgid "Search failed: {error}"
+msgstr "Suche fehlgeschlagen: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "Suchergebnisse unterhalb dieser Kosinus-Ähnlichkeit werden ausgeblendet."
+
+msgid "Search your notes by meaning…"
+msgstr "Notizen nach Bedeutung durchsuchen…"
+
+msgid "Searching…"
+msgstr "Suche…"
+
+msgid "Select Notes Folder"
+msgstr "Notizenordner auswählen"
+
+msgid "Select a prompt to edit..."
+msgstr "Prompt zum Bearbeiten auswählen..."
+
+msgid "Semantic Search"
+msgstr "Semantische Suche"
+
+msgid "Settings"
+msgstr "Einstellungen"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "Schwebendes Countdown-Overlay während der Aufnahme anzeigen"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "Eloquent Notes beim Anmelden automatisch starten"
+
+msgid "Start/Stop Recording"
+msgstr "Aufnahme starten/stoppen"
+
+msgid "Startup Options"
+msgstr "Startoptionen"
+
+msgid "Stereo (2 channels)"
+msgstr "Stereo (2 Kanäle)"
+
+msgid "Stop dictation"
+msgstr "Diktat stoppen"
+
+msgid "System is busy. Please wait."
+msgstr "System ist beschäftigt. Bitte warten."
+
+msgid "Tags, separated by commas"
+msgstr "Tags, durch Kommas getrennt"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "Zielsprache für umgeschriebene Notizen, Titel und Tags (z. B. English, Spanish)."
+
+msgid "Task"
+msgstr "Aufgabe"
+
+msgid "Tasks"
+msgstr "Aufgaben"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "Zeit, für die das Modell nach der Notizerstellung geladen bleibt (z. B. '0' zum sofortigen Entladen oder '5m')."
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "Zeit, für die die Modellgewichte während der Aufnahme im VRAM bleiben, um Latenz zu minimieren (z. B. '5m')."
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "Zeit, für die das Embedding-Modell nach einer Suche geladen bleibt (z. B. '5m' oder '0')."
+
+msgid "Timeline Columns:"
+msgstr "Zeitachsen-Spalten:"
+
+msgid "Title"
+msgstr "Titel"
+
+msgid "Today"
+msgstr "Heute"
+
+msgid "Transcription - System Prompt"
+msgstr "Transkription - System-Prompt"
+
+msgid "Transcription - User Prompt"
+msgstr "Transkription - Benutzer-Prompt"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "URL Ihres lokalen oder entfernten Ollama-Servers."
+
+msgid "Use default context length"
+msgstr "Standard-Kontextlänge verwenden"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "Benutzerkonfiguration unter {path} ist keine gültige YAML-Zuordnung"
+
+msgid "Validation Error"
+msgstr "Validierungsfehler"
+
+msgid "Verbosity level for app logging."
+msgstr "Detailgrad für die Anwendungsprotokollierung."
+
+msgid "View Log File"
+msgstr "Protokolldatei anzeigen"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "Sprachdiktate verwandelt in organisierte Notizen"
+
+msgid "Yesterday"
+msgstr "Gestern"
+
+msgid "← Back"
+msgstr "← Zurück"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} Ergebnis"
+msgstr[1] "{count} Ergebnisse"

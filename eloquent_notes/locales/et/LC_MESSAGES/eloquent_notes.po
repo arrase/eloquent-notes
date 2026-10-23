@@ -1,0 +1,523 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: et\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid " Hz"
+msgstr " Hz"
+
+msgid " MB"
+msgstr " MB"
+
+msgid " sec"
+msgstr " sek"
+
+msgid "AI Model (Audio):"
+msgstr "Tehisaru mudel (heli):"
+
+msgid "AI Model cannot be empty."
+msgstr "Tehisaru mudel ei või olla tühi."
+
+msgid "AI Settings"
+msgstr "Tehisaru seaded"
+
+msgid "Add dictation"
+msgstr "Lisa dikteering"
+
+msgid "Alias for 'toggle' command."
+msgstr "Käsu 'toggle' alias."
+
+msgid "All"
+msgstr "Kõik"
+
+msgid "All tags"
+msgstr "Kõik sildid"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "Kas olete kindel, et soovite taastada kõik seadistused ja viibad nende vaikeväärtustele?\n\nSee kirjutab praegused muudatused üle."
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "Helisignaalid salvestamise alustamisel ja peatamisel."
+
+msgid "Audio"
+msgstr "Heli"
+
+msgid "Audio Capture Settings"
+msgstr "Helisalvestuse seaded"
+
+msgid "Audio Channels:"
+msgstr "Helikanalid:"
+
+msgid "Backup Count:"
+msgstr "Varukoopiate arv:"
+
+msgid "Beep Duration:"
+msgstr "Helisignaali kestus:"
+
+msgid "Beep Frequency:"
+msgstr "Helisignaali sagedus:"
+
+msgid "Browse..."
+msgstr "Sirvi..."
+
+msgid "Cancel"
+msgstr "Tühista"
+
+msgid "Capture Duration:"
+msgstr "Salvestuse kestus:"
+
+msgid "Classification - System Prompt"
+msgstr "Klassifitseerimine – süsteemiviip"
+
+msgid "Classification - User Prompt"
+msgstr "Klassifitseerimine – kasutajaviip"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "Käivitatav käsk: 'install-autostart', 'toggle', 'open' (kuva märkmete aken) või 'config' (ava seadistuste liides)."
+
+msgid "Configuration"
+msgstr "Seadistus"
+
+msgid "Configuration Error"
+msgstr "Seadistuse viga"
+
+msgid "Configuration reloaded successfully."
+msgstr "Seadistus laaditi edukalt uuesti."
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "Seadistuse jaotis '{key}' peab olema vastendus, saadi {type_name}"
+
+msgid "Connection failed: {error}"
+msgstr "Ühendus ebaõnnestus: {error}"
+
+msgid "Context Length:"
+msgstr "Konteksti pikkus:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "Konteksti pikkus sõnedes, mis edastatakse Ollamale. Suuremad väärtused võimaldavad pikemaid dikteeringuid, kuid kasutavad rohkem mälu."
+
+msgid "Copy"
+msgstr "Kopeeri"
+
+msgid "Could not move {name} to the trash."
+msgstr "Faili {name} ei õnnestunud prügikasti teisaldada."
+
+msgid "Could not start recording: {error}"
+msgstr "Salvestamist ei õnnestunud alustada: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "Salvestamist ei õnnestunud peatada: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "Loob töölaua automaatkäivituse kirje XDG automaatkäivituse kataloogi"
+
+msgid "Decision"
+msgstr "Otsus"
+
+msgid "Decisions"
+msgstr "Otsused"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "Vaikeväärtused taastatud. Muudatuste kettale salvestamiseks klõpsake „Salvesta“."
+
+msgid "Delete"
+msgstr "Kustuta"
+
+msgid "Delete Failed"
+msgstr "Kustutamine ebaõnnestus"
+
+msgid "Delete Note"
+msgstr "Kustuta märge"
+
+msgid "Dictation Added"
+msgstr "Dikteering lisatud"
+
+msgid "Dictation Empty"
+msgstr "Dikteering on tühi"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "Kuvab dikteerimise ajal hõljuva kapslikujulise ülekatte koos pöördloendustaimeri ja edenemisribaga."
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (Ootel)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (Töötlemine...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (Salvestamine...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes – Linuxi süsteemisalve tööriist, mis muudab võrguühenduseta hääldikteeringud korrastatud märkmeteks."
+
+msgid "Eloquent Notes Configuration"
+msgstr "Eloquent Notesi seadistus"
+
+msgid "Eloquent Notes Daemon"
+msgstr "Eloquent Notesi deemon"
+
+msgid "Embedding Model cannot be empty."
+msgstr "Manustamismudel ei või olla tühi."
+
+msgid "Embedding Model:"
+msgstr "Manustamismudel:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "Viga dikteeringu töötlemisel: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "Kasutaja seadistuse laadimine ebaõnnestus: {error}\n\nLaaditi vaikeseaded."
+
+msgid "Failed to reload configuration: {error}"
+msgstr "Seadistuse uuesti laadimine ebaõnnestus: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "Seadete salvestamine ebaõnnestus: {error}"
+
+msgid "Fetching models..."
+msgstr "Mudelite toomine..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "Kaust, kuhu iga häälmärge salvestatakse Markdown-failina. Suunake see Obsidiani hoidlasse, et näha oma märkmeid ka seal."
+
+msgid "General"
+msgstr "Üldine"
+
+msgid "Idea"
+msgstr "Idee"
+
+msgid "Ideas"
+msgstr "Ideed"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "Kui see on märgitud, määratakse context_length väärtuseks null (või jäetakse määramata), mis suunab Ollamat kasutama mudeli vaikimisi maksimaalset kontekstipikkust."
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Vigane mälus hoidmise vorming: '{value}'. Peab olema täisarv või kestus (nt 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Vigane eellaadimise mälus hoidmise vorming: '{value}'. Peab olema täisarv või kestus (nt 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Vigane otsingu mälus hoidmise vorming: '{value}'. Peab olema täisarv või kestus (nt 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "Vigane seadistusväärtus võtmele '{key}'"
+
+msgid "Keep Alive Time:"
+msgstr "Mälus hoidmise aeg:"
+
+msgid "Log File"
+msgstr "Logifail"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "Logifaili pole veel olemas. Tehke esmalt mõned dikteeringud!"
+
+msgid "Logging Level:"
+msgstr "Logimise tase:"
+
+msgid "Logging Settings"
+msgstr "Logimise seaded"
+
+msgid "Max Log File Size:"
+msgstr "Logifaili max suurus:"
+
+msgid "Max Retries:"
+msgstr "Max korduskatseid:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "Helisalvestuse maksimaalne kestus sekundites enne automaatset töötlemist."
+
+msgid "Maximum size of the log file before rotating."
+msgstr "Logifaili maksimaalne suurus enne roteerimist."
+
+msgid "Minimum Similarity:"
+msgstr "Minimaalne sarnasus:"
+
+msgid "Model returned empty note content"
+msgstr "Mudel tagastas tühja märkme sisu"
+
+msgid "Models loaded successfully."
+msgstr "Mudelid laaditi edukalt."
+
+msgid "Mono (1 channel)"
+msgstr "Mono (1 kanal)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "Kas teisaldada „{title}“ prügikasti?"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "Dikteerimisülesannete jaoks käivitatava Ollama LLM-mudeli nimi (nt gemma4:e4b-it-qat)."
+
+msgid "No audio-capable models found."
+msgstr "Helitoega mudeleid ei leitud."
+
+msgid "No matching notes."
+msgstr "Vastavad märkmed puuduvad."
+
+msgid "No note was created because the audio was empty."
+msgstr "Märget ei loodud, kuna helisalvestis oli tühi."
+
+msgid "No notes match these filters."
+msgstr "Nendele filtritele ei vasta ükski märge."
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "Märkmeid pole veel. Esimese märkme salvestamiseks klõpsake salveikoonil."
+
+msgid "Note"
+msgstr "Märge"
+
+msgid "Note Saved"
+msgstr "Märge salvestatud"
+
+msgid "Notes"
+msgstr "Märkmed"
+
+msgid "Notes Folder cannot be empty."
+msgstr "Märkmete kaust ei või olla tühi."
+
+msgid "Notes Folder:"
+msgstr "Märkmete kaust:"
+
+msgid "Notes Storage"
+msgstr "Märkmete salvestusruum"
+
+msgid "Number of audio input channels."
+msgstr "Heli sisendkanalite arv."
+
+msgid "Number of backup log files to retain."
+msgstr "Säilitatavate varulogifailide arv."
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "Veergude arv märkmete ajajoone ruudustikus."
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "Korduskatsete arv, kui LLM-i väljundi JSON-i parsimine ebaõnnestub."
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "Ollama && tehisaru töövoo seaded"
+
+msgid "Ollama URL cannot be empty."
+msgstr "Ollama URL ei või olla tühi."
+
+msgid "Ollama URL is empty."
+msgstr "Ollama URL on tühi."
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "Ollama URL peab algama stringiga http:// või https://."
+
+msgid "Ollama URL:"
+msgstr "Ollama URL:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "Ollama manustamismudel, mida kasutatakse märkmete tähenduse järgi otsimiseks (nt embeddinggemma-2:latest)."
+
+msgid "Open Notes"
+msgstr "Ava märkmed"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "Ava taustadeemoni logifail süsteemi redaktoris."
+
+msgid "Output Language cannot be empty."
+msgstr "Väljundkeel ei või olla tühi."
+
+msgid "Output Language:"
+msgstr "Väljundkeel:"
+
+msgid "Play beep on recording start and stop"
+msgstr "Esita helisignaal salvestamise alustamisel ja peatamisel"
+
+msgid "Preload Keep Alive:"
+msgstr "Eellaadimise mälus hoidmine:"
+
+msgid "Preload Timeout:"
+msgstr "Eellaadimise ajalõpp:"
+
+msgid "Processing Error"
+msgstr "Töötlemise viga"
+
+msgid "Processing…"
+msgstr "Töötlemine…"
+
+msgid "Prompt Content:"
+msgstr "Viiba sisu:"
+
+msgid "Prompts"
+msgstr "Viibad"
+
+msgid "Prompts:"
+msgstr "Viibad:"
+
+msgid "Question"
+msgstr "Küsimus"
+
+msgid "Questions"
+msgstr "Küsimused"
+
+msgid "Quit"
+msgstr "Välju"
+
+msgid "Ready"
+msgstr "Valmis"
+
+msgid "Recording Note..."
+msgstr "Salvestan märget..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "Salvestamine käib — klõpsake peatamiseks ja märkme töötlemiseks"
+
+msgid "Refresh"
+msgstr "Värskenda"
+
+msgid "Reload Configuration"
+msgstr "Laadi seadistus uuesti"
+
+msgid "Reminder"
+msgstr "Meeldetuletus"
+
+msgid "Reminders"
+msgstr "Meeldetuletused"
+
+msgid "Request Timeout:"
+msgstr "Päringu ajalõpp:"
+
+msgid "Restore Defaults"
+msgstr "Taasta vaikeväärtused"
+
+msgid "Retry Prompt"
+msgstr "Korduskatse viip"
+
+msgid "Rewriting - System Prompt"
+msgstr "Ümberkirjutamine – süsteemiviip"
+
+msgid "Rewriting - User Prompt"
+msgstr "Ümberkirjutamine – kasutajaviip"
+
+msgid "Sample Rate:"
+msgstr "Diskreetimissagedus:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "Mikrofonisalvestuse diskreetimissagedus (kõnedikteerimismudelite jaoks on soovitatav 16000 Hz)."
+
+msgid "Save"
+msgstr "Salvesta"
+
+msgid "Save Error"
+msgstr "Salvestamise viga"
+
+msgid "Search failed: {error}"
+msgstr "Otsing ebaõnnestus: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "Sellest koosinussarnasusest madalamad otsingutulemused peidetakse."
+
+msgid "Search your notes by meaning…"
+msgstr "Otsige märkmeid tähenduse järgi…"
+
+msgid "Searching…"
+msgstr "Otsimine…"
+
+msgid "Select Notes Folder"
+msgstr "Vali märkmete kaust"
+
+msgid "Select a prompt to edit..."
+msgstr "Valige muutmiseks viip..."
+
+msgid "Semantic Search"
+msgstr "Semantiline otsing"
+
+msgid "Settings"
+msgstr "Seaded"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "Kuva salvestamise ajal hõljuv pöördloenduse HUD-ülekate"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "Käivita Eloquent Notes sisselogimisel automaatselt"
+
+msgid "Start/Stop Recording"
+msgstr "Alusta/peata salvestamine"
+
+msgid "Startup Options"
+msgstr "Käivitamise valikud"
+
+msgid "Stereo (2 channels)"
+msgstr "Stereo (2 kanalit)"
+
+msgid "Stop dictation"
+msgstr "Peata dikteerimine"
+
+msgid "System is busy. Please wait."
+msgstr "Süsteem on hõivatud. Palun oodake."
+
+msgid "Tags, separated by commas"
+msgstr "Sildid, komadega eraldatud"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "Ümberkirjutatud märkmete, pealkirjade ja siltide sihtkeel (nt English, Estonian)."
+
+msgid "Task"
+msgstr "Ülesanne"
+
+msgid "Tasks"
+msgstr "Ülesanded"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "Aeg, mille jooksul hoitakse mudelit pärast märkme genereerimist mälus (nt '0' koheseks vabastamiseks või '5m')."
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "Aeg, mille jooksul hoitakse mudeli kaalusid salvestamise ajal VRAM-is latentsuse minimeerimiseks (nt '5m')."
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "Aeg, mille jooksul hoitakse manustamismudelit pärast otsingut mälus (nt '5m' või '0')."
+
+msgid "Timeline Columns:"
+msgstr "Ajajoone veerud:"
+
+msgid "Title"
+msgstr "Pealkiri"
+
+msgid "Today"
+msgstr "Täna"
+
+msgid "Transcription - System Prompt"
+msgstr "Transkriptsioon – süsteemiviip"
+
+msgid "Transcription - User Prompt"
+msgstr "Transkriptsioon – kasutajaviip"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "Kohaliku või kaug-Ollama serveri URL."
+
+msgid "Use default context length"
+msgstr "Kasuta vaikimisi kontekstipikkust"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "Kasutaja seadistus asukohas {path} ei ole kehtiv YAML-vastendus"
+
+msgid "Validation Error"
+msgstr "Valideerimisviga"
+
+msgid "Verbosity level for app logging."
+msgstr "Rakenduse logimise üksikasjalikkuse tase."
+
+msgid "View Log File"
+msgstr "Vaata logifaili"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "Hääldikteeringud muudetud korrastatud märkmeteks"
+
+msgid "Yesterday"
+msgstr "Eile"
+
+msgid "← Back"
+msgstr "← Tagasi"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} tulemus"
+msgstr[1] "{count} tulemust"

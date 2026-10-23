@@ -1,0 +1,524 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: uk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgid " Hz"
+msgstr " Гц"
+
+msgid " MB"
+msgstr " МБ"
+
+msgid " sec"
+msgstr " с"
+
+msgid "AI Model (Audio):"
+msgstr "ШІ-модель (Аудіо):"
+
+msgid "AI Model cannot be empty."
+msgstr "ШІ-модель не може бути порожньою."
+
+msgid "AI Settings"
+msgstr "Налаштування ШІ"
+
+msgid "Add dictation"
+msgstr "Додати диктування"
+
+msgid "Alias for 'toggle' command."
+msgstr "Псевдонім для команди 'toggle'."
+
+msgid "All"
+msgstr "Усі"
+
+msgid "All tags"
+msgstr "Усі теги"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "Ви впевнені, що хочете відновити всі налаштування конфігурації та промпти до значень за замовчуванням?\n\nЦе перезапише поточні зміни."
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "Звукові сигнали під час початку та зупинки запису."
+
+msgid "Audio"
+msgstr "Аудіо"
+
+msgid "Audio Capture Settings"
+msgstr "Налаштування захоплення аудіо"
+
+msgid "Audio Channels:"
+msgstr "Аудіоканали:"
+
+msgid "Backup Count:"
+msgstr "Кількість резервних копій:"
+
+msgid "Beep Duration:"
+msgstr "Тривалість сигналу:"
+
+msgid "Beep Frequency:"
+msgstr "Частота сигналу:"
+
+msgid "Browse..."
+msgstr "Огляд..."
+
+msgid "Cancel"
+msgstr "Скасувати"
+
+msgid "Capture Duration:"
+msgstr "Тривалість запису:"
+
+msgid "Classification - System Prompt"
+msgstr "Класифікація — Системний промпт"
+
+msgid "Classification - User Prompt"
+msgstr "Класифікація — Промпт користувача"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "Команда для виконання: 'install-autostart', 'toggle', 'open' (показати вікно нотаток) або 'config' (відкрити вікно налаштувань)."
+
+msgid "Configuration"
+msgstr "Конфігурація"
+
+msgid "Configuration Error"
+msgstr "Помилка конфігурації"
+
+msgid "Configuration reloaded successfully."
+msgstr "Конфігурацію успішно перезавантажено."
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "Розділ конфігурації '{key}' має бути словником, отримано {type_name}"
+
+msgid "Connection failed: {error}"
+msgstr "Помилка підключення: {error}"
+
+msgid "Context Length:"
+msgstr "Довжина контексту:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "Довжина контексту в токенах для передачі в Ollama. Більші значення дозволяють довші диктування, але використовують більше пам'яті."
+
+msgid "Copy"
+msgstr "Копіювати"
+
+msgid "Could not move {name} to the trash."
+msgstr "Не вдалося перемістити {name} до кошика."
+
+msgid "Could not start recording: {error}"
+msgstr "Не вдалося розпочати запис: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "Не вдалося зупинити запис: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "Створює запис автозапуску в каталозі автозапуску XDG"
+
+msgid "Decision"
+msgstr "Рішення"
+
+msgid "Decisions"
+msgstr "Рішення"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "Значення за замовчуванням відновлено. Натисніть «Зберегти», щоб застосувати зміни на диску."
+
+msgid "Delete"
+msgstr "Видалити"
+
+msgid "Delete Failed"
+msgstr "Помилка видалення"
+
+msgid "Delete Note"
+msgstr "Видалити нотатку"
+
+msgid "Dictation Added"
+msgstr "Диктування додано"
+
+msgid "Dictation Empty"
+msgstr "Диктування порожнє"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "Відображає компактну плаваючу панель із таймером зворотного відліку та індикатором виконання під час диктування."
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (Очікування)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (Обробка...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (Запис...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes — утиліта системного трею Linux, яка перетворює офлайн-диктування на впорядковані нотатки."
+
+msgid "Eloquent Notes Configuration"
+msgstr "Конфігурація Eloquent Notes"
+
+msgid "Eloquent Notes Daemon"
+msgstr "Фонова служба Eloquent Notes"
+
+msgid "Embedding Model cannot be empty."
+msgstr "Модель ембедингів не може бути порожньою."
+
+msgid "Embedding Model:"
+msgstr "Модель ембедингів:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "Помилка обробки диктування: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "Не вдалося завантажити конфігурацію користувача: {error}\n\nЗавантажено налаштування за замовчуванням."
+
+msgid "Failed to reload configuration: {error}"
+msgstr "Не вдалося перезавантажити конфігурацію: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "Не вдалося зберегти налаштування: {error}"
+
+msgid "Fetching models..."
+msgstr "Отримання моделей..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "Папка, у якій кожна голосова нотатка зберігається як файл Markdown. Вкажіть сховище Obsidian, щоб бачити свої нотатки й там."
+
+msgid "General"
+msgstr "Загальні"
+
+msgid "Idea"
+msgstr "Ідея"
+
+msgid "Ideas"
+msgstr "Ідеї"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "Якщо позначено, встановлює context_length у null (або залишає невизначеним), наказуючи Ollama використовувати максимальну довжину контексту моделі за замовчуванням."
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Неправильний формат Keep Alive: '{value}'. Має бути цілим числом або тривалістю (наприклад, 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Неправильний формат Preload Keep Alive: '{value}'. Має бути цілим числом або тривалістю (наприклад, 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Неправильний формат Search Keep Alive: '{value}'. Має бути цілим числом або тривалістю (наприклад, 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "Неправильне значення конфігурації для '{key}'"
+
+msgid "Keep Alive Time:"
+msgstr "Час Keep Alive:"
+
+msgid "Log File"
+msgstr "Файл журналу"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "Файл журналу ще не існує. Спочатку виконайте кілька диктувань!"
+
+msgid "Logging Level:"
+msgstr "Рівень логування:"
+
+msgid "Logging Settings"
+msgstr "Налаштування логування"
+
+msgid "Max Log File Size:"
+msgstr "Макс. розмір файлу журналу:"
+
+msgid "Max Retries:"
+msgstr "Макс. кількість спроб:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "Максимальна тривалість запису аудіо в секундах перед автоматичною обробкою."
+
+msgid "Maximum size of the log file before rotating."
+msgstr "Максимальний розмір файлу журналу перед ротацією."
+
+msgid "Minimum Similarity:"
+msgstr "Мінімальна схожість:"
+
+msgid "Model returned empty note content"
+msgstr "Модель повернула порожній вміст нотатки"
+
+msgid "Models loaded successfully."
+msgstr "Моделі успішно завантажено."
+
+msgid "Mono (1 channel)"
+msgstr "Моно (1 канал)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "Перемістити «{title}» до кошика?"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "Назва LLM-моделі Ollama для завдань диктування (наприклад, gemma4:e4b-it-qat)."
+
+msgid "No audio-capable models found."
+msgstr "Моделей із підтримкою аудіо не знайдено."
+
+msgid "No matching notes."
+msgstr "Відповідних нотаток немає."
+
+msgid "No note was created because the audio was empty."
+msgstr "Нотатку не створено, оскільки аудіозапис був порожнім."
+
+msgid "No notes match these filters."
+msgstr "Жодна нотатка не відповідає цим фільтрам."
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "Нотаток ще немає. Натисніть значок у треї, щоб записати першу."
+
+msgid "Note"
+msgstr "Нотатка"
+
+msgid "Note Saved"
+msgstr "Нотатку збережено"
+
+msgid "Notes"
+msgstr "Нотатки"
+
+msgid "Notes Folder cannot be empty."
+msgstr "Папка нотаток не може бути порожньою."
+
+msgid "Notes Folder:"
+msgstr "Папка нотаток:"
+
+msgid "Notes Storage"
+msgstr "Сховище нотаток"
+
+msgid "Number of audio input channels."
+msgstr "Кількість вхідних аудіоканалів."
+
+msgid "Number of backup log files to retain."
+msgstr "Кількість резервних файлів журналу для зберігання."
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "Кількість стовпців у сітці хронології нотаток."
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "Кількість повторних спроб, якщо відповідь LLM не вдається розібрати як JSON."
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "Налаштування конвеєра Ollama && ШІ"
+
+msgid "Ollama URL cannot be empty."
+msgstr "URL Ollama не може бути порожнім."
+
+msgid "Ollama URL is empty."
+msgstr "URL Ollama порожній."
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "URL Ollama має починатися з http:// або https://."
+
+msgid "Ollama URL:"
+msgstr "URL Ollama:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "Модель ембедингів Ollama для пошуку нотаток за змістом (наприклад, embeddinggemma-2:latest)."
+
+msgid "Open Notes"
+msgstr "Відкрити нотатки"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "Відкрити файл журналу фонової служби в системному редакторі."
+
+msgid "Output Language cannot be empty."
+msgstr "Мова виводу не може бути порожньою."
+
+msgid "Output Language:"
+msgstr "Мова виводу:"
+
+msgid "Play beep on recording start and stop"
+msgstr "Відтворювати звуковий сигнал на початку та в кінці запису"
+
+msgid "Preload Keep Alive:"
+msgstr "Preload Keep Alive:"
+
+msgid "Preload Timeout:"
+msgstr "Тайм-аут попереднього завантаження:"
+
+msgid "Processing Error"
+msgstr "Помилка обробки"
+
+msgid "Processing…"
+msgstr "Обробка…"
+
+msgid "Prompt Content:"
+msgstr "Вміст промпту:"
+
+msgid "Prompts"
+msgstr "Промпти"
+
+msgid "Prompts:"
+msgstr "Промпти:"
+
+msgid "Question"
+msgstr "Питання"
+
+msgid "Questions"
+msgstr "Питання"
+
+msgid "Quit"
+msgstr "Вийти"
+
+msgid "Ready"
+msgstr "Готово"
+
+msgid "Recording Note..."
+msgstr "Запис нотатки..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "Триває запис — натисніть, щоб зупинити й обробити нотатку"
+
+msgid "Refresh"
+msgstr "Оновити"
+
+msgid "Reload Configuration"
+msgstr "Перезавантажити конфігурацію"
+
+msgid "Reminder"
+msgstr "Нагадування"
+
+msgid "Reminders"
+msgstr "Нагадування"
+
+msgid "Request Timeout:"
+msgstr "Тайм-аут запиту:"
+
+msgid "Restore Defaults"
+msgstr "Відновити за замовчуванням"
+
+msgid "Retry Prompt"
+msgstr "Промпт повторної спроби"
+
+msgid "Rewriting - System Prompt"
+msgstr "Переписування — Системний промпт"
+
+msgid "Rewriting - User Prompt"
+msgstr "Переписування — Промпт користувача"
+
+msgid "Sample Rate:"
+msgstr "Частота дискретизації:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "Частота дискретизації для запису з мікрофона (16000 Гц рекомендовано для моделей розпізнавання мовлення)."
+
+msgid "Save"
+msgstr "Зберегти"
+
+msgid "Save Error"
+msgstr "Помилка збереження"
+
+msgid "Search failed: {error}"
+msgstr "Помилка пошуку: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "Результати пошуку нижче цієї косинусної схожості приховуються."
+
+msgid "Search your notes by meaning…"
+msgstr "Шукайте нотатки за змістом…"
+
+msgid "Searching…"
+msgstr "Пошук…"
+
+msgid "Select Notes Folder"
+msgstr "Виберіть папку нотаток"
+
+msgid "Select a prompt to edit..."
+msgstr "Виберіть промпт для редагування..."
+
+msgid "Semantic Search"
+msgstr "Семантичний пошук"
+
+msgid "Settings"
+msgstr "Налаштування"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "Показувати плаваючу HUD-панель зворотного відліку під час запису"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "Автоматично запускати Eloquent Notes під час входу в систему"
+
+msgid "Start/Stop Recording"
+msgstr "Почати/зупинити запис"
+
+msgid "Startup Options"
+msgstr "Параметри запуску"
+
+msgid "Stereo (2 channels)"
+msgstr "Стерео (2 канали)"
+
+msgid "Stop dictation"
+msgstr "Зупинити диктування"
+
+msgid "System is busy. Please wait."
+msgstr "Система зайнята. Зачекайте, будь ласка."
+
+msgid "Tags, separated by commas"
+msgstr "Теги, розділені комами"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "Цільова мова для переписаних нотаток, заголовків і тегів (наприклад, English, Ukrainian)."
+
+msgid "Task"
+msgstr "Завдання"
+
+msgid "Tasks"
+msgstr "Завдання"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "Час утримання моделі в пам'яті після створення нотатки (наприклад, '0' для негайного вивантаження або '5m')."
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "Час утримання ваг моделі у VRAM під час запису для мінімізації затримки (наприклад, '5m')."
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "Час утримання моделі ембедингів у пам'яті після пошуку (наприклад, '5m' або '0')."
+
+msgid "Timeline Columns:"
+msgstr "Стовпці хронології:"
+
+msgid "Title"
+msgstr "Заголовок"
+
+msgid "Today"
+msgstr "Сьогодні"
+
+msgid "Transcription - System Prompt"
+msgstr "Транскрипція — Системний промпт"
+
+msgid "Transcription - User Prompt"
+msgstr "Транскрипція — Промпт користувача"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "URL вашого локального або віддаленого сервера Ollama."
+
+msgid "Use default context length"
+msgstr "Використовувати довжину контексту за замовчуванням"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "Конфігурація користувача за адресою {path} не є коректним словником YAML"
+
+msgid "Validation Error"
+msgstr "Помилка перевірки"
+
+msgid "Verbosity level for app logging."
+msgstr "Рівень деталізації журналювання програми."
+
+msgid "View Log File"
+msgstr "Переглянути файл журналу"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "Голосові диктування, перетворені на впорядковані нотатки"
+
+msgid "Yesterday"
+msgstr "Учора"
+
+msgid "← Back"
+msgstr "← Назад"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} результат"
+msgstr[1] "{count} результати"
+msgstr[2] "{count} результатів"

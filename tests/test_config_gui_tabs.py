@@ -47,6 +47,12 @@ def test_ai_tab_load_and_save_valid(qapp):
     assert tab.spn_preload_timeout.value() == 50
     assert tab.spn_request_timeout.value() == 100
 
+    config_data["ai"]["output_language"] = "Esperanto"
+    with patch.object(AITab, "_fetch_models"):
+        tab.load_settings(config_data)
+    assert tab.cmb_language.currentText() == "Esperanto"
+    tab.cmb_language.setCurrentText("Japanese")
+
     assert tab.cmb_embedding_model.currentText() == "embeddinggemma-2:latest"
     assert tab.txt_search_keep_alive.text() == "5m"
     assert tab.spn_min_similarity.value() == 0.3

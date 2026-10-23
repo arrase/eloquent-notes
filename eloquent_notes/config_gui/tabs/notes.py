@@ -16,6 +16,8 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from eloquent_notes.i18n import _
+
 
 class NotesTab(QWidget):
     """Notes folder configuration tab."""
@@ -29,7 +31,7 @@ class NotesTab(QWidget):
         layout.setContentsMargins(15, 15, 15, 15)
         layout.setSpacing(15)
 
-        grp_notes = QGroupBox("Notes Storage")
+        grp_notes = QGroupBox(_("Notes Storage"))
         form_layout = QFormLayout(grp_notes)
         form_layout.setSpacing(10)
 
@@ -40,20 +42,22 @@ class NotesTab(QWidget):
 
         self.txt_folder = QLineEdit()
         self.txt_folder.setToolTip(
-            "Folder where each voice note is saved as a Markdown file."
-            " Point it inside an Obsidian vault to see your notes there too."
+            _(
+                "Folder where each voice note is saved as a Markdown file."
+                " Point it inside an Obsidian vault to see your notes there too."
+            )
         )
-        self.btn_browse_folder = QPushButton("Browse...")
+        self.btn_browse_folder = QPushButton(_("Browse..."))
         self.btn_browse_folder.clicked.connect(self._browse_folder)
         path_layout.addWidget(self.txt_folder, 1)
         path_layout.addWidget(self.btn_browse_folder)
 
-        form_layout.addRow(QLabel("Notes Folder:"), path_widget)
+        form_layout.addRow(QLabel(_("Notes Folder:")), path_widget)
 
         self.spn_columns = QSpinBox()
         self.spn_columns.setRange(1, 6)
-        self.spn_columns.setToolTip("Number of columns in the notes timeline grid.")
-        form_layout.addRow(QLabel("Timeline Columns:"), self.spn_columns)
+        self.spn_columns.setToolTip(_("Number of columns in the notes timeline grid."))
+        form_layout.addRow(QLabel(_("Timeline Columns:")), self.spn_columns)
 
         layout.addWidget(grp_notes)
         layout.addStretch()
@@ -64,7 +68,7 @@ class NotesTab(QWidget):
             initial_dir = os.path.expanduser("~/")
 
         dir_path = QFileDialog.getExistingDirectory(
-            self, "Select Notes Folder", initial_dir
+            self, _("Select Notes Folder"), initial_dir
         )
         if dir_path:
             self.txt_folder.setText(dir_path)
@@ -76,7 +80,7 @@ class NotesTab(QWidget):
     def save_settings(self, config_data: dict) -> bool:
         folder = self.txt_folder.text().strip()
         if not folder:
-            QMessageBox.warning(self, "Validation Error", "Notes Folder cannot be empty.")
+            QMessageBox.warning(self, _("Validation Error"), _("Notes Folder cannot be empty."))
             return False
 
         config_data["notes"]["folder"] = folder

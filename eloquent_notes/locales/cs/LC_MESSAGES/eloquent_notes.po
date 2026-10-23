@@ -1,0 +1,524 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+msgid " Hz"
+msgstr " Hz"
+
+msgid " MB"
+msgstr " MB"
+
+msgid " sec"
+msgstr " s"
+
+msgid "AI Model (Audio):"
+msgstr "AI model (Audio):"
+
+msgid "AI Model cannot be empty."
+msgstr "AI model nesmí být prázdný."
+
+msgid "AI Settings"
+msgstr "Nastavení AI"
+
+msgid "Add dictation"
+msgstr "Přidat diktát"
+
+msgid "Alias for 'toggle' command."
+msgstr "Alias pro příkaz 'toggle'."
+
+msgid "All"
+msgstr "Vše"
+
+msgid "All tags"
+msgstr "Všechny štítky"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "Opravdu chcete obnovit všechna nastavení konfigurace a prompty na výchozí hodnoty?\n\nTímto přepíšete aktuální úpravy."
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "Zvuková odezva (pípnutí) při spuštění a zastavení nahrávání."
+
+msgid "Audio"
+msgstr "Zvuk"
+
+msgid "Audio Capture Settings"
+msgstr "Nastavení záznamu zvuku"
+
+msgid "Audio Channels:"
+msgstr "Zvukové kanály:"
+
+msgid "Backup Count:"
+msgstr "Počet záloh:"
+
+msgid "Beep Duration:"
+msgstr "Délka pípnutí:"
+
+msgid "Beep Frequency:"
+msgstr "Frekvence pípnutí:"
+
+msgid "Browse..."
+msgstr "Procházet..."
+
+msgid "Cancel"
+msgstr "Zrušit"
+
+msgid "Capture Duration:"
+msgstr "Délka záznamu:"
+
+msgid "Classification - System Prompt"
+msgstr "Klasifikace – Systémový prompt"
+
+msgid "Classification - User Prompt"
+msgstr "Klasifikace – Uživatelský prompt"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "Příkaz ke spuštění: 'install-autostart', 'toggle', 'open' (zobrazit okno poznámek) nebo 'config' (otevřít nastavení)."
+
+msgid "Configuration"
+msgstr "Konfigurace"
+
+msgid "Configuration Error"
+msgstr "Chyba konfigurace"
+
+msgid "Configuration reloaded successfully."
+msgstr "Konfigurace byla úspěšně znovu načtena."
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "Sekce konfigurace '{key}' musí být mapování, obdrženo {type_name}"
+
+msgid "Connection failed: {error}"
+msgstr "Připojení selhalo: {error}"
+
+msgid "Context Length:"
+msgstr "Délka kontextu:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "Délka kontextu v tokenech předávaná do Ollama. Vyšší hodnoty umožňují delší diktáty, ale spotřebují více paměti."
+
+msgid "Copy"
+msgstr "Kopírovat"
+
+msgid "Could not move {name} to the trash."
+msgstr "Nelze přesunout {name} do koše."
+
+msgid "Could not start recording: {error}"
+msgstr "Nelze spustit nahrávání: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "Nelze zastavit nahrávání: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "Vytvoří položku automatického spuštění v adresáři XDG autostart"
+
+msgid "Decision"
+msgstr "Rozhodnutí"
+
+msgid "Decisions"
+msgstr "Rozhodnutí"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "Výchozí hodnoty obnoveny. Kliknutím na „Uložit“ zapíšete změny na disk."
+
+msgid "Delete"
+msgstr "Smazat"
+
+msgid "Delete Failed"
+msgstr "Smazání selhalo"
+
+msgid "Delete Note"
+msgstr "Smazat poznámku"
+
+msgid "Dictation Added"
+msgstr "Diktát přidán"
+
+msgid "Dictation Empty"
+msgstr "Diktát je prázdný"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "Během diktování zobrazuje elegantní plovoucí panel s odpočítáváním a ukazatelem průběhu."
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (Nečinný)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (Zpracování...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (Nahrávání...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes – Nástroj systémové lišty pro Linux, který převádí offline hlasové diktáty na přehledné poznámky."
+
+msgid "Eloquent Notes Configuration"
+msgstr "Konfigurace Eloquent Notes"
+
+msgid "Eloquent Notes Daemon"
+msgstr "Démon Eloquent Notes"
+
+msgid "Embedding Model cannot be empty."
+msgstr "Model vnořování (embedding) nesmí být prázdný."
+
+msgid "Embedding Model:"
+msgstr "Model vnořování:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "Chyba při zpracování diktátu: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "Nepodařilo se načíst uživatelskou konfiguraci: {error}\n\nByla načtena výchozí nastavení."
+
+msgid "Failed to reload configuration: {error}"
+msgstr "Nepodařilo se znovu načíst konfiguraci: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "Nepodařilo se uložit nastavení: {error}"
+
+msgid "Fetching models..."
+msgstr "Načítání modelů..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "Složka, kam se každá hlasová poznámka ukládá jako soubor Markdown. Nasměrujte ji do trezoru Obsidianu, abyste poznámky viděli i tam."
+
+msgid "General"
+msgstr "Obecné"
+
+msgid "Idea"
+msgstr "Nápad"
+
+msgid "Ideas"
+msgstr "Nápady"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "Pokud je zaškrtnuto, nastaví context_length na null (nebo ponechá nenastavené), čímž Ollama použije výchozí maximální délku kontextu modelu."
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Neplatný formát Keep Alive: '{value}'. Musí být celé číslo nebo doba trvání (např. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Neplatný formát Preload Keep Alive: '{value}'. Musí být celé číslo nebo doba trvání (např. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Neplatný formát Search Keep Alive: '{value}'. Musí být celé číslo nebo doba trvání (např. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "Neplatná hodnota konfigurace pro '{key}'"
+
+msgid "Keep Alive Time:"
+msgstr "Doba Keep Alive:"
+
+msgid "Log File"
+msgstr "Soubor protokolu"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "Soubor protokolu ještě neexistuje. Nejprve proveďte nějaké diktování!"
+
+msgid "Logging Level:"
+msgstr "Úroveň protokolování:"
+
+msgid "Logging Settings"
+msgstr "Nastavení protokolování"
+
+msgid "Max Log File Size:"
+msgstr "Max. velikost souboru protokolu:"
+
+msgid "Max Retries:"
+msgstr "Max. počet opakování:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "Maximální délka zvukového záznamu v sekundách před automatickým zpracováním."
+
+msgid "Maximum size of the log file before rotating."
+msgstr "Maximální velikost souboru protokolu před rotací."
+
+msgid "Minimum Similarity:"
+msgstr "Minimální podobnost:"
+
+msgid "Model returned empty note content"
+msgstr "Model vrátil prázdný obsah poznámky"
+
+msgid "Models loaded successfully."
+msgstr "Modely byly úspěšně načteny."
+
+msgid "Mono (1 channel)"
+msgstr "Mono (1 kanál)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "Přesunout „{title}“ do koše?"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "Název LLM modelu Ollama pro úlohy diktování (např. gemma4:e4b-it-qat)."
+
+msgid "No audio-capable models found."
+msgstr "Nebyly nalezeny žádné modely podporující zvuk."
+
+msgid "No matching notes."
+msgstr "Žádné odpovídající poznámky."
+
+msgid "No note was created because the audio was empty."
+msgstr "Nebyla vytvořena žádná poznámka, protože záznam zvuku byl prázdný."
+
+msgid "No notes match these filters."
+msgstr "Těmto filtrům neodpovídají žádné poznámky."
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "Zatím žádné poznámky. Kliknutím na ikonu v liště nahrajte první."
+
+msgid "Note"
+msgstr "Poznámka"
+
+msgid "Note Saved"
+msgstr "Poznámka uložena"
+
+msgid "Notes"
+msgstr "Poznámky"
+
+msgid "Notes Folder cannot be empty."
+msgstr "Složka poznámek nesmí být prázdná."
+
+msgid "Notes Folder:"
+msgstr "Složka poznámek:"
+
+msgid "Notes Storage"
+msgstr "Úložiště poznámek"
+
+msgid "Number of audio input channels."
+msgstr "Počet vstupních zvukových kanálů."
+
+msgid "Number of backup log files to retain."
+msgstr "Počet uchovávaných záložních souborů protokolu."
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "Počet sloupců v mřížce časové osy poznámek."
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "Počet pokusů o opakování, pokud výstup LLM selže při parsování JSON."
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "Nastavení Ollama && AI pipeline"
+
+msgid "Ollama URL cannot be empty."
+msgstr "URL Ollama nesmí být prázdná."
+
+msgid "Ollama URL is empty."
+msgstr "URL Ollama je prázdná."
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "URL Ollama musí začínat na http:// nebo https://."
+
+msgid "Ollama URL:"
+msgstr "URL Ollama:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "Model vnořování Ollama používaný k vyhledávání poznámek podle významu (např. embeddinggemma-2:latest)."
+
+msgid "Open Notes"
+msgstr "Otevřít poznámky"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "Otevřít soubor protokolu démona na pozadí v systémovém editoru."
+
+msgid "Output Language cannot be empty."
+msgstr "Výstupní jazyk nesmí být prázdný."
+
+msgid "Output Language:"
+msgstr "Výstupní jazyk:"
+
+msgid "Play beep on recording start and stop"
+msgstr "Přehrát pípnutí při spuštění a zastavení nahrávání"
+
+msgid "Preload Keep Alive:"
+msgstr "Preload Keep Alive:"
+
+msgid "Preload Timeout:"
+msgstr "Časový limit přednačtení:"
+
+msgid "Processing Error"
+msgstr "Chyba zpracování"
+
+msgid "Processing…"
+msgstr "Zpracování…"
+
+msgid "Prompt Content:"
+msgstr "Obsah promptu:"
+
+msgid "Prompts"
+msgstr "Prompty"
+
+msgid "Prompts:"
+msgstr "Prompty:"
+
+msgid "Question"
+msgstr "Otázka"
+
+msgid "Questions"
+msgstr "Otázky"
+
+msgid "Quit"
+msgstr "Ukončit"
+
+msgid "Ready"
+msgstr "Připraveno"
+
+msgid "Recording Note..."
+msgstr "Nahrávání poznámky..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "Probíhá nahrávání — kliknutím zastavíte a zpracujete poznámku"
+
+msgid "Refresh"
+msgstr "Obnovit"
+
+msgid "Reload Configuration"
+msgstr "Znovu načíst konfiguraci"
+
+msgid "Reminder"
+msgstr "Připomínka"
+
+msgid "Reminders"
+msgstr "Připomínky"
+
+msgid "Request Timeout:"
+msgstr "Časový limit požadavku:"
+
+msgid "Restore Defaults"
+msgstr "Obnovit výchozí"
+
+msgid "Retry Prompt"
+msgstr "Prompt pro opakování"
+
+msgid "Rewriting - System Prompt"
+msgstr "Přepisování – Systémový prompt"
+
+msgid "Rewriting - User Prompt"
+msgstr "Přepisování – Uživatelský prompt"
+
+msgid "Sample Rate:"
+msgstr "Vzorkovací frekvence:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "Vzorkovací frekvence pro záznam z mikrofonu (pro modely diktování řeči se doporučuje 16000 Hz)."
+
+msgid "Save"
+msgstr "Uložit"
+
+msgid "Save Error"
+msgstr "Chyba uložení"
+
+msgid "Search failed: {error}"
+msgstr "Vyhledávání selhalo: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "Výsledky vyhledávání pod touto kosinovou podobností jsou skryty."
+
+msgid "Search your notes by meaning…"
+msgstr "Hledejte v poznámkách podle významu…"
+
+msgid "Searching…"
+msgstr "Vyhledávání…"
+
+msgid "Select Notes Folder"
+msgstr "Vybrat složku poznámek"
+
+msgid "Select a prompt to edit..."
+msgstr "Vyberte prompt k úpravě..."
+
+msgid "Semantic Search"
+msgstr "Sémantické vyhledávání"
+
+msgid "Settings"
+msgstr "Nastavení"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "Zobrazit plovoucí HUD panel s odpočítáváním během nahrávání"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "Spouštět Eloquent Notes automaticky při přihlášení"
+
+msgid "Start/Stop Recording"
+msgstr "Spustit/zastavit nahrávání"
+
+msgid "Startup Options"
+msgstr "Možnosti spuštění"
+
+msgid "Stereo (2 channels)"
+msgstr "Stereo (2 kanály)"
+
+msgid "Stop dictation"
+msgstr "Zastavit diktování"
+
+msgid "System is busy. Please wait."
+msgstr "Systém je zaneprázdněn. Čekejte prosím."
+
+msgid "Tags, separated by commas"
+msgstr "Štítky oddělené čárkami"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "Cílový jazyk pro přepsané poznámky, názvy a štítky (např. English, Czech)."
+
+msgid "Task"
+msgstr "Úkol"
+
+msgid "Tasks"
+msgstr "Úkoly"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "Doba ponechání modelu v paměti po vygenerování poznámky (např. '0' pro okamžité uvolnění nebo '5m')."
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "Doba ponechání vah modelu ve VRAM během nahrávání pro minimalizaci prodlevy (např. '5m')."
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "Doba ponechání modelu vnořování v paměti po vyhledávání (např. '5m' nebo '0')."
+
+msgid "Timeline Columns:"
+msgstr "Sloupce časové osy:"
+
+msgid "Title"
+msgstr "Název"
+
+msgid "Today"
+msgstr "Dnes"
+
+msgid "Transcription - System Prompt"
+msgstr "Přepis – Systémový prompt"
+
+msgid "Transcription - User Prompt"
+msgstr "Přepis – Uživatelský prompt"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "URL vašeho místního nebo vzdáleného serveru Ollama."
+
+msgid "Use default context length"
+msgstr "Použít výchozí délku kontextu"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "Uživatelská konfigurace v {path} není platné mapování YAML"
+
+msgid "Validation Error"
+msgstr "Chyba ověření"
+
+msgid "Verbosity level for app logging."
+msgstr "Úroveň podrobnosti protokolování aplikace."
+
+msgid "View Log File"
+msgstr "Zobrazit soubor protokolu"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "Hlasové diktáty přeměněné na přehledné poznámky"
+
+msgid "Yesterday"
+msgstr "Včera"
+
+msgid "← Back"
+msgstr "← Zpět"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} výsledek"
+msgstr[1] "{count} výsledky"
+msgstr[2] "{count} výsledků"

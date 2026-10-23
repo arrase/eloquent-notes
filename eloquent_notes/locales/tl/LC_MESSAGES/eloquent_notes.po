@@ -1,0 +1,523 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: tl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid " Hz"
+msgstr " Hz"
+
+msgid " MB"
+msgstr " MB"
+
+msgid " sec"
+msgstr " seg"
+
+msgid "AI Model (Audio):"
+msgstr "Modelo ng AI (Audio):"
+
+msgid "AI Model cannot be empty."
+msgstr "Hindi maaaring walang laman ang Modelo ng AI."
+
+msgid "AI Settings"
+msgstr "Mga Setting ng AI"
+
+msgid "Add dictation"
+msgstr "Magdagdag ng diktasyon"
+
+msgid "Alias for 'toggle' command."
+msgstr "Alyas para sa command na 'toggle'."
+
+msgid "All"
+msgstr "Lahat"
+
+msgid "All tags"
+msgstr "Lahat ng tag"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "Sigurado ka bang gusto mong ibalik ang lahat ng setting ng configuration at prompt sa kanilang mga default na halaga?\n\nPapalitan nito ang mga kasalukuyang pag-edit."
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "Mga naririnig na beep kapag nagsisimula/humihinto sa pag-record."
+
+msgid "Audio"
+msgstr "Audio"
+
+msgid "Audio Capture Settings"
+msgstr "Mga Setting sa Pag-record ng Audio"
+
+msgid "Audio Channels:"
+msgstr "Mga Channel ng Audio:"
+
+msgid "Backup Count:"
+msgstr "Bilang ng Backup:"
+
+msgid "Beep Duration:"
+msgstr "Tagal ng Beep:"
+
+msgid "Beep Frequency:"
+msgstr "Dalas ng Beep:"
+
+msgid "Browse..."
+msgstr "Mag-browse..."
+
+msgid "Cancel"
+msgstr "Kanselahin"
+
+msgid "Capture Duration:"
+msgstr "Tagal ng Pag-record:"
+
+msgid "Classification - System Prompt"
+msgstr "Klasipikasyon - System Prompt"
+
+msgid "Classification - User Prompt"
+msgstr "Klasipikasyon - User Prompt"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "Command na isasagawa: 'install-autostart', 'toggle', 'open' (ipakita ang window ng mga tala), o 'config' (buksan ang configuration GUI)."
+
+msgid "Configuration"
+msgstr "Configuration"
+
+msgid "Configuration Error"
+msgstr "Error sa Configuration"
+
+msgid "Configuration reloaded successfully."
+msgstr "Matagumpay na na-reload ang configuration."
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "Ang seksyon ng configuration na '{key}' ay dapat na isang mapping, nakakuha ng {type_name}"
+
+msgid "Connection failed: {error}"
+msgstr "Nabigo ang koneksyon: {error}"
+
+msgid "Context Length:"
+msgstr "Haba ng Konteksto:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "Haba ng konteksto sa mga token na ipapasa sa Ollama. Ang mas malalaking halaga ay nagbibigay-daan sa mas mahabang diktasyon ngunit gumagamit ng mas maraming memorya."
+
+msgid "Copy"
+msgstr "Kopyahin"
+
+msgid "Could not move {name} to the trash."
+msgstr "Hindi mailipat ang {name} sa basurahan."
+
+msgid "Could not start recording: {error}"
+msgstr "Hindi masimulan ang pag-record: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "Hindi maihinto ang pag-record: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "Gumagawa ng desktop autostart entry sa XDG autostart directory"
+
+msgid "Decision"
+msgstr "Desisyon"
+
+msgid "Decisions"
+msgstr "Mga Desisyon"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "Naibalik na ang mga default. I-click ang 'I-save' upang ilapat ang mga pagbabago sa disk."
+
+msgid "Delete"
+msgstr "Burahin"
+
+msgid "Delete Failed"
+msgstr "Nabigo ang Pagbura"
+
+msgid "Delete Note"
+msgstr "Burahin ang Tala"
+
+msgid "Dictation Added"
+msgstr "Naidagdag ang Diktasyon"
+
+msgid "Dictation Empty"
+msgstr "Walang Laman ang Diktasyon"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "Nagpapakita ng makinis na lumulutang na pill overlay na may live countdown timer at progress bar habang nagdidikta."
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (Naka-idle)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (Pinoproseso...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (Nagre-record...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes - Linux system tray utility na ginagawang organisadong mga tala ang mga offline na diktasyon ng boses."
+
+msgid "Eloquent Notes Configuration"
+msgstr "Configuration ng Eloquent Notes"
+
+msgid "Eloquent Notes Daemon"
+msgstr "Eloquent Notes Daemon"
+
+msgid "Embedding Model cannot be empty."
+msgstr "Hindi maaaring walang laman ang Embedding Model."
+
+msgid "Embedding Model:"
+msgstr "Embedding Model:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "Error sa pagpoproseso ng diktasyon: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "Nabigong i-load ang configuration ng user: {error}\n\nNa-load ang mga default na setting."
+
+msgid "Failed to reload configuration: {error}"
+msgstr "Nabigong i-reload ang configuration: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "Nabigong i-save ang mga setting: {error}"
+
+msgid "Fetching models..."
+msgstr "Kinukuha ang mga modelo..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "Folder kung saan sine-save ang bawat voice note bilang Markdown file. Ituro ito sa loob ng isang Obsidian vault upang makita rin doon ang iyong mga tala."
+
+msgid "General"
+msgstr "Pangkalahatan"
+
+msgid "Idea"
+msgstr "Ideya"
+
+msgid "Ideas"
+msgstr "Mga Ideya"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "Kung naka-check, itatakda ang context_length sa null (o iiwang hindi nakatakda), na nag-uutos sa Ollama na gamitin ang default na maximum na haba ng konteksto ng modelo."
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Di-wastong format ng Keep Alive: '{value}'. Dapat ay isang integer o tagal (hal., 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Di-wastong format ng Preload Keep Alive: '{value}'. Dapat ay isang integer o tagal (hal., 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Di-wastong format ng Search Keep Alive: '{value}'. Dapat ay isang integer o tagal (hal., 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "Di-wastong halaga ng configuration para sa '{key}'"
+
+msgid "Keep Alive Time:"
+msgstr "Oras ng Keep Alive:"
+
+msgid "Log File"
+msgstr "Log File"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "Wala pa ang log file. Magpatakbo muna ng ilang diktasyon!"
+
+msgid "Logging Level:"
+msgstr "Antas ng Pag-log:"
+
+msgid "Logging Settings"
+msgstr "Mga Setting ng Pag-log"
+
+msgid "Max Log File Size:"
+msgstr "Max na Laki ng Log File:"
+
+msgid "Max Retries:"
+msgstr "Max na Pag-ulit:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "Maximum na tagal sa segundo para sa pag-record ng audio bago awtomatikong iproseso."
+
+msgid "Maximum size of the log file before rotating."
+msgstr "Maximum na laki ng log file bago i-rotate."
+
+msgid "Minimum Similarity:"
+msgstr "Minimum na Pagkakatulad:"
+
+msgid "Model returned empty note content"
+msgstr "Nagbalik ang modelo ng walang lamang nilalaman ng tala"
+
+msgid "Models loaded successfully."
+msgstr "Matagumpay na na-load ang mga modelo."
+
+msgid "Mono (1 channel)"
+msgstr "Mono (1 channel)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "Ilipat ang “{title}” sa basurahan?"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "Pangalan ng modelo ng Ollama LLM na patatakbuhin para sa mga gawain ng diktasyon (hal. gemma4:e4b-it-qat)."
+
+msgid "No audio-capable models found."
+msgstr "Walang nahanap na mga modelong may kakayahan sa audio."
+
+msgid "No matching notes."
+msgstr "Walang tumutugmang mga tala."
+
+msgid "No note was created because the audio was empty."
+msgstr "Walang nagawang tala dahil walang laman ang audio."
+
+msgid "No notes match these filters."
+msgstr "Walang mga talang tumutugma sa mga filter na ito."
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "Wala pang mga tala. I-click ang icon sa tray upang i-record ang iyong unang tala."
+
+msgid "Note"
+msgstr "Tala"
+
+msgid "Note Saved"
+msgstr "Na-save ang Tala"
+
+msgid "Notes"
+msgstr "Mga Tala"
+
+msgid "Notes Folder cannot be empty."
+msgstr "Hindi maaaring walang laman ang Folder ng Mga Tala."
+
+msgid "Notes Folder:"
+msgstr "Folder ng Mga Tala:"
+
+msgid "Notes Storage"
+msgstr "Imbakan ng Mga Tala"
+
+msgid "Number of audio input channels."
+msgstr "Bilang ng mga channel ng audio input."
+
+msgid "Number of backup log files to retain."
+msgstr "Bilang ng mga backup na log file na pananatilihin."
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "Bilang ng mga column sa grid ng timeline ng mga tala."
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "Bilang ng mga pagsubok na ulitin kung mabigo ang output ng LLM sa pag-parse ng JSON."
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "Mga Setting ng Ollama && AI Pipeline"
+
+msgid "Ollama URL cannot be empty."
+msgstr "Hindi maaaring walang laman ang Ollama URL."
+
+msgid "Ollama URL is empty."
+msgstr "Walang laman ang Ollama URL."
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "Ang Ollama URL ay dapat magsimula sa http:// o https://."
+
+msgid "Ollama URL:"
+msgstr "Ollama URL:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "Embedding model ng Ollama na ginagamit upang maghanap ng mga tala ayon sa kahulugan (hal. embeddinggemma-2:latest)."
+
+msgid "Open Notes"
+msgstr "Buksan ang Mga Tala"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "Buksan ang log file ng background daemon sa iyong system editor."
+
+msgid "Output Language cannot be empty."
+msgstr "Hindi maaaring walang laman ang Wika ng Output."
+
+msgid "Output Language:"
+msgstr "Wika ng Output:"
+
+msgid "Play beep on recording start and stop"
+msgstr "Magpatugtog ng beep sa pagsisimula at paghinto ng pag-record"
+
+msgid "Preload Keep Alive:"
+msgstr "Preload Keep Alive:"
+
+msgid "Preload Timeout:"
+msgstr "Timeout ng Preload:"
+
+msgid "Processing Error"
+msgstr "Error sa Pagpoproseso"
+
+msgid "Processing…"
+msgstr "Pinoproseso…"
+
+msgid "Prompt Content:"
+msgstr "Nilalaman ng Prompt:"
+
+msgid "Prompts"
+msgstr "Mga Prompt"
+
+msgid "Prompts:"
+msgstr "Mga Prompt:"
+
+msgid "Question"
+msgstr "Tanong"
+
+msgid "Questions"
+msgstr "Mga Tanong"
+
+msgid "Quit"
+msgstr "Umalis"
+
+msgid "Ready"
+msgstr "Handa na"
+
+msgid "Recording Note..."
+msgstr "Nagre-record..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "Kasalukuyang nagre-record — i-click upang ihinto at iproseso ang tala"
+
+msgid "Refresh"
+msgstr "I-refresh"
+
+msgid "Reload Configuration"
+msgstr "I-reload ang Configuration"
+
+msgid "Reminder"
+msgstr "Paalala"
+
+msgid "Reminders"
+msgstr "Mga Paalala"
+
+msgid "Request Timeout:"
+msgstr "Timeout ng Kahilingan:"
+
+msgid "Restore Defaults"
+msgstr "Ibalik ang Mga Default"
+
+msgid "Retry Prompt"
+msgstr "Prompt sa Pag-ulit"
+
+msgid "Rewriting - System Prompt"
+msgstr "Pagsusulat Muli - System Prompt"
+
+msgid "Rewriting - User Prompt"
+msgstr "Pagsusulat Muli - User Prompt"
+
+msgid "Sample Rate:"
+msgstr "Sample Rate:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "Sample rate para sa pag-record ng mikropono (inirerekomenda ang 16000 Hz para sa mga modelo ng diktasyon ng boses)."
+
+msgid "Save"
+msgstr "I-save"
+
+msgid "Save Error"
+msgstr "Error sa Pag-save"
+
+msgid "Search failed: {error}"
+msgstr "Nabigo ang paghahanap: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "Ang mga resulta ng paghahanap na mas mababa sa cosine similarity na ito ay nakatago."
+
+msgid "Search your notes by meaning…"
+msgstr "Hanapin ang iyong mga tala ayon sa kahulugan…"
+
+msgid "Searching…"
+msgstr "Naghahanap…"
+
+msgid "Select Notes Folder"
+msgstr "Piliin ang Folder ng Mga Tala"
+
+msgid "Select a prompt to edit..."
+msgstr "Pumili ng prompt na ie-edit..."
+
+msgid "Semantic Search"
+msgstr "Semantic na Paghahanap"
+
+msgid "Settings"
+msgstr "Mga Setting"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "Ipakita ang lumulutang na countdown HUD overlay habang nagre-record"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "Awtomatikong simulan ang Eloquent Notes pagka-login"
+
+msgid "Start/Stop Recording"
+msgstr "Simulan/Ihinto ang Pag-record"
+
+msgid "Startup Options"
+msgstr "Mga Opsyon sa Pagsisimula"
+
+msgid "Stereo (2 channels)"
+msgstr "Stereo (2 channel)"
+
+msgid "Stop dictation"
+msgstr "Ihinto ang diktasyon"
+
+msgid "System is busy. Please wait."
+msgstr "Abala ang system. Mangyaring maghintay."
+
+msgid "Tags, separated by commas"
+msgstr "Mga tag, pinaghihiwalay ng mga kuwit"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "Target na wika para sa mga isinulat muli na tala, pamagat, at tag (hal. English, Spanish)."
+
+msgid "Task"
+msgstr "Gawain"
+
+msgid "Tasks"
+msgstr "Mga Gawain"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "Oras upang panatilihing naka-load ang modelo pagkatapos mabuo ang tala (hal., '0' upang i-unload agad, o '5m')."
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "Oras upang panatilihing naka-load ang mga weight ng modelo sa VRAM habang nagre-record upang mabawasan ang latency (hal., '5m')."
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "Oras upang panatilihing naka-load ang embedding model pagkatapos ng paghahanap (hal., '5m' o '0')."
+
+msgid "Timeline Columns:"
+msgstr "Mga Column ng Timeline:"
+
+msgid "Title"
+msgstr "Pamagat"
+
+msgid "Today"
+msgstr "Ngayon"
+
+msgid "Transcription - System Prompt"
+msgstr "Transkripsyon - System Prompt"
+
+msgid "Transcription - User Prompt"
+msgstr "Transkripsyon - User Prompt"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "URL ng iyong lokal o remote na Ollama server."
+
+msgid "Use default context length"
+msgstr "Gamitin ang default na haba ng konteksto"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "Ang config ng user sa {path} ay hindi isang wastong YAML mapping"
+
+msgid "Validation Error"
+msgstr "Error sa Pagpapatunay"
+
+msgid "Verbosity level for app logging."
+msgstr "Antas ng verbosity para sa pag-log ng app."
+
+msgid "View Log File"
+msgstr "Tingnan ang Log File"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "Mga diktasyon ng boses na ginawang organisadong mga tala"
+
+msgid "Yesterday"
+msgstr "Kahapon"
+
+msgid "← Back"
+msgstr "← Bumalik"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} resulta"
+msgstr[1] "{count} na resulta"

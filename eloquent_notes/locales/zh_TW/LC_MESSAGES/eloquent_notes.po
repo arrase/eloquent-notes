@@ -1,0 +1,522 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid " Hz"
+msgstr " Hz"
+
+msgid " MB"
+msgstr " MB"
+
+msgid " sec"
+msgstr " 秒"
+
+msgid "AI Model (Audio):"
+msgstr "AI 模型（音訊）："
+
+msgid "AI Model cannot be empty."
+msgstr "AI 模型不能為空。"
+
+msgid "AI Settings"
+msgstr "AI 設定"
+
+msgid "Add dictation"
+msgstr "新增聽寫"
+
+msgid "Alias for 'toggle' command."
+msgstr "'toggle' 命令的別名。"
+
+msgid "All"
+msgstr "全部"
+
+msgid "All tags"
+msgstr "所有標籤"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "確定要將所有設定和提示詞恢復為預設值嗎？\n\n這將覆寫目前的修改。"
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "開始/停止錄音時播放提示音。"
+
+msgid "Audio"
+msgstr "音訊"
+
+msgid "Audio Capture Settings"
+msgstr "音訊擷取設定"
+
+msgid "Audio Channels:"
+msgstr "音訊聲道："
+
+msgid "Backup Count:"
+msgstr "備份數量："
+
+msgid "Beep Duration:"
+msgstr "提示音時長："
+
+msgid "Beep Frequency:"
+msgstr "提示音頻率："
+
+msgid "Browse..."
+msgstr "瀏覽..."
+
+msgid "Cancel"
+msgstr "取消"
+
+msgid "Capture Duration:"
+msgstr "擷取時長："
+
+msgid "Classification - System Prompt"
+msgstr "分類 - 系統提示詞"
+
+msgid "Classification - User Prompt"
+msgstr "分類 - 使用者提示詞"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "要執行的命令：'install-autostart'、'toggle'、'open'（顯示筆記視窗）或 'config'（開啟設定介面）。"
+
+msgid "Configuration"
+msgstr "設定"
+
+msgid "Configuration Error"
+msgstr "設定錯誤"
+
+msgid "Configuration reloaded successfully."
+msgstr "設定已成功重新載入。"
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "設定區段 '{key}' 必須是映射類型，實際為 {type_name}"
+
+msgid "Connection failed: {error}"
+msgstr "連線失敗：{error}"
+
+msgid "Context Length:"
+msgstr "上下文長度："
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "傳遞給 Ollama 的上下文長度（以 token 為單位）。較大的值允許更長的聽寫，但會佔用更多記憶體。"
+
+msgid "Copy"
+msgstr "複製"
+
+msgid "Could not move {name} to the trash."
+msgstr "無法將 {name} 移至垃圾桶。"
+
+msgid "Could not start recording: {error}"
+msgstr "無法開始錄音：{error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "無法停止錄音：{error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "在 XDG 自動啟動目錄中建立桌面自動啟動項目"
+
+msgid "Decision"
+msgstr "決定"
+
+msgid "Decisions"
+msgstr "決定"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "已恢復預設值。點擊「儲存」將變更套用到磁碟。"
+
+msgid "Delete"
+msgstr "刪除"
+
+msgid "Delete Failed"
+msgstr "刪除失敗"
+
+msgid "Delete Note"
+msgstr "刪除筆記"
+
+msgid "Dictation Added"
+msgstr "已新增聽寫"
+
+msgid "Dictation Empty"
+msgstr "聽寫為空"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "聽寫時顯示帶有即時倒數計時和進度條的精緻懸浮膠囊視窗。"
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes（閒置）"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes（處理中...）"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes（錄音中...）"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes - 將離線語音聽寫轉化為有序筆記的 Linux 系統匣工具。"
+
+msgid "Eloquent Notes Configuration"
+msgstr "Eloquent Notes 設定"
+
+msgid "Eloquent Notes Daemon"
+msgstr "Eloquent Notes 背景程式"
+
+msgid "Embedding Model cannot be empty."
+msgstr "嵌入模型不能為空。"
+
+msgid "Embedding Model:"
+msgstr "嵌入模型："
+
+msgid "Error processing dictation: {detail}"
+msgstr "處理聽寫時發生錯誤：{detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "載入使用者設定失敗：{error}\n\n已載入預設設定。"
+
+msgid "Failed to reload configuration: {error}"
+msgstr "重新載入設定失敗：{error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "儲存設定失敗：{error}"
+
+msgid "Fetching models..."
+msgstr "正在取得模型..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "每則語音筆記儲存為 Markdown 檔案的資料夾。將其指向 Obsidian 儲存庫內部即可在那裡檢視筆記。"
+
+msgid "General"
+msgstr "一般"
+
+msgid "Idea"
+msgstr "想法"
+
+msgid "Ideas"
+msgstr "想法"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "勾選後會將 context_length 設為 null（或留空），指示 Ollama 使用模型的預設最大上下文長度。"
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "無效的保持活動時間格式：'{value}'。必須是整數或時長（例如 5m、10s、1h、0、-1）。"
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "無效的預載保持活動時間格式：'{value}'。必須是整數或時長（例如 5m、10s、1h、0、-1）。"
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "無效的搜尋保持活動時間格式：'{value}'。必須是整數或時長（例如 5m、10s、1h、0、-1）。"
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "'{key}' 的設定值無效"
+
+msgid "Keep Alive Time:"
+msgstr "保持活動時間："
+
+msgid "Log File"
+msgstr "日誌檔案"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "日誌檔案尚不存在。請先進行幾次聽寫！"
+
+msgid "Logging Level:"
+msgstr "日誌等級："
+
+msgid "Logging Settings"
+msgstr "日誌設定"
+
+msgid "Max Log File Size:"
+msgstr "最大日誌檔案大小："
+
+msgid "Max Retries:"
+msgstr "最大重試次數："
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "自動處理前的音訊錄製最長持續時間（秒）。"
+
+msgid "Maximum size of the log file before rotating."
+msgstr "日誌檔案輪替前的最大大小。"
+
+msgid "Minimum Similarity:"
+msgstr "最小相似度："
+
+msgid "Model returned empty note content"
+msgstr "模型回傳了空的筆記內容"
+
+msgid "Models loaded successfully."
+msgstr "模型載入成功。"
+
+msgid "Mono (1 channel)"
+msgstr "單聲道（1 聲道）"
+
+msgid "Move “{title}” to the trash?"
+msgstr "將「{title}」移至垃圾桶？"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "用於執行聽寫任務的 Ollama LLM 模型名稱（例如 gemma4:e4b-it-qat）。"
+
+msgid "No audio-capable models found."
+msgstr "找不到支援音訊的模型。"
+
+msgid "No matching notes."
+msgstr "沒有符合的筆記。"
+
+msgid "No note was created because the audio was empty."
+msgstr "由於音訊為空，未建立任何筆記。"
+
+msgid "No notes match these filters."
+msgstr "沒有符合這些篩選條件的筆記。"
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "還沒有筆記。點擊系統匣圖示錄製第一則筆記。"
+
+msgid "Note"
+msgstr "筆記"
+
+msgid "Note Saved"
+msgstr "筆記已儲存"
+
+msgid "Notes"
+msgstr "筆記"
+
+msgid "Notes Folder cannot be empty."
+msgstr "筆記資料夾不能為空。"
+
+msgid "Notes Folder:"
+msgstr "筆記資料夾："
+
+msgid "Notes Storage"
+msgstr "筆記儲存"
+
+msgid "Number of audio input channels."
+msgstr "音訊輸入聲道數。"
+
+msgid "Number of backup log files to retain."
+msgstr "要保留的備份日誌檔案數量。"
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "筆記時間軸網格中的欄數。"
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "當 LLM 輸出無法解析為 JSON 時的重試次數。"
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "Ollama && AI 管線設定"
+
+msgid "Ollama URL cannot be empty."
+msgstr "Ollama URL 不能為空。"
+
+msgid "Ollama URL is empty."
+msgstr "Ollama URL 為空。"
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "Ollama URL 必須以 http:// 或 https:// 開頭。"
+
+msgid "Ollama URL:"
+msgstr "Ollama URL："
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "用於按語意搜尋筆記的 Ollama 嵌入模型（例如 embeddinggemma-2:latest）。"
+
+msgid "Open Notes"
+msgstr "開啟筆記"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "在系統編輯器中開啟背景程式日誌檔案。"
+
+msgid "Output Language cannot be empty."
+msgstr "輸出語言不能為空。"
+
+msgid "Output Language:"
+msgstr "輸出語言："
+
+msgid "Play beep on recording start and stop"
+msgstr "錄音開始和停止時播放提示音"
+
+msgid "Preload Keep Alive:"
+msgstr "預載保持活動時間："
+
+msgid "Preload Timeout:"
+msgstr "預載逾時："
+
+msgid "Processing Error"
+msgstr "處理錯誤"
+
+msgid "Processing…"
+msgstr "處理中…"
+
+msgid "Prompt Content:"
+msgstr "提示詞內容："
+
+msgid "Prompts"
+msgstr "提示詞"
+
+msgid "Prompts:"
+msgstr "提示詞："
+
+msgid "Question"
+msgstr "問題"
+
+msgid "Questions"
+msgstr "問題"
+
+msgid "Quit"
+msgstr "結束"
+
+msgid "Ready"
+msgstr "就緒"
+
+msgid "Recording Note..."
+msgstr "正在錄製筆記..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "正在錄音 — 點擊停止並處理筆記"
+
+msgid "Refresh"
+msgstr "重新整理"
+
+msgid "Reload Configuration"
+msgstr "重新載入設定"
+
+msgid "Reminder"
+msgstr "提醒"
+
+msgid "Reminders"
+msgstr "提醒"
+
+msgid "Request Timeout:"
+msgstr "請求逾時："
+
+msgid "Restore Defaults"
+msgstr "恢復預設值"
+
+msgid "Retry Prompt"
+msgstr "重試提示詞"
+
+msgid "Rewriting - System Prompt"
+msgstr "重寫 - 系統提示詞"
+
+msgid "Rewriting - User Prompt"
+msgstr "重寫 - 使用者提示詞"
+
+msgid "Sample Rate:"
+msgstr "取樣率："
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "麥克風錄音的取樣率（語音聽寫模型建議使用 16000 Hz）。"
+
+msgid "Save"
+msgstr "儲存"
+
+msgid "Save Error"
+msgstr "儲存錯誤"
+
+msgid "Search failed: {error}"
+msgstr "搜尋失敗：{error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "低於此餘弦相似度的搜尋結果將被隱藏。"
+
+msgid "Search your notes by meaning…"
+msgstr "按語意搜尋筆記…"
+
+msgid "Searching…"
+msgstr "搜尋中…"
+
+msgid "Select Notes Folder"
+msgstr "選擇筆記資料夾"
+
+msgid "Select a prompt to edit..."
+msgstr "選擇要編輯的提示詞..."
+
+msgid "Semantic Search"
+msgstr "語意搜尋"
+
+msgid "Settings"
+msgstr "設定"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "錄音期間顯示懸浮倒數計時 HUD 視窗"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "登入時自動啟動 Eloquent Notes"
+
+msgid "Start/Stop Recording"
+msgstr "開始/停止錄音"
+
+msgid "Startup Options"
+msgstr "啟動選項"
+
+msgid "Stereo (2 channels)"
+msgstr "立體聲（2 聲道）"
+
+msgid "Stop dictation"
+msgstr "停止聽寫"
+
+msgid "System is busy. Please wait."
+msgstr "系統忙碌中，請稍候。"
+
+msgid "Tags, separated by commas"
+msgstr "標籤，以逗號分隔"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "重寫筆記、標題和標籤的目標語言（例如 English、Spanish）。"
+
+msgid "Task"
+msgstr "任務"
+
+msgid "Tasks"
+msgstr "任務"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "產生筆記後保持模型載入的時間（例如 '0' 表示立即卸載，或 '5m'）。"
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "錄音期間將模型權重保留在視訊記憶體中以降低延遲的時間（例如 '5m'）。"
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "搜尋後保持嵌入模型載入的時間（例如 '5m' 或 '0'）。"
+
+msgid "Timeline Columns:"
+msgstr "時間軸欄數："
+
+msgid "Title"
+msgstr "標題"
+
+msgid "Today"
+msgstr "今天"
+
+msgid "Transcription - System Prompt"
+msgstr "轉錄 - 系統提示詞"
+
+msgid "Transcription - User Prompt"
+msgstr "轉錄 - 使用者提示詞"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "本機或遠端 Ollama 伺服器的 URL。"
+
+msgid "Use default context length"
+msgstr "使用預設上下文長度"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "位於 {path} 的使用者設定不是有效的 YAML 映射"
+
+msgid "Validation Error"
+msgstr "驗證錯誤"
+
+msgid "Verbosity level for app logging."
+msgstr "應用程式日誌的詳細程度等級。"
+
+msgid "View Log File"
+msgstr "檢視日誌檔案"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "將語音聽寫轉化為井然有序的筆記"
+
+msgid "Yesterday"
+msgstr "昨天"
+
+msgid "← Back"
+msgstr "← 返回"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} 個結果"

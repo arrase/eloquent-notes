@@ -1,0 +1,524 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: ro\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);\n"
+
+msgid " Hz"
+msgstr " Hz"
+
+msgid " MB"
+msgstr " MB"
+
+msgid " sec"
+msgstr " sec"
+
+msgid "AI Model (Audio):"
+msgstr "Model AI (Audio):"
+
+msgid "AI Model cannot be empty."
+msgstr "Modelul AI nu poate fi gol."
+
+msgid "AI Settings"
+msgstr "Setări AI"
+
+msgid "Add dictation"
+msgstr "Adaugă dictare"
+
+msgid "Alias for 'toggle' command."
+msgstr "Alias pentru comanda 'toggle'."
+
+msgid "All"
+msgstr "Toate"
+
+msgid "All tags"
+msgstr "Toate etichetele"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "Sigur doriți să restaurați toate setările de configurare și prompturile la valorile implicite?\n\nAceasta va suprascrie modificările curente."
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "Semnale sonore la pornirea și oprirea înregistrării."
+
+msgid "Audio"
+msgstr "Audio"
+
+msgid "Audio Capture Settings"
+msgstr "Setări captură audio"
+
+msgid "Audio Channels:"
+msgstr "Canale audio:"
+
+msgid "Backup Count:"
+msgstr "Număr copii de rezervă:"
+
+msgid "Beep Duration:"
+msgstr "Durată semnal sonor:"
+
+msgid "Beep Frequency:"
+msgstr "Frecvență semnal sonor:"
+
+msgid "Browse..."
+msgstr "Răsfoire..."
+
+msgid "Cancel"
+msgstr "Anulează"
+
+msgid "Capture Duration:"
+msgstr "Durată captură:"
+
+msgid "Classification - System Prompt"
+msgstr "Clasificare - Prompt de sistem"
+
+msgid "Classification - User Prompt"
+msgstr "Clasificare - Prompt utilizator"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "Comandă de executat: 'install-autostart', 'toggle', 'open' (afișează fereastra de notițe) sau 'config' (deschide interfața de configurare)."
+
+msgid "Configuration"
+msgstr "Configurare"
+
+msgid "Configuration Error"
+msgstr "Eroare de configurare"
+
+msgid "Configuration reloaded successfully."
+msgstr "Configurarea a fost reîncărcată cu succes."
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "Secțiunea de configurare '{key}' trebuie să fie o mapare, s-a primit {type_name}"
+
+msgid "Connection failed: {error}"
+msgstr "Conectare eșuată: {error}"
+
+msgid "Context Length:"
+msgstr "Lungime context:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "Lungimea contextului în tokeni transmisă către Ollama. Valorile mai mari permit dictări mai lungi, dar consumă mai multă memorie."
+
+msgid "Copy"
+msgstr "Copiază"
+
+msgid "Could not move {name} to the trash."
+msgstr "Nu s-a putut muta {name} la coșul de gunoi."
+
+msgid "Could not start recording: {error}"
+msgstr "Nu s-a putut porni înregistrarea: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "Nu s-a putut opri înregistrarea: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "Creează o intrare de pornire automată în directorul XDG autostart"
+
+msgid "Decision"
+msgstr "Decizie"
+
+msgid "Decisions"
+msgstr "Decizii"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "Valorile implicite au fost restaurate. Faceți clic pe „Salvează” pentru a aplica modificările pe disc."
+
+msgid "Delete"
+msgstr "Șterge"
+
+msgid "Delete Failed"
+msgstr "Ștergere eșuată"
+
+msgid "Delete Note"
+msgstr "Șterge notița"
+
+msgid "Dictation Added"
+msgstr "Dictare adăugată"
+
+msgid "Dictation Empty"
+msgstr "Dictare goală"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "Afișează o suprapunere flotantă elegantă cu cronometru invers și bară de progres în timpul dictării."
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (Inactiv)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (Se procesează...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (Se înregistrează...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes - Utilitar de bară de sistem Linux care transformă dictările vocale offline în notițe organizate."
+
+msgid "Eloquent Notes Configuration"
+msgstr "Configurare Eloquent Notes"
+
+msgid "Eloquent Notes Daemon"
+msgstr "Serviciu de fundal Eloquent Notes"
+
+msgid "Embedding Model cannot be empty."
+msgstr "Modelul de embedding nu poate fi gol."
+
+msgid "Embedding Model:"
+msgstr "Model de embedding:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "Eroare la procesarea dictării: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "Nu s-a putut încărca configurarea utilizatorului: {error}\n\nAu fost încărcate setările implicite."
+
+msgid "Failed to reload configuration: {error}"
+msgstr "Nu s-a putut reîncărca configurarea: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "Nu s-au putut salva setările: {error}"
+
+msgid "Fetching models..."
+msgstr "Se preiau modelele..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "Dosarul în care fiecare notiță vocală este salvată ca fișier Markdown. Indicați un seif Obsidian pentru a vă vedea notițele și acolo."
+
+msgid "General"
+msgstr "General"
+
+msgid "Idea"
+msgstr "Idee"
+
+msgid "Ideas"
+msgstr "Idei"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "Dacă este bifat, setează context_length la null (sau îl lasă nesetat), instruind Ollama să utilizeze lungimea maximă implicită a contextului modelului."
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Format Keep Alive nevalid: '{value}'. Trebuie să fie un număr întreg sau o durată (de ex., 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Format Preload Keep Alive nevalid: '{value}'. Trebuie să fie un număr întreg sau o durată (de ex., 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Format Search Keep Alive nevalid: '{value}'. Trebuie să fie un număr întreg sau o durată (de ex., 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "Valoare de configurare nevalidă pentru '{key}'"
+
+msgid "Keep Alive Time:"
+msgstr "Timp Keep Alive:"
+
+msgid "Log File"
+msgstr "Fișier jurnal"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "Fișierul jurnal nu există încă. Efectuați mai întâi câteva dictări!"
+
+msgid "Logging Level:"
+msgstr "Nivel de jurnalizare:"
+
+msgid "Logging Settings"
+msgstr "Setări jurnalizare"
+
+msgid "Max Log File Size:"
+msgstr "Dimensiune max. fișier jurnal:"
+
+msgid "Max Retries:"
+msgstr "Număr max. reîncercări:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "Durata maximă în secunde pentru înregistrarea audio înainte de procesarea automată."
+
+msgid "Maximum size of the log file before rotating."
+msgstr "Dimensiunea maximă a fișierului jurnal înainte de rotație."
+
+msgid "Minimum Similarity:"
+msgstr "Similaritate minimă:"
+
+msgid "Model returned empty note content"
+msgstr "Modelul a returnat un conținut de notiță gol"
+
+msgid "Models loaded successfully."
+msgstr "Modelele au fost încărcate cu succes."
+
+msgid "Mono (1 channel)"
+msgstr "Mono (1 canal)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "Mutați „{title}” la coșul de gunoi?"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "Numele modelului LLM Ollama utilizat pentru sarcinile de dictare (de ex. gemma4:e4b-it-qat)."
+
+msgid "No audio-capable models found."
+msgstr "Nu s-au găsit modele compatibile audio."
+
+msgid "No matching notes."
+msgstr "Nicio notiță potrivită."
+
+msgid "No note was created because the audio was empty."
+msgstr "Nu a fost creată nicio notiță deoarece înregistrarea audio a fost goală."
+
+msgid "No notes match these filters."
+msgstr "Nicio notiță nu corespunde acestor filtre."
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "Nicio notiță încă. Faceți clic pe pictograma din bara de sistem pentru a înregistra prima notiță."
+
+msgid "Note"
+msgstr "Notiță"
+
+msgid "Note Saved"
+msgstr "Notiță salvată"
+
+msgid "Notes"
+msgstr "Notițe"
+
+msgid "Notes Folder cannot be empty."
+msgstr "Dosarul de notițe nu poate fi gol."
+
+msgid "Notes Folder:"
+msgstr "Dosar notițe:"
+
+msgid "Notes Storage"
+msgstr "Stocare notițe"
+
+msgid "Number of audio input channels."
+msgstr "Numărul de canale de intrare audio."
+
+msgid "Number of backup log files to retain."
+msgstr "Numărul de fișiere jurnal de rezervă păstrate."
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "Numărul de coloane în grila cronologică a notițelor."
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "Numărul de reîncercări dacă ieșirea LLM eșuează la parsarea JSON."
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "Setări Ollama && flux AI"
+
+msgid "Ollama URL cannot be empty."
+msgstr "URL-ul Ollama nu poate fi gol."
+
+msgid "Ollama URL is empty."
+msgstr "URL-ul Ollama este gol."
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "URL-ul Ollama trebuie să înceapă cu http:// sau https://."
+
+msgid "Ollama URL:"
+msgstr "URL Ollama:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "Modelul de embedding Ollama utilizat pentru căutarea notițelor după sens (de ex. embeddinggemma-2:latest)."
+
+msgid "Open Notes"
+msgstr "Deschide notițele"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "Deschideți fișierul jurnal al serviciului de fundal în editorul de sistem."
+
+msgid "Output Language cannot be empty."
+msgstr "Limba de ieșire nu poate fi goală."
+
+msgid "Output Language:"
+msgstr "Limbă de ieșire:"
+
+msgid "Play beep on recording start and stop"
+msgstr "Redă un semnal sonor la pornirea și oprirea înregistrării"
+
+msgid "Preload Keep Alive:"
+msgstr "Preload Keep Alive:"
+
+msgid "Preload Timeout:"
+msgstr "Expirare preîncărcare:"
+
+msgid "Processing Error"
+msgstr "Eroare de procesare"
+
+msgid "Processing…"
+msgstr "Se procesează…"
+
+msgid "Prompt Content:"
+msgstr "Conținut prompt:"
+
+msgid "Prompts"
+msgstr "Prompturi"
+
+msgid "Prompts:"
+msgstr "Prompturi:"
+
+msgid "Question"
+msgstr "Întrebare"
+
+msgid "Questions"
+msgstr "Întrebări"
+
+msgid "Quit"
+msgstr "Ieșire"
+
+msgid "Ready"
+msgstr "Pregătit"
+
+msgid "Recording Note..."
+msgstr "Înregistrare notă..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "Înregistrare în curs — clic pentru a opri și procesa notița"
+
+msgid "Refresh"
+msgstr "Reîmprospătează"
+
+msgid "Reload Configuration"
+msgstr "Reîncarcă configurarea"
+
+msgid "Reminder"
+msgstr "Memento"
+
+msgid "Reminders"
+msgstr "Mementouri"
+
+msgid "Request Timeout:"
+msgstr "Expirare cerere:"
+
+msgid "Restore Defaults"
+msgstr "Restaurează valorile implicite"
+
+msgid "Retry Prompt"
+msgstr "Prompt de reîncercare"
+
+msgid "Rewriting - System Prompt"
+msgstr "Rescriere - Prompt de sistem"
+
+msgid "Rewriting - User Prompt"
+msgstr "Rescriere - Prompt utilizator"
+
+msgid "Sample Rate:"
+msgstr "Rată de eșantionare:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "Rata de eșantionare pentru înregistrarea cu microfonul (16000 Hz este recomandat pentru modelele de dictare vocală)."
+
+msgid "Save"
+msgstr "Salvează"
+
+msgid "Save Error"
+msgstr "Eroare la salvare"
+
+msgid "Search failed: {error}"
+msgstr "Căutare eșuată: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "Rezultatele căutării sub această similaritate cosinus sunt ascunse."
+
+msgid "Search your notes by meaning…"
+msgstr "Căutați în notițe după sens…"
+
+msgid "Searching…"
+msgstr "Se caută…"
+
+msgid "Select Notes Folder"
+msgstr "Selectează dosarul de notițe"
+
+msgid "Select a prompt to edit..."
+msgstr "Selectați un prompt pentru editare..."
+
+msgid "Semantic Search"
+msgstr "Căutare semantică"
+
+msgid "Settings"
+msgstr "Setări"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "Afișează suprapunerea flotantă HUD cu cronometru invers în timpul înregistrării"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "Pornește Eloquent Notes automat la autentificare"
+
+msgid "Start/Stop Recording"
+msgstr "Pornește/Oprește înregistrarea"
+
+msgid "Startup Options"
+msgstr "Opțiuni de pornire"
+
+msgid "Stereo (2 channels)"
+msgstr "Stereo (2 canale)"
+
+msgid "Stop dictation"
+msgstr "Oprește dictarea"
+
+msgid "System is busy. Please wait."
+msgstr "Sistemul este ocupat. Vă rugăm să așteptați."
+
+msgid "Tags, separated by commas"
+msgstr "Etichete, separate prin virgulă"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "Limba țintă pentru notițele rescrise, titluri și etichete (de ex. English, Romanian)."
+
+msgid "Task"
+msgstr "Sarcină"
+
+msgid "Tasks"
+msgstr "Sarcini"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "Timpul de păstrare a modelului încărcat după generarea notiței (de ex., '0' pentru descărcare imediată sau '5m')."
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "Timpul de păstrare a ponderilor modelului încărcate în VRAM în timpul înregistrării pentru a minimiza latența (de ex., '5m')."
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "Timpul de păstrare a modelului de embedding încărcat după o căutare (de ex., '5m' sau '0')."
+
+msgid "Timeline Columns:"
+msgstr "Coloane cronologie:"
+
+msgid "Title"
+msgstr "Titlu"
+
+msgid "Today"
+msgstr "Astăzi"
+
+msgid "Transcription - System Prompt"
+msgstr "Transcriere - Prompt de sistem"
+
+msgid "Transcription - User Prompt"
+msgstr "Transcriere - Prompt utilizator"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "URL-ul serverului Ollama local sau la distanță."
+
+msgid "Use default context length"
+msgstr "Utilizează lungimea implicită a contextului"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "Configurarea utilizatorului de la {path} nu este o mapare YAML validă"
+
+msgid "Validation Error"
+msgstr "Eroare de validare"
+
+msgid "Verbosity level for app logging."
+msgstr "Nivelul de detaliere pentru jurnalizarea aplicației."
+
+msgid "View Log File"
+msgstr "Vizualizează fișierul jurnal"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "Dictări vocale transformate în notițe organizate"
+
+msgid "Yesterday"
+msgstr "Ieri"
+
+msgid "← Back"
+msgstr "← Înapoi"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} rezultat"
+msgstr[1] "{count} rezultate"
+msgstr[2] "{count} de rezultate"

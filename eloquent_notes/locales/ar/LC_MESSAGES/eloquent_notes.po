@@ -1,0 +1,527 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
+
+msgid " Hz"
+msgstr " هرتز"
+
+msgid " MB"
+msgstr " ميجابايت"
+
+msgid " sec"
+msgstr " ثانية"
+
+msgid "AI Model (Audio):"
+msgstr "نموذج الذكاء الاصطناعي (الصوت):"
+
+msgid "AI Model cannot be empty."
+msgstr "لا يمكن ترك نموذج الذكاء الاصطناعي فارغًا."
+
+msgid "AI Settings"
+msgstr "إعدادات الذكاء الاصطناعي"
+
+msgid "Add dictation"
+msgstr "إضافة إملاء"
+
+msgid "Alias for 'toggle' command."
+msgstr "اسم بديل للأمر 'toggle'."
+
+msgid "All"
+msgstr "الكل"
+
+msgid "All tags"
+msgstr "كل الوسوم"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "هل أنت متأكد من أنك تريد استعادة جميع إعدادات التكوين والموجهات إلى قيمها الافتراضية؟\n\nسيؤدي هذا إلى الكتابة فوق التعديلات الحالية."
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "إصدار تنبيهات صوتية عند بدء التسجيل وإيقافه."
+
+msgid "Audio"
+msgstr "الصوت"
+
+msgid "Audio Capture Settings"
+msgstr "إعدادات التقاط الصوت"
+
+msgid "Audio Channels:"
+msgstr "قنوات الصوت:"
+
+msgid "Backup Count:"
+msgstr "عدد النسخ الاحتياطية:"
+
+msgid "Beep Duration:"
+msgstr "مدة التنبيه الصوتي:"
+
+msgid "Beep Frequency:"
+msgstr "تردد التنبيه الصوتي:"
+
+msgid "Browse..."
+msgstr "استعراض..."
+
+msgid "Cancel"
+msgstr "إلغاء"
+
+msgid "Capture Duration:"
+msgstr "مدة التسجيل:"
+
+msgid "Classification - System Prompt"
+msgstr "التصنيف - موجه النظام"
+
+msgid "Classification - User Prompt"
+msgstr "التصنيف - موجه المستخدم"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "الأمر المراد تنفيذه: 'install-autostart'، أو 'toggle'، أو 'open' (إظهار نافذة الملاحظات)، أو 'config' (فتح واجهة الإعدادات)."
+
+msgid "Configuration"
+msgstr "الإعدادات"
+
+msgid "Configuration Error"
+msgstr "خطأ في الإعدادات"
+
+msgid "Configuration reloaded successfully."
+msgstr "تمت إعادة تحميل الإعدادات بنجاح."
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "يجب أن يكون قسم الإعدادات '{key}' خريطة مفاتيح، ولكن تم تلقي {type_name}"
+
+msgid "Connection failed: {error}"
+msgstr "فشل الاتصال: {error}"
+
+msgid "Context Length:"
+msgstr "طول السياق:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "طول السياق بالرموز الممررة إلى Ollama. القيم الأكبر تسمح بإملاءات أطول لكنها تستهلك ذاكرة أكبر."
+
+msgid "Copy"
+msgstr "نسخ"
+
+msgid "Could not move {name} to the trash."
+msgstr "تعذر نقل {name} إلى المهملات."
+
+msgid "Could not start recording: {error}"
+msgstr "تعذر بدء التسجيل: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "تعذر إيقاف التسجيل: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "ينشئ إدخال بدء تشغيل تلقائي لسطح المكتب في دليل بدء التشغيل التلقائي XDG"
+
+msgid "Decision"
+msgstr "قرار"
+
+msgid "Decisions"
+msgstr "قرارات"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "تمت استعادة الإعدادات الافتراضية. انقر فوق 'حفظ' لتطبيق التغييرات على القرص."
+
+msgid "Delete"
+msgstr "حذف"
+
+msgid "Delete Failed"
+msgstr "فشل الحذف"
+
+msgid "Delete Note"
+msgstr "حذف الملاحظة"
+
+msgid "Dictation Added"
+msgstr "تمت إضافة الإملاء"
+
+msgid "Dictation Empty"
+msgstr "الإملاء فارغ"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "يعرض نافذة عائمة أنيقة مع مؤقت عد تنازلي مباشر وشريط تقدم أثناء الإملاء."
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (خامل)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (جارٍ المعالجة...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (جارٍ التسجيل...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes - أداة في شريط نظام لينكس تحول الإملاءات الصوتية دون اتصال إلى ملاحظات منظمة."
+
+msgid "Eloquent Notes Configuration"
+msgstr "إعدادات Eloquent Notes"
+
+msgid "Eloquent Notes Daemon"
+msgstr "خدمة Eloquent Notes الخلفية"
+
+msgid "Embedding Model cannot be empty."
+msgstr "لا يمكن ترك نموذج التضمين فارغًا."
+
+msgid "Embedding Model:"
+msgstr "نموذج التضمين:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "خطأ في معالجة الإملاء: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "فشل تحميل إعدادات المستخدم: {error}\n\nتم تحميل الإعدادات الافتراضية."
+
+msgid "Failed to reload configuration: {error}"
+msgstr "فشلت إعادة تحميل الإعدادات: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "فشل حفظ الإعدادات: {error}"
+
+msgid "Fetching models..."
+msgstr "جارٍ جلب النماذج..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "المجلد الذي تُحفظ فيه كل ملاحظة صوتية كملف Markdown. وجّهه داخل خزنة Obsidian لرؤية ملاحظاتك هناك أيضًا."
+
+msgid "General"
+msgstr "عام"
+
+msgid "Idea"
+msgstr "فكرة"
+
+msgid "Ideas"
+msgstr "أفكار"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "في حال التحديد، يتم تعيين context_length إلى null (أو تركه غير معين)، مما يوجه Ollama لاستخدام الحد الأقصى الافتراضي لطول السياق الخاص بالنموذج."
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "تنسيق مدة البقاء في الذاكرة غير صالح: '{value}'. يجب أن يكون عددًا صحيحًا أو مدة زمنية (مثل 5m، 10s، 1h، 0، -1)."
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "تنسيق مدة بقاء التحميل المسبق غير صالح: '{value}'. يجب أن يكون عددًا صحيحًا أو مدة زمنية (مثل 5m، 10s، 1h، 0، -1)."
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "تنسيق مدة بقاء البحث غير صالح: '{value}'. يجب أن يكون عددًا صحيحًا أو مدة زمنية (مثل 5m، 10s، 1h، 0، -1)."
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "قيمة إعداد غير صالحة للمفتاح '{key}'"
+
+msgid "Keep Alive Time:"
+msgstr "وقت البقاء في الذاكرة:"
+
+msgid "Log File"
+msgstr "ملف السجل"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "ملف السجل غير موجود بعد. قم بإجراء بعض الإملاءات أولاً!"
+
+msgid "Logging Level:"
+msgstr "مستوى التسجيل:"
+
+msgid "Logging Settings"
+msgstr "إعدادات السجل"
+
+msgid "Max Log File Size:"
+msgstr "الحد الأقصى لحجم ملف السجل:"
+
+msgid "Max Retries:"
+msgstr "الحد الأقصى لإعادة المحاولة:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "المدة القصوى بالثواني لتسجيل الصوت قبل المعالجة التلقائية."
+
+msgid "Maximum size of the log file before rotating."
+msgstr "الحجم الأقصى لملف السجل قبل التدوير."
+
+msgid "Minimum Similarity:"
+msgstr "الحد الأدنى للتشابه:"
+
+msgid "Model returned empty note content"
+msgstr "أرجع النموذج محتوى ملاحظة فارغًا"
+
+msgid "Models loaded successfully."
+msgstr "تم تحميل النماذج بنجاح."
+
+msgid "Mono (1 channel)"
+msgstr "أحادي (قناة واحدة)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "هل تريد نقل “{title}” إلى المهملات؟"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "اسم نموذج Ollama اللغوي المخصص لمهام الإملاء (مثل gemma4:e4b-it-qat)."
+
+msgid "No audio-capable models found."
+msgstr "لم يتم العثور على نماذج تدعم الصوت."
+
+msgid "No matching notes."
+msgstr "لا توجد ملاحظات مطابقة."
+
+msgid "No note was created because the audio was empty."
+msgstr "لم يتم إنشاء ملاحظة لأن التسجيل الصوتي كان فارغًا."
+
+msgid "No notes match these filters."
+msgstr "لا توجد ملاحظات تطابق عوامل التصفية هذه."
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "لا توجد ملاحظات بعد. انقر على أيقونة شريط النظام لتسجيل ملاحظتك الأولى."
+
+msgid "Note"
+msgstr "ملاحظة"
+
+msgid "Note Saved"
+msgstr "تم حفظ الملاحظة"
+
+msgid "Notes"
+msgstr "الملاحظات"
+
+msgid "Notes Folder cannot be empty."
+msgstr "لا يمكن ترك مجلد الملاحظات فارغًا."
+
+msgid "Notes Folder:"
+msgstr "مجلد الملاحظات:"
+
+msgid "Notes Storage"
+msgstr "تخزين الملاحظات"
+
+msgid "Number of audio input channels."
+msgstr "عدد قنوات إدخال الصوت."
+
+msgid "Number of backup log files to retain."
+msgstr "عدد ملفات السجل الاحتياطية المراد الاحتفاظ بها."
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "عدد الأعمدة في شبكة الجدول الزمني للملاحظات."
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "عدد محاولات الإعادة إذا فشل تحليل مخرجات النموذج بصيغة JSON."
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "إعدادات Ollama && مسار الذكاء الاصطناعي"
+
+msgid "Ollama URL cannot be empty."
+msgstr "لا يمكن ترك عنوان URL لخدمة Ollama فارغًا."
+
+msgid "Ollama URL is empty."
+msgstr "عنوان URL لخدمة Ollama فارغ."
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "يجب أن يبدأ عنوان URL لخدمة Ollama بـ http:// أو https://."
+
+msgid "Ollama URL:"
+msgstr "عنوان URL لخدمة Ollama:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "نموذج التضمين في Ollama المستخدم للبحث في الملاحظات حسب المعنى (مثل embeddinggemma-2:latest)."
+
+msgid "Open Notes"
+msgstr "فتح الملاحظات"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "افتح ملف سجل الخدمة الخلفية في محرر النظام لديك."
+
+msgid "Output Language cannot be empty."
+msgstr "لا يمكن ترك لغة الإخراج فارغة."
+
+msgid "Output Language:"
+msgstr "لغة الإخراج:"
+
+msgid "Play beep on recording start and stop"
+msgstr "تشغيل تنبيه صوتي عند بدء التسجيل وإيقافه"
+
+msgid "Preload Keep Alive:"
+msgstr "بقاء التحميل المسبق:"
+
+msgid "Preload Timeout:"
+msgstr "مهلة التحميل المسبق:"
+
+msgid "Processing Error"
+msgstr "خطأ في المعالجة"
+
+msgid "Processing…"
+msgstr "جارٍ المعالجة…"
+
+msgid "Prompt Content:"
+msgstr "محتوى الموجه:"
+
+msgid "Prompts"
+msgstr "الموجهات"
+
+msgid "Prompts:"
+msgstr "الموجهات:"
+
+msgid "Question"
+msgstr "سؤال"
+
+msgid "Questions"
+msgstr "أسئلة"
+
+msgid "Quit"
+msgstr "إنهاء"
+
+msgid "Ready"
+msgstr "جاهز"
+
+msgid "Recording Note..."
+msgstr "تسجيل الملاحظة..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "التسجيل جارٍ — انقر للإيقاف ومعالجة الملاحظة"
+
+msgid "Refresh"
+msgstr "تحديث"
+
+msgid "Reload Configuration"
+msgstr "إعادة تحميل الإعدادات"
+
+msgid "Reminder"
+msgstr "تذكير"
+
+msgid "Reminders"
+msgstr "تذكيرات"
+
+msgid "Request Timeout:"
+msgstr "مهلة الطلب:"
+
+msgid "Restore Defaults"
+msgstr "استعادة الافتراضيات"
+
+msgid "Retry Prompt"
+msgstr "موجه إعادة المحاولة"
+
+msgid "Rewriting - System Prompt"
+msgstr "إعادة الصياغة - موجه النظام"
+
+msgid "Rewriting - User Prompt"
+msgstr "إعادة الصياغة - موجه المستخدم"
+
+msgid "Sample Rate:"
+msgstr "معدل العينة:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "معدل العينة لتسجيل الميكروفون (يوصى بـ 16000 هرتز لنماذج إملاء الكلام)."
+
+msgid "Save"
+msgstr "حفظ"
+
+msgid "Save Error"
+msgstr "خطأ في الحفظ"
+
+msgid "Search failed: {error}"
+msgstr "فشل البحث: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "يتم إخفاء نتائج البحث التي يقل تشابه جيب التمام فيها عن هذا الحد."
+
+msgid "Search your notes by meaning…"
+msgstr "ابحث في ملاحظاتك حسب المعنى…"
+
+msgid "Searching…"
+msgstr "جارٍ البحث…"
+
+msgid "Select Notes Folder"
+msgstr "اختر مجلد الملاحظات"
+
+msgid "Select a prompt to edit..."
+msgstr "اختر موجهًا لتحريره..."
+
+msgid "Semantic Search"
+msgstr "البحث الدلالي"
+
+msgid "Settings"
+msgstr "الإعدادات"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "إظهار نافذة العد التنازلي العائمة أثناء التسجيل"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "بدء تشغيل Eloquent Notes تلقائيًا عند تسجيل الدخول"
+
+msgid "Start/Stop Recording"
+msgstr "بدء/إيقاف التسجيل"
+
+msgid "Startup Options"
+msgstr "خيارات بدء التشغيل"
+
+msgid "Stereo (2 channels)"
+msgstr "ستيريو (قناتان)"
+
+msgid "Stop dictation"
+msgstr "إيقاف الإملاء"
+
+msgid "System is busy. Please wait."
+msgstr "النظام مشغول. يرجى الانتظار."
+
+msgid "Tags, separated by commas"
+msgstr "الوسوم، مفصولة بفواصل"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "اللغة المستهدفة للملاحظات المعاد صياغتها والعناوين والوسوم (مثل English أو Arabic)."
+
+msgid "Task"
+msgstr "مهمة"
+
+msgid "Tasks"
+msgstr "مهام"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "وقت إبقاء النموذج محملاً في الذاكرة بعد إنشاء الملاحظة (مثل '0' للتفريغ فورًا، أو '5m')."
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "وقت إبقاء أوزان النموذج محملة في ذاكرة VRAM أثناء التسجيل لتقليل زمن الاستجابة (مثل '5m')."
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "وقت إبقاء نموذج التضمين محملاً بعد البحث (مثل '5m' أو '0')."
+
+msgid "Timeline Columns:"
+msgstr "أعمدة الجدول الزمني:"
+
+msgid "Title"
+msgstr "العنوان"
+
+msgid "Today"
+msgstr "اليوم"
+
+msgid "Transcription - System Prompt"
+msgstr "النسخ الصوتي - موجه النظام"
+
+msgid "Transcription - User Prompt"
+msgstr "النسخ الصوتي - موجه المستخدم"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "عنوان URL لخادم Ollama المحلي أو البعيد."
+
+msgid "Use default context length"
+msgstr "استخدام طول السياق الافتراضي"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "إعدادات المستخدم في {path} ليست خريطة YAML صالحة"
+
+msgid "Validation Error"
+msgstr "خطأ في التحقق"
+
+msgid "Verbosity level for app logging."
+msgstr "مستوى التفصيل في سجل التطبيق."
+
+msgid "View Log File"
+msgstr "عرض ملف السجل"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "إملاءات صوتية تتحول إلى ملاحظات منظمة"
+
+msgid "Yesterday"
+msgstr "أمس"
+
+msgid "← Back"
+msgstr "← رجوع"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} نتيجة"
+msgstr[1] "{count} نتيجة"
+msgstr[2] "{count} نتيجتان"
+msgstr[3] "{count} نتائج"
+msgstr[4] "{count} نتيجة"
+msgstr[5] "{count} نتيجة"

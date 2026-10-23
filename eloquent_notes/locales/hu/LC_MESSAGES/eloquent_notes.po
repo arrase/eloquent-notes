@@ -1,0 +1,523 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: hu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid " Hz"
+msgstr " Hz"
+
+msgid " MB"
+msgstr " MB"
+
+msgid " sec"
+msgstr " mp"
+
+msgid "AI Model (Audio):"
+msgstr "MI-modell (Hang):"
+
+msgid "AI Model cannot be empty."
+msgstr "Az MI-modell nem lehet üres."
+
+msgid "AI Settings"
+msgstr "MI-beállítások"
+
+msgid "Add dictation"
+msgstr "Diktálás hozzáadása"
+
+msgid "Alias for 'toggle' command."
+msgstr "A 'toggle' parancs álneve."
+
+msgid "All"
+msgstr "Összes"
+
+msgid "All tags"
+msgstr "Összes címke"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "Biztosan visszaállítja az összes konfigurációs beállítást és promptot az alapértelmezett értékekre?\n\nEz felülírja a jelenlegi módosításokat."
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "Hangjelzés a felvétel indításakor és leállításakor."
+
+msgid "Audio"
+msgstr "Hang"
+
+msgid "Audio Capture Settings"
+msgstr "Hangrögzítési beállítások"
+
+msgid "Audio Channels:"
+msgstr "Hangcsatornák:"
+
+msgid "Backup Count:"
+msgstr "Biztonsági mentések száma:"
+
+msgid "Beep Duration:"
+msgstr "Hangjelzés időtartama:"
+
+msgid "Beep Frequency:"
+msgstr "Hangjelzés frekvenciája:"
+
+msgid "Browse..."
+msgstr "Tallózás..."
+
+msgid "Cancel"
+msgstr "Mégse"
+
+msgid "Capture Duration:"
+msgstr "Felvétel időtartama:"
+
+msgid "Classification - System Prompt"
+msgstr "Osztályozás - Rendszerprompt"
+
+msgid "Classification - User Prompt"
+msgstr "Osztályozás - Felhasználói prompt"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "Végrehajtandó parancs: 'install-autostart', 'toggle', 'open' (jegyzetek ablak megjelenítése) vagy 'config' (beállítások megnyitása)."
+
+msgid "Configuration"
+msgstr "Konfiguráció"
+
+msgid "Configuration Error"
+msgstr "Konfigurációs hiba"
+
+msgid "Configuration reloaded successfully."
+msgstr "A konfiguráció sikeresen újratöltve."
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "A(z) '{key}' konfigurációs szakasznak leképezésnek kell lennie, kapott típus: {type_name}"
+
+msgid "Connection failed: {error}"
+msgstr "Sikertelen kapcsolódás: {error}"
+
+msgid "Context Length:"
+msgstr "Kontextushossz:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "Az Ollamának átadott kontextushossz tokenekben. A nagyobb értékek hosszabb diktálást tesznek lehetővé, de több memóriát használnak."
+
+msgid "Copy"
+msgstr "Másolás"
+
+msgid "Could not move {name} to the trash."
+msgstr "Nem sikerült áthelyezni a kukába: {name}."
+
+msgid "Could not start recording: {error}"
+msgstr "Nem sikerült elindítani a felvételt: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "Nem sikerült leállítani a felvételt: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "Automatikus indítási bejegyzést hoz létre az XDG autostart könyvtárban"
+
+msgid "Decision"
+msgstr "Döntés"
+
+msgid "Decisions"
+msgstr "Döntések"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "Alapértelmezések visszaállítva. Kattintson a „Mentés” gombra a módosítások lemezre írásához."
+
+msgid "Delete"
+msgstr "Törlés"
+
+msgid "Delete Failed"
+msgstr "Sikertelen törlés"
+
+msgid "Delete Note"
+msgstr "Jegyzet törlése"
+
+msgid "Dictation Added"
+msgstr "Diktálás hozzáadva"
+
+msgid "Dictation Empty"
+msgstr "Üres diktálás"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "Elegáns lebegő sávot jelenít meg élő visszaszámlálóval és folyamatjelzővel diktálás közben."
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (Tétlen)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (Feldolgozás...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (Felvétel...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes - Linux rendszertálca-segédprogram, amely az offline hangdiktálásokat rendszerezett jegyzetekké alakítja."
+
+msgid "Eloquent Notes Configuration"
+msgstr "Eloquent Notes beállítások"
+
+msgid "Eloquent Notes Daemon"
+msgstr "Eloquent Notes démon"
+
+msgid "Embedding Model cannot be empty."
+msgstr "A beágyazási modell nem lehet üres."
+
+msgid "Embedding Model:"
+msgstr "Beágyazási modell:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "Hiba a diktálás feldolgozásakor: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "Nem sikerült betölteni a felhasználói konfigurációt: {error}\n\nAlapértelmezett beállítások betöltve."
+
+msgid "Failed to reload configuration: {error}"
+msgstr "Nem sikerült újratölteni a konfigurációt: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "Nem sikerült menteni a beállításokat: {error}"
+
+msgid "Fetching models..."
+msgstr "Modellek lekérése..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "Mappa, ahová az egyes hangjegyzetek Markdown-fájlként kerülnek mentésre. Állítsa be egy Obsidian-széfbe, hogy ott is lássa jegyzeteit."
+
+msgid "General"
+msgstr "Általános"
+
+msgid "Idea"
+msgstr "Ötlet"
+
+msgid "Ideas"
+msgstr "Ötletek"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "Ha be van jelölve, a context_length értékét nullra állítja (vagy üresen hagyja), utasítva az Ollamát a modell alapértelmezett maximális kontextushosszának használatára."
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Érvénytelen Keep Alive formátum: '{value}'. Egész számnak vagy időtartamnak kell lennie (pl. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Érvénytelen Preload Keep Alive formátum: '{value}'. Egész számnak vagy időtartamnak kell lennie (pl. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Érvénytelen Search Keep Alive formátum: '{value}'. Egész számnak vagy időtartamnak kell lennie (pl. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "Érvénytelen konfigurációs érték ehhez: '{key}'"
+
+msgid "Keep Alive Time:"
+msgstr "Keep Alive idő:"
+
+msgid "Log File"
+msgstr "Naplófájl"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "A naplófájl még nem létezik. Először végezzen néhány diktálást!"
+
+msgid "Logging Level:"
+msgstr "Naplózási szint:"
+
+msgid "Logging Settings"
+msgstr "Naplózási beállítások"
+
+msgid "Max Log File Size:"
+msgstr "Max. naplófájlméret:"
+
+msgid "Max Retries:"
+msgstr "Max. újrapróbálkozások:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "A hangrögzítés maximális időtartama másodpercben az automatikus feldolgozás előtt."
+
+msgid "Maximum size of the log file before rotating."
+msgstr "A naplófájl maximális mérete forgatás előtt."
+
+msgid "Minimum Similarity:"
+msgstr "Minimális hasonlóság:"
+
+msgid "Model returned empty note content"
+msgstr "A modell üres jegyzettartalmat adott vissza"
+
+msgid "Models loaded successfully."
+msgstr "A modellek sikeresen betöltve."
+
+msgid "Mono (1 channel)"
+msgstr "Monó (1 csatorna)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "Áthelyezi a(z) „{title}” jegyzetet a kukába?"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "A diktálási feladatokhoz használt Ollama LLM-modell neve (pl. gemma4:e4b-it-qat)."
+
+msgid "No audio-capable models found."
+msgstr "Nem található hangfeldolgozásra képes modell."
+
+msgid "No matching notes."
+msgstr "Nincs találat."
+
+msgid "No note was created because the audio was empty."
+msgstr "Nem jött létre jegyzet, mert a hangfelvétel üres volt."
+
+msgid "No notes match these filters."
+msgstr "Egyetlen jegyzet sem felel meg ezeknek a szűrőknek."
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "Még nincsenek jegyzetek. Kattintson a tálcaikonra az első felvételéhez."
+
+msgid "Note"
+msgstr "Jegyzet"
+
+msgid "Note Saved"
+msgstr "Jegyzet mentve"
+
+msgid "Notes"
+msgstr "Jegyzetek"
+
+msgid "Notes Folder cannot be empty."
+msgstr "A jegyzetek mappája nem lehet üres."
+
+msgid "Notes Folder:"
+msgstr "Jegyzetek mappája:"
+
+msgid "Notes Storage"
+msgstr "Jegyzetek tárolása"
+
+msgid "Number of audio input channels."
+msgstr "A hangbemeneti csatornák száma."
+
+msgid "Number of backup log files to retain."
+msgstr "A megtartandó biztonsági naplófájlok száma."
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "Az oszlopok száma a jegyzetek idővonal-rácsában."
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "Újrapróbálkozások száma, ha az LLM-kimenet JSON-elemzése sikertelen."
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "Ollama && MI-folyamat beállításai"
+
+msgid "Ollama URL cannot be empty."
+msgstr "Az Ollama URL nem lehet üres."
+
+msgid "Ollama URL is empty."
+msgstr "Az Ollama URL üres."
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "Az Ollama URL-nek http:// vagy https:// előtaggal kell kezdődnie."
+
+msgid "Ollama URL:"
+msgstr "Ollama URL:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "A jegyzetek jelentés alapú kereséséhez használt Ollama beágyazási modell (pl. embeddinggemma-2:latest)."
+
+msgid "Open Notes"
+msgstr "Jegyzetek megnyitása"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "A háttérdémon naplófájljának megnyitása a rendszer szövegszerkesztőjében."
+
+msgid "Output Language cannot be empty."
+msgstr "A kimeneti nyelv nem lehet üres."
+
+msgid "Output Language:"
+msgstr "Kimeneti nyelv:"
+
+msgid "Play beep on recording start and stop"
+msgstr "Hangjelzés lejátszása a felvétel indításakor és leállításakor"
+
+msgid "Preload Keep Alive:"
+msgstr "Előtöltés Keep Alive:"
+
+msgid "Preload Timeout:"
+msgstr "Előtöltési időkorlát:"
+
+msgid "Processing Error"
+msgstr "Feldolgozási hiba"
+
+msgid "Processing…"
+msgstr "Feldolgozás…"
+
+msgid "Prompt Content:"
+msgstr "Prompt tartalma:"
+
+msgid "Prompts"
+msgstr "Promptok"
+
+msgid "Prompts:"
+msgstr "Promptok:"
+
+msgid "Question"
+msgstr "Kérdés"
+
+msgid "Questions"
+msgstr "Kérdések"
+
+msgid "Quit"
+msgstr "Kilépés"
+
+msgid "Ready"
+msgstr "Kész"
+
+msgid "Recording Note..."
+msgstr "Jegyzet rögzítése..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "Felvétel folyamatban — kattintson a leállításhoz és a jegyzet feldolgozásához"
+
+msgid "Refresh"
+msgstr "Frissítés"
+
+msgid "Reload Configuration"
+msgstr "Konfiguráció újratöltése"
+
+msgid "Reminder"
+msgstr "Emlékeztető"
+
+msgid "Reminders"
+msgstr "Emlékeztetők"
+
+msgid "Request Timeout:"
+msgstr "Kérés időkorlátja:"
+
+msgid "Restore Defaults"
+msgstr "Alapértelmezések visszaállítása"
+
+msgid "Retry Prompt"
+msgstr "Újrapróbálkozási prompt"
+
+msgid "Rewriting - System Prompt"
+msgstr "Átírás - Rendszerprompt"
+
+msgid "Rewriting - User Prompt"
+msgstr "Átírás - Felhasználói prompt"
+
+msgid "Sample Rate:"
+msgstr "Mintavételi frekvencia:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "Mintavételi frekvencia mikrofonfelvételhez (beszéddiktáló modellekhez 16000 Hz ajánlott)."
+
+msgid "Save"
+msgstr "Mentés"
+
+msgid "Save Error"
+msgstr "Mentési hiba"
+
+msgid "Search failed: {error}"
+msgstr "Sikertelen keresés: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "Az ennél alacsonyabb koszinusz-hasonlóságú keresési találatok el vannak rejtve."
+
+msgid "Search your notes by meaning…"
+msgstr "Keressen a jegyzeteiben jelentés alapján…"
+
+msgid "Searching…"
+msgstr "Keresés…"
+
+msgid "Select Notes Folder"
+msgstr "Jegyzetek mappájának kiválasztása"
+
+msgid "Select a prompt to edit..."
+msgstr "Válasszon egy promptot a szerkesztéshez..."
+
+msgid "Semantic Search"
+msgstr "Szemantikus keresés"
+
+msgid "Settings"
+msgstr "Beállítások"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "Lebegő visszaszámláló HUD-sáv megjelenítése felvétel közben"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "Az Eloquent Notes automatikus indítása bejelentkezéskor"
+
+msgid "Start/Stop Recording"
+msgstr "Felvétel indítása/leállítása"
+
+msgid "Startup Options"
+msgstr "Indítási beállítások"
+
+msgid "Stereo (2 channels)"
+msgstr "Sztereó (2 csatorna)"
+
+msgid "Stop dictation"
+msgstr "Diktálás leállítása"
+
+msgid "System is busy. Please wait."
+msgstr "A rendszer foglalt. Kérjük, várjon."
+
+msgid "Tags, separated by commas"
+msgstr "Címkék, vesszővel elválasztva"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "Az átírt jegyzetek, címek és címkék célnyelve (pl. English, Hungarian)."
+
+msgid "Task"
+msgstr "Feladat"
+
+msgid "Tasks"
+msgstr "Feladatok"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "A modell memóriában tartásának ideje jegyzetgenerálás után (pl. '0' az azonnali ürítéshez, vagy '5m')."
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "A modellsúlyok VRAM-ban tartásának ideje felvétel közben a késleltetés minimalizálása érdekében (pl. '5m')."
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "A beágyazási modell memóriában tartásának ideje keresés után (pl. '5m' vagy '0')."
+
+msgid "Timeline Columns:"
+msgstr "Idővonal oszlopai:"
+
+msgid "Title"
+msgstr "Cím"
+
+msgid "Today"
+msgstr "Ma"
+
+msgid "Transcription - System Prompt"
+msgstr "Átirat - Rendszerprompt"
+
+msgid "Transcription - User Prompt"
+msgstr "Átirat - Felhasználói prompt"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "A helyi vagy távoli Ollama-kiszolgáló URL-címe."
+
+msgid "Use default context length"
+msgstr "Alapértelmezett kontextushossz használata"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "A(z) {path} helyen található felhasználói konfiguráció nem érvényes YAML-leképezés"
+
+msgid "Validation Error"
+msgstr "Érvényesítési hiba"
+
+msgid "Verbosity level for app logging."
+msgstr "Az alkalmazásnaplózás részletességi szintje."
+
+msgid "View Log File"
+msgstr "Naplófájl megtekintése"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "Hangdiktálások rendszerezett jegyzetekké alakítva"
+
+msgid "Yesterday"
+msgstr "Tegnap"
+
+msgid "← Back"
+msgstr "← Vissza"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} találat"
+msgstr[1] "{count} találat"

@@ -1,0 +1,523 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: no\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid " Hz"
+msgstr " Hz"
+
+msgid " MB"
+msgstr " MB"
+
+msgid " sec"
+msgstr " sek"
+
+msgid "AI Model (Audio):"
+msgstr "AI-modell (lyd):"
+
+msgid "AI Model cannot be empty."
+msgstr "AI-modell kan ikke være tom."
+
+msgid "AI Settings"
+msgstr "AI-innstillinger"
+
+msgid "Add dictation"
+msgstr "Legg til diktering"
+
+msgid "Alias for 'toggle' command."
+msgstr "Alias for kommandoen 'toggle'."
+
+msgid "All"
+msgstr "Alle"
+
+msgid "All tags"
+msgstr "Alle emneknagger"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "Er du sikker på at du vil tilbakestille alle innstillinger og instrukser til standardverdiene?\n\nDette vil overskrive nåværende endringer."
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "Hørbare pipelyder ved start og stopp av opptak."
+
+msgid "Audio"
+msgstr "Lyd"
+
+msgid "Audio Capture Settings"
+msgstr "Innstillinger for lydopptak"
+
+msgid "Audio Channels:"
+msgstr "Lydkanaler:"
+
+msgid "Backup Count:"
+msgstr "Antall sikkerhetskopier:"
+
+msgid "Beep Duration:"
+msgstr "Pipets varighet:"
+
+msgid "Beep Frequency:"
+msgstr "Pipefrekvens:"
+
+msgid "Browse..."
+msgstr "Bla gjennom..."
+
+msgid "Cancel"
+msgstr "Avbryt"
+
+msgid "Capture Duration:"
+msgstr "Opptaksvarighet:"
+
+msgid "Classification - System Prompt"
+msgstr "Klassifisering – Systeminstruks"
+
+msgid "Classification - User Prompt"
+msgstr "Klassifisering – Brukerinstruks"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "Kommando som skal kjøres: 'install-autostart', 'toggle', 'open' (vis notatvinduet) eller 'config' (åpne innstillinger)."
+
+msgid "Configuration"
+msgstr "Konfigurasjon"
+
+msgid "Configuration Error"
+msgstr "Konfigurasjonsfeil"
+
+msgid "Configuration reloaded successfully."
+msgstr "Konfigurasjonen ble lastet inn på nytt."
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "Konfigurasjonsdelen '{key}' må være en tilordning, fikk {type_name}"
+
+msgid "Connection failed: {error}"
+msgstr "Tilkobling mislyktes: {error}"
+
+msgid "Context Length:"
+msgstr "Kontekstlengde:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "Kontekstlengde i tokens som sendes til Ollama. Høyere verdier tillater lengre dikteringer, men bruker mer minne."
+
+msgid "Copy"
+msgstr "Kopier"
+
+msgid "Could not move {name} to the trash."
+msgstr "Kunne ikke flytte {name} til papirkurven."
+
+msgid "Could not start recording: {error}"
+msgstr "Kunne ikke starte opptak: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "Kunne ikke stoppe opptak: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "Oppretter en autostart-oppføring i XDG-autostartmappen"
+
+msgid "Decision"
+msgstr "Beslutning"
+
+msgid "Decisions"
+msgstr "Beslutninger"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "Standardverdier gjenopprettet. Klikk på «Lagre» for å lagre endringene på disken."
+
+msgid "Delete"
+msgstr "Slett"
+
+msgid "Delete Failed"
+msgstr "Sletting mislyktes"
+
+msgid "Delete Note"
+msgstr "Slett notat"
+
+msgid "Dictation Added"
+msgstr "Diktering lagt til"
+
+msgid "Dictation Empty"
+msgstr "Diktering er tom"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "Viser en elegant flytende indikator med nedtelling og fremdriftslinje under diktering."
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (Inaktiv)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (Behandler...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (Tar opp...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes – Systemstatusverktøy for Linux som gjør frakoblede stemmedikteringer om til organiserte notater."
+
+msgid "Eloquent Notes Configuration"
+msgstr "Eloquent Notes-konfigurasjon"
+
+msgid "Eloquent Notes Daemon"
+msgstr "Eloquent Notes-bakgrunnstjeneste"
+
+msgid "Embedding Model cannot be empty."
+msgstr "Innebyggingsmodell kan ikke være tom."
+
+msgid "Embedding Model:"
+msgstr "Innebyggingsmodell:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "Feil under behandling av diktering: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "Kunne ikke laste brukerkonfigurasjon: {error}\n\nLastet inn standardinnstillinger."
+
+msgid "Failed to reload configuration: {error}"
+msgstr "Kunne ikke laste inn konfigurasjonen på nytt: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "Kunne ikke lagre innstillinger: {error}"
+
+msgid "Fetching models..."
+msgstr "Henter modeller..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "Mappe der hvert talenotat lagres som en Markdown-fil. Pek den til et Obsidian-hvelv for å se notatene dine der også."
+
+msgid "General"
+msgstr "Generelt"
+
+msgid "Idea"
+msgstr "Idé"
+
+msgid "Ideas"
+msgstr "Ideer"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "Hvis valgt, settes context_length til null (eller utelates), slik at Ollama bruker modellens maksimale standard kontekstlengde."
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Ugyldig Keep Alive-format: '{value}'. Må være et heltall eller en varighet (f.eks. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Ugyldig Preload Keep Alive-format: '{value}'. Må være et heltall eller en varighet (f.eks. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Ugyldig Search Keep Alive-format: '{value}'. Må være et heltall eller en varighet (f.eks. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "Ugyldig konfigurasjonsverdi for '{key}'"
+
+msgid "Keep Alive Time:"
+msgstr "Keep Alive-tid:"
+
+msgid "Log File"
+msgstr "Loggfil"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "Loggfilen finnes ikke ennå. Kjør noen dikteringer først!"
+
+msgid "Logging Level:"
+msgstr "Loggnivå:"
+
+msgid "Logging Settings"
+msgstr "Logginnstillinger"
+
+msgid "Max Log File Size:"
+msgstr "Maks. størrelse på loggfil:"
+
+msgid "Max Retries:"
+msgstr "Maks. antall forsøk:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "Maksimal varighet i sekunder for lydopptak før automatisk behandling."
+
+msgid "Maximum size of the log file before rotating."
+msgstr "Maksimal størrelse på loggfilen før rotering."
+
+msgid "Minimum Similarity:"
+msgstr "Minimum likhet:"
+
+msgid "Model returned empty note content"
+msgstr "Modellen returnerte tomt notatinnhold"
+
+msgid "Models loaded successfully."
+msgstr "Modeller ble lastet inn."
+
+msgid "Mono (1 channel)"
+msgstr "Mono (1 kanal)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "Flytte «{title}» til papirkurven?"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "Navn på Ollama LLM-modellen som skal brukes til dikteringsoppgaver (f.eks. gemma4:e4b-it-qat)."
+
+msgid "No audio-capable models found."
+msgstr "Ingen lydkompatible modeller ble funnet."
+
+msgid "No matching notes."
+msgstr "Ingen samsvarende notater."
+
+msgid "No note was created because the audio was empty."
+msgstr "Ingen notater ble opprettet fordi lyden var tom."
+
+msgid "No notes match these filters."
+msgstr "Ingen notater samsvarer med disse filtrene."
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "Ingen notater ennå. Klikk på systemstatusikonet for å ta opp ditt første."
+
+msgid "Note"
+msgstr "Notat"
+
+msgid "Note Saved"
+msgstr "Notat lagret"
+
+msgid "Notes"
+msgstr "Notater"
+
+msgid "Notes Folder cannot be empty."
+msgstr "Notatmappe kan ikke være tom."
+
+msgid "Notes Folder:"
+msgstr "Notatmappe:"
+
+msgid "Notes Storage"
+msgstr "Notatlagring"
+
+msgid "Number of audio input channels."
+msgstr "Antall lydinngangskanaler."
+
+msgid "Number of backup log files to retain."
+msgstr "Antall sikkerhetskopier av loggfiler som skal beholdes."
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "Antall kolonner i tidslinjerutenettet for notater."
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "Antall nye forsøk hvis LLM-utdata feiler ved JSON-tolkning."
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "Innstillinger for Ollama && AI-pipeline"
+
+msgid "Ollama URL cannot be empty."
+msgstr "Ollama-URL kan ikke være tom."
+
+msgid "Ollama URL is empty."
+msgstr "Ollama-URL er tom."
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "Ollama-URL må starte med http:// eller https://."
+
+msgid "Ollama URL:"
+msgstr "Ollama-URL:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "Ollama-innebyggingsmodell brukt til å søke i notater etter betydning (f.eks. embeddinggemma-2:latest)."
+
+msgid "Open Notes"
+msgstr "Åpne notater"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "Åpne loggfilen for bakgrunnstjenesten i systemets tekstredigerer."
+
+msgid "Output Language cannot be empty."
+msgstr "Utdata-språk kan ikke være tomt."
+
+msgid "Output Language:"
+msgstr "Utdata-språk:"
+
+msgid "Play beep on recording start and stop"
+msgstr "Spill av pipelyd ved start og stopp av opptak"
+
+msgid "Preload Keep Alive:"
+msgstr "Forhåndslast Keep Alive:"
+
+msgid "Preload Timeout:"
+msgstr "Tidsavbrudd for forhåndslasting:"
+
+msgid "Processing Error"
+msgstr "Behandlingsfeil"
+
+msgid "Processing…"
+msgstr "Behandler…"
+
+msgid "Prompt Content:"
+msgstr "Instruksinnhold:"
+
+msgid "Prompts"
+msgstr "Instrukser"
+
+msgid "Prompts:"
+msgstr "Instrukser:"
+
+msgid "Question"
+msgstr "Spørsmål"
+
+msgid "Questions"
+msgstr "Spørsmål"
+
+msgid "Quit"
+msgstr "Avslutt"
+
+msgid "Ready"
+msgstr "Klar"
+
+msgid "Recording Note..."
+msgstr "Tar opp notat..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "Opptak pågår — klikk for å stoppe og behandle notat"
+
+msgid "Refresh"
+msgstr "Oppdater"
+
+msgid "Reload Configuration"
+msgstr "Last inn konfigurasjon på nytt"
+
+msgid "Reminder"
+msgstr "Påminnelse"
+
+msgid "Reminders"
+msgstr "Påminnelser"
+
+msgid "Request Timeout:"
+msgstr "Tidsavbrudd for forespørsel:"
+
+msgid "Restore Defaults"
+msgstr "Gjenopprett standarder"
+
+msgid "Retry Prompt"
+msgstr "Instruks for nytt forsøk"
+
+msgid "Rewriting - System Prompt"
+msgstr "Omskriving – Systeminstruks"
+
+msgid "Rewriting - User Prompt"
+msgstr "Omskriving – Brukerinstruks"
+
+msgid "Sample Rate:"
+msgstr "Samplingsfrekvens:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "Samplingsfrekvens for mikrofonopptak (16000 Hz anbefales for taledikteringsmodeller)."
+
+msgid "Save"
+msgstr "Lagre"
+
+msgid "Save Error"
+msgstr "Lagringsfeil"
+
+msgid "Search failed: {error}"
+msgstr "Søk mislyktes: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "Søkeresultater under denne cosinuslikheten skjules."
+
+msgid "Search your notes by meaning…"
+msgstr "Søk i notatene dine etter betydning…"
+
+msgid "Searching…"
+msgstr "Søker…"
+
+msgid "Select Notes Folder"
+msgstr "Velg notatmappe"
+
+msgid "Select a prompt to edit..."
+msgstr "Velg en instruks å redigere..."
+
+msgid "Semantic Search"
+msgstr "Semantisk søk"
+
+msgid "Settings"
+msgstr "Innstillinger"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "Vis flytende nedtellingsindikator under opptak"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "Start Eloquent Notes automatisk ved innlogging"
+
+msgid "Start/Stop Recording"
+msgstr "Start/stopp opptak"
+
+msgid "Startup Options"
+msgstr "Oppstartsalternativer"
+
+msgid "Stereo (2 channels)"
+msgstr "Stereo (2 kanaler)"
+
+msgid "Stop dictation"
+msgstr "Stopp diktering"
+
+msgid "System is busy. Please wait."
+msgstr "Systemet er opptatt. Vennligst vent."
+
+msgid "Tags, separated by commas"
+msgstr "Emneknagger, atskilt med komma"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "Målspråk for omskrevne notater, titler og emneknagger (f.eks. English, Norwegian)."
+
+msgid "Task"
+msgstr "Oppgave"
+
+msgid "Tasks"
+msgstr "Oppgaver"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "Tid modellen holdes lastet etter notatgenerering (f.eks. '0' for å laste ut umiddelbart, eller '5m')."
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "Tid modellvekter holdes lastet i VRAM under opptak for å minimere ventetid (f.eks. '5m')."
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "Tid innebyggingsmodellen holdes lastet etter et søk (f.eks. '5m' eller '0')."
+
+msgid "Timeline Columns:"
+msgstr "Tidslinjekolonner:"
+
+msgid "Title"
+msgstr "Tittel"
+
+msgid "Today"
+msgstr "I dag"
+
+msgid "Transcription - System Prompt"
+msgstr "Transkripsjon – Systeminstruks"
+
+msgid "Transcription - User Prompt"
+msgstr "Transkripsjon – Brukerinstruks"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "URL til din lokale eller eksterne Ollama-server."
+
+msgid "Use default context length"
+msgstr "Bruk standard kontekstlengde"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "Brukerkonfigurasjon ved {path} er ikke en gyldig YAML-tilordning"
+
+msgid "Validation Error"
+msgstr "Valideringsfeil"
+
+msgid "Verbosity level for app logging."
+msgstr "Detaljnivå for applogging."
+
+msgid "View Log File"
+msgstr "Vis loggfil"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "Stemmedikteringer gjort om til organiserte notater"
+
+msgid "Yesterday"
+msgstr "I går"
+
+msgid "← Back"
+msgstr "← Tilbake"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} resultat"
+msgstr[1] "{count} resultater"

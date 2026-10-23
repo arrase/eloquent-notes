@@ -20,6 +20,7 @@ from eloquent_notes.config_gui.tabs import (
     NotesTab,
     TextFilesTab,
 )
+from eloquent_notes.i18n import _
 
 RESTORE_DEFAULTS_TITLE = "Restore Defaults"
 
@@ -29,7 +30,7 @@ class ConfigurationDialog(QDialog):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Eloquent Notes Configuration")
+        self.setWindowTitle(_("Eloquent Notes Configuration"))
         self.setWindowIcon(ui.get_app_icon())
         self.setMinimumSize(850, 700)
         self._dark = ui.is_dark_theme()
@@ -43,8 +44,8 @@ class ConfigurationDialog(QDialog):
         except (OSError, yaml.YAMLError, TypeError, ValueError, KeyError) as e:
             QMessageBox.warning(
                 self,
-                "Configuration Error",
-                f"Failed to load user configuration: {e}\n\nLoaded default settings.",
+                _("Configuration Error"),
+                _("Failed to load user configuration: {error}\n\nLoaded default settings.").format(error=e),
             )
             self.config_data = config.load_default_config()
             self.load_settings_to_ui()
@@ -73,11 +74,11 @@ class ConfigurationDialog(QDialog):
         self.prompts_tab = TextFilesTab()
 
         self._tabs = [
-            (self.general_tab, "General"),
-            (self.notes_tab, "Notes"),
-            (self.ai_tab, "AI Settings"),
-            (self.audio_tab, "Audio"),
-            (self.prompts_tab, "Prompts"),
+            (self.general_tab, _("General")),
+            (self.notes_tab, _("Notes")),
+            (self.ai_tab, _("AI Settings")),
+            (self.audio_tab, _("Audio")),
+            (self.prompts_tab, _("Prompts")),
         ]
 
         for tab_widget, title in self._tabs:
@@ -86,17 +87,17 @@ class ConfigurationDialog(QDialog):
         layout.addWidget(self.tab_widget)
 
         btn_layout = QHBoxLayout()
-        self.btn_defaults = QPushButton(RESTORE_DEFAULTS_TITLE)
+        self.btn_defaults = QPushButton(_(RESTORE_DEFAULTS_TITLE))
         self.btn_defaults.clicked.connect(self.restore_defaults)
         btn_layout.addWidget(self.btn_defaults)
 
         btn_layout.addStretch()
 
-        self.btn_cancel = QPushButton("Cancel")
+        self.btn_cancel = QPushButton(_("Cancel"))
         self.btn_cancel.clicked.connect(self.reject)
         btn_layout.addWidget(self.btn_cancel)
 
-        self.btn_save = QPushButton("Save")
+        self.btn_save = QPushButton(_("Save"))
         self.btn_save.setObjectName("btnSave")
         self.btn_save.clicked.connect(self.accept)
         btn_layout.addWidget(self.btn_save)
@@ -105,17 +106,19 @@ class ConfigurationDialog(QDialog):
 
     def load_settings_to_ui(self):
         """Populate widget states from loaded configuration dict."""
-        for tab_widget, _ in self._tabs:
+        for tab_widget, _title in self._tabs:
             tab_widget.load_settings(self.config_data)
 
     def restore_defaults(self):
         """Overwrite current edits with factory defaults after confirmation."""
         confirm = QMessageBox.question(
             self,
-            RESTORE_DEFAULTS_TITLE,
-            "Are you sure you want to restore all configuration settings"
-            " and prompts to their default values?\n\nThis will"
-            " overwrite current edits.",
+            _(RESTORE_DEFAULTS_TITLE),
+            _(
+                "Are you sure you want to restore all configuration settings"
+                " and prompts to their default values?\n\nThis will"
+                " overwrite current edits."
+            ),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
         )
         if confirm != QMessageBox.StandardButton.Yes:
@@ -136,8 +139,8 @@ class ConfigurationDialog(QDialog):
 
         QMessageBox.information(
             self,
-            RESTORE_DEFAULTS_TITLE,
-            "Defaults restored. Click 'Save' to apply changes to disk.",
+            _(RESTORE_DEFAULTS_TITLE),
+            _("Defaults restored. Click 'Save' to apply changes to disk."),
         )
 
     def save_settings_from_ui(self):
@@ -160,7 +163,7 @@ class ConfigurationDialog(QDialog):
             config.save_config(overrides)
         except (OSError, yaml.YAMLError) as e:
             QMessageBox.critical(
-                self, "Save Error", f"Failed to save settings: {e}"
+                self, _("Save Error"), _("Failed to save settings: {error}").format(error=e)
             )
             return False
         else:

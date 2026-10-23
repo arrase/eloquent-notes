@@ -1,0 +1,523 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: fi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid " Hz"
+msgstr " Hz"
+
+msgid " MB"
+msgstr " Mt"
+
+msgid " sec"
+msgstr " s"
+
+msgid "AI Model (Audio):"
+msgstr "Tekoälymalli (Ääni):"
+
+msgid "AI Model cannot be empty."
+msgstr "Tekoälymalli ei voi olla tyhjä."
+
+msgid "AI Settings"
+msgstr "Tekoälyasetukset"
+
+msgid "Add dictation"
+msgstr "Lisää sanelu"
+
+msgid "Alias for 'toggle' command."
+msgstr "Alias komennolle 'toggle'."
+
+msgid "All"
+msgstr "Kaikki"
+
+msgid "All tags"
+msgstr "Kaikki tunnisteet"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "Haluatko varmasti palauttaa kaikki asetukset ja kehotteet oletusarvoihin?\n\nTämä korvaa nykyiset muutokset."
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "Äänimerkit tallennuksen alkaessa ja päättyessä."
+
+msgid "Audio"
+msgstr "Ääni"
+
+msgid "Audio Capture Settings"
+msgstr "Äänentallennusasetukset"
+
+msgid "Audio Channels:"
+msgstr "Äänikanavat:"
+
+msgid "Backup Count:"
+msgstr "Varmuuskopioiden määrä:"
+
+msgid "Beep Duration:"
+msgstr "Äänimerkin kesto:"
+
+msgid "Beep Frequency:"
+msgstr "Äänimerkin taajuus:"
+
+msgid "Browse..."
+msgstr "Selaa..."
+
+msgid "Cancel"
+msgstr "Peruuta"
+
+msgid "Capture Duration:"
+msgstr "Tallennuksen kesto:"
+
+msgid "Classification - System Prompt"
+msgstr "Luokittelu - Järjestelmäkehote"
+
+msgid "Classification - User Prompt"
+msgstr "Luokittelu - Käyttäjäkehote"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "Suoritettava komento: 'install-autostart', 'toggle', 'open' (näytä muistiinpanoikkuna) tai 'config' (avaa asetusikkuna)."
+
+msgid "Configuration"
+msgstr "Asetukset"
+
+msgid "Configuration Error"
+msgstr "Asetusvirhe"
+
+msgid "Configuration reloaded successfully."
+msgstr "Asetukset ladattiin uudelleen."
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "Asetusosion '{key}' on oltava kuvaus, saatiin {type_name}"
+
+msgid "Connection failed: {error}"
+msgstr "Yhteys epäonnistui: {error}"
+
+msgid "Context Length:"
+msgstr "Kontekstin pituus:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "Ollamalle välitettävä kontekstin pituus tokeneina. Suuremmat arvot sallivat pidemmät sanelut, mutta käyttävät enemmän muistia."
+
+msgid "Copy"
+msgstr "Kopioi"
+
+msgid "Could not move {name} to the trash."
+msgstr "Kohdetta {name} ei voitu siirtää roskakoriin."
+
+msgid "Could not start recording: {error}"
+msgstr "Tallennusta ei voitu aloittaa: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "Tallennusta ei voitu lopettaa: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "Luo automaattisen käynnistyksen merkinnän XDG autostart -hakemistoon"
+
+msgid "Decision"
+msgstr "Päätös"
+
+msgid "Decisions"
+msgstr "Päätökset"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "Oletusarvot palautettu. Napsauta 'Tallenna' tallentaaksesi muutokset levylle."
+
+msgid "Delete"
+msgstr "Poista"
+
+msgid "Delete Failed"
+msgstr "Poisto epäonnistui"
+
+msgid "Delete Note"
+msgstr "Poista muistiinpano"
+
+msgid "Dictation Added"
+msgstr "Sanelu lisätty"
+
+msgid "Dictation Empty"
+msgstr "Sanelu on tyhjä"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "Näyttää tyylikkään kelluvan palkin laskurilla ja edistymispalkilla sanelun aikana."
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (Valmiina)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (Käsitellään...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (Tallennetaan...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes - Linuxin ilmoitusalueen työkalu, joka muuntaa offline-äänisanelut jäsennellyiksi muistiinpanoiksi."
+
+msgid "Eloquent Notes Configuration"
+msgstr "Eloquent Notesin asetukset"
+
+msgid "Eloquent Notes Daemon"
+msgstr "Eloquent Notes -taustapalvelu"
+
+msgid "Embedding Model cannot be empty."
+msgstr "Upotusmalli ei voi olla tyhjä."
+
+msgid "Embedding Model:"
+msgstr "Upotusmalli:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "Virhe sanelun käsittelyssä: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "Käyttäjäasetusten lataaminen epäonnistui: {error}\n\nLadattiin oletusasetukset."
+
+msgid "Failed to reload configuration: {error}"
+msgstr "Asetusten uudelleenlataus epäonnistui: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "Asetusten tallennus epäonnistui: {error}"
+
+msgid "Fetching models..."
+msgstr "Haetaan malleja..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "Kansio, johon jokainen äänimuistiinpano tallennetaan Markdown-tiedostona. Aseta se Obsidian-holvin sisään nähdäksesi muistiinpanosi myös siellä."
+
+msgid "General"
+msgstr "Yleiset"
+
+msgid "Idea"
+msgstr "Idea"
+
+msgid "Ideas"
+msgstr "Ideat"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "Jos valittu, context_length asetetaan arvoon null (tai jätetään tyhjäksi), jolloin Ollama käyttää mallin oletusarvoista enimmäiskontekstipituutta."
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Virheellinen Keep Alive -muoto: '{value}'. On oltava kokonaisluku tai kesto (esim. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Virheellinen esilatauksen Keep Alive -muoto: '{value}'. On oltava kokonaisluku tai kesto (esim. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Virheellinen haun Keep Alive -muoto: '{value}'. On oltava kokonaisluku tai kesto (esim. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "Virheellinen asetusarvo kohteelle '{key}'"
+
+msgid "Keep Alive Time:"
+msgstr "Keep Alive -aika:"
+
+msgid "Log File"
+msgstr "Lokitiedosto"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "Lokitiedostoa ei vielä ole. Suorita ensin muutama sanelu!"
+
+msgid "Logging Level:"
+msgstr "Lokitaso:"
+
+msgid "Logging Settings"
+msgstr "Lokiasetukset"
+
+msgid "Max Log File Size:"
+msgstr "Lokitiedoston enimmäiskoko:"
+
+msgid "Max Retries:"
+msgstr "Uudelleenyritysten enimmäismäärä:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "Äänentallennuksen enimmäiskesto sekunteina ennen automaattista käsittelyä."
+
+msgid "Maximum size of the log file before rotating."
+msgstr "Lokitiedoston enimmäiskoko ennen kiertoa."
+
+msgid "Minimum Similarity:"
+msgstr "Vähimmäissamankaltaisuus:"
+
+msgid "Model returned empty note content"
+msgstr "Malli palautti tyhjän muistiinpanosisällön"
+
+msgid "Models loaded successfully."
+msgstr "Mallit ladattiin onnistuneesti."
+
+msgid "Mono (1 channel)"
+msgstr "Mono (1 kanava)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "Siirretäänkö ”{title}” roskakoriin?"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "Sanelutehtäviin käytettävän Ollama LLM -mallin nimi (esim. gemma4:e4b-it-qat)."
+
+msgid "No audio-capable models found."
+msgstr "Ääntä tukevia malleja ei löytynyt."
+
+msgid "No matching notes."
+msgstr "Ei vastaavia muistiinpanoja."
+
+msgid "No note was created because the audio was empty."
+msgstr "Muistiinpanoa ei luotu, koska äänite oli tyhjä."
+
+msgid "No notes match these filters."
+msgstr "Mikään muistiinpano ei vastaa näitä suodattimia."
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "Ei vielä muistiinpanoja. Napsauta ilmoitusalueen kuvaketta tallentaaksesi ensimmäisen."
+
+msgid "Note"
+msgstr "Muistiinpano"
+
+msgid "Note Saved"
+msgstr "Muistiinpano tallennettu"
+
+msgid "Notes"
+msgstr "Muistiinpanot"
+
+msgid "Notes Folder cannot be empty."
+msgstr "Muistiinpanokansio ei voi olla tyhjä."
+
+msgid "Notes Folder:"
+msgstr "Muistiinpanokansio:"
+
+msgid "Notes Storage"
+msgstr "Muistiinpanojen tallennus"
+
+msgid "Number of audio input channels."
+msgstr "Äänen sisääntulokanavien määrä."
+
+msgid "Number of backup log files to retain."
+msgstr "Säilytettävien varmuuskopiolokitiedostojen määrä."
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "Sarakkeiden määrä muistiinpanojen aikajanaruudukossa."
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "Uudelleenyritysten määrä, jos kielimallin tulosteen JSON-jäsennys epäonnistuu."
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "Ollaman && tekoälyputken asetukset"
+
+msgid "Ollama URL cannot be empty."
+msgstr "Ollama-URL ei voi olla tyhjä."
+
+msgid "Ollama URL is empty."
+msgstr "Ollama-URL on tyhjä."
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "Ollama-URL:n on alettava http:// tai https://."
+
+msgid "Ollama URL:"
+msgstr "Ollama-URL:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "Ollaman upotusmalli muistiinpanojen hakuun merkityksen perusteella (esim. embeddinggemma-2:latest)."
+
+msgid "Open Notes"
+msgstr "Avaa muistiinpanot"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "Avaa taustapalvelun lokitiedosto järjestelmän tekstieditorissa."
+
+msgid "Output Language cannot be empty."
+msgstr "Tulostuskieli ei voi olla tyhjä."
+
+msgid "Output Language:"
+msgstr "Tulostuskieli:"
+
+msgid "Play beep on recording start and stop"
+msgstr "Toista äänimerkki tallennuksen alkaessa ja päättyessä"
+
+msgid "Preload Keep Alive:"
+msgstr "Esilatauksen Keep Alive:"
+
+msgid "Preload Timeout:"
+msgstr "Esilatauksen aikakatkaisu:"
+
+msgid "Processing Error"
+msgstr "Käsittelyvirhe"
+
+msgid "Processing…"
+msgstr "Käsitellään…"
+
+msgid "Prompt Content:"
+msgstr "Kehotteen sisältö:"
+
+msgid "Prompts"
+msgstr "Kehotteet"
+
+msgid "Prompts:"
+msgstr "Kehotteet:"
+
+msgid "Question"
+msgstr "Kysymys"
+
+msgid "Questions"
+msgstr "Kysymykset"
+
+msgid "Quit"
+msgstr "Lopeta"
+
+msgid "Ready"
+msgstr "Valmis"
+
+msgid "Recording Note..."
+msgstr "Tallennetaan..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "Tallennus käynnissä — napsauta lopettaaksesi ja käsitelläksesi muistiinpanon"
+
+msgid "Refresh"
+msgstr "Päivitä"
+
+msgid "Reload Configuration"
+msgstr "Lataa asetukset uudelleen"
+
+msgid "Reminder"
+msgstr "Muistutus"
+
+msgid "Reminders"
+msgstr "Muistutukset"
+
+msgid "Request Timeout:"
+msgstr "Pyynnön aikakatkaisu:"
+
+msgid "Restore Defaults"
+msgstr "Palauta oletusarvot"
+
+msgid "Retry Prompt"
+msgstr "Uudelleenyrityskehote"
+
+msgid "Rewriting - System Prompt"
+msgstr "Uudelleenkirjoitus - Järjestelmäkehote"
+
+msgid "Rewriting - User Prompt"
+msgstr "Uudelleenkirjoitus - Käyttäjäkehote"
+
+msgid "Sample Rate:"
+msgstr "Näytteenottotaajuus:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "Mikrofonitallennuksen näytteenottotaajuus (16000 Hz suositellaan puhesanelumalleille)."
+
+msgid "Save"
+msgstr "Tallenna"
+
+msgid "Save Error"
+msgstr "Tallennusvirhe"
+
+msgid "Search failed: {error}"
+msgstr "Haku epäonnistui: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "Tätä kosinisamankaltaisuutta heikommat hakutulokset piilotetaan."
+
+msgid "Search your notes by meaning…"
+msgstr "Hae muistiinpanoja merkityksen perusteella…"
+
+msgid "Searching…"
+msgstr "Haetaan…"
+
+msgid "Select Notes Folder"
+msgstr "Valitse muistiinpanokansio"
+
+msgid "Select a prompt to edit..."
+msgstr "Valitse muokattava kehote..."
+
+msgid "Semantic Search"
+msgstr "Semanttinen haku"
+
+msgid "Settings"
+msgstr "Asetukset"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "Näytä kelluva laskurinäkymä tallennuksen aikana"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "Käynnistä Eloquent Notes automaattisesti kirjautumisen yhteydessä"
+
+msgid "Start/Stop Recording"
+msgstr "Aloita/lopeta tallennus"
+
+msgid "Startup Options"
+msgstr "Käynnistysasetukset"
+
+msgid "Stereo (2 channels)"
+msgstr "Stereo (2 kanavaa)"
+
+msgid "Stop dictation"
+msgstr "Lopeta sanelu"
+
+msgid "System is busy. Please wait."
+msgstr "Järjestelmä on varattu. Odota hetki."
+
+msgid "Tags, separated by commas"
+msgstr "Tunnisteet pilkulla erotettuna"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "Uudelleenkirjoitettujen muistiinpanojen, otsikoiden ja tunnisteiden kohdekieli (esim. English, Spanish)."
+
+msgid "Task"
+msgstr "Tehtävä"
+
+msgid "Tasks"
+msgstr "Tehtävät"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "Aika, jonka malli pidetään muistissa muistiinpanon luonnin jälkeen (esim. '0' vapauttaa heti, tai '5m')."
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "Aika, jonka mallin painot pidetään VRAM-muistissa tallennuksen aikana viiveen minimoimiseksi (esim. '5m')."
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "Aika, jonka upotusmalli pidetään muistissa haun jälkeen (esim. '5m' tai '0')."
+
+msgid "Timeline Columns:"
+msgstr "Aikajanan sarakkeet:"
+
+msgid "Title"
+msgstr "Otsikko"
+
+msgid "Today"
+msgstr "Tänään"
+
+msgid "Transcription - System Prompt"
+msgstr "Litterointi - Järjestelmäkehote"
+
+msgid "Transcription - User Prompt"
+msgstr "Litterointi - Käyttäjäkehote"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "Paikallisen tai etä-Ollama-palvelimen URL-osoite."
+
+msgid "Use default context length"
+msgstr "Käytä oletuskontekstipituutta"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "Käyttäjäasetustiedosto kohteessa {path} ei ole kelvollinen YAML-kuvaus"
+
+msgid "Validation Error"
+msgstr "Validointivirhe"
+
+msgid "Verbosity level for app logging."
+msgstr "Sovelluslokin tarkkuustaso."
+
+msgid "View Log File"
+msgstr "Näytä lokitiedosto"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "Äänisanelut muunnettuna jäsennellyiksi muistiinpanoiksi"
+
+msgid "Yesterday"
+msgstr "Eilen"
+
+msgid "← Back"
+msgstr "← Takaisin"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} tulos"
+msgstr[1] "{count} tulosta"

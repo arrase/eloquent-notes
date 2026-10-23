@@ -14,6 +14,12 @@ for _xdg_var in ("XDG_CONFIG_HOME", "XDG_CACHE_HOME", "XDG_DATA_HOME", "XDG_STAT
     os.environ[_xdg_var] = _xdg_tmp
     atexit.register(shutil.rmtree, _xdg_tmp, ignore_errors=True)
 
+# Force the default English locale during tests unless a test explicitly overrides it.
+os.environ["LC_ALL"] = "C"
+os.environ["LANG"] = "C"
+os.environ.pop("LANGUAGE", None)
+os.environ.pop("LC_MESSAGES", None)
+
 if "sounddevice" not in sys.modules:
     sd_mock = MagicMock()
     sd_mock.CallbackFlags = MagicMock()

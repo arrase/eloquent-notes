@@ -15,13 +15,14 @@ from PyQt6.QtWidgets import QApplication, QDialog
 from eloquent_notes import IPC_SERVER_NAME, __version__
 from eloquent_notes.autostart import install_autostart
 from eloquent_notes.config_gui import ConfigurationDialog
+from eloquent_notes.i18n import _
 
 
 def parse_args(cli_args=None):
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
         prog="eloquent-notes",
-        description=(
+        description=_(
             "Eloquent Notes - Linux system tray utility"
             " that turns offline voice dictations into organized notes."
         ),
@@ -36,7 +37,7 @@ def parse_args(cli_args=None):
         nargs="?",
         choices=["install-autostart", "toggle", "open", "config"],
         metavar="command",
-        help=(
+        help=_(
             "Command to execute: 'install-autostart', 'toggle',"
             " 'open' (show the notes window), or 'config' (open configuration GUI)."
         ),
@@ -44,7 +45,7 @@ def parse_args(cli_args=None):
     parser.add_argument(
         "-t", "--toggle",
         action="store_true",
-        help="Alias for 'toggle' command.",
+        help=_("Alias for 'toggle' command."),
     )
     return parser.parse_args(cli_args)
 

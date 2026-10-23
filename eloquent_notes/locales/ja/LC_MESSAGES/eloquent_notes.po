@@ -1,0 +1,522 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid " Hz"
+msgstr " Hz"
+
+msgid " MB"
+msgstr " MB"
+
+msgid " sec"
+msgstr " 秒"
+
+msgid "AI Model (Audio):"
+msgstr "AIモデル（音声）:"
+
+msgid "AI Model cannot be empty."
+msgstr "AIモデルを空にすることはできません。"
+
+msgid "AI Settings"
+msgstr "AI設定"
+
+msgid "Add dictation"
+msgstr "音声入力を追加"
+
+msgid "Alias for 'toggle' command."
+msgstr "'toggle' コマンドのエイリアス。"
+
+msgid "All"
+msgstr "すべて"
+
+msgid "All tags"
+msgstr "すべてのタグ"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "すべての設定とプロンプトをデフォルト値に戻してもよろしいですか？\n\n現在の編集内容は上書きされます。"
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "録音の開始・停止時にビープ音を鳴らします。"
+
+msgid "Audio"
+msgstr "音声"
+
+msgid "Audio Capture Settings"
+msgstr "音声キャプチャ設定"
+
+msgid "Audio Channels:"
+msgstr "音声チャンネル:"
+
+msgid "Backup Count:"
+msgstr "バックアップ数:"
+
+msgid "Beep Duration:"
+msgstr "ビープ音の長さ:"
+
+msgid "Beep Frequency:"
+msgstr "ビープ音の周波数:"
+
+msgid "Browse..."
+msgstr "参照..."
+
+msgid "Cancel"
+msgstr "キャンセル"
+
+msgid "Capture Duration:"
+msgstr "録音時間:"
+
+msgid "Classification - System Prompt"
+msgstr "分類 - システムプロンプト"
+
+msgid "Classification - User Prompt"
+msgstr "分類 - ユーザープロンプト"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "実行するコマンド: 'install-autostart'、'toggle'、'open'（ノートウィンドウを表示）、または 'config'（設定GUIを開く）。"
+
+msgid "Configuration"
+msgstr "設定"
+
+msgid "Configuration Error"
+msgstr "設定エラー"
+
+msgid "Configuration reloaded successfully."
+msgstr "設定を正常に再読み込みしました。"
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "設定セクション '{key}' はマッピングである必要がありますが、{type_name} が指定されました"
+
+msgid "Connection failed: {error}"
+msgstr "接続に失敗しました: {error}"
+
+msgid "Context Length:"
+msgstr "コンテキスト長:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "Ollamaに渡すトークン単位のコンテキスト長。値を大きくすると長い音声入力が可能になりますが、メモリ使用量が増えます。"
+
+msgid "Copy"
+msgstr "コピー"
+
+msgid "Could not move {name} to the trash."
+msgstr "{name} をゴミ箱に移動できませんでした。"
+
+msgid "Could not start recording: {error}"
+msgstr "録音を開始できませんでした: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "録音を停止できませんでした: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "XDG自動起動ディレクトリにデスクトップ自動起動エントリを作成します"
+
+msgid "Decision"
+msgstr "決定事項"
+
+msgid "Decisions"
+msgstr "決定事項"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "デフォルト設定に戻しました。「保存」をクリックしてディスクに変更を適用してください。"
+
+msgid "Delete"
+msgstr "削除"
+
+msgid "Delete Failed"
+msgstr "削除失敗"
+
+msgid "Delete Note"
+msgstr "ノートを削除"
+
+msgid "Dictation Added"
+msgstr "音声入力を追加しました"
+
+msgid "Dictation Empty"
+msgstr "音声入力が空です"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "音声入力中にカウントダウンタイマーとプログレスバーを備えたフローティングオーバーレイを表示します。"
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (待機中)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (処理中...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (録音中...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes - オフラインの音声入力を整理されたノートに変換するLinuxシステムトレイユーティリティ。"
+
+msgid "Eloquent Notes Configuration"
+msgstr "Eloquent Notes 設定"
+
+msgid "Eloquent Notes Daemon"
+msgstr "Eloquent Notes デーモン"
+
+msgid "Embedding Model cannot be empty."
+msgstr "埋め込みモデルを空にすることはできません。"
+
+msgid "Embedding Model:"
+msgstr "埋め込みモデル:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "音声入力の処理中にエラーが発生しました: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "ユーザー設定の読み込みに失敗しました: {error}\n\nデフォルト設定を読み込みました。"
+
+msgid "Failed to reload configuration: {error}"
+msgstr "設定の再読み込みに失敗しました: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "設定の保存に失敗しました: {error}"
+
+msgid "Fetching models..."
+msgstr "モデルを取得中..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "各音声ノートがMarkdownファイルとして保存されるフォルダ。Obsidian保管庫内を指定すると、Obsidianでもノートを確認できます。"
+
+msgid "General"
+msgstr "一般"
+
+msgid "Idea"
+msgstr "アイデア"
+
+msgid "Ideas"
+msgstr "アイデア"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "チェックすると context_length を null（または未設定）にし、モデルのデフォルト最大コンテキスト長を使用するようOllamaに指示します。"
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Keep Aliveの形式が無効です: '{value}'。整数または期間（例: 5m、10s、1h、0、-1）である必要があります。"
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "プリロードKeep Aliveの形式が無効です: '{value}'。整数または期間（例: 5m、10s、1h、0、-1）である必要があります。"
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "検索Keep Aliveの形式が無効です: '{value}'。整数または期間（例: 5m、10s、1h、0、-1）である必要があります。"
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "'{key}' の設定値が無効です"
+
+msgid "Keep Alive Time:"
+msgstr "Keep Alive時間:"
+
+msgid "Log File"
+msgstr "ログファイル"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "ログファイルがまだ存在しません。まずは音声入力を実行してください！"
+
+msgid "Logging Level:"
+msgstr "ログレベル:"
+
+msgid "Logging Settings"
+msgstr "ログ設定"
+
+msgid "Max Log File Size:"
+msgstr "最大ログファイルサイズ:"
+
+msgid "Max Retries:"
+msgstr "最大リトライ回数:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "自動的に処理を開始するまでの音声録音の最大秒数。"
+
+msgid "Maximum size of the log file before rotating."
+msgstr "ローテーションする前のログファイルの最大サイズ。"
+
+msgid "Minimum Similarity:"
+msgstr "最小類似度:"
+
+msgid "Model returned empty note content"
+msgstr "モデルが空のノート内容を返しました"
+
+msgid "Models loaded successfully."
+msgstr "モデルを正常に読み込みました。"
+
+msgid "Mono (1 channel)"
+msgstr "モノラル (1チャンネル)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "「{title}」をゴミ箱に移動しますか？"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "音声入力タスクで実行するOllama LLMモデルの名前（例: gemma4:e4b-it-qat）。"
+
+msgid "No audio-capable models found."
+msgstr "音声対応モデルが見つかりません。"
+
+msgid "No matching notes."
+msgstr "一致するノートがありません。"
+
+msgid "No note was created because the audio was empty."
+msgstr "音声が空だったため、ノートは作成されませんでした。"
+
+msgid "No notes match these filters."
+msgstr "これらのフィルタに一致するノートはありません。"
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "まだノートがありません。トレイアイコンをクリックして最初のノートを録音しましょう。"
+
+msgid "Note"
+msgstr "ノート"
+
+msgid "Note Saved"
+msgstr "ノートを保存しました"
+
+msgid "Notes"
+msgstr "ノート"
+
+msgid "Notes Folder cannot be empty."
+msgstr "ノートフォルダを空にすることはできません。"
+
+msgid "Notes Folder:"
+msgstr "ノートフォルダ:"
+
+msgid "Notes Storage"
+msgstr "ノートの保存先"
+
+msgid "Number of audio input channels."
+msgstr "音声入力チャンネル数。"
+
+msgid "Number of backup log files to retain."
+msgstr "保持するバックアップログファイルの数。"
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "ノートタイムライングリッドの列数。"
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "LLM出力のJSON解析に失敗した場合のリトライ回数。"
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "Ollama && AIパイプライン設定"
+
+msgid "Ollama URL cannot be empty."
+msgstr "Ollama URLを空にすることはできません。"
+
+msgid "Ollama URL is empty."
+msgstr "Ollama URLが空です。"
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "Ollama URLは http:// または https:// で始まる必要があります。"
+
+msgid "Ollama URL:"
+msgstr "Ollama URL:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "意味によるノート検索に使用するOllama埋め込みモデル（例: embeddinggemma-2:latest）。"
+
+msgid "Open Notes"
+msgstr "ノートを開く"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "システムエディタでバックグラウンドデーモンのログファイルを開きます。"
+
+msgid "Output Language cannot be empty."
+msgstr "出力言語を空にすることはできません。"
+
+msgid "Output Language:"
+msgstr "出力言語:"
+
+msgid "Play beep on recording start and stop"
+msgstr "録音の開始時と停止時にビープ音を鳴らす"
+
+msgid "Preload Keep Alive:"
+msgstr "プリロードKeep Alive:"
+
+msgid "Preload Timeout:"
+msgstr "プリロードタイムアウト:"
+
+msgid "Processing Error"
+msgstr "処理エラー"
+
+msgid "Processing…"
+msgstr "処理中…"
+
+msgid "Prompt Content:"
+msgstr "プロンプト内容:"
+
+msgid "Prompts"
+msgstr "プロンプト"
+
+msgid "Prompts:"
+msgstr "プロンプト:"
+
+msgid "Question"
+msgstr "質問"
+
+msgid "Questions"
+msgstr "質問"
+
+msgid "Quit"
+msgstr "終了"
+
+msgid "Ready"
+msgstr "準備完了"
+
+msgid "Recording Note..."
+msgstr "ノートを録音中..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "録音中 — クリックして停止しノートを処理"
+
+msgid "Refresh"
+msgstr "更新"
+
+msgid "Reload Configuration"
+msgstr "設定を再読み込み"
+
+msgid "Reminder"
+msgstr "リマインダー"
+
+msgid "Reminders"
+msgstr "リマインダー"
+
+msgid "Request Timeout:"
+msgstr "リクエストタイムアウト:"
+
+msgid "Restore Defaults"
+msgstr "デフォルトに戻す"
+
+msgid "Retry Prompt"
+msgstr "リトライプロンプト"
+
+msgid "Rewriting - System Prompt"
+msgstr "書き直し - システムプロンプト"
+
+msgid "Rewriting - User Prompt"
+msgstr "書き直し - ユーザープロンプト"
+
+msgid "Sample Rate:"
+msgstr "サンプルレート:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "マイク録音のサンプルレート（音声入力モデルには16000 Hzを推奨）。"
+
+msgid "Save"
+msgstr "保存"
+
+msgid "Save Error"
+msgstr "保存エラー"
+
+msgid "Search failed: {error}"
+msgstr "検索に失敗しました: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "このコサイン類似度未満の検索結果は非表示になります。"
+
+msgid "Search your notes by meaning…"
+msgstr "意味でノートを検索…"
+
+msgid "Searching…"
+msgstr "検索中…"
+
+msgid "Select Notes Folder"
+msgstr "ノートフォルダを選択"
+
+msgid "Select a prompt to edit..."
+msgstr "編集するプロンプトを選択..."
+
+msgid "Semantic Search"
+msgstr "セマンティック検索"
+
+msgid "Settings"
+msgstr "設定"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "録音中にフローティングカウントダウンHUDオーバーレイを表示"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "ログイン時にEloquent Notesを自動起動"
+
+msgid "Start/Stop Recording"
+msgstr "録音の開始/停止"
+
+msgid "Startup Options"
+msgstr "起動オプション"
+
+msgid "Stereo (2 channels)"
+msgstr "ステレオ (2チャンネル)"
+
+msgid "Stop dictation"
+msgstr "音声入力を停止"
+
+msgid "System is busy. Please wait."
+msgstr "システムがビジー状態です。しばらくお待ちください。"
+
+msgid "Tags, separated by commas"
+msgstr "タグ（カンマ区切り）"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "書き直されたノート、タイトル、タグの対象言語（例: English、Spanish）。"
+
+msgid "Task"
+msgstr "タスク"
+
+msgid "Tasks"
+msgstr "タスク"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "ノート生成後にモデルをロードしたままにする時間（例: 即座にアンロードする場合は '0'、または '5m'）。"
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "遅延を最小限に抑えるため、録音中にモデルの重みをVRAMに保持する時間（例: '5m'）。"
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "検索後に埋め込みモデルをロードしたままにする時間（例: '5m' または '0'）。"
+
+msgid "Timeline Columns:"
+msgstr "タイムラインの列数:"
+
+msgid "Title"
+msgstr "タイトル"
+
+msgid "Today"
+msgstr "今日"
+
+msgid "Transcription - System Prompt"
+msgstr "文字起こし - システムプロンプト"
+
+msgid "Transcription - User Prompt"
+msgstr "文字起こし - ユーザープロンプト"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "ローカルまたはリモートのOllamaサーバーのURL。"
+
+msgid "Use default context length"
+msgstr "デフォルトのコンテキスト長を使用"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "{path} のユーザー設定は有効なYAMLマッピングではありません"
+
+msgid "Validation Error"
+msgstr "検証エラー"
+
+msgid "Verbosity level for app logging."
+msgstr "アプリログの詳細度レベル。"
+
+msgid "View Log File"
+msgstr "ログファイルを表示"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "音声入力を整理されたノートに変換"
+
+msgid "Yesterday"
+msgstr "昨日"
+
+msgid "← Back"
+msgstr "← 戻る"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} 件の結果"

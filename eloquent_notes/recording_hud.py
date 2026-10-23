@@ -24,6 +24,8 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from eloquent_notes.i18n import _
+
 _BG_COLOR = QColor(24, 24, 27, 240)
 _BORDER_PEN = QPen(QColor(255, 255, 255, 38), 1.0)
 _TIMER_LABEL_QSS = "color: {}; font-size: 12px; font-weight: bold; font-family: monospace;"
@@ -66,7 +68,7 @@ class RecordingHUD(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
         self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating, True)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.setToolTip("Recording in progress — click to stop and process note")
+        self.setToolTip(_("Recording in progress — click to stop and process note"))
         self.setFixedSize(260, 52)
 
     def _init_ui(self) -> None:
@@ -83,7 +85,7 @@ class RecordingHUD(QWidget):
         self.lbl_dot.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
         header_layout.addWidget(self.lbl_dot)
 
-        self.lbl_status = QLabel("Recording Note...")
+        self.lbl_status = QLabel(_("Recording Note..."))
         self.lbl_status.setStyleSheet("color: #F3F4F6; font-size: 12px; font-weight: 600;")
         self.lbl_status.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
         header_layout.addWidget(self.lbl_status)

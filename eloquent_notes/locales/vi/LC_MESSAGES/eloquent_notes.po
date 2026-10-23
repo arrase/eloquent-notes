@@ -1,0 +1,522 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: vi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid " Hz"
+msgstr " Hz"
+
+msgid " MB"
+msgstr " MB"
+
+msgid " sec"
+msgstr " giây"
+
+msgid "AI Model (Audio):"
+msgstr "Mô hình AI (Âm thanh):"
+
+msgid "AI Model cannot be empty."
+msgstr "Mô hình AI không được để trống."
+
+msgid "AI Settings"
+msgstr "Cài đặt AI"
+
+msgid "Add dictation"
+msgstr "Thêm đọc chính tả"
+
+msgid "Alias for 'toggle' command."
+msgstr "Bí danh cho lệnh 'toggle'."
+
+msgid "All"
+msgstr "Tất cả"
+
+msgid "All tags"
+msgstr "Tất cả thẻ"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "Bạn có chắc chắn muốn khôi phục tất cả cài đặt cấu hình và lời nhắc về giá trị mặc định không?\n\nThao tác này sẽ ghi đè các chỉnh sửa hiện tại."
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "Phát tiếng bíp phản hồi khi bắt đầu/dừng ghi âm."
+
+msgid "Audio"
+msgstr "Âm thanh"
+
+msgid "Audio Capture Settings"
+msgstr "Cài đặt thu âm"
+
+msgid "Audio Channels:"
+msgstr "Kênh âm thanh:"
+
+msgid "Backup Count:"
+msgstr "Số bản sao lưu:"
+
+msgid "Beep Duration:"
+msgstr "Thời lượng tiếng bíp:"
+
+msgid "Beep Frequency:"
+msgstr "Tần số tiếng bíp:"
+
+msgid "Browse..."
+msgstr "Duyệt..."
+
+msgid "Cancel"
+msgstr "Hủy"
+
+msgid "Capture Duration:"
+msgstr "Thời lượng thu âm:"
+
+msgid "Classification - System Prompt"
+msgstr "Phân loại - Lời nhắc hệ thống"
+
+msgid "Classification - User Prompt"
+msgstr "Phân loại - Lời nhắc người dùng"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "Lệnh cần thực thi: 'install-autostart', 'toggle', 'open' (hiển thị cửa sổ ghi chú), hoặc 'config' (mở giao diện cấu hình)."
+
+msgid "Configuration"
+msgstr "Cấu hình"
+
+msgid "Configuration Error"
+msgstr "Lỗi cấu hình"
+
+msgid "Configuration reloaded successfully."
+msgstr "Đã tải lại cấu hình thành công."
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "Phần cấu hình '{key}' phải là một ánh xạ, nhưng nhận được {type_name}"
+
+msgid "Connection failed: {error}"
+msgstr "Kết nối thất bại: {error}"
+
+msgid "Context Length:"
+msgstr "Độ dài ngữ cảnh:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "Độ dài ngữ cảnh tính bằng token truyền cho Ollama. Giá trị lớn hơn cho phép đọc chính tả dài hơn nhưng tốn nhiều bộ nhớ hơn."
+
+msgid "Copy"
+msgstr "Sao chép"
+
+msgid "Could not move {name} to the trash."
+msgstr "Không thể chuyển {name} vào thùng rác."
+
+msgid "Could not start recording: {error}"
+msgstr "Không thể bắt đầu ghi âm: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "Không thể dừng ghi âm: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "Tạo mục tự khởi động trên màn hình trong thư mục tự khởi động XDG"
+
+msgid "Decision"
+msgstr "Quyết định"
+
+msgid "Decisions"
+msgstr "Quyết định"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "Đã khôi phục mặc định. Nhấp vào 'Lưu' để áp dụng thay đổi vào ổ đĩa."
+
+msgid "Delete"
+msgstr "Xóa"
+
+msgid "Delete Failed"
+msgstr "Xóa thất bại"
+
+msgid "Delete Note"
+msgstr "Xóa ghi chú"
+
+msgid "Dictation Added"
+msgstr "Đã thêm bản đọc chính tả"
+
+msgid "Dictation Empty"
+msgstr "Bản đọc chính tả trống"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "Hiển thị lớp phủ nổi gọn gàng với bộ đếm ngược trực tiếp và thanh tiến trình trong khi đọc chính tả."
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (Rảnh)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (Đang xử lý...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (Đang ghi âm...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes - Tiện ích khay hệ thống Linux giúp chuyển đổi giọng đọc ngoại tuyến thành các ghi chú có tổ chức."
+
+msgid "Eloquent Notes Configuration"
+msgstr "Cấu hình Eloquent Notes"
+
+msgid "Eloquent Notes Daemon"
+msgstr "Tiến trình nền Eloquent Notes"
+
+msgid "Embedding Model cannot be empty."
+msgstr "Mô hình nhúng không được để trống."
+
+msgid "Embedding Model:"
+msgstr "Mô hình nhúng:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "Lỗi khi xử lý bản đọc chính tả: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "Không thể tải cấu hình người dùng: {error}\n\nĐã tải cài đặt mặc định."
+
+msgid "Failed to reload configuration: {error}"
+msgstr "Không thể tải lại cấu hình: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "Không thể lưu cài đặt: {error}"
+
+msgid "Fetching models..."
+msgstr "Đang lấy danh sách mô hình..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "Thư mục nơi mỗi ghi chú giọng nói được lưu dưới dạng tệp Markdown. Hãy trỏ vào bên trong kho lưu trữ Obsidian để xem ghi chú của bạn ở đó."
+
+msgid "General"
+msgstr "Chung"
+
+msgid "Idea"
+msgstr "Ý tưởng"
+
+msgid "Ideas"
+msgstr "Ý tưởng"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "Nếu được chọn, đặt context_length thành null (hoặc để trống), hướng dẫn Ollama sử dụng độ dài ngữ cảnh tối đa mặc định của mô hình."
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Định dạng Keep Alive không hợp lệ: '{value}'. Phải là số nguyên hoặc thời lượng (ví dụ: 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Định dạng Preload Keep Alive không hợp lệ: '{value}'. Phải là số nguyên hoặc thời lượng (ví dụ: 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Định dạng Search Keep Alive không hợp lệ: '{value}'. Phải là số nguyên hoặc thời lượng (ví dụ: 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "Giá trị cấu hình không hợp lệ cho '{key}'"
+
+msgid "Keep Alive Time:"
+msgstr "Thời gian Keep Alive:"
+
+msgid "Log File"
+msgstr "Tệp nhật ký"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "Tệp nhật ký chưa tồn tại. Hãy thực hiện vài lần đọc chính tả trước!"
+
+msgid "Logging Level:"
+msgstr "Mức nhật ký:"
+
+msgid "Logging Settings"
+msgstr "Cài đặt nhật ký"
+
+msgid "Max Log File Size:"
+msgstr "Kích thước tệp nhật ký tối đa:"
+
+msgid "Max Retries:"
+msgstr "Số lần thử lại tối đa:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "Thời lượng tối đa tính bằng giây cho việc ghi âm trước khi tự động xử lý."
+
+msgid "Maximum size of the log file before rotating."
+msgstr "Kích thước tối đa của tệp nhật ký trước khi xoay vòng."
+
+msgid "Minimum Similarity:"
+msgstr "Độ tương đồng tối thiểu:"
+
+msgid "Model returned empty note content"
+msgstr "Mô hình trả về nội dung ghi chú trống"
+
+msgid "Models loaded successfully."
+msgstr "Đã tải các mô hình thành công."
+
+msgid "Mono (1 channel)"
+msgstr "Đơn âm (1 kênh)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "Chuyển “{title}” vào thùng rác?"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "Tên mô hình LLM của Ollama để chạy các tác vụ đọc chính tả (ví dụ: gemma4:e4b-it-qat)."
+
+msgid "No audio-capable models found."
+msgstr "Không tìm thấy mô hình nào hỗ trợ âm thanh."
+
+msgid "No matching notes."
+msgstr "Không có ghi chú phù hợp."
+
+msgid "No note was created because the audio was empty."
+msgstr "Không có ghi chú nào được tạo vì âm thanh trống."
+
+msgid "No notes match these filters."
+msgstr "Không có ghi chú nào khớp với bộ lọc này."
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "Chưa có ghi chú nào. Nhấp vào biểu tượng khay hệ thống để ghi âm ghi chú đầu tiên."
+
+msgid "Note"
+msgstr "Ghi chú"
+
+msgid "Note Saved"
+msgstr "Đã lưu ghi chú"
+
+msgid "Notes"
+msgstr "Ghi chú"
+
+msgid "Notes Folder cannot be empty."
+msgstr "Thư mục ghi chú không được để trống."
+
+msgid "Notes Folder:"
+msgstr "Thư mục ghi chú:"
+
+msgid "Notes Storage"
+msgstr "Lưu trữ ghi chú"
+
+msgid "Number of audio input channels."
+msgstr "Số lượng kênh đầu vào âm thanh."
+
+msgid "Number of backup log files to retain."
+msgstr "Số lượng tệp nhật ký sao lưu cần giữ lại."
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "Số lượng cột trong lưới dòng thời gian ghi chú."
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "Số lần thử lại nếu đầu ra LLM lỗi phân tích cú pháp JSON."
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "Cài đặt Ollama && Quy trình AI"
+
+msgid "Ollama URL cannot be empty."
+msgstr "URL Ollama không được để trống."
+
+msgid "Ollama URL is empty."
+msgstr "URL Ollama đang trống."
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "URL Ollama phải bắt đầu bằng http:// hoặc https://."
+
+msgid "Ollama URL:"
+msgstr "URL Ollama:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "Mô hình nhúng Ollama được dùng để tìm kiếm ghi chú theo ngữ nghĩa (ví dụ: embeddinggemma-2:latest)."
+
+msgid "Open Notes"
+msgstr "Mở ghi chú"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "Mở tệp nhật ký tiến trình nền trong trình soạn thảo hệ thống của bạn."
+
+msgid "Output Language cannot be empty."
+msgstr "Ngôn ngữ đầu ra không được để trống."
+
+msgid "Output Language:"
+msgstr "Ngôn ngữ đầu ra:"
+
+msgid "Play beep on recording start and stop"
+msgstr "Phát tiếng bíp khi bắt đầu và dừng ghi âm"
+
+msgid "Preload Keep Alive:"
+msgstr "Preload Keep Alive:"
+
+msgid "Preload Timeout:"
+msgstr "Thời gian chờ tải trước:"
+
+msgid "Processing Error"
+msgstr "Lỗi xử lý"
+
+msgid "Processing…"
+msgstr "Đang xử lý…"
+
+msgid "Prompt Content:"
+msgstr "Nội dung lời nhắc:"
+
+msgid "Prompts"
+msgstr "Lời nhắc"
+
+msgid "Prompts:"
+msgstr "Lời nhắc:"
+
+msgid "Question"
+msgstr "Câu hỏi"
+
+msgid "Questions"
+msgstr "Câu hỏi"
+
+msgid "Quit"
+msgstr "Thoát"
+
+msgid "Ready"
+msgstr "Sẵn sàng"
+
+msgid "Recording Note..."
+msgstr "Đang ghi chú..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "Đang ghi âm — nhấp để dừng và xử lý ghi chú"
+
+msgid "Refresh"
+msgstr "Làm mới"
+
+msgid "Reload Configuration"
+msgstr "Tải lại cấu hình"
+
+msgid "Reminder"
+msgstr "Lời nhắc"
+
+msgid "Reminders"
+msgstr "Lời nhắc"
+
+msgid "Request Timeout:"
+msgstr "Thời gian chờ yêu cầu:"
+
+msgid "Restore Defaults"
+msgstr "Khôi phục mặc định"
+
+msgid "Retry Prompt"
+msgstr "Lời nhắc thử lại"
+
+msgid "Rewriting - System Prompt"
+msgstr "Viết lại - Lời nhắc hệ thống"
+
+msgid "Rewriting - User Prompt"
+msgstr "Viết lại - Lời nhắc người dùng"
+
+msgid "Sample Rate:"
+msgstr "Tần số lấy mẫu:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "Tần số lấy mẫu cho ghi âm micro (khuyến nghị 16000 Hz cho các mô hình đọc chính tả giọng nói)."
+
+msgid "Save"
+msgstr "Lưu"
+
+msgid "Save Error"
+msgstr "Lỗi lưu"
+
+msgid "Search failed: {error}"
+msgstr "Tìm kiếm thất bại: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "Kết quả tìm kiếm dưới mức tương đồng cosine này sẽ bị ẩn."
+
+msgid "Search your notes by meaning…"
+msgstr "Tìm kiếm ghi chú theo ngữ nghĩa…"
+
+msgid "Searching…"
+msgstr "Đang tìm kiếm…"
+
+msgid "Select Notes Folder"
+msgstr "Chọn thư mục ghi chú"
+
+msgid "Select a prompt to edit..."
+msgstr "Chọn một lời nhắc để chỉnh sửa..."
+
+msgid "Semantic Search"
+msgstr "Tìm kiếm ngữ nghĩa"
+
+msgid "Settings"
+msgstr "Cài đặt"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "Hiển thị lớp phủ HUD đếm ngược nổi trong khi ghi âm"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "Tự động khởi động Eloquent Notes khi đăng nhập"
+
+msgid "Start/Stop Recording"
+msgstr "Bắt đầu/Dừng ghi âm"
+
+msgid "Startup Options"
+msgstr "Tùy chọn khởi động"
+
+msgid "Stereo (2 channels)"
+msgstr "Âm thanh nổi (2 kênh)"
+
+msgid "Stop dictation"
+msgstr "Dừng đọc chính tả"
+
+msgid "System is busy. Please wait."
+msgstr "Hệ thống đang bận. Vui lòng đợi."
+
+msgid "Tags, separated by commas"
+msgstr "Thẻ, phân cách bằng dấu phẩy"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "Ngôn ngữ đích cho ghi chú, tiêu đề và thẻ được viết lại (ví dụ: English, Spanish)."
+
+msgid "Task"
+msgstr "Công việc"
+
+msgid "Tasks"
+msgstr "Công việc"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "Thời gian giữ mô hình trong bộ nhớ sau khi tạo ghi chú (ví dụ: '0' để giải phóng ngay, hoặc '5m')."
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "Thời gian giữ trọng số mô hình trong VRAM khi ghi âm để giảm thiểu độ trễ (ví dụ: '5m')."
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "Thời gian giữ mô hình nhúng trong bộ nhớ sau khi tìm kiếm (ví dụ: '5m' hoặc '0')."
+
+msgid "Timeline Columns:"
+msgstr "Số cột dòng thời gian:"
+
+msgid "Title"
+msgstr "Tiêu đề"
+
+msgid "Today"
+msgstr "Hôm nay"
+
+msgid "Transcription - System Prompt"
+msgstr "Phiên âm - Lời nhắc hệ thống"
+
+msgid "Transcription - User Prompt"
+msgstr "Phiên âm - Lời nhắc người dùng"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "URL máy chủ Ollama cục bộ hoặc từ xa của bạn."
+
+msgid "Use default context length"
+msgstr "Sử dụng độ dài ngữ cảnh mặc định"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "Cấu hình người dùng tại {path} không phải là ánh xạ YAML hợp lệ"
+
+msgid "Validation Error"
+msgstr "Lỗi xác thực"
+
+msgid "Verbosity level for app logging."
+msgstr "Mức độ chi tiết cho nhật ký ứng dụng."
+
+msgid "View Log File"
+msgstr "Xem tệp nhật ký"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "Chuyển đổi giọng đọc thành các ghi chú có tổ chức"
+
+msgid "Yesterday"
+msgstr "Hôm qua"
+
+msgid "← Back"
+msgstr "← Quay lại"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} kết quả"

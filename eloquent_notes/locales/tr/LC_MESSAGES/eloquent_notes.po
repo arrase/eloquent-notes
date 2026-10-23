@@ -1,0 +1,523 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid " Hz"
+msgstr " Hz"
+
+msgid " MB"
+msgstr " MB"
+
+msgid " sec"
+msgstr " sn"
+
+msgid "AI Model (Audio):"
+msgstr "YZ Modeli (Ses):"
+
+msgid "AI Model cannot be empty."
+msgstr "YZ Modeli boş olamaz."
+
+msgid "AI Settings"
+msgstr "YZ Ayarları"
+
+msgid "Add dictation"
+msgstr "Dikte ekle"
+
+msgid "Alias for 'toggle' command."
+msgstr "'toggle' komutu için takma ad."
+
+msgid "All"
+msgstr "Tümü"
+
+msgid "All tags"
+msgstr "Tüm etiketler"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "Tüm yapılandırma ayarlarını ve istemleri varsayılan değerlerine sıfırlamak istediğinizden emin misiniz?\n\nBu işlem mevcut düzenlemelerin üzerine yazacaktır."
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "Kaydı başlatırken/durdururken sesli geri bildirim sinyalleri."
+
+msgid "Audio"
+msgstr "Ses"
+
+msgid "Audio Capture Settings"
+msgstr "Ses Yakalama Ayarları"
+
+msgid "Audio Channels:"
+msgstr "Ses Kanalları:"
+
+msgid "Backup Count:"
+msgstr "Yedek Sayısı:"
+
+msgid "Beep Duration:"
+msgstr "Sinyal Süresi:"
+
+msgid "Beep Frequency:"
+msgstr "Sinyal Frekansı:"
+
+msgid "Browse..."
+msgstr "Gözat..."
+
+msgid "Cancel"
+msgstr "İptal"
+
+msgid "Capture Duration:"
+msgstr "Kayıt Süresi:"
+
+msgid "Classification - System Prompt"
+msgstr "Sınıflandırma - Sistem İstemi"
+
+msgid "Classification - User Prompt"
+msgstr "Sınıflandırma - Kullanıcı İstemi"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "Çalıştırılacak komut: 'install-autostart', 'toggle', 'open' (notlar penceresini göster) veya 'config' (yapılandırma arayüzünü aç)."
+
+msgid "Configuration"
+msgstr "Yapılandırma"
+
+msgid "Configuration Error"
+msgstr "Yapılandırma Hatası"
+
+msgid "Configuration reloaded successfully."
+msgstr "Yapılandırma başarıyla yeniden yüklendi."
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "'{key}' yapılandırma bölümü bir eşleme olmalıdır, {type_name} alındı"
+
+msgid "Connection failed: {error}"
+msgstr "Bağlantı başarısız: {error}"
+
+msgid "Context Length:"
+msgstr "Bağlam Uzunluğu:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "Ollama'ya iletilecek jeton (token) cinsinden bağlam uzunluğu. Daha büyük değerler daha uzun diktelere olanak tanır ancak daha fazla bellek kullanır."
+
+msgid "Copy"
+msgstr "Kopyala"
+
+msgid "Could not move {name} to the trash."
+msgstr "{name} çöpe taşınamadı."
+
+msgid "Could not start recording: {error}"
+msgstr "Kayıt başlatılamadı: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "Kayıt durdurulamadı: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "XDG otomatik başlatma dizininde bir masaüstü otomatik başlatma girdisi oluşturur"
+
+msgid "Decision"
+msgstr "Karar"
+
+msgid "Decisions"
+msgstr "Kararlar"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "Varsayılanlar geri yüklendi. Değişiklikleri diske uygulamak için 'Kaydet'e tıklayın."
+
+msgid "Delete"
+msgstr "Sil"
+
+msgid "Delete Failed"
+msgstr "Silme Başarısız"
+
+msgid "Delete Note"
+msgstr "Notu Sil"
+
+msgid "Dictation Added"
+msgstr "Dikte Eklendi"
+
+msgid "Dictation Empty"
+msgstr "Dikte Boş"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "Dikte sırasında canlı geri sayım sayacı ve ilerleme çubuğu içeren şık, yüzen bir kapsül katmanı görüntüler."
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (Boşta)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (İşleniyor...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (Kaydediliyor...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes - Çevrimdışı sesli dikteleri düzenli notlara dönüştüren Linux sistem tepsisi aracı."
+
+msgid "Eloquent Notes Configuration"
+msgstr "Eloquent Notes Yapılandırması"
+
+msgid "Eloquent Notes Daemon"
+msgstr "Eloquent Notes Arka Plan Hizmeti"
+
+msgid "Embedding Model cannot be empty."
+msgstr "Gömme (Embedding) Modeli boş olamaz."
+
+msgid "Embedding Model:"
+msgstr "Gömme Modeli:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "Dikte işlenirken hata oluştu: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "Kullanıcı yapılandırması yüklenemedi: {error}\n\nVarsayılan ayarlar yüklendi."
+
+msgid "Failed to reload configuration: {error}"
+msgstr "Yapılandırma yeniden yüklenemedi: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "Ayarlar kaydedilemedi: {error}"
+
+msgid "Fetching models..."
+msgstr "Modeller getiriliyor..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "Her sesli notun bir Markdown dosyası olarak kaydedildiği klasör. Notlarınızı orada da görmek için bir Obsidian kasasının (vault) içine yönlendirin."
+
+msgid "General"
+msgstr "Genel"
+
+msgid "Idea"
+msgstr "Fikir"
+
+msgid "Ideas"
+msgstr "Fikirler"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "İşaretlenirse, context_length değerini null olarak ayarlar (veya ayarlanmamış bırakır) ve Ollama'ya modelin varsayılan maksimum bağlam uzunluğunu kullanmasını söyler."
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Geçersiz Bellekte Tutma biçimi: '{value}'. Bir tam sayı veya süre olmalıdır (örn. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Geçersiz Ön Yükleme Bellekte Tutma biçimi: '{value}'. Bir tam sayı veya süre olmalıdır (örn. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Geçersiz Arama Bellekte Tutma biçimi: '{value}'. Bir tam sayı veya süre olmalıdır (örn. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "'{key}' için geçersiz yapılandırma değeri"
+
+msgid "Keep Alive Time:"
+msgstr "Bellekte Tutma Süresi:"
+
+msgid "Log File"
+msgstr "Günlük Dosyası"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "Günlük dosyası henüz mevcut değil. Önce birkaç dikte yapın!"
+
+msgid "Logging Level:"
+msgstr "Günlükleme Düzeyi:"
+
+msgid "Logging Settings"
+msgstr "Günlükleme Ayarları"
+
+msgid "Max Log File Size:"
+msgstr "Maks. Günlük Dosyası Boyutu:"
+
+msgid "Max Retries:"
+msgstr "Maks. Yeniden Deneme:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "Otomatik işlemeden önce ses kaydı için saniye cinsinden maksimum süre."
+
+msgid "Maximum size of the log file before rotating."
+msgstr "Döndürmeden önce günlük dosyasının maksimum boyutu."
+
+msgid "Minimum Similarity:"
+msgstr "Minimum Benzerlik:"
+
+msgid "Model returned empty note content"
+msgstr "Model boş not içeriği döndürdü"
+
+msgid "Models loaded successfully."
+msgstr "Modeller başarıyla yüklendi."
+
+msgid "Mono (1 channel)"
+msgstr "Mono (1 kanal)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "“{title}” çöpe taşınsın mı?"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "Dikte görevleri için çalıştırılacak Ollama LLM modelinin adı (örn. gemma4:e4b-it-qat)."
+
+msgid "No audio-capable models found."
+msgstr "Ses destekli model bulunamadı."
+
+msgid "No matching notes."
+msgstr "Eşleşen not yok."
+
+msgid "No note was created because the audio was empty."
+msgstr "Ses boş olduğu için not oluşturulmadı."
+
+msgid "No notes match these filters."
+msgstr "Bu filtrelerle eşleşen not yok."
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "Henüz not yok. İlk notunuzu kaydetmek için sistem tepsisi simgesine tıklayın."
+
+msgid "Note"
+msgstr "Not"
+
+msgid "Note Saved"
+msgstr "Not Kaydedildi"
+
+msgid "Notes"
+msgstr "Notlar"
+
+msgid "Notes Folder cannot be empty."
+msgstr "Notlar Klasörü boş olamaz."
+
+msgid "Notes Folder:"
+msgstr "Notlar Klasörü:"
+
+msgid "Notes Storage"
+msgstr "Not Depolama"
+
+msgid "Number of audio input channels."
+msgstr "Ses giriş kanalı sayısı."
+
+msgid "Number of backup log files to retain."
+msgstr "Saklanacak yedek günlük dosyası sayısı."
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "Notlar zaman çizelgesi ızgarasındaki sütun sayısı."
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "LLM çıktısı JSON ayrıştırmasında başarısız olursa yapılacak yeniden deneme sayısı."
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "Ollama && YZ İş Hattı Ayarları"
+
+msgid "Ollama URL cannot be empty."
+msgstr "Ollama URL'si boş olamaz."
+
+msgid "Ollama URL is empty."
+msgstr "Ollama URL'si boş."
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "Ollama URL'si http:// veya https:// ile başlamalıdır."
+
+msgid "Ollama URL:"
+msgstr "Ollama URL'si:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "Notları anlama göre aramak için kullanılan Ollama gömme modeli (örn. embeddinggemma-2:latest)."
+
+msgid "Open Notes"
+msgstr "Notları Aç"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "Arka plan hizmeti günlük dosyasını sistem düzenleyicinizde açın."
+
+msgid "Output Language cannot be empty."
+msgstr "Çıktı Dili boş olamaz."
+
+msgid "Output Language:"
+msgstr "Çıktı Dili:"
+
+msgid "Play beep on recording start and stop"
+msgstr "Kayıt başlangıcında ve bitişinde sesli sinyal çal"
+
+msgid "Preload Keep Alive:"
+msgstr "Ön Yükleme Bellekte Tutma:"
+
+msgid "Preload Timeout:"
+msgstr "Ön Yükleme Zaman Aşımı:"
+
+msgid "Processing Error"
+msgstr "İşleme Hatası"
+
+msgid "Processing…"
+msgstr "İşleniyor…"
+
+msgid "Prompt Content:"
+msgstr "İstem İçeriği:"
+
+msgid "Prompts"
+msgstr "İstemler"
+
+msgid "Prompts:"
+msgstr "İstemler:"
+
+msgid "Question"
+msgstr "Soru"
+
+msgid "Questions"
+msgstr "Sorular"
+
+msgid "Quit"
+msgstr "Çıkış"
+
+msgid "Ready"
+msgstr "Hazır"
+
+msgid "Recording Note..."
+msgstr "Not kaydediliyor..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "Kayıt devam ediyor — durdurmak ve notu işlemek için tıklayın"
+
+msgid "Refresh"
+msgstr "Yenile"
+
+msgid "Reload Configuration"
+msgstr "Yapılandırmayı Yeniden Yükle"
+
+msgid "Reminder"
+msgstr "Hatırlatıcı"
+
+msgid "Reminders"
+msgstr "Hatırlatıcılar"
+
+msgid "Request Timeout:"
+msgstr "İstek Zaman Aşımı:"
+
+msgid "Restore Defaults"
+msgstr "Varsayılanları Geri Yükle"
+
+msgid "Retry Prompt"
+msgstr "Yeniden Deneme İstemi"
+
+msgid "Rewriting - System Prompt"
+msgstr "Yeniden Yazma - Sistem İstemi"
+
+msgid "Rewriting - User Prompt"
+msgstr "Yeniden Yazma - Kullanıcı İstemi"
+
+msgid "Sample Rate:"
+msgstr "Örnekleme Hızı:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "Mikrofon kaydı için örnekleme hızı (konuşma dikte modelleri için 16000 Hz önerilir)."
+
+msgid "Save"
+msgstr "Kaydet"
+
+msgid "Save Error"
+msgstr "Kaydetme Hatası"
+
+msgid "Search failed: {error}"
+msgstr "Arama başarısız: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "Bu kosinüs benzerliğinin altındaki arama sonuçları gizlenir."
+
+msgid "Search your notes by meaning…"
+msgstr "Notlarınızı anlama göre arayın…"
+
+msgid "Searching…"
+msgstr "Aranıyor…"
+
+msgid "Select Notes Folder"
+msgstr "Notlar Klasörünü Seç"
+
+msgid "Select a prompt to edit..."
+msgstr "Düzenlemek için bir istem seçin..."
+
+msgid "Semantic Search"
+msgstr "Anlamsal Arama"
+
+msgid "Settings"
+msgstr "Ayarlar"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "Kayıt sırasında yüzen geri sayım HUD katmanını göster"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "Oturum açıldığında Eloquent Notes'u otomatik olarak başlat"
+
+msgid "Start/Stop Recording"
+msgstr "Kaydı Başlat/Durdur"
+
+msgid "Startup Options"
+msgstr "Başlangıç Seçenekleri"
+
+msgid "Stereo (2 channels)"
+msgstr "Stereo (2 kanal)"
+
+msgid "Stop dictation"
+msgstr "Dikteyi durdur"
+
+msgid "System is busy. Please wait."
+msgstr "Sistem meşgul. Lütfen bekleyin."
+
+msgid "Tags, separated by commas"
+msgstr "Virgülle ayrılmış etiketler"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "Yeniden yazılan notlar, başlıklar ve etiketler için hedef dil (örn. English, Turkish)."
+
+msgid "Task"
+msgstr "Görev"
+
+msgid "Tasks"
+msgstr "Görevler"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "Not oluşturulduktan sonra modelin bellekte tutulacağı süre (örn. hemen boşaltmak için '0' veya '5m')."
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "Gecikmeyi en aza indirmek için kayıt sırasında model ağırlıklarının VRAM'de tutulacağı süre (örn. '5m')."
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "Bir aramadan sonra gömme modelinin bellekte tutulacağı süre (örn. '5m' veya '0')."
+
+msgid "Timeline Columns:"
+msgstr "Zaman Çizelgesi Sütunları:"
+
+msgid "Title"
+msgstr "Başlık"
+
+msgid "Today"
+msgstr "Bugün"
+
+msgid "Transcription - System Prompt"
+msgstr "Deşifre - Sistem İstemi"
+
+msgid "Transcription - User Prompt"
+msgstr "Deşifre - Kullanıcı İstemi"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "Yerel veya uzak Ollama sunucunuzun URL'si."
+
+msgid "Use default context length"
+msgstr "Varsayılan bağlam uzunluğunu kullan"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "{path} konumundaki kullanıcı yapılandırması geçerli bir YAML eşlemesi değil"
+
+msgid "Validation Error"
+msgstr "Doğrulama Hatası"
+
+msgid "Verbosity level for app logging."
+msgstr "Uygulama günlüklemesi için ayrıntı düzeyi."
+
+msgid "View Log File"
+msgstr "Günlük Dosyasını Görüntüle"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "Düzenli notlara dönüştürülen sesli dikteler"
+
+msgid "Yesterday"
+msgstr "Dün"
+
+msgid "← Back"
+msgstr "← Geri"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} sonuç"
+msgstr[1] "{count} sonuç"

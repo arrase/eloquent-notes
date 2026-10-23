@@ -1,0 +1,523 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: sv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid " Hz"
+msgstr " Hz"
+
+msgid " MB"
+msgstr " MB"
+
+msgid " sec"
+msgstr " sek"
+
+msgid "AI Model (Audio):"
+msgstr "AI-modell (Ljud):"
+
+msgid "AI Model cannot be empty."
+msgstr "AI-modell får inte vara tom."
+
+msgid "AI Settings"
+msgstr "AI-inställningar"
+
+msgid "Add dictation"
+msgstr "Lägg till diktering"
+
+msgid "Alias for 'toggle' command."
+msgstr "Alias för kommandot 'toggle'."
+
+msgid "All"
+msgstr "Alla"
+
+msgid "All tags"
+msgstr "Alla taggar"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "Är du säker på att du vill återställa alla konfigurationsinställningar och prompter till standardvärdena?\n\nDetta skriver över nuvarande ändringar."
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "Ljudsignaler vid start och stopp av inspelning."
+
+msgid "Audio"
+msgstr "Ljud"
+
+msgid "Audio Capture Settings"
+msgstr "Inställningar för ljudinspelning"
+
+msgid "Audio Channels:"
+msgstr "Ljudkanaler:"
+
+msgid "Backup Count:"
+msgstr "Antal säkerhetskopior:"
+
+msgid "Beep Duration:"
+msgstr "Pipets längd:"
+
+msgid "Beep Frequency:"
+msgstr "Pipets frekvens:"
+
+msgid "Browse..."
+msgstr "Bläddra..."
+
+msgid "Cancel"
+msgstr "Avbryt"
+
+msgid "Capture Duration:"
+msgstr "Inspelningslängd:"
+
+msgid "Classification - System Prompt"
+msgstr "Klassificering - Systemprompt"
+
+msgid "Classification - User Prompt"
+msgstr "Klassificering - Användarprompt"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "Kommando att köra: 'install-autostart', 'toggle', 'open' (visa anteckningsfönstret) eller 'config' (öppna konfigurationsfönstret)."
+
+msgid "Configuration"
+msgstr "Konfiguration"
+
+msgid "Configuration Error"
+msgstr "Konfigurationsfel"
+
+msgid "Configuration reloaded successfully."
+msgstr "Konfigurationen har lästs in på nytt."
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "Konfigurationsavsnittet '{key}' måste vara en mappning, fick {type_name}"
+
+msgid "Connection failed: {error}"
+msgstr "Anslutningen misslyckades: {error}"
+
+msgid "Context Length:"
+msgstr "Kontextlängd:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "Kontextlängd i tokens som skickas till Ollama. Större värden tillåter längre dikteringar men använder mer minne."
+
+msgid "Copy"
+msgstr "Kopiera"
+
+msgid "Could not move {name} to the trash."
+msgstr "Kunde inte flytta {name} till papperskorgen."
+
+msgid "Could not start recording: {error}"
+msgstr "Kunde inte starta inspelning: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "Kunde inte stoppa inspelning: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "Skapar en autostartpost i XDG autostart-katalogen"
+
+msgid "Decision"
+msgstr "Beslut"
+
+msgid "Decisions"
+msgstr "Beslut"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "Standardvärden återställda. Klicka på 'Spara' för att verkställa ändringarna på disk."
+
+msgid "Delete"
+msgstr "Ta bort"
+
+msgid "Delete Failed"
+msgstr "Borttagning misslyckades"
+
+msgid "Delete Note"
+msgstr "Ta bort anteckning"
+
+msgid "Dictation Added"
+msgstr "Diktering tillagd"
+
+msgid "Dictation Empty"
+msgstr "Diktering tom"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "Visar en smidig svävande ruta med nedräkningstimer och förloppsindikator under diktering."
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (Inaktiv)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (Bearbetar...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (Spelar in...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes - Systemfältsverktyg för Linux som omvandlar röstdikteringar offline till organiserade anteckningar."
+
+msgid "Eloquent Notes Configuration"
+msgstr "Eloquent Notes-konfiguration"
+
+msgid "Eloquent Notes Daemon"
+msgstr "Eloquent Notes-bakgrundstjänst"
+
+msgid "Embedding Model cannot be empty."
+msgstr "Inbäddningsmodell får inte vara tom."
+
+msgid "Embedding Model:"
+msgstr "Inbäddningsmodell:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "Fel vid bearbetning av diktering: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "Kunde inte läsa in användarkonfiguration: {error}\n\nStandardinställningar lästes in."
+
+msgid "Failed to reload configuration: {error}"
+msgstr "Kunde inte läsa in konfigurationen på nytt: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "Kunde inte spara inställningar: {error}"
+
+msgid "Fetching models..."
+msgstr "Hämtar modeller..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "Mapp där varje röstanteckning sparas som en Markdown-fil. Peka den till ett Obsidian-valv för att se dina anteckningar där också."
+
+msgid "General"
+msgstr "Allmänt"
+
+msgid "Idea"
+msgstr "Idé"
+
+msgid "Ideas"
+msgstr "Idéer"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "Om markerad sätts context_length till null (eller lämnas tomt), vilket instruerar Ollama att använda modellens maximala standardkontextlängd."
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Ogiltigt Keep Alive-format: '{value}'. Måste vara ett heltal eller en varaktighet (t.ex. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Ogiltigt Keep Alive-format för förinläsning: '{value}'. Måste vara ett heltal eller en varaktighet (t.ex. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Ogiltigt Keep Alive-format för sökning: '{value}'. Måste vara ett heltal eller en varaktighet (t.ex. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "Ogiltigt konfigurationsvärde för '{key}'"
+
+msgid "Keep Alive Time:"
+msgstr "Keep Alive-tid:"
+
+msgid "Log File"
+msgstr "Loggfil"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "Loggfilen finns inte ännu. Kör några dikteringar först!"
+
+msgid "Logging Level:"
+msgstr "Loggningsnivå:"
+
+msgid "Logging Settings"
+msgstr "Loggningsinställningar"
+
+msgid "Max Log File Size:"
+msgstr "Max storlek på loggfil:"
+
+msgid "Max Retries:"
+msgstr "Max antal försök:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "Maximal tid i sekunder för ljudinspelning innan automatisk bearbetning sker."
+
+msgid "Maximum size of the log file before rotating."
+msgstr "Maximal storlek på loggfilen innan rotation."
+
+msgid "Minimum Similarity:"
+msgstr "Minsta likhet:"
+
+msgid "Model returned empty note content"
+msgstr "Modellen returnerade tomt anteckningsinnehåll"
+
+msgid "Models loaded successfully."
+msgstr "Modellerna har lästs in."
+
+msgid "Mono (1 channel)"
+msgstr "Mono (1 kanal)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "Flytta ”{title}” till papperskorgen?"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "Namn på Ollama LLM-modellen som ska köras för dikteringsuppgifter (t.ex. gemma4:e4b-it-qat)."
+
+msgid "No audio-capable models found."
+msgstr "Inga ljudkapabla modeller hittades."
+
+msgid "No matching notes."
+msgstr "Inga matchande anteckningar."
+
+msgid "No note was created because the audio was empty."
+msgstr "Ingen anteckning skapades eftersom ljudet var tomt."
+
+msgid "No notes match these filters."
+msgstr "Inga anteckningar matchar dessa filter."
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "Inga anteckningar ännu. Klicka på ikonen i systemfältet för att spela in din första."
+
+msgid "Note"
+msgstr "Anteckning"
+
+msgid "Note Saved"
+msgstr "Anteckning sparad"
+
+msgid "Notes"
+msgstr "Anteckningar"
+
+msgid "Notes Folder cannot be empty."
+msgstr "Anteckningsmappen får inte vara tom."
+
+msgid "Notes Folder:"
+msgstr "Anteckningsmapp:"
+
+msgid "Notes Storage"
+msgstr "Anteckningslagring"
+
+msgid "Number of audio input channels."
+msgstr "Antal ljudingångskanaler."
+
+msgid "Number of backup log files to retain."
+msgstr "Antal säkerhetskopierade loggfiler att behålla."
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "Antal kolumner i tidslinjerutnätet för anteckningar."
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "Antal omförsök om LLM-utdata misslyckas med JSON-tolkning."
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "Inställningar för Ollama && AI-pipeline"
+
+msgid "Ollama URL cannot be empty."
+msgstr "Ollama-URL får inte vara tom."
+
+msgid "Ollama URL is empty."
+msgstr "Ollama-URL är tom."
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "Ollama-URL måste börja med http:// eller https://."
+
+msgid "Ollama URL:"
+msgstr "Ollama-URL:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "Inbäddningsmodell i Ollama som används för att söka anteckningar efter betydelse (t.ex. embeddinggemma-2:latest)."
+
+msgid "Open Notes"
+msgstr "Öppna anteckningar"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "Öppna bakgrundstjänstens loggfil i systemets textredigerare."
+
+msgid "Output Language cannot be empty."
+msgstr "Utmatningsspråk får inte vara tomt."
+
+msgid "Output Language:"
+msgstr "Utmatningsspråk:"
+
+msgid "Play beep on recording start and stop"
+msgstr "Spela ljudsignal vid start och stopp av inspelning"
+
+msgid "Preload Keep Alive:"
+msgstr "Keep Alive vid förinläsning:"
+
+msgid "Preload Timeout:"
+msgstr "Tidsgräns för förinläsning:"
+
+msgid "Processing Error"
+msgstr "Bearbetningsfel"
+
+msgid "Processing…"
+msgstr "Bearbetar…"
+
+msgid "Prompt Content:"
+msgstr "Promptinnehåll:"
+
+msgid "Prompts"
+msgstr "Prompter"
+
+msgid "Prompts:"
+msgstr "Prompter:"
+
+msgid "Question"
+msgstr "Fråga"
+
+msgid "Questions"
+msgstr "Frågor"
+
+msgid "Quit"
+msgstr "Avsluta"
+
+msgid "Ready"
+msgstr "Redo"
+
+msgid "Recording Note..."
+msgstr "Spelar in..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "Inspelning pågår — klicka för att stoppa och bearbeta anteckning"
+
+msgid "Refresh"
+msgstr "Uppdatera"
+
+msgid "Reload Configuration"
+msgstr "Läs in konfiguration igen"
+
+msgid "Reminder"
+msgstr "Påminnelse"
+
+msgid "Reminders"
+msgstr "Påminnelser"
+
+msgid "Request Timeout:"
+msgstr "Tidsgräns för begäran:"
+
+msgid "Restore Defaults"
+msgstr "Återställ standardvärden"
+
+msgid "Retry Prompt"
+msgstr "Omförsöksprompt"
+
+msgid "Rewriting - System Prompt"
+msgstr "Omskrivning - Systemprompt"
+
+msgid "Rewriting - User Prompt"
+msgstr "Omskrivning - Användarprompt"
+
+msgid "Sample Rate:"
+msgstr "Samplingsfrekvens:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "Samplingsfrekvens för mikrofoninspelning (16000 Hz rekommenderas för taldikteringsmodeller)."
+
+msgid "Save"
+msgstr "Spara"
+
+msgid "Save Error"
+msgstr "Fel vid sparande"
+
+msgid "Search failed: {error}"
+msgstr "Sökningen misslyckades: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "Sökresultat under denna cosinuslikhet döljs."
+
+msgid "Search your notes by meaning…"
+msgstr "Sök i dina anteckningar efter betydelse…"
+
+msgid "Searching…"
+msgstr "Söker…"
+
+msgid "Select Notes Folder"
+msgstr "Välj anteckningsmapp"
+
+msgid "Select a prompt to edit..."
+msgstr "Välj en prompt att redigera..."
+
+msgid "Semantic Search"
+msgstr "Semantisk sökning"
+
+msgid "Settings"
+msgstr "Inställningar"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "Visa svävande nedräkningsruta under inspelning"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "Starta Eloquent Notes automatiskt vid inloggning"
+
+msgid "Start/Stop Recording"
+msgstr "Starta/stoppa inspelning"
+
+msgid "Startup Options"
+msgstr "Startalternativ"
+
+msgid "Stereo (2 channels)"
+msgstr "Stereo (2 kanaler)"
+
+msgid "Stop dictation"
+msgstr "Stoppa diktering"
+
+msgid "System is busy. Please wait."
+msgstr "Systemet är upptaget. Vänta."
+
+msgid "Tags, separated by commas"
+msgstr "Taggar, separerade med kommatecken"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "Målspråk för omskrivna anteckningar, rubriker och taggar (t.ex. English, Spanish)."
+
+msgid "Task"
+msgstr "Uppgift"
+
+msgid "Tasks"
+msgstr "Uppgifter"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "Tid att hålla modellen inläst efter anteckningsskapande (t.ex. '0' för att ladda ur direkt, eller '5m')."
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "Tid att hålla modellvikter inlästa i VRAM under inspelning för att minimera fördröjning (t.ex. '5m')."
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "Tid att hålla inbäddningsmodellen inläst efter en sökning (t.ex. '5m' eller '0')."
+
+msgid "Timeline Columns:"
+msgstr "Tidslinjekolumner:"
+
+msgid "Title"
+msgstr "Rubrik"
+
+msgid "Today"
+msgstr "Idag"
+
+msgid "Transcription - System Prompt"
+msgstr "Transkription - Systemprompt"
+
+msgid "Transcription - User Prompt"
+msgstr "Transkription - Användarprompt"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "URL till din lokala eller fjärranslutna Ollama-server."
+
+msgid "Use default context length"
+msgstr "Använd standardkontextlängd"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "Användarkonfigurationen på {path} är inte en giltig YAML-mappning"
+
+msgid "Validation Error"
+msgstr "Valideringsfel"
+
+msgid "Verbosity level for app logging."
+msgstr "Detaljnivå för programloggning."
+
+msgid "View Log File"
+msgstr "Visa loggfil"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "Röstdikteringar omvandlade till organiserade anteckningar"
+
+msgid "Yesterday"
+msgstr "Igår"
+
+msgid "← Back"
+msgstr "← Tillbaka"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} resultat"
+msgstr[1] "{count} resultat"

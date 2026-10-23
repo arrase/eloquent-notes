@@ -1,0 +1,523 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid " Hz"
+msgstr " Hz"
+
+msgid " MB"
+msgstr " MB"
+
+msgid " sec"
+msgstr " sec"
+
+msgid "AI Model (Audio):"
+msgstr "AI-model (Audio):"
+
+msgid "AI Model cannot be empty."
+msgstr "AI-model mag niet leeg zijn."
+
+msgid "AI Settings"
+msgstr "AI-instellingen"
+
+msgid "Add dictation"
+msgstr "Dictaat toevoegen"
+
+msgid "Alias for 'toggle' command."
+msgstr "Alias voor de opdracht 'toggle'."
+
+msgid "All"
+msgstr "Alle"
+
+msgid "All tags"
+msgstr "Alle tags"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "Weet u zeker dat u alle configuratie-instellingen en prompts wilt herstellen naar de standaardwaarden?\n\nHiermee worden huidige wijzigingen overschreven."
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "Hoorbare pieptonen bij het starten en stoppen van de opname."
+
+msgid "Audio"
+msgstr "Audio"
+
+msgid "Audio Capture Settings"
+msgstr "Instellingen voor audio-opname"
+
+msgid "Audio Channels:"
+msgstr "Audiokanalen:"
+
+msgid "Backup Count:"
+msgstr "Aantal back-ups:"
+
+msgid "Beep Duration:"
+msgstr "Piepduur:"
+
+msgid "Beep Frequency:"
+msgstr "Piepfrequentie:"
+
+msgid "Browse..."
+msgstr "Bladeren..."
+
+msgid "Cancel"
+msgstr "Annuleren"
+
+msgid "Capture Duration:"
+msgstr "Opnameduur:"
+
+msgid "Classification - System Prompt"
+msgstr "Classificatie - Systeemprompt"
+
+msgid "Classification - User Prompt"
+msgstr "Classificatie - Gebruikersprompt"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "Uit te voeren opdracht: 'install-autostart', 'toggle', 'open' (notitievenster tonen) of 'config' (configuratievenster openen)."
+
+msgid "Configuration"
+msgstr "Configuratie"
+
+msgid "Configuration Error"
+msgstr "Configuratiefout"
+
+msgid "Configuration reloaded successfully."
+msgstr "Configuratie succesvol herladen."
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "Configuratiesectie '{key}' moet een mapping zijn, kreeg {type_name}"
+
+msgid "Connection failed: {error}"
+msgstr "Verbinding mislukt: {error}"
+
+msgid "Context Length:"
+msgstr "Contextlengte:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "Contextlengte in tokens om door te geven aan Ollama. Grotere waarden staan langere dictaten toe, maar gebruiken meer geheugen."
+
+msgid "Copy"
+msgstr "Kopiëren"
+
+msgid "Could not move {name} to the trash."
+msgstr "Kon {name} niet naar de prullenbak verplaatsen."
+
+msgid "Could not start recording: {error}"
+msgstr "Kon opname niet starten: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "Kon opname niet stoppen: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "Maakt een autostart-item aan in de XDG autostart-map"
+
+msgid "Decision"
+msgstr "Beslissing"
+
+msgid "Decisions"
+msgstr "Beslissingen"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "Standaardwaarden hersteld. Klik op 'Opslaan' om de wijzigingen op schijf toe te passen."
+
+msgid "Delete"
+msgstr "Verwijderen"
+
+msgid "Delete Failed"
+msgstr "Verwijderen mislukt"
+
+msgid "Delete Note"
+msgstr "Notitie verwijderen"
+
+msgid "Dictation Added"
+msgstr "Dictaat toegevoegd"
+
+msgid "Dictation Empty"
+msgstr "Dictaat leeg"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "Toont een zwevende balk met live afteltimer en voortgangsbalk tijdens het dicteren."
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (Inactief)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (Verwerken...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (Opnemen...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes - Linux-systeemvakprogramma dat offline spraakdictaten omzet in geordende notities."
+
+msgid "Eloquent Notes Configuration"
+msgstr "Eloquent Notes-configuratie"
+
+msgid "Eloquent Notes Daemon"
+msgstr "Eloquent Notes-achtergronddienst"
+
+msgid "Embedding Model cannot be empty."
+msgstr "Embeddingmodel mag niet leeg zijn."
+
+msgid "Embedding Model:"
+msgstr "Embeddingmodel:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "Fout bij verwerken van dictaat: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "Kan gebruikersconfiguratie niet laden: {error}\n\nStandaardinstellingen zijn geladen."
+
+msgid "Failed to reload configuration: {error}"
+msgstr "Kan configuratie niet herladen: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "Kan instellingen niet opslaan: {error}"
+
+msgid "Fetching models..."
+msgstr "Modellen ophalen..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "Map waarin elke spraaknotitie als Markdown-bestand wordt opgeslagen. Verwijs naar een Obsidian-kluis om uw notities daar ook te bekijken."
+
+msgid "General"
+msgstr "Algemeen"
+
+msgid "Idea"
+msgstr "Idee"
+
+msgid "Ideas"
+msgstr "Ideeën"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "Indien aangevinkt, wordt context_length ingesteld op null (of leeg gelaten), zodat Ollama de standaard maximale contextlengte van het model gebruikt."
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Ongeldige Keep Alive-indeling: '{value}'. Moet een geheel getal of duur zijn (bijv. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Ongeldige Preload Keep Alive-indeling: '{value}'. Moet een geheel getal of duur zijn (bijv. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Ongeldige Search Keep Alive-indeling: '{value}'. Moet een geheel getal of duur zijn (bijv. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "Ongeldige configuratiewaarde voor '{key}'"
+
+msgid "Keep Alive Time:"
+msgstr "Keep Alive-tijd:"
+
+msgid "Log File"
+msgstr "Logbestand"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "Logbestand bestaat nog niet. Voer eerst enkele dictaten uit!"
+
+msgid "Logging Level:"
+msgstr "Logniveau:"
+
+msgid "Logging Settings"
+msgstr "Loginstellingen"
+
+msgid "Max Log File Size:"
+msgstr "Max. logbestandsgrootte:"
+
+msgid "Max Retries:"
+msgstr "Max. pogingen:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "Maximale duur in seconden voor audio-opname voordat automatisch wordt verwerkt."
+
+msgid "Maximum size of the log file before rotating."
+msgstr "Maximale grootte van het logbestand voordat het wordt geroteerd."
+
+msgid "Minimum Similarity:"
+msgstr "Minimale gelijkenis:"
+
+msgid "Model returned empty note content"
+msgstr "Model gaf lege notitie-inhoud terug"
+
+msgid "Models loaded successfully."
+msgstr "Modellen succesvol geladen."
+
+msgid "Mono (1 channel)"
+msgstr "Mono (1 kanaal)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "“{title}” naar de prullenbak verplaatsen?"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "Naam van het Ollama LLM-model voor dicteertaken (bijv. gemma4:e4b-it-qat)."
+
+msgid "No audio-capable models found."
+msgstr "Geen modellen met audio-ondersteuning gevonden."
+
+msgid "No matching notes."
+msgstr "Geen overeenkomende notities."
+
+msgid "No note was created because the audio was empty."
+msgstr "Er is geen notitie aangemaakt omdat de audio leeg was."
+
+msgid "No notes match these filters."
+msgstr "Geen notities komen overeen met deze filters."
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "Nog geen notities. Klik op het systeemvakpictogram om uw eerste op te nemen."
+
+msgid "Note"
+msgstr "Notitie"
+
+msgid "Note Saved"
+msgstr "Notitie opgeslagen"
+
+msgid "Notes"
+msgstr "Notities"
+
+msgid "Notes Folder cannot be empty."
+msgstr "Notitiemap mag niet leeg zijn."
+
+msgid "Notes Folder:"
+msgstr "Notitiemap:"
+
+msgid "Notes Storage"
+msgstr "Notitieopslag"
+
+msgid "Number of audio input channels."
+msgstr "Aantal audio-invoerkanalen."
+
+msgid "Number of backup log files to retain."
+msgstr "Aantal te bewaren back-uplogbestanden."
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "Aantal kolommen in het tijdlijnraster van notities."
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "Aantal nieuwe pogingen als de LLM-uitvoer niet als JSON kan worden geparseerd."
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "Ollama- && AI-pipeline-instellingen"
+
+msgid "Ollama URL cannot be empty."
+msgstr "Ollama-URL mag niet leeg zijn."
+
+msgid "Ollama URL is empty."
+msgstr "Ollama-URL is leeg."
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "Ollama-URL moet beginnen met http:// of https://."
+
+msgid "Ollama URL:"
+msgstr "Ollama-URL:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "Ollama-embeddingmodel dat wordt gebruikt om notities op betekenis te doorzoeken (bijv. embeddinggemma-2:latest)."
+
+msgid "Open Notes"
+msgstr "Notities openen"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "Open het logbestand van de achtergronddienst in uw systeemeditor."
+
+msgid "Output Language cannot be empty."
+msgstr "Uitvoertaal mag niet leeg zijn."
+
+msgid "Output Language:"
+msgstr "Uitvoertaal:"
+
+msgid "Play beep on recording start and stop"
+msgstr "Pieptoon afspelen bij starten en stoppen van opname"
+
+msgid "Preload Keep Alive:"
+msgstr "Preload Keep Alive:"
+
+msgid "Preload Timeout:"
+msgstr "Preload-time-out:"
+
+msgid "Processing Error"
+msgstr "Verwerkingsfout"
+
+msgid "Processing…"
+msgstr "Verwerken…"
+
+msgid "Prompt Content:"
+msgstr "Promptinhoud:"
+
+msgid "Prompts"
+msgstr "Prompts"
+
+msgid "Prompts:"
+msgstr "Prompts:"
+
+msgid "Question"
+msgstr "Vraag"
+
+msgid "Questions"
+msgstr "Vragen"
+
+msgid "Quit"
+msgstr "Afsluiten"
+
+msgid "Ready"
+msgstr "Gereed"
+
+msgid "Recording Note..."
+msgstr "Notitie opnemen..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "Opname bezig — klik om te stoppen en de notitie te verwerken"
+
+msgid "Refresh"
+msgstr "Vernieuwen"
+
+msgid "Reload Configuration"
+msgstr "Configuratie herladen"
+
+msgid "Reminder"
+msgstr "Herinnering"
+
+msgid "Reminders"
+msgstr "Herinneringen"
+
+msgid "Request Timeout:"
+msgstr "Time-out van verzoek:"
+
+msgid "Restore Defaults"
+msgstr "Standaardwaarden herstellen"
+
+msgid "Retry Prompt"
+msgstr "Prompt voor nieuwe poging"
+
+msgid "Rewriting - System Prompt"
+msgstr "Herschrijven - Systeemprompt"
+
+msgid "Rewriting - User Prompt"
+msgstr "Herschrijven - Gebruikersprompt"
+
+msgid "Sample Rate:"
+msgstr "Samplefrequentie:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "Samplefrequentie voor microfoonopname (16000 Hz wordt aanbevolen voor spraakdicteermodellen)."
+
+msgid "Save"
+msgstr "Opslaan"
+
+msgid "Save Error"
+msgstr "Fout bij opslaan"
+
+msgid "Search failed: {error}"
+msgstr "Zoeken mislukt: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "Zoekresultaten onder deze cosinusgelijkenis worden verborgen."
+
+msgid "Search your notes by meaning…"
+msgstr "Doorzoek uw notities op betekenis…"
+
+msgid "Searching…"
+msgstr "Zoeken…"
+
+msgid "Select Notes Folder"
+msgstr "Notitiemap selecteren"
+
+msgid "Select a prompt to edit..."
+msgstr "Selecteer een prompt om te bewerken..."
+
+msgid "Semantic Search"
+msgstr "Semantisch zoeken"
+
+msgid "Settings"
+msgstr "Instellingen"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "Zwevende aftel-overlay tonen tijdens opname"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "Eloquent Notes automatisch starten bij aanmelden"
+
+msgid "Start/Stop Recording"
+msgstr "Opname starten/stoppen"
+
+msgid "Startup Options"
+msgstr "Opstartopties"
+
+msgid "Stereo (2 channels)"
+msgstr "Stereo (2 kanalen)"
+
+msgid "Stop dictation"
+msgstr "Dictaat stoppen"
+
+msgid "System is busy. Please wait."
+msgstr "Systeem is bezig. Even geduld."
+
+msgid "Tags, separated by commas"
+msgstr "Tags, gescheiden door komma's"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "Doeltaal voor herschreven notities, titels en tags (bijv. English, Spanish)."
+
+msgid "Task"
+msgstr "Taak"
+
+msgid "Tasks"
+msgstr "Taken"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "Tijd om het model geladen te houden na het maken van een notitie (bijv. '0' om direct te ontladen, of '5m')."
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "Tijd om modelgewichten tijdens opname in VRAM geladen te houden om latentie te beperken (bijv. '5m')."
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "Tijd om het embeddingmodel geladen te houden na een zoekopdracht (bijv. '5m' of '0')."
+
+msgid "Timeline Columns:"
+msgstr "Tijdlijnkolommen:"
+
+msgid "Title"
+msgstr "Titel"
+
+msgid "Today"
+msgstr "Vandaag"
+
+msgid "Transcription - System Prompt"
+msgstr "Transcriptie - Systeemprompt"
+
+msgid "Transcription - User Prompt"
+msgstr "Transcriptie - Gebruikersprompt"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "URL van uw lokale of externe Ollama-server."
+
+msgid "Use default context length"
+msgstr "Standaard contextlengte gebruiken"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "Gebruikersconfiguratie op {path} is geen geldige YAML-mapping"
+
+msgid "Validation Error"
+msgstr "Validatiefout"
+
+msgid "Verbosity level for app logging."
+msgstr "Detailniveau voor applicatielogboeken."
+
+msgid "View Log File"
+msgstr "Logbestand bekijken"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "Spraakdictaten omgezet in geordende notities"
+
+msgid "Yesterday"
+msgstr "Gisteren"
+
+msgid "← Back"
+msgstr "← Terug"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} resultaat"
+msgstr[1] "{count} resultaten"

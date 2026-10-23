@@ -15,6 +15,7 @@ from PyQt6.QtWidgets import (
 )
 
 from eloquent_notes import config
+from eloquent_notes.i18n import _
 
 PROMPTS = [
     (
@@ -70,11 +71,11 @@ class TextFilesTab(QWidget):
         left_widget = QWidget()
         left_layout = QVBoxLayout(left_widget)
         left_layout.setContentsMargins(0, 0, 0, 0)
-        left_layout.addWidget(QLabel("Prompts:"))
+        left_layout.addWidget(QLabel(_("Prompts:")))
 
         self.lst_items = QListWidget()
-        for label, path, _ in PROMPTS:
-            item = QListWidgetItem(label)
+        for label, path, _default in PROMPTS:
+            item = QListWidgetItem(_(label))
             item.setData(Qt.ItemDataRole.UserRole, path)
             self.lst_items.addItem(item)
 
@@ -85,12 +86,12 @@ class TextFilesTab(QWidget):
         editor_layout = QVBoxLayout(editor_widget)
         editor_layout.setContentsMargins(0, 0, 0, 0)
 
-        lbl = QLabel("Prompt Content:")
+        lbl = QLabel(_("Prompt Content:"))
         self.editor = QTextEdit()
         font = QFont("Courier New", 10)
         font.setStyleHint(QFont.StyleHint.Monospace)
         self.editor.setFont(font)
-        self.editor.setPlaceholderText("Select a prompt to edit...")
+        self.editor.setPlaceholderText(_("Select a prompt to edit..."))
 
         editor_layout.addWidget(lbl)
         editor_layout.addWidget(self.editor)
@@ -121,7 +122,7 @@ class TextFilesTab(QWidget):
         self.lst_items.blockSignals(True)
         self.loaded_contents.clear()
 
-        for _, path, default_path in PROMPTS:
+        for _label, path, default_path in PROMPTS:
             src = path if os.path.exists(path) else default_path
             self.loaded_contents[path] = config.load_file(src)
 
@@ -137,7 +138,7 @@ class TextFilesTab(QWidget):
 
     def restore_defaults(self) -> None:
         self.loaded_contents.clear()
-        for _, path, default_path in PROMPTS:
+        for _label, path, default_path in PROMPTS:
             self.loaded_contents[path] = config.load_file(default_path)
         current = self.lst_items.currentItem()
         if current:
@@ -146,7 +147,7 @@ class TextFilesTab(QWidget):
 
     def save_settings(self, config_data: dict) -> bool:
         self.commit_active_editor()
-        for _, path, _ in PROMPTS:
+        for _label, path, _default in PROMPTS:
             content = self.loaded_contents[path]
             if not os.path.exists(path) or config.load_file(path) != content:
                 config.atomic_write(path, content)

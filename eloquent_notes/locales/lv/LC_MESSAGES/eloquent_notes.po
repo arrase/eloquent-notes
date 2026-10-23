@@ -1,0 +1,524 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: lv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);\n"
+
+msgid " Hz"
+msgstr " Hz"
+
+msgid " MB"
+msgstr " MB"
+
+msgid " sec"
+msgstr " sek."
+
+msgid "AI Model (Audio):"
+msgstr "MI modelis (audio):"
+
+msgid "AI Model cannot be empty."
+msgstr "MI modelis nedrīkst būt tukšs."
+
+msgid "AI Settings"
+msgstr "MI iestatījumi"
+
+msgid "Add dictation"
+msgstr "Pievienot diktātu"
+
+msgid "Alias for 'toggle' command."
+msgstr "Komandas 'toggle' aizstājvārds."
+
+msgid "All"
+msgstr "Visas"
+
+msgid "All tags"
+msgstr "Visas birkas"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "Vai tiešām vēlaties atjaunot visus konfigurācijas iestatījumus un uzvednes uz to noklusējuma vērtībām?\n\nTas pārrakstīs pašreizējās izmaiņas."
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "Skaņas signāli, sākot un apturot ierakstīšanu."
+
+msgid "Audio"
+msgstr "Audio"
+
+msgid "Audio Capture Settings"
+msgstr "Audio tveršanas iestatījumi"
+
+msgid "Audio Channels:"
+msgstr "Audio kanāli:"
+
+msgid "Backup Count:"
+msgstr "Dublējumu skaits:"
+
+msgid "Beep Duration:"
+msgstr "Signāla ilgums:"
+
+msgid "Beep Frequency:"
+msgstr "Signāla frekvence:"
+
+msgid "Browse..."
+msgstr "Pārlūkot..."
+
+msgid "Cancel"
+msgstr "Atcelt"
+
+msgid "Capture Duration:"
+msgstr "Tveršanas ilgums:"
+
+msgid "Classification - System Prompt"
+msgstr "Klasifikācija – sistēmas uzvedne"
+
+msgid "Classification - User Prompt"
+msgstr "Klasifikācija – lietotāja uzvedne"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "Izpildāmā komanda: 'install-autostart', 'toggle', 'open' (rādīt piezīmju logu) vai 'config' (atvērt konfigurācijas saskarni)."
+
+msgid "Configuration"
+msgstr "Konfigurācija"
+
+msgid "Configuration Error"
+msgstr "Konfigurācijas kļūda"
+
+msgid "Configuration reloaded successfully."
+msgstr "Konfigurācija veiksmīgi pārlādēta."
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "Konfigurācijas sadaļai '{key}' jābūt kartējumam, saņemts {type_name}"
+
+msgid "Connection failed: {error}"
+msgstr "Savienojums neizdevās: {error}"
+
+msgid "Context Length:"
+msgstr "Konteksta garums:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "Konteksta garums marķieros, ko nodot Ollama. Lielākas vērtības ļauj veikt garākus diktātus, bet izmanto vairāk atmiņas."
+
+msgid "Copy"
+msgstr "Kopēt"
+
+msgid "Could not move {name} to the trash."
+msgstr "Nevarēja pārvietot {name} uz atkritni."
+
+msgid "Could not start recording: {error}"
+msgstr "Nevarēja sākt ierakstīšanu: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "Nevarēja apturēt ierakstīšanu: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "Izveido darbvirsmas automātiskās palaišanas ierakstu XDG automātiskās palaišanas direktorijā"
+
+msgid "Decision"
+msgstr "Lēmums"
+
+msgid "Decisions"
+msgstr "Lēmumi"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "Noklusējuma vērtības atjaunotas. Noklikšķiniet uz “Saglabāt”, lai lietotu izmaiņas diskā."
+
+msgid "Delete"
+msgstr "Dzēst"
+
+msgid "Delete Failed"
+msgstr "Dzēšana neizdevās"
+
+msgid "Delete Note"
+msgstr "Dzēst piezīmi"
+
+msgid "Dictation Added"
+msgstr "Diktāts pievienots"
+
+msgid "Dictation Empty"
+msgstr "Diktāts ir tukšs"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "Diktēšanas laikā rāda peldošu kapsulas pārklājumu ar atpakaļskaitīšanas taimeri un progresa joslu."
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (Dīkstāve)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (Apstrādā...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (Ieraksta...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes – Linux sistēmas teknes rīks, kas balss diktātus pārvērš sakārtotās piezīmēs."
+
+msgid "Eloquent Notes Configuration"
+msgstr "Eloquent Notes konfigurācija"
+
+msgid "Eloquent Notes Daemon"
+msgstr "Eloquent Notes dēmons"
+
+msgid "Embedding Model cannot be empty."
+msgstr "Iegulšanas modelis nedrīkst būt tukšs."
+
+msgid "Embedding Model:"
+msgstr "Iegulšanas modelis:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "Kļūda, apstrādājot diktātu: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "Neizdevās ielādēt lietotāja konfigurāciju: {error}\n\nIelādēti noklusējuma iestatījumi."
+
+msgid "Failed to reload configuration: {error}"
+msgstr "Neizdevās pārlādēt konfigurāciju: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "Neizdevās saglabāt iestatījumus: {error}"
+
+msgid "Fetching models..."
+msgstr "Iegūst modeļus..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "Mape, kurā katra balss piezīme tiek saglabāta kā Markdown fails. Norādiet uz Obsidian glabātuvi, lai redzētu savas piezīmes arī tur."
+
+msgid "General"
+msgstr "Vispārīgi"
+
+msgid "Idea"
+msgstr "Ideja"
+
+msgid "Ideas"
+msgstr "Idejas"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "Ja atzīmēts, iestata context_length uz null (vai atstāj neiestatītu), liekot Ollama izmantot modeļa noklusējuma maksimālo konteksta garumu."
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Nederīgs Keep Alive formāts: '{value}'. Jābūt veselam skaitlim vai ilgumam (piem., 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Nederīgs priekšielādes Keep Alive formāts: '{value}'. Jābūt veselam skaitlim vai ilgumam (piem., 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Nederīgs meklēšanas Keep Alive formāts: '{value}'. Jābūt veselam skaitlim vai ilgumam (piem., 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "Nederīga konfigurācijas vērtība atslēgai '{key}'"
+
+msgid "Keep Alive Time:"
+msgstr "Uzturēšanas laiks atmiņā:"
+
+msgid "Log File"
+msgstr "Žurnāla fails"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "Žurnāla fails vēl nepastāv. Vispirms veiciet dažus diktātus!"
+
+msgid "Logging Level:"
+msgstr "Reģistrēšanas līmenis:"
+
+msgid "Logging Settings"
+msgstr "Reģistrēšanas iestatījumi"
+
+msgid "Max Log File Size:"
+msgstr "Maks. žurnāla faila izmērs:"
+
+msgid "Max Retries:"
+msgstr "Maks. mēģinājumu skaits:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "Maksimālais audio ierakstīšanas ilgums sekundēs pirms automātiskas apstrādes."
+
+msgid "Maximum size of the log file before rotating."
+msgstr "Maksimālais žurnāla faila izmērs pirms rotācijas."
+
+msgid "Minimum Similarity:"
+msgstr "Minimālā līdzība:"
+
+msgid "Model returned empty note content"
+msgstr "Modelis atgrieza tukšu piezīmes saturu"
+
+msgid "Models loaded successfully."
+msgstr "Modeļi veiksmīgi ielādēti."
+
+msgid "Mono (1 channel)"
+msgstr "Mono (1 kanāls)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "Vai pārvietot “{title}” uz atkritni?"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "Ollama LLM modeļa nosaukums diktēšanas uzdevumu veikšanai (piem., gemma4:e4b-it-qat)."
+
+msgid "No audio-capable models found."
+msgstr "Nav atrasts neviens modelis ar audio atbalstu."
+
+msgid "No matching notes."
+msgstr "Nav atbilstošu piezīmju."
+
+msgid "No note was created because the audio was empty."
+msgstr "Piezīme netika izveidota, jo audio bija tukšs."
+
+msgid "No notes match these filters."
+msgstr "Šiem filtriem neatbilst neviena piezīme."
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "Vēl nav piezīmju. Noklikšķiniet uz teknes ikonas, lai ierakstītu pirmo."
+
+msgid "Note"
+msgstr "Piezīme"
+
+msgid "Note Saved"
+msgstr "Piezīme saglabāta"
+
+msgid "Notes"
+msgstr "Piezīmes"
+
+msgid "Notes Folder cannot be empty."
+msgstr "Piezīmju mape nedrīkst būt tukša."
+
+msgid "Notes Folder:"
+msgstr "Piezīmju mape:"
+
+msgid "Notes Storage"
+msgstr "Piezīmju glabātuve"
+
+msgid "Number of audio input channels."
+msgstr "Audio ievades kanālu skaits."
+
+msgid "Number of backup log files to retain."
+msgstr "Saglabājamo dublējuma žurnāla failu skaits."
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "Kolonnu skaits piezīmju laika skalas režģī."
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "Atkārtotu mēģinājumu skaits, ja LLM izvadi neizdodas parsēt kā JSON."
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "Ollama && MI konveijera iestatījumi"
+
+msgid "Ollama URL cannot be empty."
+msgstr "Ollama URL nedrīkst būt tukšs."
+
+msgid "Ollama URL is empty."
+msgstr "Ollama URL ir tukšs."
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "Ollama URL jāsākas ar http:// vai https://."
+
+msgid "Ollama URL:"
+msgstr "Ollama URL:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "Ollama iegulšanas modelis, ko izmanto piezīmju meklēšanai pēc nozīmes (piem., embeddinggemma-2:latest)."
+
+msgid "Open Notes"
+msgstr "Atvērt piezīmes"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "Atvērt fona dēmona žurnāla failu sistēmas redaktorā."
+
+msgid "Output Language cannot be empty."
+msgstr "Izvades valoda nedrīkst būt tukša."
+
+msgid "Output Language:"
+msgstr "Izvades valoda:"
+
+msgid "Play beep on recording start and stop"
+msgstr "Atskaņot skaņas signālu, sākot un apturot ierakstīšanu"
+
+msgid "Preload Keep Alive:"
+msgstr "Priekšielādes uzturēšanas laiks:"
+
+msgid "Preload Timeout:"
+msgstr "Priekšielādes noildze:"
+
+msgid "Processing Error"
+msgstr "Apstrādes kļūda"
+
+msgid "Processing…"
+msgstr "Apstrādā…"
+
+msgid "Prompt Content:"
+msgstr "Uzvednes saturs:"
+
+msgid "Prompts"
+msgstr "Uzvednes"
+
+msgid "Prompts:"
+msgstr "Uzvednes:"
+
+msgid "Question"
+msgstr "Jautājums"
+
+msgid "Questions"
+msgstr "Jautājumi"
+
+msgid "Quit"
+msgstr "Iziet"
+
+msgid "Ready"
+msgstr "Gatavs"
+
+msgid "Recording Note..."
+msgstr "Ieraksta piezīmi..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "Notiek ierakstīšana — noklikšķiniet, lai apturētu un apstrādātu piezīmi"
+
+msgid "Refresh"
+msgstr "Atsvaidzināt"
+
+msgid "Reload Configuration"
+msgstr "Pārlādēt konfigurāciju"
+
+msgid "Reminder"
+msgstr "Atgādinājums"
+
+msgid "Reminders"
+msgstr "Atgādinājumi"
+
+msgid "Request Timeout:"
+msgstr "Pieprasījuma noildze:"
+
+msgid "Restore Defaults"
+msgstr "Atjaunot noklusējumus"
+
+msgid "Retry Prompt"
+msgstr "Atkārtota mēģinājuma uzvedne"
+
+msgid "Rewriting - System Prompt"
+msgstr "Pārrakstīšana – sistēmas uzvedne"
+
+msgid "Rewriting - User Prompt"
+msgstr "Pārrakstīšana – lietotāja uzvedne"
+
+msgid "Sample Rate:"
+msgstr "Diskretizācijas frekvence:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "Mikrofona ierakstīšanas diskretizācijas frekvence (runas diktēšanas modeļiem ieteicams 16000 Hz)."
+
+msgid "Save"
+msgstr "Saglabāt"
+
+msgid "Save Error"
+msgstr "Saglabāšanas kļūda"
+
+msgid "Search failed: {error}"
+msgstr "Meklēšana neizdevās: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "Meklēšanas rezultāti, kuru kosinusa līdzība ir zem šīs vērtības, tiek paslēpti."
+
+msgid "Search your notes by meaning…"
+msgstr "Meklējiet piezīmes pēc nozīmes…"
+
+msgid "Searching…"
+msgstr "Meklē…"
+
+msgid "Select Notes Folder"
+msgstr "Izvēlieties piezīmju mapi"
+
+msgid "Select a prompt to edit..."
+msgstr "Izvēlieties uzvedni rediģēšanai..."
+
+msgid "Semantic Search"
+msgstr "Semantiskā meklēšana"
+
+msgid "Settings"
+msgstr "Iestatījumi"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "Ierakstīšanas laikā rādīt peldošo atpakaļskaitīšanas HUD pārklājumu"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "Automātiski palaist Eloquent Notes pēc pieteikšanās"
+
+msgid "Start/Stop Recording"
+msgstr "Sākt/apturēt ierakstīšanu"
+
+msgid "Startup Options"
+msgstr "Palaišanas opcijas"
+
+msgid "Stereo (2 channels)"
+msgstr "Stereo (2 kanāli)"
+
+msgid "Stop dictation"
+msgstr "Apturēt diktātu"
+
+msgid "System is busy. Please wait."
+msgstr "Sistēma ir aizņemta. Lūdzu, uzgaidiet."
+
+msgid "Tags, separated by commas"
+msgstr "Birkas, atdalītas ar komatiem"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "Mērķa valoda pārrakstītajām piezīmēm, virsrakstiem un birkām (piem., English, Latvian)."
+
+msgid "Task"
+msgstr "Uzdevums"
+
+msgid "Tasks"
+msgstr "Uzdevumi"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "Laiks, cik ilgi paturēt modeli ielādētu pēc piezīmes ģenerēšanas (piem., '0', lai izlādētu uzreiz, vai '5m')."
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "Laiks, cik ilgi paturēt modeļa svarus VRAM ierakstīšanas laikā, lai samazinātu aizturi (piem., '5m')."
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "Laiks, cik ilgi paturēt iegulšanas modeli ielādētu pēc meklēšanas (piem., '5m' vai '0')."
+
+msgid "Timeline Columns:"
+msgstr "Laika skalas kolonnas:"
+
+msgid "Title"
+msgstr "Virsraksts"
+
+msgid "Today"
+msgstr "Šodien"
+
+msgid "Transcription - System Prompt"
+msgstr "Transkripcija – sistēmas uzvedne"
+
+msgid "Transcription - User Prompt"
+msgstr "Transkripcija – lietotāja uzvedne"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "Vietējā vai attālā Ollama servera URL."
+
+msgid "Use default context length"
+msgstr "Izmantot noklusējuma konteksta garumu"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "Lietotāja konfigurācija ceļā {path} nav derīgs YAML kartējums"
+
+msgid "Validation Error"
+msgstr "Validācijas kļūda"
+
+msgid "Verbosity level for app logging."
+msgstr "Lietotnes žurnāla detalizācijas līmenis."
+
+msgid "View Log File"
+msgstr "Skatīt žurnāla failu"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "Balss diktāti, kas pārvērsti sakārtotās piezīmēs"
+
+msgid "Yesterday"
+msgstr "Vakar"
+
+msgid "← Back"
+msgstr "← Atpakaļ"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} rezultāts"
+msgstr[1] "{count} rezultāti"
+msgstr[2] "{count} rezultātu"

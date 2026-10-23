@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 
 from eloquent_notes.config import atomic_write, get_config_home, get_data_home
+from eloquent_notes.i18n import _
 
 APP_ICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
   <rect x="4" y="4" width="56" height="56" rx="14" fill="#2C4C7E"/>
@@ -81,11 +82,12 @@ def _resolve_launcher():
 
 
 def _write_desktop_entry(icon_path, exec_path):
+    comment = _("Voice dictations turned into organized notes")
     content = f"""[Desktop Entry]
 Type=Application
 Exec={exec_path} open
 Name=Eloquent Notes
-Comment=Voice dictations turned into organized notes
+Comment={comment}
 Icon={icon_path}
 Terminal=false
 Categories=Utility;
@@ -113,6 +115,7 @@ def install_autostart():
     """
     icon_path, exec_path = _resolve_launcher()
     _write_desktop_entry(icon_path, exec_path)
+    comment = _("Voice dictations turned into organized notes")
 
     content = f"""[Desktop Entry]
 Type=Application
@@ -121,7 +124,7 @@ Hidden=false
 NoDisplay=false
 X-GNOME-Autostart-enabled=true
 Name=Eloquent Notes
-Comment=Voice dictations turned into organized notes
+Comment={comment}
 Icon={icon_path}
 Categories=Utility;
 """

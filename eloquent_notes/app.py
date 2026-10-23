@@ -38,6 +38,7 @@ from eloquent_notes import (
     recording_hud,
     ui,
 )
+from eloquent_notes.i18n import _
 from eloquent_notes.logging_utils import setup_logging
 from eloquent_notes.search import SemanticIndex
 from eloquent_notes.window import MainWindow
@@ -124,34 +125,34 @@ class EloquentApp(QObject):
         self.tray.setContextMenu(self.menu)
         self.tray.activated.connect(self._on_tray_activated)
         self.tray.messageClicked.connect(self.show_window)
-        self._update_icon("gray", "Eloquent Notes (Idle)")
+        self._update_icon("gray", _("Eloquent Notes (Idle)"))
         self.tray.show()
 
     def _create_tray_menu(self):
         menu = QMenu()
 
-        toggle_action = QAction("Start/Stop Recording", menu)
+        toggle_action = QAction(_("Start/Stop Recording"), menu)
         font = toggle_action.font()
         font.setBold(True)
         toggle_action.setFont(font)
         toggle_action.triggered.connect(self.toggle_action)
         menu.addAction(toggle_action)
 
-        open_action = QAction("Open Notes", menu)
+        open_action = QAction(_("Open Notes"), menu)
         open_action.triggered.connect(self.show_window)
         menu.addAction(open_action)
 
-        settings_action = QAction("Configuration", menu)
+        settings_action = QAction(_("Configuration"), menu)
         settings_action.triggered.connect(self.show_config_dialog)
         menu.addAction(settings_action)
 
-        reload_action = QAction("Reload Configuration", menu)
+        reload_action = QAction(_("Reload Configuration"), menu)
         reload_action.triggered.connect(self.reload_config)
         menu.addAction(reload_action)
 
         menu.addSeparator()
 
-        quit_action = QAction("Quit", menu)
+        quit_action = QAction(_("Quit"), menu)
         quit_action.triggered.connect(self.exit_app)
         menu.addAction(quit_action)
 
@@ -244,7 +245,10 @@ class EloquentApp(QObject):
         if self._append_target is not None and self._append_target.path == note.path:
             self._append_target = None
         if not QFile.moveToTrash(str(note.path)):
-            self._notify("Delete Failed", f"Could not move {note.path.name} to the trash.")
+            self._notify(
+                _("Delete Failed"),
+                _("Could not move {name} to the trash.").format(name=note.path.name),
+            )
         self._refresh_window()
 
     def _start_search(self, query):
@@ -281,7 +285,7 @@ class EloquentApp(QObject):
         elif self.state == RECORDING:
             self._stop_and_process()
         else:
-            self._notify(APP_NAME, "System is busy. Please wait.")
+            self._notify(APP_NAME, _("System is busy. Please wait."))
 
     def dictate_into(self, note):
         """Start recording a dictation that will be appended to note, or stop the current one."""
@@ -310,7 +314,7 @@ class EloquentApp(QObject):
             recorder.start()
         except Exception as e:
             logger.exception("Failed to start recording")
-            self.processing_completed.emit("error", f"Could not start recording: {e}")
+            self.processing_completed.emit("error", _("Could not start recording: {error}").format(error=e))
             return
 
         self.state = RECORDING
@@ -319,7 +323,7 @@ class EloquentApp(QObject):
         self._capture_duration = float(audio_cfg["capture_duration"])
         self._recording_started_at = time.monotonic()
 
-        self._update_icon("red", "Eloquent Notes (Recording...)")
+        self._update_icon("red", _("Eloquent Notes (Recording...)"))
         if audio_cfg["recording_hud_enabled"]:
             self._hud.show_recording(self._capture_duration)
         self._tick_timer.start(100)
@@ -372,11 +376,11 @@ class EloquentApp(QObject):
             recorder.stop()
         except Exception as e:
             logger.exception("Failed to stop recording")
-            self.processing_completed.emit("error", f"Could not stop recording: {e}")
+            self.processing_completed.emit("error", _("Could not stop recording: {error}").format(error=e))
             return
 
         self._play_beep(snapshot["audio"], wait=False)
-        self._update_icon("orange", "Eloquent Notes (Processing...)")
+        self._update_icon("orange", _("Eloquent Notes (Processing...)"))
 
         self._processing_thread = threading.Thread(
             target=self._process_audio,
@@ -506,7 +510,7 @@ class EloquentApp(QObject):
             title = rewrite["title"].strip()
             content = rewrite["content"].strip()
             if not content or (not append and not title):
-                raise ValueError("Model returned empty note content")
+                raise ValueError(_("Model returned empty note content"))
             logger.info("Rewriting: title=%s", title)
 
             if append:
@@ -542,26 +546,26 @@ class EloquentApp(QObject):
 
     def _on_processing_completed(self, status, detail):
         self.state = IDLE
-        self._update_icon("gray", "Eloquent Notes (Idle)")
+        self._update_icon("gray", _("Eloquent Notes (Idle)"))
         target, self._append_target = self._append_target, None
 
         if status == "success":
             logger.info("Note saved: %s", detail)
-            self._notify("Note Saved", detail)
+            self._notify(_("Note Saved"), detail)
             self._refresh_window()
         elif status == "appended":
             self._append_dictation(target, detail)
         elif status == "empty":
             logger.info("Dictation processing finished: Audio was empty")
             self._notify(
-                "Dictation Empty",
-                "No note was created because the audio was empty.",
+                _("Dictation Empty"),
+                _("No note was created because the audio was empty."),
             )
         elif status == "error":
             logger.error("Dictation processing failed: %s", detail)
             self._notify(
-                "Processing Error",
-                f"Error processing dictation: {detail}",
+                _("Processing Error"),
+                _("Error processing dictation: {detail}").format(detail=detail),
             )
 
     def _append_dictation(self, target, text):
@@ -574,7 +578,7 @@ class EloquentApp(QObject):
                 target = self.window.reader.note
         notes.append_to_note(target, text)
         logger.info("Dictation appended to %s", target.path.name)
-        self._notify("Dictation Added", target.title)
+        self._notify(_("Dictation Added"), target.title)
         self._refresh_window()
 
     def reload_config(self):
@@ -591,14 +595,14 @@ class EloquentApp(QObject):
             logger.info("Configuration reloaded successfully")
             self._notify(
                 APP_NAME,
-                "Configuration reloaded successfully.",
+                _("Configuration reloaded successfully."),
             )
             self._refresh_window()
         except Exception as e:
             logger.exception("Failed to reload configuration")
             self._notify(
-                "Configuration Error",
-                f"Failed to reload configuration: {e}",
+                _("Configuration Error"),
+                _("Failed to reload configuration: {error}").format(error=e),
             )
 
     def show_config_dialog(self):
@@ -648,7 +652,7 @@ class EloquentApp(QObject):
 
 def main():
     """Daemon entry point — configure logging and launch the tray app."""
-    parser = argparse.ArgumentParser(description="Eloquent Notes Daemon")
+    parser = argparse.ArgumentParser(description=_("Eloquent Notes Daemon"))
     parser.add_argument(
         "command", nargs="?", choices=["toggle", "open"], metavar="command",
     )

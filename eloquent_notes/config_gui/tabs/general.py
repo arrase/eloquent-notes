@@ -22,6 +22,7 @@ from eloquent_notes.autostart import (
     is_autostart_enabled,
     remove_autostart,
 )
+from eloquent_notes.i18n import _
 from eloquent_notes.logging_utils import _LOG_LEVELS, get_log_file_path
 
 
@@ -37,40 +38,40 @@ class GeneralTab(QWidget):
         layout.setContentsMargins(15, 15, 15, 15)
         layout.setSpacing(15)
 
-        grp_startup = QGroupBox("Startup Options")
+        grp_startup = QGroupBox(_("Startup Options"))
         startup_layout = QVBoxLayout(grp_startup)
-        self.chk_autostart = QCheckBox("Start Eloquent Notes automatically on login")
+        self.chk_autostart = QCheckBox(_("Start Eloquent Notes automatically on login"))
         self.chk_autostart.setToolTip(
-            "Creates a desktop autostart entry in the XDG autostart directory"
+            _("Creates a desktop autostart entry in the XDG autostart directory")
         )
         startup_layout.addWidget(self.chk_autostart)
         layout.addWidget(grp_startup)
 
-        grp_logging = QGroupBox("Logging Settings")
+        grp_logging = QGroupBox(_("Logging Settings"))
         form_layout = QFormLayout(grp_logging)
         form_layout.setSpacing(10)
 
         self.cmb_log_level = QComboBox()
         self.cmb_log_level.addItems(list(_LOG_LEVELS))
-        self.cmb_log_level.setToolTip("Verbosity level for app logging.")
-        form_layout.addRow(QLabel("Logging Level:"), self.cmb_log_level)
+        self.cmb_log_level.setToolTip(_("Verbosity level for app logging."))
+        form_layout.addRow(QLabel(_("Logging Level:")), self.cmb_log_level)
 
         self.spn_log_max_mb = QSpinBox()
         self.spn_log_max_mb.setRange(1, 100)
-        self.spn_log_max_mb.setSuffix(" MB")
-        self.spn_log_max_mb.setToolTip("Maximum size of the log file before rotating.")
-        form_layout.addRow(QLabel("Max Log File Size:"), self.spn_log_max_mb)
+        self.spn_log_max_mb.setSuffix(_(" MB"))
+        self.spn_log_max_mb.setToolTip(_("Maximum size of the log file before rotating."))
+        form_layout.addRow(QLabel(_("Max Log File Size:")), self.spn_log_max_mb)
 
         self.spn_log_backups = QSpinBox()
         self.spn_log_backups.setRange(0, 10)
-        self.spn_log_backups.setToolTip("Number of backup log files to retain.")
-        form_layout.addRow(QLabel("Backup Count:"), self.spn_log_backups)
+        self.spn_log_backups.setToolTip(_("Number of backup log files to retain."))
+        form_layout.addRow(QLabel(_("Backup Count:")), self.spn_log_backups)
 
         layout.addWidget(grp_logging)
 
-        self.btn_view_logs = QPushButton("View Log File")
+        self.btn_view_logs = QPushButton(_("View Log File"))
         self.btn_view_logs.setToolTip(
-            "Open the background daemon log file in your system editor."
+            _("Open the background daemon log file in your system editor.")
         )
         self.btn_view_logs.clicked.connect(self._view_log_file)
         layout.addWidget(self.btn_view_logs, alignment=Qt.AlignmentFlag.AlignLeft)
@@ -82,8 +83,8 @@ class GeneralTab(QWidget):
         if not os.path.exists(log_file_path):
             QMessageBox.information(
                 self,
-                "Log File",
-                "Log file does not exist yet. Run some dictations first!",
+                _("Log File"),
+                _("Log file does not exist yet. Run some dictations first!"),
             )
             return
 

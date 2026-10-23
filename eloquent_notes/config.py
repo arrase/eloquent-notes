@@ -10,6 +10,8 @@ import shutil
 
 import yaml
 
+from eloquent_notes.i18n import _
+
 
 def get_config_home():
     """Return the XDG base directory for user configuration files."""
@@ -80,7 +82,7 @@ def _validate_override(key: str, value, default_val) -> None:
         return
     expected = (int, float) if type(default_val) is float else (type(default_val),)
     if type(value) not in expected:
-        raise TypeError(f"Invalid configuration value for '{key}'")
+        raise TypeError(_("Invalid configuration value for '{key}'").format(key=key))
 
 
 def _merge_configs(base: dict, overrides: dict) -> dict:
@@ -91,7 +93,9 @@ def _merge_configs(base: dict, overrides: dict) -> dict:
         if isinstance(default_val, dict):
             if not isinstance(v, dict):
                 raise TypeError(
-                    f"Configuration section '{k}' must be a mapping, got {type(v).__name__}"
+                    _("Configuration section '{key}' must be a mapping, got {type_name}").format(
+                        key=k, type_name=type(v).__name__
+                    )
                 )
             result[k] = _merge_configs(default_val, v)
         else:
@@ -132,7 +136,7 @@ def load_config():
     if user_config is None:
         user_config = {}
     elif not isinstance(user_config, dict):
-        raise TypeError(f"User config at {CONFIG_PATH} is not a valid YAML mapping")
+        raise TypeError(_("User config at {path} is not a valid YAML mapping").format(path=CONFIG_PATH))
 
     return _merge_configs(default_config, user_config)
 

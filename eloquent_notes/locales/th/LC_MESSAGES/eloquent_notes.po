@@ -1,0 +1,522 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: th\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid " Hz"
+msgstr " Hz"
+
+msgid " MB"
+msgstr " MB"
+
+msgid " sec"
+msgstr " วินาที"
+
+msgid "AI Model (Audio):"
+msgstr "โมเดล AI (เสียง):"
+
+msgid "AI Model cannot be empty."
+msgstr "โมเดล AI ต้องไม่เว้นว่าง"
+
+msgid "AI Settings"
+msgstr "การตั้งค่า AI"
+
+msgid "Add dictation"
+msgstr "เพิ่มการป้อนด้วยเสียง"
+
+msgid "Alias for 'toggle' command."
+msgstr "ชื่อเรียกแทนสำหรับคำสั่ง 'toggle'"
+
+msgid "All"
+msgstr "ทั้งหมด"
+
+msgid "All tags"
+msgstr "แท็กทั้งหมด"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "คุณแน่ใจหรือไม่ว่าต้องการคืนค่าการตั้งค่ากำหนดค่าและพรอมต์ทั้งหมดเป็นค่าเริ่มต้น?\n\nการดำเนินการนี้จะเขียนทับการแก้ไขปัจจุบัน"
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "ส่งเสียงบี๊บแจ้งเตือนเมื่อเริ่ม/หยุดการบันทึกเสียง"
+
+msgid "Audio"
+msgstr "เสียง"
+
+msgid "Audio Capture Settings"
+msgstr "การตั้งค่าการบันทึกเสียง"
+
+msgid "Audio Channels:"
+msgstr "ช่องสัญญาณเสียง:"
+
+msgid "Backup Count:"
+msgstr "จำนวนไฟล์สำรอง:"
+
+msgid "Beep Duration:"
+msgstr "ระยะเวลาเสียงบี๊บ:"
+
+msgid "Beep Frequency:"
+msgstr "ความถี่เสียงบี๊บ:"
+
+msgid "Browse..."
+msgstr "เรียกดู..."
+
+msgid "Cancel"
+msgstr "ยกเลิก"
+
+msgid "Capture Duration:"
+msgstr "ระยะเวลาการบันทึก:"
+
+msgid "Classification - System Prompt"
+msgstr "การจัดหมวดหมู่ - พรอมต์ระบบ"
+
+msgid "Classification - User Prompt"
+msgstr "การจัดหมวดหมู่ - พรอมต์ผู้ใช้"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "คำสั่งที่จะดำเนินการ: 'install-autostart', 'toggle', 'open' (แสดงหน้าต่างโน้ต) หรือ 'config' (เปิด GUI การกำหนดค่า)"
+
+msgid "Configuration"
+msgstr "การกำหนดค่า"
+
+msgid "Configuration Error"
+msgstr "ข้อผิดพลาดในการกำหนดค่า"
+
+msgid "Configuration reloaded successfully."
+msgstr "โหลดการกำหนดค่าซ้ำสำเร็จแล้ว"
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "ส่วนการกำหนดค่า '{key}' ต้องเป็นแมปปิง แต่ได้รับ {type_name}"
+
+msgid "Connection failed: {error}"
+msgstr "การเชื่อมต่อล้มเหลว: {error}"
+
+msgid "Context Length:"
+msgstr "ความยาวบริบท:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "ความยาวบริบทเป็นโทเค็นที่จะส่งไปยัง Ollama ค่าที่มากขึ้นช่วยให้ป้อนด้วยเสียงได้ยาวขึ้นแต่ใช้หน่วยความจำมากขึ้น"
+
+msgid "Copy"
+msgstr "คัดลอก"
+
+msgid "Could not move {name} to the trash."
+msgstr "ไม่สามารถย้าย {name} ไปยังถังขยะได้"
+
+msgid "Could not start recording: {error}"
+msgstr "ไม่สามารถเริ่มการบันทึกเสียงได้: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "ไม่สามารถหยุดการบันทึกเสียงได้: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "สร้างรายการเริ่มทำงานอัตโนมัติของเดสก์ท็อปในไดเรกทอรี XDG autostart"
+
+msgid "Decision"
+msgstr "การตัดสินใจ"
+
+msgid "Decisions"
+msgstr "การตัดสินใจ"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "คืนค่าเริ่มต้นแล้ว คลิก 'บันทึก' เพื่อนำการเปลี่ยนแปลงไปใช้กับดิสก์"
+
+msgid "Delete"
+msgstr "ลบ"
+
+msgid "Delete Failed"
+msgstr "การลบล้มเหลว"
+
+msgid "Delete Note"
+msgstr "ลบโน้ต"
+
+msgid "Dictation Added"
+msgstr "เพิ่มการป้อนด้วยเสียงแล้ว"
+
+msgid "Dictation Empty"
+msgstr "การป้อนด้วยเสียงว่างเปล่า"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "แสดงโอเวอร์เลย์ลอยตัวพร้อมตัวนับเวลาถอยหลังและแถบความคืบหน้าขณะป้อนด้วยเสียง"
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (ว่าง)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (กำลังประมวลผล...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (กำลังบันทึกเสียง...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes - ยูทิลิตี้ถาดระบบ Linux ที่เปลี่ยนการป้อนด้วยเสียงแบบออฟไลน์ให้เป็นโน้ตที่เป็นระเบียบ"
+
+msgid "Eloquent Notes Configuration"
+msgstr "การกำหนดค่า Eloquent Notes"
+
+msgid "Eloquent Notes Daemon"
+msgstr "ดีมอน Eloquent Notes"
+
+msgid "Embedding Model cannot be empty."
+msgstr "โมเดล Embedding ต้องไม่เว้นว่าง"
+
+msgid "Embedding Model:"
+msgstr "โมเดล Embedding:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "เกิดข้อผิดพลาดในการประมวลผลการป้อนด้วยเสียง: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "โหลดการกำหนดค่าผู้ใช้ล้มเหลว: {error}\n\nโหลดการตั้งค่าเริ่มต้นแล้ว"
+
+msgid "Failed to reload configuration: {error}"
+msgstr "โหลดการกำหนดค่าซ้ำล้มเหลว: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "บันทึกการตั้งค่าล้มเหลว: {error}"
+
+msgid "Fetching models..."
+msgstr "กำลังดึงข้อมูลโมเดล..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "โฟลเดอร์ที่บันทึกโน้ตเสียงแต่ละรายการเป็นไฟล์ Markdown ชี้ไปที่ภายในคลัง Obsidian เพื่อดูโน้ตของคุณที่นั่นด้วย"
+
+msgid "General"
+msgstr "ทั่วไป"
+
+msgid "Idea"
+msgstr "ไอเดีย"
+
+msgid "Ideas"
+msgstr "ไอเดีย"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "หากเลือก จะตั้งค่า context_length เป็น null (หรือปล่อยว่างไว้) เพื่อสั่งให้ Ollama ใช้ความยาวบริบทสูงสุดเริ่มต้นของโมเดล"
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "รูปแบบ Keep Alive ไม่ถูกต้อง: '{value}' ต้องเป็นจำนวนเต็มหรือระยะเวลา (เช่น 5m, 10s, 1h, 0, -1)"
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "รูปแบบ Preload Keep Alive ไม่ถูกต้อง: '{value}' ต้องเป็นจำนวนเต็มหรือระยะเวลา (เช่น 5m, 10s, 1h, 0, -1)"
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "รูปแบบ Search Keep Alive ไม่ถูกต้อง: '{value}' ต้องเป็นจำนวนเต็มหรือระยะเวลา (เช่น 5m, 10s, 1h, 0, -1)"
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "ค่าการกำหนดค่าไม่ถูกต้องสำหรับ '{key}'"
+
+msgid "Keep Alive Time:"
+msgstr "เวลา Keep Alive:"
+
+msgid "Log File"
+msgstr "ไฟล์บันทึก (Log)"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "ยังไม่มีไฟล์บันทึก ลองป้อนด้วยเสียงสักครู่ก่อน!"
+
+msgid "Logging Level:"
+msgstr "ระดับการบันทึก:"
+
+msgid "Logging Settings"
+msgstr "การตั้งค่าการบันทึก"
+
+msgid "Max Log File Size:"
+msgstr "ขนาดไฟล์บันทึกสูงสุด:"
+
+msgid "Max Retries:"
+msgstr "จำนวนครั้งที่ลองใหม่สูงสุด:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "ระยะเวลาสูงสุดเป็นวินาทีสำหรับการบันทึกเสียงก่อนที่จะประมวลผลโดยอัตโนมัติ"
+
+msgid "Maximum size of the log file before rotating."
+msgstr "ขนาดสูงสุดของไฟล์บันทึกก่อนที่จะหมุนเวียนไฟล์"
+
+msgid "Minimum Similarity:"
+msgstr "ความคล้ายคลึงขั้นต่ำ:"
+
+msgid "Model returned empty note content"
+msgstr "โมเดลส่งคืนเนื้อหาโน้ตที่ว่างเปล่า"
+
+msgid "Models loaded successfully."
+msgstr "โหลดโมเดลสำเร็จแล้ว"
+
+msgid "Mono (1 channel)"
+msgstr "โมโน (1 ช่องสัญญาณ)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "ย้าย “{title}” ไปยังถังขยะหรือไม่?"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "ชื่อของโมเดล Ollama LLM ที่จะใช้สำหรับงานป้อนด้วยเสียง (เช่น gemma4:e4b-it-qat)"
+
+msgid "No audio-capable models found."
+msgstr "ไม่พบโมเดลที่รองรับเสียง"
+
+msgid "No matching notes."
+msgstr "ไม่มีโน้ตที่ตรงกัน"
+
+msgid "No note was created because the audio was empty."
+msgstr "ไม่ได้สร้างโน้ตเนื่องจากไม่มีเสียง"
+
+msgid "No notes match these filters."
+msgstr "ไม่มีโน้ตที่ตรงกับตัวกรองเหล่านี้"
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "ยังไม่มีโน้ต คลิกไอคอนบนถาดระบบเพื่อบันทึกโน้ตแรกของคุณ"
+
+msgid "Note"
+msgstr "โน้ต"
+
+msgid "Note Saved"
+msgstr "บันทึกโน้ตแล้ว"
+
+msgid "Notes"
+msgstr "โน้ต"
+
+msgid "Notes Folder cannot be empty."
+msgstr "โฟลเดอร์โน้ตต้องไม่เว้นว่าง"
+
+msgid "Notes Folder:"
+msgstr "โฟลเดอร์โน้ต:"
+
+msgid "Notes Storage"
+msgstr "ที่เก็บโน้ต"
+
+msgid "Number of audio input channels."
+msgstr "จำนวนช่องสัญญาณเสียงเข้า"
+
+msgid "Number of backup log files to retain."
+msgstr "จำนวนไฟล์บันทึกสำรองที่จะเก็บไว้"
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "จำนวนคอลัมน์ในตารางไทม์ไลน์ของโน้ต"
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "จำนวนครั้งที่จะลองใหม่หากเอาต์พุต LLM แยกวิเคราะห์ JSON ล้มเหลว"
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "การตั้งค่า Ollama && ไปป์ไลน์ AI"
+
+msgid "Ollama URL cannot be empty."
+msgstr "URL ของ Ollama ต้องไม่เว้นว่าง"
+
+msgid "Ollama URL is empty."
+msgstr "URL ของ Ollama ว่างเปล่า"
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "URL ของ Ollama ต้องขึ้นต้นด้วย http:// หรือ https://"
+
+msgid "Ollama URL:"
+msgstr "URL ของ Ollama:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "โมเดล Embedding ของ Ollama ที่ใช้ค้นหาโน้ตตามความหมาย (เช่น embeddinggemma-2:latest)"
+
+msgid "Open Notes"
+msgstr "เปิดโน้ต"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "เปิดไฟล์บันทึกของดีมอนเบื้องหลังในโปรแกรมแก้ไขของระบบ"
+
+msgid "Output Language cannot be empty."
+msgstr "ภาษาผลลัพธ์ต้องไม่เว้นว่าง"
+
+msgid "Output Language:"
+msgstr "ภาษาผลลัพธ์:"
+
+msgid "Play beep on recording start and stop"
+msgstr "เล่นเสียงบี๊บเมื่อเริ่มและหยุดการบันทึกเสียง"
+
+msgid "Preload Keep Alive:"
+msgstr "Preload Keep Alive:"
+
+msgid "Preload Timeout:"
+msgstr "หมดเวลาโหลดล่วงหน้า:"
+
+msgid "Processing Error"
+msgstr "ข้อผิดพลาดในการประมวลผล"
+
+msgid "Processing…"
+msgstr "กำลังประมวลผล…"
+
+msgid "Prompt Content:"
+msgstr "เนื้อหาพรอมต์:"
+
+msgid "Prompts"
+msgstr "พรอมต์"
+
+msgid "Prompts:"
+msgstr "พรอมต์:"
+
+msgid "Question"
+msgstr "คำถาม"
+
+msgid "Questions"
+msgstr "คำถาม"
+
+msgid "Quit"
+msgstr "ออก"
+
+msgid "Ready"
+msgstr "พร้อม"
+
+msgid "Recording Note..."
+msgstr "กำลังบันทึกโน้ต..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "กำลังบันทึกเสียง — คลิกเพื่อหยุดและประมวลผลโน้ต"
+
+msgid "Refresh"
+msgstr "รีเฟรช"
+
+msgid "Reload Configuration"
+msgstr "โหลดการกำหนดค่าซ้ำ"
+
+msgid "Reminder"
+msgstr "การเตือนความจำ"
+
+msgid "Reminders"
+msgstr "การเตือนความจำ"
+
+msgid "Request Timeout:"
+msgstr "หมดเวลาคำขอ:"
+
+msgid "Restore Defaults"
+msgstr "คืนค่าเริ่มต้น"
+
+msgid "Retry Prompt"
+msgstr "พรอมต์ลองใหม่"
+
+msgid "Rewriting - System Prompt"
+msgstr "การเขียนใหม่ - พรอมต์ระบบ"
+
+msgid "Rewriting - User Prompt"
+msgstr "การเขียนใหม่ - พรอมต์ผู้ใช้"
+
+msgid "Sample Rate:"
+msgstr "อัตราสุ่มสัญญาณ:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "อัตราสุ่มสัญญาณสำหรับการบันทึกไมโครโฟน (แนะนำ 16000 Hz สำหรับโมเดลป้อนด้วยเสียง)"
+
+msgid "Save"
+msgstr "บันทึก"
+
+msgid "Save Error"
+msgstr "ข้อผิดพลาดในการบันทึก"
+
+msgid "Search failed: {error}"
+msgstr "การค้นหาล้มเหลว: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "ผลการค้นหาที่มีความคล้ายคลึงโคไซน์ต่ำกว่าค่านี้จะถูกซ่อน"
+
+msgid "Search your notes by meaning…"
+msgstr "ค้นหาโน้ตของคุณตามความหมาย…"
+
+msgid "Searching…"
+msgstr "กำลังค้นหา…"
+
+msgid "Select Notes Folder"
+msgstr "เลือกโฟลเดอร์โน้ต"
+
+msgid "Select a prompt to edit..."
+msgstr "เลือกพรอมต์เพื่อแก้ไข..."
+
+msgid "Semantic Search"
+msgstr "การค้นหาเชิงความหมาย"
+
+msgid "Settings"
+msgstr "การตั้งค่า"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "แสดงโอเวอร์เลย์ HUD นับถอยหลังแบบลอยตัวระหว่างการบันทึกเสียง"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "เริ่ม Eloquent Notes อัตโนมัติเมื่อเข้าสู่ระบบ"
+
+msgid "Start/Stop Recording"
+msgstr "เริ่ม/หยุดการบันทึกเสียง"
+
+msgid "Startup Options"
+msgstr "ตัวเลือกการเริ่มระบบ"
+
+msgid "Stereo (2 channels)"
+msgstr "สเตอริโอ (2 ช่องสัญญาณ)"
+
+msgid "Stop dictation"
+msgstr "หยุดการป้อนด้วยเสียง"
+
+msgid "System is busy. Please wait."
+msgstr "ระบบกำลังทำงานอยู่ โปรดรอสักครู่"
+
+msgid "Tags, separated by commas"
+msgstr "แท็ก คั่นด้วยเครื่องหมายจุลภาค"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "ภาษาเป้าหมายสำหรับโน้ต ชื่อเรื่อง และแท็กที่เขียนใหม่ (เช่น English, Spanish)"
+
+msgid "Task"
+msgstr "งาน"
+
+msgid "Tasks"
+msgstr "งาน"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "เวลาที่จะคงโมเดลไว้ในหน่วยความจำหลังจากสร้างโน้ต (เช่น '0' เพื่อยกเลิกการโหลดทันที หรือ '5m')"
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "เวลาที่จะคงน้ำหนักโมเดลไว้ใน VRAM ระหว่างการบันทึกเสียงเพื่อลดความหน่วง (เช่น '5m')"
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "เวลาที่จะคงโมเดล Embedding ไว้หลังจากการค้นหา (เช่น '5m' หรือ '0')"
+
+msgid "Timeline Columns:"
+msgstr "คอลัมน์ไทม์ไลน์:"
+
+msgid "Title"
+msgstr "ชื่อเรื่อง"
+
+msgid "Today"
+msgstr "วันนี้"
+
+msgid "Transcription - System Prompt"
+msgstr "การถอดความ - พรอมต์ระบบ"
+
+msgid "Transcription - User Prompt"
+msgstr "การถอดความ - พรอมต์ผู้ใช้"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "URL ของเซิร์ฟเวอร์ Ollama ในเครื่องหรือระยะไกลของคุณ"
+
+msgid "Use default context length"
+msgstr "ใช้ความยาวบริบทเริ่มต้น"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "การกำหนดค่าผู้ใช้ที่ {path} ไม่ใช่แมปปิง YAML ที่ถูกต้อง"
+
+msgid "Validation Error"
+msgstr "ข้อผิดพลาดในการตรวจสอบ"
+
+msgid "Verbosity level for app logging."
+msgstr "ระดับความละเอียดสำหรับการบันทึกของแอป"
+
+msgid "View Log File"
+msgstr "ดูไฟล์บันทึก"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "เปลี่ยนการป้อนด้วยเสียงให้เป็นโน้ตที่เป็นระเบียบ"
+
+msgid "Yesterday"
+msgstr "เมื่อวาน"
+
+msgid "← Back"
+msgstr "← กลับ"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "ผลลัพธ์ {count} รายการ"

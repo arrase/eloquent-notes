@@ -1,0 +1,522 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: ms\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid " Hz"
+msgstr " Hz"
+
+msgid " MB"
+msgstr " MB"
+
+msgid " sec"
+msgstr " saat"
+
+msgid "AI Model (Audio):"
+msgstr "Model AI (Audio):"
+
+msgid "AI Model cannot be empty."
+msgstr "Model AI tidak boleh kosong."
+
+msgid "AI Settings"
+msgstr "Tetapan AI"
+
+msgid "Add dictation"
+msgstr "Tambah imlak"
+
+msgid "Alias for 'toggle' command."
+msgstr "Alias untuk perintah 'toggle'."
+
+msgid "All"
+msgstr "Semua"
+
+msgid "All tags"
+msgstr "Semua tag"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "Adakah anda pasti mahu memulihkan semua tetapan konfigurasi dan prompt kepada nilai lalai?\n\nIni akan menulis ganti suntingan semasa."
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "Bunyi bip maklum balas apabila memulakan/menghentikan rakaman."
+
+msgid "Audio"
+msgstr "Audio"
+
+msgid "Audio Capture Settings"
+msgstr "Tetapan Rakaman Audio"
+
+msgid "Audio Channels:"
+msgstr "Saluran Audio:"
+
+msgid "Backup Count:"
+msgstr "Bilangan Sandaran:"
+
+msgid "Beep Duration:"
+msgstr "Tempoh Bip:"
+
+msgid "Beep Frequency:"
+msgstr "Frekuensi Bip:"
+
+msgid "Browse..."
+msgstr "Semak imbas..."
+
+msgid "Cancel"
+msgstr "Batal"
+
+msgid "Capture Duration:"
+msgstr "Tempoh Rakaman:"
+
+msgid "Classification - System Prompt"
+msgstr "Klasifikasi - Prompt Sistem"
+
+msgid "Classification - User Prompt"
+msgstr "Klasifikasi - Prompt Pengguna"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "Perintah untuk dilaksanakan: 'install-autostart', 'toggle', 'open' (tunjukkan tetingkap nota), atau 'config' (buka GUI konfigurasi)."
+
+msgid "Configuration"
+msgstr "Konfigurasi"
+
+msgid "Configuration Error"
+msgstr "Ralat Konfigurasi"
+
+msgid "Configuration reloaded successfully."
+msgstr "Konfigurasi berjaya dimuat semula."
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "Bahagian konfigurasi '{key}' mestilah pemetaan, mendapat {type_name}"
+
+msgid "Connection failed: {error}"
+msgstr "Sambungan gagal: {error}"
+
+msgid "Context Length:"
+msgstr "Panjang Konteks:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "Panjang konteks dalam token untuk dihantar ke Ollama. Nilai yang lebih besar membolehkan imlak yang lebih panjang tetapi menggunakan lebih banyak memori."
+
+msgid "Copy"
+msgstr "Salin"
+
+msgid "Could not move {name} to the trash."
+msgstr "Tidak dapat mengalihkan {name} ke tong sampah."
+
+msgid "Could not start recording: {error}"
+msgstr "Tidak dapat memulakan rakaman: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "Tidak dapat menghentikan rakaman: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "Mencipta entri mula automatik desktop dalam direktori mula automatik XDG"
+
+msgid "Decision"
+msgstr "Keputusan"
+
+msgid "Decisions"
+msgstr "Keputusan"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "Lalai dipulihkan. Klik 'Simpan' untuk menggunakan perubahan pada cakera."
+
+msgid "Delete"
+msgstr "Padam"
+
+msgid "Delete Failed"
+msgstr "Gagal Memadam"
+
+msgid "Delete Note"
+msgstr "Padam Nota"
+
+msgid "Dictation Added"
+msgstr "Imlak Ditambah"
+
+msgid "Dictation Empty"
+msgstr "Imlak Kosong"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "Memaparkan tindihan kapsul terapung yang kemas dengan pemasa kira detik langsung dan bar kemajuan semasa mengimlak."
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (Melahu)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (Memproses...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (Merakam...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes - Utiliti dulang sistem Linux yang menukar imlak suara luar talian kepada nota yang tersusun."
+
+msgid "Eloquent Notes Configuration"
+msgstr "Konfigurasi Eloquent Notes"
+
+msgid "Eloquent Notes Daemon"
+msgstr "Daemon Eloquent Notes"
+
+msgid "Embedding Model cannot be empty."
+msgstr "Model Pembenaman tidak boleh kosong."
+
+msgid "Embedding Model:"
+msgstr "Model Pembenaman:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "Ralat memproses imlak: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "Gagal memuatkan konfigurasi pengguna: {error}\n\nTetapan lalai telah dimuatkan."
+
+msgid "Failed to reload configuration: {error}"
+msgstr "Gagal memuat semula konfigurasi: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "Gagal menyimpan tetapan: {error}"
+
+msgid "Fetching models..."
+msgstr "Mendapatkan model..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "Folder tempat setiap nota suara disimpan sebagai fail Markdown. Halakannya ke dalam peti besi Obsidian untuk melihat nota anda di sana juga."
+
+msgid "General"
+msgstr "Umum"
+
+msgid "Idea"
+msgstr "Idea"
+
+msgid "Ideas"
+msgstr "Idea"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "Jika ditandakan, menetapkan context_length kepada null (atau membiarkannya tidak ditetapkan), mengarahkan Ollama menggunakan panjang konteks maksimum lalai model."
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Format Keep Alive tidak sah: '{value}'. Mestilah integer atau tempoh (cth., 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Format Preload Keep Alive tidak sah: '{value}'. Mestilah integer atau tempoh (cth., 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Format Search Keep Alive tidak sah: '{value}'. Mestilah integer atau tempoh (cth., 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "Nilai konfigurasi tidak sah untuk '{key}'"
+
+msgid "Keep Alive Time:"
+msgstr "Masa Keep Alive:"
+
+msgid "Log File"
+msgstr "Fail Log"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "Fail log belum wujud lagi. Jalankan beberapa imlak dahulu!"
+
+msgid "Logging Level:"
+msgstr "Tahap Log:"
+
+msgid "Logging Settings"
+msgstr "Tetapan Log"
+
+msgid "Max Log File Size:"
+msgstr "Saiz Fail Log Maks:"
+
+msgid "Max Retries:"
+msgstr "Cuba Semula Maks:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "Tempoh maksimum dalam saat untuk rakaman audio sebelum diproses secara automatik."
+
+msgid "Maximum size of the log file before rotating."
+msgstr "Saiz maksimum fail log sebelum digilirkan."
+
+msgid "Minimum Similarity:"
+msgstr "Persamaan Minimum:"
+
+msgid "Model returned empty note content"
+msgstr "Model mengembalikan kandungan nota kosong"
+
+msgid "Models loaded successfully."
+msgstr "Model berjaya dimuatkan."
+
+msgid "Mono (1 channel)"
+msgstr "Mono (1 saluran)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "Alihkan “{title}” ke tong sampah?"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "Nama model LLM Ollama untuk dijalankan bagi tugas imlak (cth. gemma4:e4b-it-qat)."
+
+msgid "No audio-capable models found."
+msgstr "Tiada model berkeupayaan audio ditemui."
+
+msgid "No matching notes."
+msgstr "Tiada nota yang sepadan."
+
+msgid "No note was created because the audio was empty."
+msgstr "Tiada nota dicipta kerana audio kosong."
+
+msgid "No notes match these filters."
+msgstr "Tiada nota sepadan dengan penapis ini."
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "Belum ada nota lagi. Klik ikon dulang untuk merakam nota pertama anda."
+
+msgid "Note"
+msgstr "Nota"
+
+msgid "Note Saved"
+msgstr "Nota Disimpan"
+
+msgid "Notes"
+msgstr "Nota"
+
+msgid "Notes Folder cannot be empty."
+msgstr "Folder Nota tidak boleh kosong."
+
+msgid "Notes Folder:"
+msgstr "Folder Nota:"
+
+msgid "Notes Storage"
+msgstr "Storan Nota"
+
+msgid "Number of audio input channels."
+msgstr "Bilangan saluran input audio."
+
+msgid "Number of backup log files to retain."
+msgstr "Bilangan fail log sandaran untuk disimpan."
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "Bilangan lajur dalam grid garis masa nota."
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "Bilangan percubaan semula jika output LLM gagal menghurai JSON."
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "Tetapan Ollama && Saluran Paip AI"
+
+msgid "Ollama URL cannot be empty."
+msgstr "URL Ollama tidak boleh kosong."
+
+msgid "Ollama URL is empty."
+msgstr "URL Ollama kosong."
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "URL Ollama mesti bermula dengan http:// atau https://."
+
+msgid "Ollama URL:"
+msgstr "URL Ollama:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "Model pembenaman Ollama yang digunakan untuk mencari nota mengikut maksud (cth. embeddinggemma-2:latest)."
+
+msgid "Open Notes"
+msgstr "Buka Nota"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "Buka fail log daemon latar belakang dalam editor sistem anda."
+
+msgid "Output Language cannot be empty."
+msgstr "Bahasa Output tidak boleh kosong."
+
+msgid "Output Language:"
+msgstr "Bahasa Output:"
+
+msgid "Play beep on recording start and stop"
+msgstr "Mainkan bunyi bip apabila rakaman bermula dan berhenti"
+
+msgid "Preload Keep Alive:"
+msgstr "Preload Keep Alive:"
+
+msgid "Preload Timeout:"
+msgstr "Tamat Masa Preload:"
+
+msgid "Processing Error"
+msgstr "Ralat Pemprosesan"
+
+msgid "Processing…"
+msgstr "Memproses…"
+
+msgid "Prompt Content:"
+msgstr "Kandungan Prompt:"
+
+msgid "Prompts"
+msgstr "Prompt"
+
+msgid "Prompts:"
+msgstr "Prompt:"
+
+msgid "Question"
+msgstr "Soalan"
+
+msgid "Questions"
+msgstr "Soalan"
+
+msgid "Quit"
+msgstr "Keluar"
+
+msgid "Ready"
+msgstr "Sedia"
+
+msgid "Recording Note..."
+msgstr "Merakam Nota..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "Rakaman sedang berjalan — klik untuk berhenti dan memproses nota"
+
+msgid "Refresh"
+msgstr "Muat Semula"
+
+msgid "Reload Configuration"
+msgstr "Muat Semula Konfigurasi"
+
+msgid "Reminder"
+msgstr "Peringatan"
+
+msgid "Reminders"
+msgstr "Peringatan"
+
+msgid "Request Timeout:"
+msgstr "Tamat Masa Permintaan:"
+
+msgid "Restore Defaults"
+msgstr "Pulihkan Lalai"
+
+msgid "Retry Prompt"
+msgstr "Prompt Cuba Semula"
+
+msgid "Rewriting - System Prompt"
+msgstr "Penulisan Semula - Prompt Sistem"
+
+msgid "Rewriting - User Prompt"
+msgstr "Penulisan Semula - Prompt Pengguna"
+
+msgid "Sample Rate:"
+msgstr "Kadar Sampel:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "Kadar sampel untuk rakaman mikrofon (16000 Hz disyorkan untuk model imlak pertuturan)."
+
+msgid "Save"
+msgstr "Simpan"
+
+msgid "Save Error"
+msgstr "Ralat Menyimpan"
+
+msgid "Search failed: {error}"
+msgstr "Carian gagal: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "Hasil carian di bawah persamaan kosinus ini disembunyikan."
+
+msgid "Search your notes by meaning…"
+msgstr "Cari nota anda mengikut maksud…"
+
+msgid "Searching…"
+msgstr "Mencari…"
+
+msgid "Select Notes Folder"
+msgstr "Pilih Folder Nota"
+
+msgid "Select a prompt to edit..."
+msgstr "Pilih prompt untuk disunting..."
+
+msgid "Semantic Search"
+msgstr "Carian Semantik"
+
+msgid "Settings"
+msgstr "Tetapan"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "Tunjukkan tindihan HUD kira detik terapung semasa rakaman"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "Mulakan Eloquent Notes secara automatik semasa log masuk"
+
+msgid "Start/Stop Recording"
+msgstr "Mula/Hentikan Rakaman"
+
+msgid "Startup Options"
+msgstr "Pilihan Permulaan"
+
+msgid "Stereo (2 channels)"
+msgstr "Stereo (2 saluran)"
+
+msgid "Stop dictation"
+msgstr "Hentikan imlak"
+
+msgid "System is busy. Please wait."
+msgstr "Sistem sedang sibuk. Sila tunggu."
+
+msgid "Tags, separated by commas"
+msgstr "Tag, dipisahkan dengan koma"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "Bahasa sasaran untuk nota, tajuk dan tag yang ditulis semula (cth. English, Spanish)."
+
+msgid "Task"
+msgstr "Tugas"
+
+msgid "Tasks"
+msgstr "Tugas"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "Masa untuk memastikan model kekal dimuatkan selepas penjanaan nota (cth., '0' untuk nyahmuat serta-merta, atau '5m')."
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "Masa untuk memastikan pemberat model kekal dimuatkan dalam VRAM semasa rakaman bagi meminimumkan kependaman (cth., '5m')."
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "Masa untuk memastikan model pembenaman kekal dimuatkan selepas carian (cth., '5m' atau '0')."
+
+msgid "Timeline Columns:"
+msgstr "Lajur Garis Masa:"
+
+msgid "Title"
+msgstr "Tajuk"
+
+msgid "Today"
+msgstr "Hari Ini"
+
+msgid "Transcription - System Prompt"
+msgstr "Transkripsi - Prompt Sistem"
+
+msgid "Transcription - User Prompt"
+msgstr "Transkripsi - Prompt Pengguna"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "URL pelayan Ollama tempatan atau jauh anda."
+
+msgid "Use default context length"
+msgstr "Gunakan panjang konteks lalai"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "Konfigurasi pengguna di {path} bukan pemetaan YAML yang sah"
+
+msgid "Validation Error"
+msgstr "Ralat Pengesahan"
+
+msgid "Verbosity level for app logging."
+msgstr "Tahap perincian untuk pengelogan aplikasi."
+
+msgid "View Log File"
+msgstr "Lihat Fail Log"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "Imlak suara ditukar menjadi nota yang tersusun"
+
+msgid "Yesterday"
+msgstr "Semalam"
+
+msgid "← Back"
+msgstr "← Kembali"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} hasil"

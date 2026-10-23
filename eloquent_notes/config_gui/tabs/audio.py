@@ -12,6 +12,8 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from eloquent_notes.i18n import _
+
 
 class AudioTab(QWidget):
     """Audio configuration tab."""
@@ -25,55 +27,55 @@ class AudioTab(QWidget):
         layout.setContentsMargins(15, 15, 15, 15)
         layout.setSpacing(15)
 
-        grp_audio = QGroupBox("Audio Capture Settings")
+        grp_audio = QGroupBox(_("Audio Capture Settings"))
         form_layout = QFormLayout(grp_audio)
         form_layout.setSpacing(10)
 
         self.spn_sample_rate = QSpinBox()
         self.spn_sample_rate.setRange(8000, 96000)
         self.spn_sample_rate.setSingleStep(8000)
-        self.spn_sample_rate.setSuffix(" Hz")
+        self.spn_sample_rate.setSuffix(_(" Hz"))
         self.spn_sample_rate.setToolTip(
-            "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+            _("Sample rate for microphone recording (16000 Hz is recommended for speech dictation models).")
         )
-        form_layout.addRow(QLabel("Sample Rate:"), self.spn_sample_rate)
+        form_layout.addRow(QLabel(_("Sample Rate:")), self.spn_sample_rate)
 
         self.cmb_channels = QComboBox()
-        self.cmb_channels.addItems(["Mono (1 channel)", "Stereo (2 channels)"])
-        self.cmb_channels.setToolTip("Number of audio input channels.")
-        form_layout.addRow(QLabel("Audio Channels:"), self.cmb_channels)
+        self.cmb_channels.addItems([_("Mono (1 channel)"), _("Stereo (2 channels)")])
+        self.cmb_channels.setToolTip(_("Number of audio input channels."))
+        form_layout.addRow(QLabel(_("Audio Channels:")), self.cmb_channels)
 
         self.spn_capture_duration = QSpinBox()
         self.spn_capture_duration.setRange(1, 3600)
         self.spn_capture_duration.setSingleStep(5)
-        self.spn_capture_duration.setSuffix(" sec")
+        self.spn_capture_duration.setSuffix(_(" sec"))
         self.spn_capture_duration.setToolTip(
-            "Maximum duration in seconds for audio recording before automatically processing."
+            _("Maximum duration in seconds for audio recording before automatically processing.")
         )
-        form_layout.addRow(QLabel("Capture Duration:"), self.spn_capture_duration)
+        form_layout.addRow(QLabel(_("Capture Duration:")), self.spn_capture_duration)
 
-        self.chk_recording_hud_enabled = QCheckBox("Show floating countdown HUD overlay during recording")
+        self.chk_recording_hud_enabled = QCheckBox(_("Show floating countdown HUD overlay during recording"))
         self.chk_recording_hud_enabled.setToolTip(
-            "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+            _("Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating.")
         )
         form_layout.addRow(self.chk_recording_hud_enabled)
 
-        self.chk_beep_enabled = QCheckBox("Play beep on recording start and stop")
-        self.chk_beep_enabled.setToolTip("Audible feedback beeps when starting/stopping recording.")
+        self.chk_beep_enabled = QCheckBox(_("Play beep on recording start and stop"))
+        self.chk_beep_enabled.setToolTip(_("Audible feedback beeps when starting/stopping recording."))
         self.chk_beep_enabled.toggled.connect(self._toggle_beep_controls)
         form_layout.addRow(self.chk_beep_enabled)
 
         self.spn_beep_freq = QSpinBox()
         self.spn_beep_freq.setRange(100, 5000)
-        self.spn_beep_freq.setSuffix(" Hz")
-        form_layout.addRow(QLabel("Beep Frequency:"), self.spn_beep_freq)
+        self.spn_beep_freq.setSuffix(_(" Hz"))
+        form_layout.addRow(QLabel(_("Beep Frequency:")), self.spn_beep_freq)
 
         self.spn_beep_duration = QDoubleSpinBox()
         self.spn_beep_duration.setRange(0.01, 2.0)
         self.spn_beep_duration.setSingleStep(0.05)
         self.spn_beep_duration.setDecimals(2)
-        self.spn_beep_duration.setSuffix(" sec")
-        form_layout.addRow(QLabel("Beep Duration:"), self.spn_beep_duration)
+        self.spn_beep_duration.setSuffix(_(" sec"))
+        form_layout.addRow(QLabel(_("Beep Duration:")), self.spn_beep_duration)
 
         layout.addWidget(grp_audio)
         layout.addStretch()

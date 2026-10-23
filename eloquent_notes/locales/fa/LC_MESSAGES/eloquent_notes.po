@@ -1,0 +1,523 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: fa\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid " Hz"
+msgstr " هرتز"
+
+msgid " MB"
+msgstr " مگابایت"
+
+msgid " sec"
+msgstr " ثانیه"
+
+msgid "AI Model (Audio):"
+msgstr "مدل هوش مصنوعی (صوتی):"
+
+msgid "AI Model cannot be empty."
+msgstr "مدل هوش مصنوعی نمی‌تواند خالی باشد."
+
+msgid "AI Settings"
+msgstr "تنظیمات هوش مصنوعی"
+
+msgid "Add dictation"
+msgstr "افزودن دیکته"
+
+msgid "Alias for 'toggle' command."
+msgstr "نام مستعار برای دستور 'toggle'."
+
+msgid "All"
+msgstr "همه"
+
+msgid "All tags"
+msgstr "همه برچسب‌ها"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "آیا مطمئن هستید که می‌خواهید تمام تنظیمات پیکربندی و پرامپت‌ها را به مقادیر پیش‌فرض بازگردانید؟\n\nاین کار ویرایش‌های فعلی را بازنویسی می‌کند."
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "پخش بوق صوتی هنگام شروع و توقف ضبط."
+
+msgid "Audio"
+msgstr "صدا"
+
+msgid "Audio Capture Settings"
+msgstr "تنظیمات ضبط صدا"
+
+msgid "Audio Channels:"
+msgstr "کانال‌های صوتی:"
+
+msgid "Backup Count:"
+msgstr "تعداد نسخه‌های پشتیبان:"
+
+msgid "Beep Duration:"
+msgstr "مدت زمان بوق:"
+
+msgid "Beep Frequency:"
+msgstr "فرکانس بوق:"
+
+msgid "Browse..."
+msgstr "مرور..."
+
+msgid "Cancel"
+msgstr "انصراف"
+
+msgid "Capture Duration:"
+msgstr "مدت زمان ضبط:"
+
+msgid "Classification - System Prompt"
+msgstr "دسته‌بندی - پرامپت سیستم"
+
+msgid "Classification - User Prompt"
+msgstr "دسته‌بندی - پرامپت کاربر"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "دستور قابل اجرا: 'install-autostart'، 'toggle'، 'open' (نمایش پنجره یادداشت‌ها) یا 'config' (باز کردن رابط تنظیمات)."
+
+msgid "Configuration"
+msgstr "پیکربندی"
+
+msgid "Configuration Error"
+msgstr "خطای پیکربندی"
+
+msgid "Configuration reloaded successfully."
+msgstr "پیکربندی با موفقیت بازخوانی شد."
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "بخش پیکربندی '{key}' باید یک نگاشت باشد، اما {type_name} دریافت شد"
+
+msgid "Connection failed: {error}"
+msgstr "اتصال ناموفق بود: {error}"
+
+msgid "Context Length:"
+msgstr "طول زمینه:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "طول زمینه بر حسب توکن برای ارسال به Ollama. مقادیر بزرگ‌تر امکان دیکته‌های طولانی‌تر را فراهم می‌کنند اما حافظه بیشتری مصرف می‌کنند."
+
+msgid "Copy"
+msgstr "کپی"
+
+msgid "Could not move {name} to the trash."
+msgstr "انتقال {name} به سطل زباله امکان‌پذیر نبود."
+
+msgid "Could not start recording: {error}"
+msgstr "شروع ضبط امکان‌پذیر نبود: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "توقف ضبط امکان‌پذیر نبود: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "یک ورودی راه‌اندازی خودکار دسکتاپ در پوشه راه‌اندازی خودکار XDG ایجاد می‌کند"
+
+msgid "Decision"
+msgstr "تصمیم"
+
+msgid "Decisions"
+msgstr "تصمیم‌ها"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "مقادیر پیش‌فرض بازیابی شدند. برای اعمال تغییرات روی دیسک، روی «ذخیره» کلیک کنید."
+
+msgid "Delete"
+msgstr "حذف"
+
+msgid "Delete Failed"
+msgstr "حذف ناموفق بود"
+
+msgid "Delete Note"
+msgstr "حذف یادداشت"
+
+msgid "Dictation Added"
+msgstr "دیکته اضافه شد"
+
+msgid "Dictation Empty"
+msgstr "دیکته خالی است"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "هنگام دیکته، یک نوار شناور زیبا با شمارشگر معکوس زنده و نوار پیشرفت نمایش می‌دهد."
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (آماده)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (در حال پردازش...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (در حال ضبط...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes - ابزار سینی سیستم لینوکس که دیکته‌های صوتی آفلاین را به یادداشت‌های منظم تبدیل می‌کند."
+
+msgid "Eloquent Notes Configuration"
+msgstr "پیکربندی Eloquent Notes"
+
+msgid "Eloquent Notes Daemon"
+msgstr "سرویس پس‌زمینه Eloquent Notes"
+
+msgid "Embedding Model cannot be empty."
+msgstr "مدل تعبیه (Embedding) نمی‌تواند خالی باشد."
+
+msgid "Embedding Model:"
+msgstr "مدل تعبیه:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "خطا در پردازش دیکته: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "بارگذاری پیکربندی کاربر ناموفق بود: {error}\n\nتنظیمات پیش‌فرض بارگذاری شد."
+
+msgid "Failed to reload configuration: {error}"
+msgstr "بازخوانی پیکربندی ناموفق بود: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "ذخیره تنظیمات ناموفق بود: {error}"
+
+msgid "Fetching models..."
+msgstr "در حال دریافت مدل‌ها..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "پوشه‌ای که هر یادداشت صوتی به‌عنوان یک فایل Markdown در آن ذخیره می‌شود. آن را به داخل یک مخزن Obsidian اشاره دهید تا یادداشت‌هایتان را در آنجا نیز ببینید."
+
+msgid "General"
+msgstr "عمومی"
+
+msgid "Idea"
+msgstr "ایده"
+
+msgid "Ideas"
+msgstr "ایده‌ها"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "در صورت انتخاب، مقدار context_length را روی null قرار می‌دهد (یا تنظیم‌نشده باقی می‌گذارد) تا Ollama از حداکثر طول زمینه پیش‌فرض مدل استفاده کند."
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "قالب زمان نگه‌داری در حافظه نامعتبر است: '{value}'. باید یک عدد صحیح یا مدت زمان باشد (مانند 5m، 10s، 1h، 0، -1)."
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "قالب زمان نگه‌داری پیش‌بارگذاری نامعتبر است: '{value}'. باید یک عدد صحیح یا مدت زمان باشد (مانند 5m، 10s، 1h، 0، -1)."
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "قالب زمان نگه‌داری جستجو نامعتبر است: '{value}'. باید یک عدد صحیح یا مدت زمان باشد (مانند 5m، 10s، 1h، 0، -1)."
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "مقدار پیکربندی نامعتبر برای '{key}'"
+
+msgid "Keep Alive Time:"
+msgstr "زمان نگه‌داری در حافظه:"
+
+msgid "Log File"
+msgstr "فایل گزارش"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "فایل گزارش هنوز وجود ندارد. ابتدا چند دیکته انجام دهید!"
+
+msgid "Logging Level:"
+msgstr "سطح گزارش‌گیری:"
+
+msgid "Logging Settings"
+msgstr "تنظیمات گزارش‌گیری"
+
+msgid "Max Log File Size:"
+msgstr "حداکثر اندازه فایل گزارش:"
+
+msgid "Max Retries:"
+msgstr "حداکثر تلاش مجدد:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "حداکثر مدت زمان ضبط صدا به ثانیه پیش از پردازش خودکار."
+
+msgid "Maximum size of the log file before rotating."
+msgstr "حداکثر اندازه فایل گزارش پیش از چرخش."
+
+msgid "Minimum Similarity:"
+msgstr "حداقل شباهت:"
+
+msgid "Model returned empty note content"
+msgstr "مدل محتوای یادداشت خالی برگرداند"
+
+msgid "Models loaded successfully."
+msgstr "مدل‌ها با موفقیت بارگذاری شدند."
+
+msgid "Mono (1 channel)"
+msgstr "مونو (۱ کانال)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "آیا “{title}” به سطل زباله منتقل شود؟"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "نام مدل زبانی Ollama برای اجرای وظایف دیکته (مانند gemma4:e4b-it-qat)."
+
+msgid "No audio-capable models found."
+msgstr "هیچ مدلی با قابلیت پشتیبانی از صدا یافت نشد."
+
+msgid "No matching notes."
+msgstr "یادداشت منطبقی یافت نشد."
+
+msgid "No note was created because the audio was empty."
+msgstr "هیچ یادداشتی ایجاد نشد زیرا فایل صوتی خالی بود."
+
+msgid "No notes match these filters."
+msgstr "هیچ یادداشتی با این فیلترها مطابقت ندارد."
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "هنوز یادداشتی وجود ندارد. برای ضبط اولین یادداشت، روی نماد سینی سیستم کلیک کنید."
+
+msgid "Note"
+msgstr "یادداشت"
+
+msgid "Note Saved"
+msgstr "یادداشت ذخیره شد"
+
+msgid "Notes"
+msgstr "یادداشت‌ها"
+
+msgid "Notes Folder cannot be empty."
+msgstr "پوشه یادداشت‌ها نمی‌تواند خالی باشد."
+
+msgid "Notes Folder:"
+msgstr "پوشه یادداشت‌ها:"
+
+msgid "Notes Storage"
+msgstr "محل ذخیره یادداشت‌ها"
+
+msgid "Number of audio input channels."
+msgstr "تعداد کانال‌های ورودی صدا."
+
+msgid "Number of backup log files to retain."
+msgstr "تعداد فایل‌های گزارش پشتیبان برای نگه‌داری."
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "تعداد ستون‌ها در شبکه خط زمانی یادداشت‌ها."
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "تعداد دفعات تلاش مجدد در صورت شکست در تجزیه JSON خروجی مدل."
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "تنظیمات Ollama && خط لوله هوش مصنوعی"
+
+msgid "Ollama URL cannot be empty."
+msgstr "نشانی Ollama نمی‌تواند خالی باشد."
+
+msgid "Ollama URL is empty."
+msgstr "نشانی Ollama خالی است."
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "نشانی Ollama باید با http:// یا https:// شروع شود."
+
+msgid "Ollama URL:"
+msgstr "نشانی Ollama:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "مدل تعبیه Ollama برای جستجوی معنایی یادداشت‌ها (مانند embeddinggemma-2:latest)."
+
+msgid "Open Notes"
+msgstr "باز کردن یادداشت‌ها"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "باز کردن فایل گزارش سرویس پس‌زمینه در ویرایشگر سیستم."
+
+msgid "Output Language cannot be empty."
+msgstr "زبان خروجی نمی‌تواند خالی باشد."
+
+msgid "Output Language:"
+msgstr "زبان خروجی:"
+
+msgid "Play beep on recording start and stop"
+msgstr "پخش بوق هنگام شروع و توقف ضبط"
+
+msgid "Preload Keep Alive:"
+msgstr "نگه‌داری پیش‌بارگذاری:"
+
+msgid "Preload Timeout:"
+msgstr "مهلت پیش‌بارگذاری:"
+
+msgid "Processing Error"
+msgstr "خطای پردازش"
+
+msgid "Processing…"
+msgstr "در حال پردازش…"
+
+msgid "Prompt Content:"
+msgstr "محتوای پرامپت:"
+
+msgid "Prompts"
+msgstr "پرامپت‌ها"
+
+msgid "Prompts:"
+msgstr "پرامپت‌ها:"
+
+msgid "Question"
+msgstr "پرسش"
+
+msgid "Questions"
+msgstr "پرسش‌ها"
+
+msgid "Quit"
+msgstr "خروج"
+
+msgid "Ready"
+msgstr "آماده"
+
+msgid "Recording Note..."
+msgstr "در حال ضبط یادداشت..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "ضبط در حال انجام است — برای توقف و پردازش یادداشت کلیک کنید"
+
+msgid "Refresh"
+msgstr "نوسازی"
+
+msgid "Reload Configuration"
+msgstr "بازخوانی پیکربندی"
+
+msgid "Reminder"
+msgstr "یادآوری"
+
+msgid "Reminders"
+msgstr "یادآوری‌ها"
+
+msgid "Request Timeout:"
+msgstr "مهلت درخواست:"
+
+msgid "Restore Defaults"
+msgstr "بازیابی پیش‌فرض‌ها"
+
+msgid "Retry Prompt"
+msgstr "پرامپت تلاش مجدد"
+
+msgid "Rewriting - System Prompt"
+msgstr "بازنویسی - پرامپت سیستم"
+
+msgid "Rewriting - User Prompt"
+msgstr "بازنویسی - پرامپت کاربر"
+
+msgid "Sample Rate:"
+msgstr "نرخ نمونه‌برداری:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "نرخ نمونه‌برداری برای ضبط میکروفون (۱۶۰۰۰ هرتز برای مدل‌های دیکته گفتار توصیه می‌شود)."
+
+msgid "Save"
+msgstr "ذخیره"
+
+msgid "Save Error"
+msgstr "خطای ذخیره‌سازی"
+
+msgid "Search failed: {error}"
+msgstr "جستجو ناموفق بود: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "نتایج جستجو با شباهت کسینوسی کمتر از این مقدار پنهان می‌شوند."
+
+msgid "Search your notes by meaning…"
+msgstr "جستجوی یادداشت‌ها بر اساس معنا…"
+
+msgid "Searching…"
+msgstr "در حال جستجو…"
+
+msgid "Select Notes Folder"
+msgstr "انتخاب پوشه یادداشت‌ها"
+
+msgid "Select a prompt to edit..."
+msgstr "یک پرامپت را برای ویرایش انتخاب کنید..."
+
+msgid "Semantic Search"
+msgstr "جستجوی معنایی"
+
+msgid "Settings"
+msgstr "تنظیمات"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "نمایش شمارشگر معکوس شناور هنگام ضبط"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "اجرای خودکار Eloquent Notes هنگام ورود به سیستم"
+
+msgid "Start/Stop Recording"
+msgstr "شروع/توقف ضبط"
+
+msgid "Startup Options"
+msgstr "گزینه‌های راه‌اندازی"
+
+msgid "Stereo (2 channels)"
+msgstr "استریو (۲ کانال)"
+
+msgid "Stop dictation"
+msgstr "توقف دیکته"
+
+msgid "System is busy. Please wait."
+msgstr "سیستم مشغول است. لطفاً صبر کنید."
+
+msgid "Tags, separated by commas"
+msgstr "برچسب‌ها، جداشده با ویرگول"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "زبان مقصد برای یادداشت‌های بازنویسی‌شده، عنوان‌ها و برچسب‌ها (مانند English، Persian)."
+
+msgid "Task"
+msgstr "وظیفه"
+
+msgid "Tasks"
+msgstr "وظایف"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "مدت زمان نگه‌داری مدل در حافظه پس از تولید یادداشت (مثلاً '0' برای تخلیه فوری یا '5m')."
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "مدت زمان نگه‌داری وزن‌های مدل در VRAM هنگام ضبط برای کاهش تأخیر (مثلاً '5m')."
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "مدت زمان نگه‌داری مدل تعبیه در حافظه پس از جستجو (مثلاً '5m' یا '0')."
+
+msgid "Timeline Columns:"
+msgstr "ستون‌های خط زمانی:"
+
+msgid "Title"
+msgstr "عنوان"
+
+msgid "Today"
+msgstr "امروز"
+
+msgid "Transcription - System Prompt"
+msgstr "رونویسی - پرامپت سیستم"
+
+msgid "Transcription - User Prompt"
+msgstr "رونویسی - پرامپت کاربر"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "نشانی سرور محلی یا راه‌دور Ollama شما."
+
+msgid "Use default context length"
+msgstr "استفاده از طول زمینه پیش‌فرض"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "پیکربندی کاربر در {path} یک نگاشت معتبر YAML نیست"
+
+msgid "Validation Error"
+msgstr "خطای اعتبارسنجی"
+
+msgid "Verbosity level for app logging."
+msgstr "سطح جزئیات برای گزارش‌گیری برنامه."
+
+msgid "View Log File"
+msgstr "مشاهده فایل گزارش"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "دیکته‌های صوتی تبدیل‌شده به یادداشت‌های منظم"
+
+msgid "Yesterday"
+msgstr "دیروز"
+
+msgid "← Back"
+msgstr "← بازگشت"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} نتیجه"
+msgstr[1] "{count} نتیجه"

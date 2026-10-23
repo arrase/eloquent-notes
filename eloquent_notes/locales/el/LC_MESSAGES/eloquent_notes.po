@@ -1,0 +1,523 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: el\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid " Hz"
+msgstr " Hz"
+
+msgid " MB"
+msgstr " MB"
+
+msgid " sec"
+msgstr " δευτ."
+
+msgid "AI Model (Audio):"
+msgstr "Μοντέλο AI (Ήχος):"
+
+msgid "AI Model cannot be empty."
+msgstr "Το μοντέλο AI δεν μπορεί να είναι κενό."
+
+msgid "AI Settings"
+msgstr "Ρυθμίσεις AI"
+
+msgid "Add dictation"
+msgstr "Προσθήκη υπαγόρευσης"
+
+msgid "Alias for 'toggle' command."
+msgstr "Ψευδώνυμο για την εντολή 'toggle'."
+
+msgid "All"
+msgstr "Όλες"
+
+msgid "All tags"
+msgstr "Όλες οι ετικέτες"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "Είστε βέβαιοι ότι θέλετε να επαναφέρετε όλες τις ρυθμίσεις και τις προτροπές στις προεπιλεγμένες τιμές τους;\n\nΑυτό θα αντικαταστήσει τις τρέχουσες αλλαγές."
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "Ηχητικά σήματα κατά την έναρξη και τη διακοπή της εγγραφής."
+
+msgid "Audio"
+msgstr "Ήχος"
+
+msgid "Audio Capture Settings"
+msgstr "Ρυθμίσεις λήψης ήχου"
+
+msgid "Audio Channels:"
+msgstr "Κανάλια ήχου:"
+
+msgid "Backup Count:"
+msgstr "Αριθμός αντιγράφων:"
+
+msgid "Beep Duration:"
+msgstr "Διάρκεια ηχητικού σήματος:"
+
+msgid "Beep Frequency:"
+msgstr "Συχνότητα ηχητικού σήματος:"
+
+msgid "Browse..."
+msgstr "Αναζήτηση..."
+
+msgid "Cancel"
+msgstr "Ακύρωση"
+
+msgid "Capture Duration:"
+msgstr "Διάρκεια εγγραφής:"
+
+msgid "Classification - System Prompt"
+msgstr "Ταξινόμηση - Προτροπή συστήματος"
+
+msgid "Classification - User Prompt"
+msgstr "Ταξινόμηση - Προτροπή χρήστη"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "Εντολή προς εκτέλεση: 'install-autostart', 'toggle', 'open' (εμφάνιση παραθύρου σημειώσεων) ή 'config' (άνοιγμα παραθύρου ρυθμίσεων)."
+
+msgid "Configuration"
+msgstr "Ρύθμιση παραμέτρων"
+
+msgid "Configuration Error"
+msgstr "Σφάλμα ρύθμισης παραμέτρων"
+
+msgid "Configuration reloaded successfully."
+msgstr "Η ρύθμιση παραμέτρων επαναφορτώθηκε επιτυχώς."
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "Η ενότητα ρυθμίσεων '{key}' πρέπει να είναι αντιστοίχιση, ελήφθη {type_name}"
+
+msgid "Connection failed: {error}"
+msgstr "Η σύνδεση απέτυχε: {error}"
+
+msgid "Context Length:"
+msgstr "Μήκος πλαισίου:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "Μήκος πλαισίου σε tokens για το Ollama. Μεγαλύτερες τιμές επιτρέπουν μεγαλύτερες υπαγορεύσεις αλλά χρησιμοποιούν περισσότερη μνήμη."
+
+msgid "Copy"
+msgstr "Αντιγραφή"
+
+msgid "Could not move {name} to the trash."
+msgstr "Δεν ήταν δυνατή η μετακίνηση του {name} στον κάδο απορριμμάτων."
+
+msgid "Could not start recording: {error}"
+msgstr "Δεν ήταν δυνατή η έναρξη εγγραφής: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "Δεν ήταν δυνατή η διακοπή εγγραφής: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "Δημιουργεί μια καταχώριση αυτόματης εκκίνησης στον κατάλογο XDG autostart"
+
+msgid "Decision"
+msgstr "Απόφαση"
+
+msgid "Decisions"
+msgstr "Αποφάσεις"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "Οι προεπιλογές επαναφέρθηκαν. Κάντε κλικ στο 'Αποθήκευση' για εφαρμογή των αλλαγών στον δίσκο."
+
+msgid "Delete"
+msgstr "Διαγραφή"
+
+msgid "Delete Failed"
+msgstr "Η διαγραφή απέτυχε"
+
+msgid "Delete Note"
+msgstr "Διαγραφή σημείωσης"
+
+msgid "Dictation Added"
+msgstr "Η υπαγόρευση προστέθηκε"
+
+msgid "Dictation Empty"
+msgstr "Κενή υπαγόρευση"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "Εμφανίζει μια κομψή αιωρούμενη ένδειξη με αντίστροφη μέτρηση και γραμμή προόδου κατά την υπαγόρευση."
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (Αδρανές)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (Επεξεργασία...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (Εγγραφή...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes - Εργαλείο περιοχής ειδοποιήσεων Linux που μετατρέπει φωνητικές υπαγορεύσεις εκτός σύνδεσης σε οργανωμένες σημειώσεις."
+
+msgid "Eloquent Notes Configuration"
+msgstr "Ρύθμιση παραμέτρων Eloquent Notes"
+
+msgid "Eloquent Notes Daemon"
+msgstr "Υπηρεσία παρασκηνίου Eloquent Notes"
+
+msgid "Embedding Model cannot be empty."
+msgstr "Το μοντέλο ενσωμάτωσης δεν μπορεί να είναι κενό."
+
+msgid "Embedding Model:"
+msgstr "Μοντέλο ενσωμάτωσης:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "Σφάλμα επεξεργασίας υπαγόρευσης: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "Αποτυχία φόρτωσης ρυθμίσεων χρήστη: {error}\n\nΦορτώθηκαν οι προεπιλεγμένες ρυθμίσεις."
+
+msgid "Failed to reload configuration: {error}"
+msgstr "Αποτυχία επαναφόρτωσης ρυθμίσεων: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "Αποτυχία αποθήκευσης ρυθμίσεων: {error}"
+
+msgid "Fetching models..."
+msgstr "Ανάκτηση μοντέλων..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "Φάκελος όπου κάθε φωνητική σημείωση αποθηκεύεται ως αρχείο Markdown. Ορίστε τον μέσα σε ένα vault του Obsidian για να βλέπετε τις σημειώσεις σας κι εκεί."
+
+msgid "General"
+msgstr "Γενικά"
+
+msgid "Idea"
+msgstr "Ιδέα"
+
+msgid "Ideas"
+msgstr "Ιδέες"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "Αν επιλεγεί, ορίζει το context_length σε null (ή κενό), δίνοντας εντολή στο Ollama να χρησιμοποιήσει το προεπιλεγμένο μέγιστο μήκος πλαισίου του μοντέλου."
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Μη έγκυρη μορφή Keep Alive: '{value}'. Πρέπει να είναι ακέραιος ή διάρκεια (π.χ. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Μη έγκυρη μορφή Keep Alive προφόρτωσης: '{value}'. Πρέπει να είναι ακέραιος ή διάρκεια (π.χ. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "Μη έγκυρη μορφή Keep Alive αναζήτησης: '{value}'. Πρέπει να είναι ακέραιος ή διάρκεια (π.χ. 5m, 10s, 1h, 0, -1)."
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "Μη έγκυρη τιμή ρύθμισης για το '{key}'"
+
+msgid "Keep Alive Time:"
+msgstr "Χρόνος Keep Alive:"
+
+msgid "Log File"
+msgstr "Αρχείο καταγραφής"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "Το αρχείο καταγραφής δεν υπάρχει ακόμη. Εκτελέστε πρώτα μερικές υπαγορεύσεις!"
+
+msgid "Logging Level:"
+msgstr "Επίπεδο καταγραφής:"
+
+msgid "Logging Settings"
+msgstr "Ρυθμίσεις καταγραφής"
+
+msgid "Max Log File Size:"
+msgstr "Μέγ. μέγεθος αρχείου καταγραφής:"
+
+msgid "Max Retries:"
+msgstr "Μέγ. προσπάθειες:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "Μέγιστη διάρκεια σε δευτερόλεπτα για εγγραφή ήχου πριν από την αυτόματη επεξεργασία."
+
+msgid "Maximum size of the log file before rotating."
+msgstr "Μέγιστο μέγεθος του αρχείου καταγραφής πριν από την εναλλαγή."
+
+msgid "Minimum Similarity:"
+msgstr "Ελάχιστη ομοιότητα:"
+
+msgid "Model returned empty note content"
+msgstr "Το μοντέλο επέστρεψε κενό περιεχόμενο σημείωσης"
+
+msgid "Models loaded successfully."
+msgstr "Τα μοντέλα φορτώθηκαν επιτυχώς."
+
+msgid "Mono (1 channel)"
+msgstr "Μονοφωνικό (1 κανάλι)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "Μετακίνηση του «{title}» στον κάδο απορριμμάτων;"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "Όνομα του μοντέλου Ollama LLM για εργασίες υπαγόρευσης (π.χ. gemma4:e4b-it-qat)."
+
+msgid "No audio-capable models found."
+msgstr "Δεν βρέθηκαν μοντέλα με υποστήριξη ήχου."
+
+msgid "No matching notes."
+msgstr "Δεν βρέθηκαν αντίστοιχες σημειώσεις."
+
+msgid "No note was created because the audio was empty."
+msgstr "Δεν δημιουργήθηκε σημείωση επειδή ο ήχος ήταν κενός."
+
+msgid "No notes match these filters."
+msgstr "Καμία σημείωση δεν ταιριάζει με αυτά τα φίλτρα."
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "Δεν υπάρχουν σημειώσεις ακόμη. Κάντε κλικ στο εικονίδιο συστήματος για να ηχογραφήσετε την πρώτη σας."
+
+msgid "Note"
+msgstr "Σημείωση"
+
+msgid "Note Saved"
+msgstr "Η σημείωση αποθηκεύτηκε"
+
+msgid "Notes"
+msgstr "Σημειώσεις"
+
+msgid "Notes Folder cannot be empty."
+msgstr "Ο φάκελος σημειώσεων δεν μπορεί να είναι κενός."
+
+msgid "Notes Folder:"
+msgstr "Φάκελος σημειώσεων:"
+
+msgid "Notes Storage"
+msgstr "Αποθήκευση σημειώσεων"
+
+msgid "Number of audio input channels."
+msgstr "Αριθμός καναλιών εισόδου ήχου."
+
+msgid "Number of backup log files to retain."
+msgstr "Αριθμός εφεδρικών αρχείων καταγραφής προς διατήρηση."
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "Αριθμός στηλών στο πλέγμα χρονολογίου σημειώσεων."
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "Αριθμός επαναλήψεων αν η έξοδος του LLM αποτύχει στην ανάλυση JSON."
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "Ρυθμίσεις Ollama && ροής AI"
+
+msgid "Ollama URL cannot be empty."
+msgstr "Το URL του Ollama δεν μπορεί να είναι κενό."
+
+msgid "Ollama URL is empty."
+msgstr "Το URL του Ollama είναι κενό."
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "Το URL του Ollama πρέπει να ξεκινά με http:// ή https://."
+
+msgid "Ollama URL:"
+msgstr "URL του Ollama:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "Μοντέλο ενσωμάτωσης Ollama για αναζήτηση σημειώσεων με βάση το νόημα (π.χ. embeddinggemma-2:latest)."
+
+msgid "Open Notes"
+msgstr "Άνοιγμα σημειώσεων"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "Άνοιγμα του αρχείου καταγραφής της υπηρεσίας παρασκηνίου στον επεξεργαστή του συστήματος."
+
+msgid "Output Language cannot be empty."
+msgstr "Η γλώσσα εξόδου δεν μπορεί να είναι κενή."
+
+msgid "Output Language:"
+msgstr "Γλώσσα εξόδου:"
+
+msgid "Play beep on recording start and stop"
+msgstr "Αναπαραγωγή ηχητικού σήματος στην έναρξη και διακοπή εγγραφής"
+
+msgid "Preload Keep Alive:"
+msgstr "Keep Alive προφόρτωσης:"
+
+msgid "Preload Timeout:"
+msgstr "Χρονικό όριο προφόρτωσης:"
+
+msgid "Processing Error"
+msgstr "Σφάλμα επεξεργασίας"
+
+msgid "Processing…"
+msgstr "Επεξεργασία…"
+
+msgid "Prompt Content:"
+msgstr "Περιεχόμενο προτροπής:"
+
+msgid "Prompts"
+msgstr "Προτροπές"
+
+msgid "Prompts:"
+msgstr "Προτροπές:"
+
+msgid "Question"
+msgstr "Ερώτηση"
+
+msgid "Questions"
+msgstr "Ερωτήσεις"
+
+msgid "Quit"
+msgstr "Έξοδος"
+
+msgid "Ready"
+msgstr "Έτοιμο"
+
+msgid "Recording Note..."
+msgstr "Εγγραφή σημείωσης..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "Εγγραφή σε εξέλιξη — κλικ για διακοπή και επεξεργασία σημείωσης"
+
+msgid "Refresh"
+msgstr "Ανανέωση"
+
+msgid "Reload Configuration"
+msgstr "Επαναφόρτωση ρυθμίσεων"
+
+msgid "Reminder"
+msgstr "Υπενθύμιση"
+
+msgid "Reminders"
+msgstr "Υπενθυμίσεις"
+
+msgid "Request Timeout:"
+msgstr "Χρονικό όριο αιτήματος:"
+
+msgid "Restore Defaults"
+msgstr "Επαναφορά προεπιλογών"
+
+msgid "Retry Prompt"
+msgstr "Προτροπή επανάληψης"
+
+msgid "Rewriting - System Prompt"
+msgstr "Αναδιατύπωση - Προτροπή συστήματος"
+
+msgid "Rewriting - User Prompt"
+msgstr "Αναδιατύπωση - Προτροπή χρήστη"
+
+msgid "Sample Rate:"
+msgstr "Ρυθμός δειγματοληψίας:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "Ρυθμός δειγματοληψίας για εγγραφή μικροφώνου (συνιστώνται 16000 Hz για μοντέλα φωνητικής υπαγόρευσης)."
+
+msgid "Save"
+msgstr "Αποθήκευση"
+
+msgid "Save Error"
+msgstr "Σφάλμα αποθήκευσης"
+
+msgid "Search failed: {error}"
+msgstr "Η αναζήτηση απέτυχε: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "Τα αποτελέσματα αναζήτησης κάτω από αυτή την ομοιότητα συνημιτόνου αποκρύπτονται."
+
+msgid "Search your notes by meaning…"
+msgstr "Αναζήτηση σημειώσεων με βάση το νόημα…"
+
+msgid "Searching…"
+msgstr "Αναζήτηση…"
+
+msgid "Select Notes Folder"
+msgstr "Επιλογή φακέλου σημειώσεων"
+
+msgid "Select a prompt to edit..."
+msgstr "Επιλέξτε μια προτροπή για επεξεργασία..."
+
+msgid "Semantic Search"
+msgstr "Σημασιολογική αναζήτηση"
+
+msgid "Settings"
+msgstr "Ρυθμίσεις"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "Εμφάνιση αιωρούμενης αντίστροφης μέτρησης κατά την εγγραφή"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "Αυτόματη εκκίνηση του Eloquent Notes κατά τη σύνδεση"
+
+msgid "Start/Stop Recording"
+msgstr "Έναρξη/Διακοπή εγγραφής"
+
+msgid "Startup Options"
+msgstr "Επιλογές εκκίνησης"
+
+msgid "Stereo (2 channels)"
+msgstr "Στερεοφωνικό (2 κανάλια)"
+
+msgid "Stop dictation"
+msgstr "Διακοπή υπαγόρευσης"
+
+msgid "System is busy. Please wait."
+msgstr "Το σύστημα είναι απασχολημένο. Παρακαλώ περιμένετε."
+
+msgid "Tags, separated by commas"
+msgstr "Ετικέτες, διαχωρισμένες με κόμμα"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "Γλώσσα προορισμού για αναδιατυπωμένες σημειώσεις, τίτλους και ετικέτες (π.χ. English, Spanish)."
+
+msgid "Task"
+msgstr "Εργασία"
+
+msgid "Tasks"
+msgstr "Εργασίες"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "Χρόνος διατήρησης του μοντέλου στη μνήμη μετά τη δημιουργία σημείωσης (π.χ. '0' για άμεση αποφόρτωση ή '5m')."
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "Χρόνος διατήρησης των βαρών του μοντέλου στη VRAM κατά την εγγραφή για ελαχιστοποίηση καθυστέρησης (π.χ. '5m')."
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "Χρόνος διατήρησης του μοντέλου ενσωμάτωσης στη μνήμη μετά από αναζήτηση (π.χ. '5m' ή '0')."
+
+msgid "Timeline Columns:"
+msgstr "Στήλες χρονολογίου:"
+
+msgid "Title"
+msgstr "Τίτλος"
+
+msgid "Today"
+msgstr "Σήμερα"
+
+msgid "Transcription - System Prompt"
+msgstr "Μεταγραφή - Προτροπή συστήματος"
+
+msgid "Transcription - User Prompt"
+msgstr "Μεταγραφή - Προτροπή χρήστη"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "URL του τοπικού ή απομακρυσμένου διακομιστή Ollama."
+
+msgid "Use default context length"
+msgstr "Χρήση προεπιλεγμένου μήκους πλαισίου"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "Η ρύθμιση χρήστη στο {path} δεν είναι έγκυρη αντιστοίχιση YAML"
+
+msgid "Validation Error"
+msgstr "Σφάλμα επικύρωσης"
+
+msgid "Verbosity level for app logging."
+msgstr "Επίπεδο λεπτομέρειας για την καταγραφή της εφαρμογής."
+
+msgid "View Log File"
+msgstr "Προβολή αρχείου καταγραφής"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "Φωνητικές υπαγορεύσεις που μετατρέπονται σε οργανωμένες σημειώσεις"
+
+msgid "Yesterday"
+msgstr "Χθες"
+
+msgid "← Back"
+msgstr "← Πίσω"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "{count} αποτέλεσμα"
+msgstr[1] "{count} αποτελέσματα"

@@ -1,0 +1,522 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid " Hz"
+msgstr " Hz"
+
+msgid " MB"
+msgstr " MB"
+
+msgid " sec"
+msgstr " 초"
+
+msgid "AI Model (Audio):"
+msgstr "AI 모델 (오디오):"
+
+msgid "AI Model cannot be empty."
+msgstr "AI 모델은 비워둘 수 없습니다."
+
+msgid "AI Settings"
+msgstr "AI 설정"
+
+msgid "Add dictation"
+msgstr "받아쓰기 추가"
+
+msgid "Alias for 'toggle' command."
+msgstr "'toggle' 명령어의 별칭입니다."
+
+msgid "All"
+msgstr "전체"
+
+msgid "All tags"
+msgstr "모든 태그"
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr "모든 구성 설정과 프롬프트를 기본값으로 복원하시겠습니까?\n\n현재 수정 사항이 덮어쓰여집니다."
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr "녹음 시작/중지 시 알림음을 재생합니다."
+
+msgid "Audio"
+msgstr "오디오"
+
+msgid "Audio Capture Settings"
+msgstr "오디오 캡처 설정"
+
+msgid "Audio Channels:"
+msgstr "오디오 채널:"
+
+msgid "Backup Count:"
+msgstr "백업 개수:"
+
+msgid "Beep Duration:"
+msgstr "알림음 길이:"
+
+msgid "Beep Frequency:"
+msgstr "알림음 주파수:"
+
+msgid "Browse..."
+msgstr "찾아보기..."
+
+msgid "Cancel"
+msgstr "취소"
+
+msgid "Capture Duration:"
+msgstr "녹음 시간:"
+
+msgid "Classification - System Prompt"
+msgstr "분류 - 시스템 프롬프트"
+
+msgid "Classification - User Prompt"
+msgstr "분류 - 사용자 프롬프트"
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr "실행할 명령어: 'install-autostart', 'toggle', 'open'(노트 창 표시), 또는 'config'(구성 GUI 열기)."
+
+msgid "Configuration"
+msgstr "구성"
+
+msgid "Configuration Error"
+msgstr "구성 오류"
+
+msgid "Configuration reloaded successfully."
+msgstr "구성을 성공적으로 다시 불러왔습니다."
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr "구성 섹션 '{key}'은(는) 매핑이어야 하지만 {type_name}이(가) 전달되었습니다"
+
+msgid "Connection failed: {error}"
+msgstr "연결 실패: {error}"
+
+msgid "Context Length:"
+msgstr "컨텍스트 길이:"
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr "Ollama에 전달할 토큰 단위의 컨텍스트 길이입니다. 값이 클수록 더 긴 받아쓰기가 가능하지만 메모리를 더 많이 사용합니다."
+
+msgid "Copy"
+msgstr "복사"
+
+msgid "Could not move {name} to the trash."
+msgstr "{name}을(를) 휴지통으로 이동할 수 없습니다."
+
+msgid "Could not start recording: {error}"
+msgstr "녹음을 시작할 수 없습니다: {error}"
+
+msgid "Could not stop recording: {error}"
+msgstr "녹음을 중지할 수 없습니다: {error}"
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr "XDG 자동 시작 디렉터리에 데스크톱 자동 시작 항목을 생성합니다"
+
+msgid "Decision"
+msgstr "결정"
+
+msgid "Decisions"
+msgstr "결정"
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr "기본값이 복원되었습니다. '저장'을 클릭하여 변경 사항을 디스크에 적용하세요."
+
+msgid "Delete"
+msgstr "삭제"
+
+msgid "Delete Failed"
+msgstr "삭제 실패"
+
+msgid "Delete Note"
+msgstr "노트 삭제"
+
+msgid "Dictation Added"
+msgstr "받아쓰기 추가됨"
+
+msgid "Dictation Empty"
+msgstr "받아쓰기 비어 있음"
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr "받아쓰기 중에 실시간 카운트다운 타이머와 진행률 표시줄이 있는 깔끔한 플로팅 오버레이를 표시합니다."
+
+msgid "Eloquent Notes (Idle)"
+msgstr "Eloquent Notes (대기 중)"
+
+msgid "Eloquent Notes (Processing...)"
+msgstr "Eloquent Notes (처리 중...)"
+
+msgid "Eloquent Notes (Recording...)"
+msgstr "Eloquent Notes (녹음 중...)"
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr "Eloquent Notes - 오프라인 음성 받아쓰기를 체계적인 노트로 변환하는 Linux 시스템 트레이 유틸리티입니다."
+
+msgid "Eloquent Notes Configuration"
+msgstr "Eloquent Notes 구성"
+
+msgid "Eloquent Notes Daemon"
+msgstr "Eloquent Notes 데몬"
+
+msgid "Embedding Model cannot be empty."
+msgstr "임베딩 모델은 비워둘 수 없습니다."
+
+msgid "Embedding Model:"
+msgstr "임베딩 모델:"
+
+msgid "Error processing dictation: {detail}"
+msgstr "받아쓰기 처리 중 오류 발생: {detail}"
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr "사용자 구성을 불러오지 못했습니다: {error}\n\n기본 설정을 불러왔습니다."
+
+msgid "Failed to reload configuration: {error}"
+msgstr "구성을 다시 불러오지 못했습니다: {error}"
+
+msgid "Failed to save settings: {error}"
+msgstr "설정을 저장하지 못했습니다: {error}"
+
+msgid "Fetching models..."
+msgstr "모델 가져오는 중..."
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr "각 음성 노트가 Markdown 파일로 저장되는 폴더입니다. Obsidian 보관함 내부를 지정하면 그곳에서도 노트를 볼 수 있습니다."
+
+msgid "General"
+msgstr "일반"
+
+msgid "Idea"
+msgstr "아이디어"
+
+msgid "Ideas"
+msgstr "아이디어"
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr "선택하면 context_length를 null로 설정(또는 미설정 상태로 유지)하여 Ollama가 모델의 기본 최대 컨텍스트 길이를 사용하도록 지시합니다."
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "잘못된 Keep Alive 형식: '{value}'. 정수 또는 기간(예: 5m, 10s, 1h, 0, -1)이어야 합니다."
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "잘못된 사전 로드 Keep Alive 형식: '{value}'. 정수 또는 기간(예: 5m, 10s, 1h, 0, -1)이어야 합니다."
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr "잘못된 검색 Keep Alive 형식: '{value}'. 정수 또는 기간(예: 5m, 10s, 1h, 0, -1)이어야 합니다."
+
+msgid "Invalid configuration value for '{key}'"
+msgstr "'{key}'에 대한 잘못된 구성 값"
+
+msgid "Keep Alive Time:"
+msgstr "Keep Alive 시간:"
+
+msgid "Log File"
+msgstr "로그 파일"
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr "로그 파일이 아직 존재하지 않습니다. 먼저 받아쓰기를 실행해 보세요!"
+
+msgid "Logging Level:"
+msgstr "로깅 수준:"
+
+msgid "Logging Settings"
+msgstr "로깅 설정"
+
+msgid "Max Log File Size:"
+msgstr "최대 로그 파일 크기:"
+
+msgid "Max Retries:"
+msgstr "최대 재시도 횟수:"
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr "자동으로 처리하기 전 오디오 녹음의 최대 시간(초)입니다."
+
+msgid "Maximum size of the log file before rotating."
+msgstr "순환하기 전 로그 파일의 최대 크기입니다."
+
+msgid "Minimum Similarity:"
+msgstr "최소 유사도:"
+
+msgid "Model returned empty note content"
+msgstr "모델이 빈 노트 내용을 반환했습니다"
+
+msgid "Models loaded successfully."
+msgstr "모델을 성공적으로 불러왔습니다."
+
+msgid "Mono (1 channel)"
+msgstr "모노 (1채널)"
+
+msgid "Move “{title}” to the trash?"
+msgstr "“{title}”을(를) 휴지통으로 이동하시겠습니까?"
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr "받아쓰기 작업에 실행할 Ollama LLM 모델의 이름입니다(예: gemma4:e4b-it-qat)."
+
+msgid "No audio-capable models found."
+msgstr "오디오 지원 모델을 찾을 수 없습니다."
+
+msgid "No matching notes."
+msgstr "일치하는 노트가 없습니다."
+
+msgid "No note was created because the audio was empty."
+msgstr "오디오가 비어 있어 노트가 생성되지 않았습니다."
+
+msgid "No notes match these filters."
+msgstr "이 필터와 일치하는 노트가 없습니다."
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr "아직 노트가 없습니다. 트레이 아이콘을 클릭하여 첫 번째 노트를 녹음하세요."
+
+msgid "Note"
+msgstr "노트"
+
+msgid "Note Saved"
+msgstr "노트 저장됨"
+
+msgid "Notes"
+msgstr "노트"
+
+msgid "Notes Folder cannot be empty."
+msgstr "노트 폴더는 비워둘 수 없습니다."
+
+msgid "Notes Folder:"
+msgstr "노트 폴더:"
+
+msgid "Notes Storage"
+msgstr "노트 저장소"
+
+msgid "Number of audio input channels."
+msgstr "오디오 입력 채널 수입니다."
+
+msgid "Number of backup log files to retain."
+msgstr "보관할 백업 로그 파일 수입니다."
+
+msgid "Number of columns in the notes timeline grid."
+msgstr "노트 타임라인 그리드의 열 개수입니다."
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr "LLM 출력의 JSON 구문 분석이 실패할 경우 재시도 횟수입니다."
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr "Ollama && AI 파이프라인 설정"
+
+msgid "Ollama URL cannot be empty."
+msgstr "Ollama URL은 비워둘 수 없습니다."
+
+msgid "Ollama URL is empty."
+msgstr "Ollama URL이 비어 있습니다."
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr "Ollama URL은 http:// 또는 https://로 시작해야 합니다."
+
+msgid "Ollama URL:"
+msgstr "Ollama URL:"
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr "의미 기반으로 노트를 검색하는 데 사용되는 Ollama 임베딩 모델입니다(예: embeddinggemma-2:latest)."
+
+msgid "Open Notes"
+msgstr "노트 열기"
+
+msgid "Open the background daemon log file in your system editor."
+msgstr "시스템 편집기에서 백그라운드 데몬 로그 파일을 엽니다."
+
+msgid "Output Language cannot be empty."
+msgstr "출력 언어는 비워둘 수 없습니다."
+
+msgid "Output Language:"
+msgstr "출력 언어:"
+
+msgid "Play beep on recording start and stop"
+msgstr "녹음 시작 및 중지 시 알림음 재생"
+
+msgid "Preload Keep Alive:"
+msgstr "사전 로드 Keep Alive:"
+
+msgid "Preload Timeout:"
+msgstr "사전 로드 시간 제한:"
+
+msgid "Processing Error"
+msgstr "처리 오류"
+
+msgid "Processing…"
+msgstr "처리 중…"
+
+msgid "Prompt Content:"
+msgstr "프롬프트 내용:"
+
+msgid "Prompts"
+msgstr "프롬프트"
+
+msgid "Prompts:"
+msgstr "프롬프트:"
+
+msgid "Question"
+msgstr "질문"
+
+msgid "Questions"
+msgstr "질문"
+
+msgid "Quit"
+msgstr "종료"
+
+msgid "Ready"
+msgstr "준비 완료"
+
+msgid "Recording Note..."
+msgstr "노트 녹음 중..."
+
+msgid "Recording in progress — click to stop and process note"
+msgstr "녹음 진행 중 — 중지하고 노트를 처리하려면 클릭하세요"
+
+msgid "Refresh"
+msgstr "새로고침"
+
+msgid "Reload Configuration"
+msgstr "구성 다시 불러오기"
+
+msgid "Reminder"
+msgstr "리마인더"
+
+msgid "Reminders"
+msgstr "리마인더"
+
+msgid "Request Timeout:"
+msgstr "요청 시간 제한:"
+
+msgid "Restore Defaults"
+msgstr "기본값 복원"
+
+msgid "Retry Prompt"
+msgstr "재시도 프롬프트"
+
+msgid "Rewriting - System Prompt"
+msgstr "재작성 - 시스템 프롬프트"
+
+msgid "Rewriting - User Prompt"
+msgstr "재작성 - 사용자 프롬프트"
+
+msgid "Sample Rate:"
+msgstr "샘플 레이트:"
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr "마이크 녹음 샘플 레이트입니다(음성 받아쓰기 모델에는 16000 Hz 권장)."
+
+msgid "Save"
+msgstr "저장"
+
+msgid "Save Error"
+msgstr "저장 오류"
+
+msgid "Search failed: {error}"
+msgstr "검색 실패: {error}"
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr "이 코사인 유사도 미만의 검색 결과는 숨겨집니다."
+
+msgid "Search your notes by meaning…"
+msgstr "의미로 노트 검색…"
+
+msgid "Searching…"
+msgstr "검색 중…"
+
+msgid "Select Notes Folder"
+msgstr "노트 폴더 선택"
+
+msgid "Select a prompt to edit..."
+msgstr "편집할 프롬프트 선택..."
+
+msgid "Semantic Search"
+msgstr "시맨틱 검색"
+
+msgid "Settings"
+msgstr "설정"
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr "녹음 중 플로팅 카운트다운 HUD 오버레이 표시"
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr "로그인 시 Eloquent Notes 자동 시작"
+
+msgid "Start/Stop Recording"
+msgstr "녹음 시작/중지"
+
+msgid "Startup Options"
+msgstr "시작 옵션"
+
+msgid "Stereo (2 channels)"
+msgstr "스테레오 (2채널)"
+
+msgid "Stop dictation"
+msgstr "받아쓰기 중지"
+
+msgid "System is busy. Please wait."
+msgstr "시스템이 사용 중입니다. 잠시만 기다려 주세요."
+
+msgid "Tags, separated by commas"
+msgstr "태그 (쉼표로 구분)"
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr "재작성된 노트, 제목 및 태그의 대상 언어입니다(예: English, Spanish)."
+
+msgid "Task"
+msgstr "작업"
+
+msgid "Tasks"
+msgstr "작업"
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr "노트 생성 후 모델을 메모리에 유지하는 시간입니다(예: 즉시 언로드는 '0', 또는 '5m')."
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr "지연 시간을 최소화하기 위해 녹음 중 모델 가중치를 VRAM에 유지하는 시간입니다(예: '5m')."
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr "검색 후 임베딩 모델을 메모리에 유지하는 시간입니다(예: '5m' 또는 '0')."
+
+msgid "Timeline Columns:"
+msgstr "타임라인 열 개수:"
+
+msgid "Title"
+msgstr "제목"
+
+msgid "Today"
+msgstr "오늘"
+
+msgid "Transcription - System Prompt"
+msgstr "전사 - 시스템 프롬프트"
+
+msgid "Transcription - User Prompt"
+msgstr "전사 - 사용자 프롬프트"
+
+msgid "URL of your local or remote Ollama server."
+msgstr "로컬 또는 원격 Ollama 서버의 URL입니다."
+
+msgid "Use default context length"
+msgstr "기본 컨텍스트 길이 사용"
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr "{path}의 사용자 구성이 올바른 YAML 매핑이 아닙니다"
+
+msgid "Validation Error"
+msgstr "유효성 검사 오류"
+
+msgid "Verbosity level for app logging."
+msgstr "앱 로깅의 상세 수준입니다."
+
+msgid "View Log File"
+msgstr "로그 파일 보기"
+
+msgid "Voice dictations turned into organized notes"
+msgstr "음성 받아쓰기를 체계적인 노트로 변환"
+
+msgid "Yesterday"
+msgstr "어제"
+
+msgid "← Back"
+msgstr "← 뒤로"
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] "결과 {count}개"
