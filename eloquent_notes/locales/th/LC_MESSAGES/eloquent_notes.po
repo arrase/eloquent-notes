@@ -37,6 +37,9 @@ msgstr "ทั้งหมด"
 msgid "All tags"
 msgstr "แท็กทั้งหมด"
 
+msgid "Appearance"
+msgstr "รูปลักษณ์"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "คุณแน่ใจหรือไม่ว่าต้องการคืนค่าการตั้งค่ากำหนดค่าและพรอมต์ทั้งหมดเป็นค่าเริ่มต้น?\n\nการดำเนินการนี้จะเขียนทับการแก้ไขปัจจุบัน"
 
@@ -274,6 +277,9 @@ msgstr "โน้ต"
 msgid "Note Saved"
 msgstr "บันทึกโน้ตแล้ว"
 
+msgid "Note Type Colors"
+msgstr "สีประเภทโน้ต"
+
 msgid "Notes"
 msgstr "โน้ต"
 
@@ -477,6 +483,9 @@ msgstr "เวลาที่จะคงโมเดล Embedding ไว้ห�
 
 msgid "Timeline Columns:"
 msgstr "คอลัมน์ไทม์ไลน์:"
+
+msgid "Timeline Layout"
+msgstr "เค้าโครงไทม์ไลน์"
 
 msgid "Title"
 msgstr "ชื่อเรื่อง"

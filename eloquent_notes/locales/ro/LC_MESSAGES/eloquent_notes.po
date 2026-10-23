@@ -37,6 +37,9 @@ msgstr "Toate"
 msgid "All tags"
 msgstr "Toate etichetele"
 
+msgid "Appearance"
+msgstr "Aspect"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "Sigur doriți să restaurați toate setările de configurare și prompturile la valorile implicite?\n\nAceasta va suprascrie modificările curente."
 
@@ -274,6 +277,9 @@ msgstr "Notiță"
 msgid "Note Saved"
 msgstr "Notiță salvată"
 
+msgid "Note Type Colors"
+msgstr "Culori tipuri de notițe"
+
 msgid "Notes"
 msgstr "Notițe"
 
@@ -477,6 +483,9 @@ msgstr "Timpul de păstrare a modelului de embedding încărcat după o căutare
 
 msgid "Timeline Columns:"
 msgstr "Coloane cronologie:"
+
+msgid "Timeline Layout"
+msgstr "Aranjament cronologie"
 
 msgid "Title"
 msgstr "Titlu"

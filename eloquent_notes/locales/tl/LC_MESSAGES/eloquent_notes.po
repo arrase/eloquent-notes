@@ -37,6 +37,9 @@ msgstr "Lahat"
 msgid "All tags"
 msgstr "Lahat ng tag"
 
+msgid "Appearance"
+msgstr "Hitsura"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "Sigurado ka bang gusto mong ibalik ang lahat ng setting ng configuration at prompt sa kanilang mga default na halaga?\n\nPapalitan nito ang mga kasalukuyang pag-edit."
 
@@ -274,6 +277,9 @@ msgstr "Tala"
 msgid "Note Saved"
 msgstr "Na-save ang Tala"
 
+msgid "Note Type Colors"
+msgstr "Mga Kulay ng Uri ng Tala"
+
 msgid "Notes"
 msgstr "Mga Tala"
 
@@ -477,6 +483,9 @@ msgstr "Oras upang panatilihing naka-load ang embedding model pagkatapos ng pagh
 
 msgid "Timeline Columns:"
 msgstr "Mga Column ng Timeline:"
+
+msgid "Timeline Layout"
+msgstr "Layout ng Timeline"
 
 msgid "Title"
 msgstr "Pamagat"

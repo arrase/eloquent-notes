@@ -37,6 +37,9 @@ msgstr "すべて"
 msgid "All tags"
 msgstr "すべてのタグ"
 
+msgid "Appearance"
+msgstr "外観"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "すべての設定とプロンプトをデフォルト値に戻してもよろしいですか？\n\n現在の編集内容は上書きされます。"
 
@@ -274,6 +277,9 @@ msgstr "ノート"
 msgid "Note Saved"
 msgstr "ノートを保存しました"
 
+msgid "Note Type Colors"
+msgstr "ノート種別の色"
+
 msgid "Notes"
 msgstr "ノート"
 
@@ -477,6 +483,9 @@ msgstr "検索後に埋め込みモデルをロードしたままにする時間
 
 msgid "Timeline Columns:"
 msgstr "タイムラインの列数:"
+
+msgid "Timeline Layout"
+msgstr "タイムラインのレイアウト"
 
 msgid "Title"
 msgstr "タイトル"

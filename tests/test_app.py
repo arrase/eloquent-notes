@@ -8,7 +8,7 @@ import pytest
 import requests
 from PyQt6.QtWidgets import QSystemTrayIcon
 
-from eloquent_notes import config, notes
+from eloquent_notes import config, notes, ui
 from eloquent_notes.app import EloquentApp
 from eloquent_notes.app import main as app_main
 
@@ -39,6 +39,7 @@ def mock_config(tmp_path):
         "notes": {
             "folder": str(tmp_path / "notes"),
             "columns": 2,
+            "type_colors": dict(ui.DEFAULT_TYPE_COLORS),
         },
         "search": {
             "embedding_model": "embed",

@@ -37,6 +37,9 @@ msgstr "Όλες"
 msgid "All tags"
 msgstr "Όλες οι ετικέτες"
 
+msgid "Appearance"
+msgstr "Εμφάνιση"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "Είστε βέβαιοι ότι θέλετε να επαναφέρετε όλες τις ρυθμίσεις και τις προτροπές στις προεπιλεγμένες τιμές τους;\n\nΑυτό θα αντικαταστήσει τις τρέχουσες αλλαγές."
 
@@ -274,6 +277,9 @@ msgstr "Σημείωση"
 msgid "Note Saved"
 msgstr "Η σημείωση αποθηκεύτηκε"
 
+msgid "Note Type Colors"
+msgstr "Χρώματα τύπων σημειώσεων"
+
 msgid "Notes"
 msgstr "Σημειώσεις"
 
@@ -477,6 +483,9 @@ msgstr "Χρόνος διατήρησης του μοντέλου ενσωμάτ
 
 msgid "Timeline Columns:"
 msgstr "Στήλες χρονολογίου:"
+
+msgid "Timeline Layout"
+msgstr "Διάταξη χρονολογίου"
 
 msgid "Title"
 msgstr "Τίτλος"

@@ -37,6 +37,9 @@ msgstr "همه"
 msgid "All tags"
 msgstr "همه برچسب‌ها"
 
+msgid "Appearance"
+msgstr "ظاهر"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "آیا مطمئن هستید که می‌خواهید تمام تنظیمات پیکربندی و پرامپت‌ها را به مقادیر پیش‌فرض بازگردانید؟\n\nاین کار ویرایش‌های فعلی را بازنویسی می‌کند."
 
@@ -274,6 +277,9 @@ msgstr "یادداشت"
 msgid "Note Saved"
 msgstr "یادداشت ذخیره شد"
 
+msgid "Note Type Colors"
+msgstr "رنگ‌های نوع یادداشت"
+
 msgid "Notes"
 msgstr "یادداشت‌ها"
 
@@ -477,6 +483,9 @@ msgstr "مدت زمان نگه‌داری مدل تعبیه در حافظه پس
 
 msgid "Timeline Columns:"
 msgstr "ستون‌های خط زمانی:"
+
+msgid "Timeline Layout"
+msgstr "چیدمان خط زمانی"
 
 msgid "Title"
 msgstr "عنوان"

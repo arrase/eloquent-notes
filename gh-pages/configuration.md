@@ -34,7 +34,7 @@ Alternatively, choose **Configuration** in the tray menu or click **Settings** i
 ![Configuration GUI (Dark)](screenshots/configuration-dark.png#only-dark)
 ![Configuration GUI (Light)](screenshots/configuration-light.png#only-light)
 
-The dialog has five tabs plus **Restore Defaults**, **Cancel** and **Save** buttons. Saving writes the prompt files and the settings that differ from the defaults to `config.yaml`, then reloads the running daemon. The dialog follows the desktop's light or dark theme and updates live when the system palette changes.
+The dialog has six tabs plus **Restore Defaults**, **Cancel** and **Save** buttons. Saving writes the prompt files and the settings that differ from the defaults to `config.yaml`, then reloads the running daemon. The dialog follows the desktop's light or dark theme and updates live when the system palette changes.
 
 ### Tab Breakdown
 
@@ -47,9 +47,12 @@ The dialog has five tabs plus **Restore Defaults**, **Cancel** and **Save** butt
 
 #### 2. Notes
 * **Notes Folder**: folder where each note is saved as a Markdown file (default `~/Documents/Eloquent Notes`). It may point inside an Obsidian vault; files without Eloquent Notes frontmatter are ignored. See [Notes & Search](notes.md).
-* **Timeline Columns**: number of columns in the notes timeline grid (default `2`).
 
-#### 3. AI Settings
+#### 3. Appearance
+* **Timeline Columns**: number of columns in the notes timeline grid (default `2`).
+* **Note Type Colors**: badge color for each note type (`note`, `task`, `idea`, `reminder`, `question`, `decision`), chosen with a color picker and saved under `notes.type_colors`.
+
+#### 4. AI Settings
 **Ollama & AI Pipeline Settings**
 * **Ollama URL**: endpoint of the Ollama server (default `http://localhost:11434`).
 * **AI Model (Audio)**: multimodal model used for all three pipeline phases (default `gemma4:e4b-it-qat`). **Refresh** queries Ollama and lists the installed models that report the `audio` capability.
@@ -65,14 +68,14 @@ The dialog has five tabs plus **Restore Defaults**, **Cancel** and **Save** butt
 * **Keep Alive Time**: how long the embedding model (`search.keep_alive`) stays loaded between searches (default `"5m"`).
 * **Minimum Similarity**: cosine similarity below which search results are hidden (default `0.6`).
 
-#### 4. Audio
+#### 5. Audio
 * **Sample Rate**: recording rate in Hz (default `16000`).
 * **Audio Channels**: `1` (mono) or `2` (stereo).
 * **Capture Duration**: maximum recording length in seconds before recording stops automatically (default `30`, the Gemma 4 audio limit).
 * **Show floating countdown HUD**: overlay with the remaining time while recording; clicking it stops the recording.
 * **Play beep on recording start and stop**: audio cues, with **Beep Frequency** (default `440` Hz) and **Beep Duration** (default `0.1` s).
 
-#### 5. Prompts
+#### 6. Prompts
 Editor for the Markdown prompts of each pipeline phase and the retry prompt (see below).
 
 ![Prompts Editor (Dark)](screenshots/configuration-prompts-dark.png#only-dark)
@@ -88,6 +91,13 @@ Default configuration:
 notes:
   folder: "~/Documents/Eloquent Notes"   # One Markdown file per voice note.
   columns: 2                             # Number of columns in the timeline grid.
+  type_colors:
+    note: "#64748B"
+    task: "#3B76B6"
+    idea: "#C27821"
+    reminder: "#C94A4D"
+    question: "#8258B8"
+    decision: "#2A8567"
 
 ai:
   ollama_url: "http://localhost:11434"

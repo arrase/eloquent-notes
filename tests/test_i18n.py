@@ -134,7 +134,7 @@ def test_load_translations_defaults_to_system_detection(monkeypatch):
 
 def test_all_40_catalogs_cover_every_codebase_string():
     msgids, plurals = _extract_codebase_msgids()
-    assert len(msgids) == 170
+    assert len(msgids) == 173
     assert plurals == {("{count} result", "{count} results")}
 
     installed_locales = sorted(

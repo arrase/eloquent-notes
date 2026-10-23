@@ -37,6 +37,9 @@ msgstr "Kõik"
 msgid "All tags"
 msgstr "Kõik sildid"
 
+msgid "Appearance"
+msgstr "Välimus"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "Kas olete kindel, et soovite taastada kõik seadistused ja viibad nende vaikeväärtustele?\n\nSee kirjutab praegused muudatused üle."
 
@@ -274,6 +277,9 @@ msgstr "Märge"
 msgid "Note Saved"
 msgstr "Märge salvestatud"
 
+msgid "Note Type Colors"
+msgstr "Märkmetüüpide värvid"
+
 msgid "Notes"
 msgstr "Märkmed"
 
@@ -477,6 +483,9 @@ msgstr "Aeg, mille jooksul hoitakse manustamismudelit pärast otsingut mälus (n
 
 msgid "Timeline Columns:"
 msgstr "Ajajoone veerud:"
+
+msgid "Timeline Layout"
+msgstr "Ajajoone paigutus"
 
 msgid "Title"
 msgstr "Pealkiri"

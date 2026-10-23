@@ -37,6 +37,9 @@ msgstr "Sve"
 msgid "All tags"
 msgstr "Sve oznake"
 
+msgid "Appearance"
+msgstr "Izgled"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "Jeste li sigurni da želite vratiti sve postavke konfiguracije i upite na zadane vrijednosti?\n\nTime ćete prebrisati trenutne izmjene."
 
@@ -274,6 +277,9 @@ msgstr "Bilješka"
 msgid "Note Saved"
 msgstr "Bilješka spremljena"
 
+msgid "Note Type Colors"
+msgstr "Boje vrsta bilješki"
+
 msgid "Notes"
 msgstr "Bilješke"
 
@@ -477,6 +483,9 @@ msgstr "Vrijeme zadržavanja modela ugradnje u memoriji nakon pretraživanja (np
 
 msgid "Timeline Columns:"
 msgstr "Stupci vremenske crte:"
+
+msgid "Timeline Layout"
+msgstr "Raspored vremenske crte"
 
 msgid "Title"
 msgstr "Naslov"

@@ -37,6 +37,9 @@ msgstr "Összes"
 msgid "All tags"
 msgstr "Összes címke"
 
+msgid "Appearance"
+msgstr "Megjelenés"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "Biztosan visszaállítja az összes konfigurációs beállítást és promptot az alapértelmezett értékekre?\n\nEz felülírja a jelenlegi módosításokat."
 
@@ -274,6 +277,9 @@ msgstr "Jegyzet"
 msgid "Note Saved"
 msgstr "Jegyzet mentve"
 
+msgid "Note Type Colors"
+msgstr "Jegyzettípusok színei"
+
 msgid "Notes"
 msgstr "Jegyzetek"
 
@@ -477,6 +483,9 @@ msgstr "A beágyazási modell memóriában tartásának ideje keresés után (pl
 
 msgid "Timeline Columns:"
 msgstr "Idővonal oszlopai:"
+
+msgid "Timeline Layout"
+msgstr "Idővonal elrendezése"
 
 msgid "Title"
 msgstr "Cím"

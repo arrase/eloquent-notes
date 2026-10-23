@@ -37,6 +37,9 @@ msgstr "הכול"
 msgid "All tags"
 msgstr "כל התגיות"
 
+msgid "Appearance"
+msgstr "מראה"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "האם אתה בטוח שברצונך לשחזר את כל הגדרות התצורה וההנחיות לערכי ברירת המחדל שלהם?\n\nפעולה זו תדרוס את העריכות הנוכחיות."
 
@@ -274,6 +277,9 @@ msgstr "הערה"
 msgid "Note Saved"
 msgstr "ההערה נשמרה"
 
+msgid "Note Type Colors"
+msgstr "צבעי סוגי הערות"
+
 msgid "Notes"
 msgstr "הערות"
 
@@ -477,6 +483,9 @@ msgstr "משך הזמן להשארת מודל ההטמעה טעון לאחר ח�
 
 msgid "Timeline Columns:"
 msgstr "עמודות ציר זמן:"
+
+msgid "Timeline Layout"
+msgstr "פריסת ציר זמן"
 
 msgid "Title"
 msgstr "כותרת"

@@ -1,10 +1,14 @@
-"""Unit tests for configuration GUI tabs (AITab, AudioTab, GeneralTab, NotesTab, TextFilesTab)."""
+"""Unit tests for configuration GUI tabs (AITab, AppearanceTab, AudioTab, GeneralTab, NotesTab, TextFilesTab)."""
 
 import os
 from unittest.mock import MagicMock, patch
 
+from PyQt6.QtGui import QColor
+
+from eloquent_notes import ui
 from eloquent_notes.config_gui.tabs import text_files
 from eloquent_notes.config_gui.tabs.ai import AITab
+from eloquent_notes.config_gui.tabs.appearance import AppearanceTab
 from eloquent_notes.config_gui.tabs.audio import AudioTab
 from eloquent_notes.config_gui.tabs.general import GeneralTab
 from eloquent_notes.config_gui.tabs.notes import NotesTab
@@ -374,22 +378,19 @@ def test_general_tab_lowercase_log_level(qapp):
 
 def test_notes_tab_load_and_save(qapp):
     tab = NotesTab()
-    config_data = {"notes": {"folder": "~/Notes", "columns": 2}}
+    config_data = {"notes": {"folder": "~/Notes"}}
 
     tab.load_settings(config_data)
     assert tab.txt_folder.text() == "~/Notes"
-    assert tab.spn_columns.value() == 2
 
     tab.txt_folder.setText("  ~/Voice Notes  ")
-    tab.spn_columns.setValue(3)
     assert tab.save_settings(config_data) is True
     assert config_data["notes"]["folder"] == "~/Voice Notes"
-    assert config_data["notes"]["columns"] == 3
 
 
 def test_notes_tab_rejects_empty_folder(qapp):
     tab = NotesTab()
-    config_data = {"notes": {"folder": "~/Notes", "columns": 2}}
+    config_data = {"notes": {"folder": "~/Notes"}}
     tab.txt_folder.setText("  ")
 
     with patch("PyQt6.QtWidgets.QMessageBox.warning") as mock_warn:
@@ -412,6 +413,48 @@ def test_notes_tab_browse_folder(qapp, tmp_path):
         tab._browse_folder()
     assert tab.txt_folder.text() == "/nonexistent/folder"
     assert mock_dialog.call_args.args[2] == os.path.expanduser("~/")
+
+
+# --- APPEARANCE TAB TESTS ---
+
+
+def test_appearance_tab_load_and_save(qapp):
+    tab = AppearanceTab()
+    config_data = {
+        "notes": {
+            "columns": 2,
+            "type_colors": dict(ui.DEFAULT_TYPE_COLORS),
+        }
+    }
+
+    tab.load_settings(config_data)
+    assert tab.spn_columns.value() == 2
+    assert tab.color_buttons["idea"].text() == ui.DEFAULT_TYPE_COLORS["idea"]
+
+    tab.spn_columns.setValue(3)
+    with patch("PyQt6.QtWidgets.QColorDialog.getColor", return_value=QColor("#1234ab")):
+        tab.color_buttons["idea"].click()
+    assert tab.color_buttons["idea"].text() == "#1234AB"
+
+    assert tab.save_settings(config_data) is True
+    assert config_data["notes"]["columns"] == 3
+    assert config_data["notes"]["type_colors"]["idea"] == "#1234AB"
+    assert config_data["notes"]["type_colors"]["note"] == ui.DEFAULT_TYPE_COLORS["note"]
+
+
+def test_appearance_tab_pick_color_cancelled(qapp):
+    tab = AppearanceTab()
+    config_data = {
+        "notes": {
+            "columns": 2,
+            "type_colors": dict(ui.DEFAULT_TYPE_COLORS),
+        }
+    }
+    tab.load_settings(config_data)
+
+    with patch("PyQt6.QtWidgets.QColorDialog.getColor", return_value=QColor()):
+        tab.color_buttons["task"].click()
+    assert tab.color_buttons["task"].text() == ui.DEFAULT_TYPE_COLORS["task"]
 
 
 # --- TEXT FILES TAB TESTS ---

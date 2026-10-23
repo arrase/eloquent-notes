@@ -70,11 +70,13 @@ def test_merge_configs():
         "audio": {"sample_rate": 16000, "channels": 1, "beep_enabled": True},
         "ai": {"model": "gemma", "context_length": 8192},
         "search": {"min_similarity": 0.6},
+        "notes": {"type_colors": {"idea": "#C27821", "note": "#64748B"}},
     }
     overrides = {
         "audio": {"sample_rate": 44100},
         "ai": {"model": "gemma4:e4b", "context_length": None},
         "search": {"min_similarity": 1},
+        "notes": {"type_colors": {"idea": "#112233"}},
     }
 
     merged = config._merge_configs(base, overrides)
@@ -84,6 +86,7 @@ def test_merge_configs():
     assert merged["ai"]["model"] == "gemma4:e4b"
     assert merged["ai"]["context_length"] is None
     assert merged["search"]["min_similarity"] == 1
+    assert merged["notes"]["type_colors"] == {"idea": "#112233", "note": "#64748B"}
 
     # Verify base was not mutated
     assert base["audio"]["sample_rate"] == 16000
@@ -105,6 +108,9 @@ def test_merge_configs():
 
     with pytest.raises(TypeError, match="Invalid configuration value for 'model'"):
         config._merge_configs(base, {"ai": {"model": None}})
+
+    with pytest.raises(ValueError, match="Invalid configuration value for 'idea'"):
+        config._merge_configs(base, {"notes": {"type_colors": {"idea": "not-a-color"}}})
 
 
 def test_load_config(tmp_config_dir, monkeypatch):
@@ -202,6 +208,14 @@ def test_load_default_config():
     assert default_config["audio"]["recording_hud_enabled"] is True
     assert default_config["notes"]["folder"] == "~/Documents/Eloquent Notes"
     assert default_config["notes"]["columns"] == 2
+    assert default_config["notes"]["type_colors"] == {
+        "note": "#64748B",
+        "task": "#3B76B6",
+        "idea": "#C27821",
+        "reminder": "#C94A4D",
+        "question": "#8258B8",
+        "decision": "#2A8567",
+    }
     assert default_config["search"]["embedding_model"] == "embeddinggemma-2:latest"
     assert default_config["search"]["keep_alive"] == "5m"
     assert default_config["search"]["min_similarity"] == 0.6

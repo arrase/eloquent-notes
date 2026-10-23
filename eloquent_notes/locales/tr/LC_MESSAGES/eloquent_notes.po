@@ -37,6 +37,9 @@ msgstr "Tümü"
 msgid "All tags"
 msgstr "Tüm etiketler"
 
+msgid "Appearance"
+msgstr "Görünüm"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "Tüm yapılandırma ayarlarını ve istemleri varsayılan değerlerine sıfırlamak istediğinizden emin misiniz?\n\nBu işlem mevcut düzenlemelerin üzerine yazacaktır."
 
@@ -274,6 +277,9 @@ msgstr "Not"
 msgid "Note Saved"
 msgstr "Not Kaydedildi"
 
+msgid "Note Type Colors"
+msgstr "Not Türü Renkleri"
+
 msgid "Notes"
 msgstr "Notlar"
 
@@ -477,6 +483,9 @@ msgstr "Bir aramadan sonra gömme modelinin bellekte tutulacağı süre (örn. '
 
 msgid "Timeline Columns:"
 msgstr "Zaman Çizelgesi Sütunları:"
+
+msgid "Timeline Layout"
+msgstr "Zaman Çizelgesi Düzeni"
 
 msgid "Title"
 msgstr "Başlık"

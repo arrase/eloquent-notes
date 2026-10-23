@@ -37,6 +37,9 @@ msgstr "Alla"
 msgid "All tags"
 msgstr "Alla taggar"
 
+msgid "Appearance"
+msgstr "Utseende"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "Är du säker på att du vill återställa alla konfigurationsinställningar och prompter till standardvärdena?\n\nDetta skriver över nuvarande ändringar."
 
@@ -274,6 +277,9 @@ msgstr "Anteckning"
 msgid "Note Saved"
 msgstr "Anteckning sparad"
 
+msgid "Note Type Colors"
+msgstr "Färger för anteckningstyper"
+
 msgid "Notes"
 msgstr "Anteckningar"
 
@@ -477,6 +483,9 @@ msgstr "Tid att hålla inbäddningsmodellen inläst efter en sökning (t.ex. '5m
 
 msgid "Timeline Columns:"
 msgstr "Tidslinjekolumner:"
+
+msgid "Timeline Layout"
+msgstr "Tidslinjelayout"
 
 msgid "Title"
 msgstr "Rubrik"

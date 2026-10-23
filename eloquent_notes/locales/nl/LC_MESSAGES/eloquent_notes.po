@@ -37,6 +37,9 @@ msgstr "Alle"
 msgid "All tags"
 msgstr "Alle tags"
 
+msgid "Appearance"
+msgstr "Uiterlijk"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "Weet u zeker dat u alle configuratie-instellingen en prompts wilt herstellen naar de standaardwaarden?\n\nHiermee worden huidige wijzigingen overschreven."
 
@@ -274,6 +277,9 @@ msgstr "Notitie"
 msgid "Note Saved"
 msgstr "Notitie opgeslagen"
 
+msgid "Note Type Colors"
+msgstr "Kleuren voor notitietypen"
+
 msgid "Notes"
 msgstr "Notities"
 
@@ -477,6 +483,9 @@ msgstr "Tijd om het embeddingmodel geladen te houden na een zoekopdracht (bijv. 
 
 msgid "Timeline Columns:"
 msgstr "Tijdlijnkolommen:"
+
+msgid "Timeline Layout"
+msgstr "Tijdlijnindeling"
 
 msgid "Title"
 msgstr "Titel"

@@ -37,6 +37,9 @@ msgstr "Kaikki"
 msgid "All tags"
 msgstr "Kaikki tunnisteet"
 
+msgid "Appearance"
+msgstr "Ulkoasu"
+
 msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
 msgstr "Haluatko varmasti palauttaa kaikki asetukset ja kehotteet oletusarvoihin?\n\nTämä korvaa nykyiset muutokset."
 
@@ -274,6 +277,9 @@ msgstr "Muistiinpano"
 msgid "Note Saved"
 msgstr "Muistiinpano tallennettu"
 
+msgid "Note Type Colors"
+msgstr "Muistiinpanotyyppien värit"
+
 msgid "Notes"
 msgstr "Muistiinpanot"
 
@@ -477,6 +483,9 @@ msgstr "Aika, jonka upotusmalli pidetään muistissa haun jälkeen (esim. '5m' t
 
 msgid "Timeline Columns:"
 msgstr "Aikajanan sarakkeet:"
+
+msgid "Timeline Layout"
+msgstr "Aikajanan asettelu"
 
 msgid "Title"
 msgstr "Otsikko"
