@@ -1,0 +1,521 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: eloquent-notes 0.4.0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid " Hz"
+msgstr ""
+
+msgid " MB"
+msgstr ""
+
+msgid " sec"
+msgstr ""
+
+msgid "AI Model (Audio):"
+msgstr ""
+
+msgid "AI Model cannot be empty."
+msgstr ""
+
+msgid "AI Settings"
+msgstr ""
+
+msgid "Add dictation"
+msgstr ""
+
+msgid "Alias for 'toggle' command."
+msgstr ""
+
+msgid "All"
+msgstr ""
+
+msgid "All tags"
+msgstr ""
+
+msgid "Are you sure you want to restore all configuration settings and prompts to their default values?\n\nThis will overwrite current edits."
+msgstr ""
+
+msgid "Audible feedback beeps when starting/stopping recording."
+msgstr ""
+
+msgid "Audio"
+msgstr ""
+
+msgid "Audio Capture Settings"
+msgstr ""
+
+msgid "Audio Channels:"
+msgstr ""
+
+msgid "Backup Count:"
+msgstr ""
+
+msgid "Beep Duration:"
+msgstr ""
+
+msgid "Beep Frequency:"
+msgstr ""
+
+msgid "Browse..."
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Capture Duration:"
+msgstr ""
+
+msgid "Classification - System Prompt"
+msgstr ""
+
+msgid "Classification - User Prompt"
+msgstr ""
+
+msgid "Command to execute: 'install-autostart', 'toggle', 'open' (show the notes window), or 'config' (open configuration GUI)."
+msgstr ""
+
+msgid "Configuration"
+msgstr ""
+
+msgid "Configuration Error"
+msgstr ""
+
+msgid "Configuration reloaded successfully."
+msgstr ""
+
+msgid "Configuration section '{key}' must be a mapping, got {type_name}"
+msgstr ""
+
+msgid "Connection failed: {error}"
+msgstr ""
+
+msgid "Context Length:"
+msgstr ""
+
+msgid "Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory."
+msgstr ""
+
+msgid "Copy"
+msgstr ""
+
+msgid "Could not move {name} to the trash."
+msgstr ""
+
+msgid "Could not start recording: {error}"
+msgstr ""
+
+msgid "Could not stop recording: {error}"
+msgstr ""
+
+msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr ""
+
+msgid "Decision"
+msgstr ""
+
+msgid "Decisions"
+msgstr ""
+
+msgid "Defaults restored. Click 'Save' to apply changes to disk."
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Delete Failed"
+msgstr ""
+
+msgid "Delete Note"
+msgstr ""
+
+msgid "Dictation Added"
+msgstr ""
+
+msgid "Dictation Empty"
+msgstr ""
+
+msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgstr ""
+
+msgid "Eloquent Notes (Idle)"
+msgstr ""
+
+msgid "Eloquent Notes (Processing...)"
+msgstr ""
+
+msgid "Eloquent Notes (Recording...)"
+msgstr ""
+
+msgid "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
+msgstr ""
+
+msgid "Eloquent Notes Configuration"
+msgstr ""
+
+msgid "Eloquent Notes Daemon"
+msgstr ""
+
+msgid "Embedding Model cannot be empty."
+msgstr ""
+
+msgid "Embedding Model:"
+msgstr ""
+
+msgid "Error processing dictation: {detail}"
+msgstr ""
+
+msgid "Failed to load user configuration: {error}\n\nLoaded default settings."
+msgstr ""
+
+msgid "Failed to reload configuration: {error}"
+msgstr ""
+
+msgid "Failed to save settings: {error}"
+msgstr ""
+
+msgid "Fetching models..."
+msgstr ""
+
+msgid "Folder where each voice note is saved as a Markdown file. Point it inside an Obsidian vault to see your notes there too."
+msgstr ""
+
+msgid "General"
+msgstr ""
+
+msgid "Idea"
+msgstr ""
+
+msgid "Ideas"
+msgstr ""
+
+msgid "If checked, sets context_length to null (or leaves it unset), instructing Ollama to use the model's default maximum context length."
+msgstr ""
+
+msgid "Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr ""
+
+msgid "Invalid Preload Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr ""
+
+msgid "Invalid Search Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
+msgstr ""
+
+msgid "Invalid configuration value for '{key}'"
+msgstr ""
+
+msgid "Keep Alive Time:"
+msgstr ""
+
+msgid "Log File"
+msgstr ""
+
+msgid "Log file does not exist yet. Run some dictations first!"
+msgstr ""
+
+msgid "Logging Level:"
+msgstr ""
+
+msgid "Logging Settings"
+msgstr ""
+
+msgid "Max Log File Size:"
+msgstr ""
+
+msgid "Max Retries:"
+msgstr ""
+
+msgid "Maximum duration in seconds for audio recording before automatically processing."
+msgstr ""
+
+msgid "Maximum size of the log file before rotating."
+msgstr ""
+
+msgid "Minimum Similarity:"
+msgstr ""
+
+msgid "Model returned empty note content"
+msgstr ""
+
+msgid "Models loaded successfully."
+msgstr ""
+
+msgid "Mono (1 channel)"
+msgstr ""
+
+msgid "Move “{title}” to the trash?"
+msgstr ""
+
+msgid "Name of the Ollama LLM model to run for dictation tasks (e.g. gemma4:e4b-it-qat)."
+msgstr ""
+
+msgid "No audio-capable models found."
+msgstr ""
+
+msgid "No matching notes."
+msgstr ""
+
+msgid "No note was created because the audio was empty."
+msgstr ""
+
+msgid "No notes match these filters."
+msgstr ""
+
+msgid "No notes yet. Click the tray icon to record your first one."
+msgstr ""
+
+msgid "Note"
+msgstr ""
+
+msgid "Note Saved"
+msgstr ""
+
+msgid "Notes"
+msgstr ""
+
+msgid "Notes Folder cannot be empty."
+msgstr ""
+
+msgid "Notes Folder:"
+msgstr ""
+
+msgid "Notes Storage"
+msgstr ""
+
+msgid "Number of audio input channels."
+msgstr ""
+
+msgid "Number of backup log files to retain."
+msgstr ""
+
+msgid "Number of columns in the notes timeline grid."
+msgstr ""
+
+msgid "Number of retry attempts if LLM output fails JSON parsing."
+msgstr ""
+
+msgid "Ollama && AI Pipeline Settings"
+msgstr ""
+
+msgid "Ollama URL cannot be empty."
+msgstr ""
+
+msgid "Ollama URL is empty."
+msgstr ""
+
+msgid "Ollama URL must start with http:// or https://."
+msgstr ""
+
+msgid "Ollama URL:"
+msgstr ""
+
+msgid "Ollama embedding model used to search notes by meaning (e.g. embeddinggemma-2:latest)."
+msgstr ""
+
+msgid "Open Notes"
+msgstr ""
+
+msgid "Open the background daemon log file in your system editor."
+msgstr ""
+
+msgid "Output Language cannot be empty."
+msgstr ""
+
+msgid "Output Language:"
+msgstr ""
+
+msgid "Play beep on recording start and stop"
+msgstr ""
+
+msgid "Preload Keep Alive:"
+msgstr ""
+
+msgid "Preload Timeout:"
+msgstr ""
+
+msgid "Processing Error"
+msgstr ""
+
+msgid "Processing…"
+msgstr ""
+
+msgid "Prompt Content:"
+msgstr ""
+
+msgid "Prompts"
+msgstr ""
+
+msgid "Prompts:"
+msgstr ""
+
+msgid "Question"
+msgstr ""
+
+msgid "Questions"
+msgstr ""
+
+msgid "Quit"
+msgstr ""
+
+msgid "Ready"
+msgstr ""
+
+msgid "Recording Note..."
+msgstr ""
+
+msgid "Recording in progress — click to stop and process note"
+msgstr ""
+
+msgid "Refresh"
+msgstr ""
+
+msgid "Reload Configuration"
+msgstr ""
+
+msgid "Reminder"
+msgstr ""
+
+msgid "Reminders"
+msgstr ""
+
+msgid "Request Timeout:"
+msgstr ""
+
+msgid "Restore Defaults"
+msgstr ""
+
+msgid "Retry Prompt"
+msgstr ""
+
+msgid "Rewriting - System Prompt"
+msgstr ""
+
+msgid "Rewriting - User Prompt"
+msgstr ""
+
+msgid "Sample Rate:"
+msgstr ""
+
+msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Save Error"
+msgstr ""
+
+msgid "Search failed: {error}"
+msgstr ""
+
+msgid "Search results below this cosine similarity are hidden."
+msgstr ""
+
+msgid "Search your notes by meaning…"
+msgstr ""
+
+msgid "Searching…"
+msgstr ""
+
+msgid "Select Notes Folder"
+msgstr ""
+
+msgid "Select a prompt to edit..."
+msgstr ""
+
+msgid "Semantic Search"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Show floating countdown HUD overlay during recording"
+msgstr ""
+
+msgid "Start Eloquent Notes automatically on login"
+msgstr ""
+
+msgid "Start/Stop Recording"
+msgstr ""
+
+msgid "Startup Options"
+msgstr ""
+
+msgid "Stereo (2 channels)"
+msgstr ""
+
+msgid "Stop dictation"
+msgstr ""
+
+msgid "System is busy. Please wait."
+msgstr ""
+
+msgid "Tags, separated by commas"
+msgstr ""
+
+msgid "Target language for rewritten notes, titles, and tags (e.g. English, Spanish)."
+msgstr ""
+
+msgid "Task"
+msgstr ""
+
+msgid "Tasks"
+msgstr ""
+
+msgid "Time to keep model loaded after note generation (e.g., '0' to unload immediately, or '5m')."
+msgstr ""
+
+msgid "Time to keep model weights loaded in VRAM during recording to minimize latency (e.g., '5m')."
+msgstr ""
+
+msgid "Time to keep the embedding model loaded after a search (e.g., '5m' or '0')."
+msgstr ""
+
+msgid "Timeline Columns:"
+msgstr ""
+
+msgid "Title"
+msgstr ""
+
+msgid "Today"
+msgstr ""
+
+msgid "Transcription - System Prompt"
+msgstr ""
+
+msgid "Transcription - User Prompt"
+msgstr ""
+
+msgid "URL of your local or remote Ollama server."
+msgstr ""
+
+msgid "Use default context length"
+msgstr ""
+
+msgid "User config at {path} is not a valid YAML mapping"
+msgstr ""
+
+msgid "Validation Error"
+msgstr ""
+
+msgid "Verbosity level for app logging."
+msgstr ""
+
+msgid "View Log File"
+msgstr ""
+
+msgid "Voice dictations turned into organized notes"
+msgstr ""
+
+msgid "Yesterday"
+msgstr ""
+
+msgid "← Back"
+msgstr ""
+
+msgid "{count} result"
+msgid_plural "{count} results"
+msgstr[0] ""
+msgstr[1] ""
