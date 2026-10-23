@@ -124,10 +124,13 @@ Browse notes grouped by day, filter by type or `#tag`, search by meaning with lo
   <span>Visual settings &amp; prompt editor</span>
 </div>
 
-Eloquent Notes includes a PyQt6 dialog for editing the notes folder, AI and search models, audio parameters and prompts.
+Eloquent Notes includes a PyQt6 dialog for editing the notes folder, timeline layout and note type colors, AI and search models, audio parameters and prompts.
 
 ![Configuration GUI (Dark)](screenshots/configuration-dark.png#only-dark)
 ![Configuration GUI (Light)](screenshots/configuration-light.png#only-light)
+
+![Appearance Settings (Dark)](screenshots/configuration-appearance-dark.png#only-dark)
+![Appearance Settings (Light)](screenshots/configuration-appearance-light.png#only-light)
 
 ![Prompts Editor (Dark)](screenshots/configuration-prompts-dark.png#only-dark)
 ![Prompts Editor (Light)](screenshots/configuration-prompts-light.png#only-light)

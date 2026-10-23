@@ -52,6 +52,9 @@ The dialog has six tabs plus **Restore Defaults**, **Cancel** and **Save** butto
 * **Timeline Columns**: number of columns in the notes timeline grid (default `2`).
 * **Note Type Colors**: badge color for each note type (`note`, `task`, `idea`, `reminder`, `question`, `decision`), chosen with a color picker and saved under `notes.type_colors`.
 
+![Appearance Settings (Dark)](screenshots/configuration-appearance-dark.png#only-dark)
+![Appearance Settings (Light)](screenshots/configuration-appearance-light.png#only-light)
+
 #### 4. AI Settings
 **Ollama & AI Pipeline Settings**
 * **Ollama URL**: endpoint of the Ollama server (default `http://localhost:11434`).

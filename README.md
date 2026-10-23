@@ -171,10 +171,19 @@ Open it from the tray menu (**Configuration**), the **Settings** button in the n
 </p>
 
 - **General:** autostart on login, logging level, log rotation, view the log file.
-- **Notes:** the notes folder and timeline grid columns.
+- **Notes:** the notes folder.
+- **Appearance:** timeline grid columns and custom badge colors for each note type.
 - **AI Settings:** Ollama URL, audio model, output language, context length, keep-alive, retries and timeouts; **Semantic Search** group with the embedding model and minimum similarity. **Refresh** lists the audio-capable and embedding models installed in Ollama.
 - **Audio:** sample rate, channels, maximum capture duration, recording HUD, beeps.
 - **Prompts:** edit the transcription, rewriting, classification and retry prompts.
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="gh-pages/screenshots/configuration-appearance-dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="gh-pages/screenshots/configuration-appearance-light.png">
+    <img alt="Appearance Settings" src="gh-pages/screenshots/configuration-appearance-dark.png">
+  </picture>
+</p>
 
 <p align="center">
   <picture>
@@ -190,6 +199,13 @@ Open it from the tray menu (**Configuration**), the **Settings** button in the n
 notes:
   folder: "~/Documents/Eloquent Notes"   # One Markdown file per voice note.
   columns: 2                             # Number of columns in the timeline grid.
+  type_colors:
+    note: "#64748B"
+    task: "#3B76B6"
+    idea: "#C27821"
+    reminder: "#C94A4D"
+    question: "#8258B8"
+    decision: "#2A8567"
 
 ai:
   ollama_url: "http://localhost:11434"
