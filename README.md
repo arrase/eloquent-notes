@@ -16,6 +16,14 @@ Eloquent Notes is a Linux system tray app, inspired by [Google Eloquent](https:/
 
 Everything runs offline on your machine.
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="gh-pages/screenshots/timeline-dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="gh-pages/screenshots/timeline-light.png">
+    <img alt="Eloquent Notes Timeline" src="gh-pages/screenshots/timeline-dark.png">
+  </picture>
+</p>
+
 ---
 
 ## ✨ Features
@@ -26,6 +34,7 @@ Everything runs offline on your machine.
 - **Notes window:** a timeline grouped by day, type and tag filters, and a reader where title, type, tags and body are editable.
 - **Add dictation:** dictate more text into an existing note; it is rewritten and appended as a new paragraph.
 - **Semantic search:** search notes by meaning with a local embedding model (`embeddinggemma-2:latest`). Embeddings are computed on demand and cached.
+- **Light & dark themes:** sober, native-feeling palettes that follow your desktop's light or dark color scheme and switch live.
 - **Multilingual:** dictate in any language and pick the output language for titles, prose and tags.
 - **Customizable prompts:** every pipeline phase is driven by editable Markdown prompts.
 
@@ -80,10 +89,14 @@ eloquent-notes install-autostart    # start it automatically on login
 ```
 
 ### Record a note
-1. Start recording: left-click the tray icon or run `eloquent-notes toggle`. A beep plays and the icon turns **red**.
+1. Start recording: left-click the tray icon or run `eloquent-notes toggle`. A beep plays, the icon turns **red**, and a floating countdown HUD appears at the top of the screen.
 2. Speak (up to 30 s). The model is preloaded in the background while you talk.
-3. Stop recording the same way. The icon turns **orange** while the note is written.
+3. Stop recording the same way (or click the floating HUD). The icon turns **orange** while the note is written.
 4. A **Note Saved** notification appears and the icon returns to **gray**. Click the notification to open the notes window. Silent recordings produce a **Dictation Empty** notification and no note.
+
+<p align="center">
+  <img alt="Floating Recording HUD" src="gh-pages/screenshots/recording-hud.png">
+</p>
 
 ### Tray icon
 
@@ -94,7 +107,7 @@ eloquent-notes install-autostart    # start it automatically on login
 | Right click | Menu: **Start/Stop Recording**, **Open Notes**, **Configuration**, **Reload Configuration**, **Quit** |
 
 ### Notes window
-Open it with a middle click on the tray icon, **Open Notes** in the menu, or `eloquent-notes open`.
+Open it with a middle click on the tray icon, **Open Notes** in the menu, or `eloquent-notes open`. The window automatically adapts to your desktop's **dark** or **light** theme.
 
 - **Timeline:** notes grouped by day (Today, Yesterday, "Monday, 19 October", …), newest first.
 - **Filters:** type chips (All, Notes, Tasks, Ideas, …) and a tag selector. Clicking a `#tag` on a card selects it.
@@ -103,6 +116,12 @@ Open it with a middle click on the tray icon, **Open Notes** in the menu, or `el
   - **Add dictation** records a new dictation and appends its rewritten text to the note, keeping its type and tags.
   - **Copy** copies the note as Markdown (`# Title` + body) to the clipboard.
   - **Delete** asks for confirmation and moves the file to the system trash.
+
+| Dark Theme | Light Theme |
+| :---: | :---: |
+| ![Timeline Dark](gh-pages/screenshots/timeline-dark.png) | ![Timeline Light](gh-pages/screenshots/timeline-light.png) |
+| ![Reader Dark](gh-pages/screenshots/reader-dark.png) | ![Reader Light](gh-pages/screenshots/reader-light.png) |
+| ![Semantic Search Dark](gh-pages/screenshots/search-dark.png) | ![Semantic Search Light](gh-pages/screenshots/search-light.png) |
 
 ### Global keyboard shortcut
 Bind `eloquent-notes toggle` in your desktop environment:
@@ -143,13 +162,27 @@ On first run, Eloquent Notes creates `~/.config/eloquent-notes/` with `config.ya
 ### Configuration GUI
 Open it from the tray menu (**Configuration**), the **Settings** button in the notes window, or `eloquent-notes config`. Saving reloads the running daemon.
 
-![Configuration GUI](screenshots/configuration.png)
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="gh-pages/screenshots/configuration-dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="gh-pages/screenshots/configuration-light.png">
+    <img alt="Configuration GUI" src="gh-pages/screenshots/configuration-dark.png">
+  </picture>
+</p>
 
 - **General:** autostart on login, logging level, log rotation, view the log file.
 - **Notes:** the notes folder and timeline grid columns.
 - **AI Settings:** Ollama URL, audio model, output language, context length, keep-alive, retries and timeouts; **Semantic Search** group with the embedding model and minimum similarity. **Refresh** lists the audio-capable and embedding models installed in Ollama.
 - **Audio:** sample rate, channels, maximum capture duration, recording HUD, beeps.
 - **Prompts:** edit the transcription, rewriting, classification and retry prompts.
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="gh-pages/screenshots/configuration-prompts-dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="gh-pages/screenshots/configuration-prompts-light.png">
+    <img alt="Prompts Editor" src="gh-pages/screenshots/configuration-prompts-dark.png">
+  </picture>
+</p>
 
 ### `config.yaml`
 

@@ -22,6 +22,8 @@ Eloquent Notes runs in your desktop panel. New recordings are started and stoppe
 
 Clicking a desktop notification (e.g. **Note Saved**) opens the notes window. While recording, clicking the floating HUD also stops the recording.
 
+![Floating Recording HUD](screenshots/recording-hud.png)
+
 ### Notifications
 
 | Notification | When |

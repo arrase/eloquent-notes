@@ -57,7 +57,7 @@ Notes edited by other programs are picked up the next time the window refreshes 
 
 Open the window with a middle click on the tray icon, **Open Notes** in the tray menu, clicking a notification, `eloquent-notes open`, or running `eloquent-notes` while the daemon is already running. Closing the window keeps the daemon running in the tray.
 
-The window follows the desktop's light/dark palette; dates are shown in English.
+The window follows the desktop's light and dark color scheme (`ui.LIGHT_THEME` and `ui.DARK_THEME`) and updates live when the system palette changes; dates are shown in English.
 
 ### Timeline
 
@@ -65,6 +65,9 @@ The window follows the desktop's light/dark palette; dates are shown in English.
 - Each card shows the time, the type, the title, a preview of the body and the tags.
 - **Type chips** (All, Notes, Tasks, Ideas, Reminders, Questions, Decisions) and the **tag selector** filter the list. Clicking a `#tag` on a card selects that tag.
 - **Settings** opens the configuration dialog.
+
+![Notes Timeline (Dark)](screenshots/timeline-dark.png#only-dark)
+![Notes Timeline (Light)](screenshots/timeline-light.png#only-light)
 
 ### Reader & Editing
 
@@ -75,6 +78,9 @@ Click a card to open it in the reader:
 - **Copy** puts the note on the clipboard as Markdown: `# Title`, a blank line, then the body.
 - **Delete** asks for confirmation and moves the file to the system trash.
 
+![Note Reader (Dark)](screenshots/reader-dark.png#only-dark)
+![Note Reader (Light)](screenshots/reader-light.png#only-light)
+
 ### Add Dictation
 
 **Add dictation** records a new dictation for the open note. It runs only Phase 1 (transcription) and Phase 2 (rewriting); the rewritten content is appended to the body as a new paragraph. The note keeps its title, type and tags. Pending edits in the reader are saved first, and the reader refreshes when the text arrives.
@@ -84,6 +90,9 @@ Click a card to open it in the reader:
 ## Semantic Search
 
 Type a query in the search box and press <kbd>Enter</kbd>. Results are ordered by similarity and can still be narrowed with the type and tag filters. Clearing the box returns to the timeline.
+
+![Semantic Search (Dark)](screenshots/search-dark.png#only-dark)
+![Semantic Search (Light)](screenshots/search-light.png#only-light)
 
 ### How It Works
 

@@ -31,9 +31,10 @@ eloquent-notes config
 
 Alternatively, choose **Configuration** in the tray menu or click **Settings** in the notes window.
 
-![Configuration GUI](screenshots/configuration.png)
+![Configuration GUI (Dark)](screenshots/configuration-dark.png#only-dark)
+![Configuration GUI (Light)](screenshots/configuration-light.png#only-light)
 
-The dialog has five tabs plus **Restore Defaults**, **Cancel** and **Save** buttons. Saving writes the prompt files and the settings that differ from the defaults to `config.yaml`, then reloads the running daemon. The dialog uses the system theme.
+The dialog has five tabs plus **Restore Defaults**, **Cancel** and **Save** buttons. Saving writes the prompt files and the settings that differ from the defaults to `config.yaml`, then reloads the running daemon. The dialog follows the desktop's light or dark theme and updates live when the system palette changes.
 
 ### Tab Breakdown
 
@@ -73,6 +74,9 @@ The dialog has five tabs plus **Restore Defaults**, **Cancel** and **Save** butt
 
 #### 5. Prompts
 Editor for the Markdown prompts of each pipeline phase and the retry prompt (see below).
+
+![Prompts Editor (Dark)](screenshots/configuration-prompts-dark.png#only-dark)
+![Prompts Editor (Light)](screenshots/configuration-prompts-light.png#only-light)
 
 ---
 

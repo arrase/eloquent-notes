@@ -85,7 +85,39 @@ hide:
     <h3>Customizable Prompts</h3>
     <p>Tailor the Markdown prompts of every pipeline phase and the output language of titles, prose and tags.</p>
   </div>
+
+  <div class="feature-card">
+    <i class="fa-solid fa-circle-half-stroke feature-icon" aria-hidden="true"></i>
+    <h3>Light &amp; Dark Themes</h3>
+    <p>Explicit dark and light palettes that follow your desktop color scheme and switch live when the system palette changes.</p>
+  </div>
 </div>
+
+<div class="section-header">
+  <h2>Notes Window &amp; Semantic Search</h2>
+  <span>Day-grouped timeline, editable reader &amp; meaning-based search</span>
+</div>
+
+Browse notes grouped by day, filter by type or `#tag`, search by meaning with local embeddings, or click any card to edit its title, type, tags and body or append a new dictation. Toggle the site theme in the top bar to preview both **dark** and **light** modes.
+
+![Notes Timeline (Dark)](screenshots/timeline-dark.png#only-dark)
+![Notes Timeline (Light)](screenshots/timeline-light.png#only-light)
+
+![Note Reader (Dark)](screenshots/reader-dark.png#only-dark)
+![Note Reader (Light)](screenshots/reader-light.png#only-light)
+
+![Semantic Search (Dark)](screenshots/search-dark.png#only-dark)
+![Semantic Search (Light)](screenshots/search-light.png#only-light)
+
+<div class="section-header">
+  <h2>Dark &amp; Light Theme Support</h2>
+  <span>Follows your system palette automatically</span>
+</div>
+
+| Dark Theme | Light Theme |
+| :---: | :---: |
+| ![Timeline Dark](screenshots/timeline-dark.png) | ![Timeline Light](screenshots/timeline-light.png) |
+| ![Reader Dark](screenshots/reader-dark.png) | ![Reader Light](screenshots/reader-light.png) |
 
 <div class="section-header">
   <h2>Graphical Configuration Interface</h2>
@@ -94,7 +126,11 @@ hide:
 
 Eloquent Notes includes a PyQt6 dialog for editing the notes folder, AI and search models, audio parameters and prompts.
 
-![Configuration GUI](screenshots/configuration.png)
+![Configuration GUI (Dark)](screenshots/configuration-dark.png#only-dark)
+![Configuration GUI (Light)](screenshots/configuration-light.png#only-light)
+
+![Prompts Editor (Dark)](screenshots/configuration-prompts-dark.png#only-dark)
+![Prompts Editor (Light)](screenshots/configuration-prompts-light.png#only-light)
 
 <div class="section-header">
   <h2>Documentation</h2>

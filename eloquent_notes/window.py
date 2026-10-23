@@ -540,8 +540,8 @@ class MainWindow(QMainWindow):
 
     def show_note(self, note: Note) -> None:
         self.save_open_note()
-        self.reader.show_note(note)
         self.stack.setCurrentWidget(self.reader)
+        self.reader.show_note(note)
 
     def show_timeline(self) -> None:
         self.save_open_note()
