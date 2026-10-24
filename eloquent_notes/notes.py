@@ -75,7 +75,11 @@ def _render(note: Note) -> str:
 
 
 def _parse(path: Path) -> Note | None:
-    match = _FRONTMATTER_RE.match(path.read_text(encoding="utf-8"))
+    try:
+        text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return None
+    match = _FRONTMATTER_RE.match(text)
     if not match:
         return None
     try:

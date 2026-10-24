@@ -67,12 +67,6 @@ def install_app_icon():
     return icon_path
 
 
-def _write_desktop_file(path, content):
-    atomic_write(path, content)
-    os.chmod(path, 0o600)
-    return path
-
-
 def _resolve_launcher():
     icon_path = install_app_icon()
     exec_path = str(Path(sys.executable).with_name("eloquent-notes"))
@@ -81,20 +75,24 @@ def _resolve_launcher():
     return icon_path, exec_path
 
 
-def _write_desktop_entry(icon_path, exec_path):
+def _write_desktop_entry(path, exec_cmd, icon_path, *extra_lines):
     comment = _("Voice dictations turned into organized notes")
-    content = f"""[Desktop Entry]
-Type=Application
-Exec={exec_path} open
-Name=Eloquent Notes
-Comment={comment}
-Icon={icon_path}
-Terminal=false
-Categories=Utility;
-StartupNotify=false
-StartupWMClass=eloquent-notes
-"""
-    return _write_desktop_file(get_desktop_entry_path(), content)
+    lines = [
+        "[Desktop Entry]",
+        "Type=Application",
+        f"Exec={exec_cmd}",
+        "Name=Eloquent Notes",
+        f"Comment={comment}",
+        f"Icon={icon_path}",
+        "Terminal=false",
+        "Categories=Utility;",
+        "StartupNotify=false",
+        "StartupWMClass=eloquent-notes",
+        *extra_lines,
+    ]
+    atomic_write(path, "\n".join(lines) + "\n")
+    os.chmod(path, 0o600)
+    return path
 
 
 def install_desktop_entry():
@@ -104,7 +102,7 @@ def install_desktop_entry():
         str: Path to the installed desktop entry file.
     """
     icon_path, exec_path = _resolve_launcher()
-    return _write_desktop_entry(icon_path, exec_path)
+    return _write_desktop_entry(get_desktop_entry_path(), f"{exec_path} open", icon_path)
 
 
 def install_autostart():
@@ -114,19 +112,13 @@ def install_autostart():
         str: Path to the installed desktop entry file.
     """
     icon_path, exec_path = _resolve_launcher()
-    _write_desktop_entry(icon_path, exec_path)
-    comment = _("Voice dictations turned into organized notes")
-
-    content = f"""[Desktop Entry]
-Type=Application
-Exec={exec_path}
-Hidden=false
-NoDisplay=false
-X-GNOME-Autostart-enabled=true
-Name=Eloquent Notes
-Comment={comment}
-Icon={icon_path}
-Categories=Utility;
-"""
-    return _write_desktop_file(get_autostart_path(), content)
+    _write_desktop_entry(get_desktop_entry_path(), f"{exec_path} open", icon_path)
+    return _write_desktop_entry(
+        get_autostart_path(),
+        exec_path,
+        icon_path,
+        "Hidden=false",
+        "NoDisplay=false",
+        "X-GNOME-Autostart-enabled=true",
+    )
 

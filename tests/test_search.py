@@ -79,8 +79,15 @@ def test_results_must_be_close_to_the_best_match(tmp_path, note_list):
 
 def test_search_reuses_cache_across_instances(tmp_path, note_list):
     cache_path = str(tmp_path / "cache" / "embeddings.npz")
-    with patch("eloquent_notes.search.llm.embed", side_effect=fake_embed):
+    with (
+        patch("eloquent_notes.search.llm.embed", side_effect=fake_embed),
+        patch("eloquent_notes.search.config.atomic_write", wraps=notes.atomic_write) as mock_atomic,
+    ):
         SemanticIndex(cache_path).search(note_list, "food", CFG)
+
+    mock_atomic.assert_called_once()
+    assert mock_atomic.call_args.args[0] == cache_path
+    assert isinstance(mock_atomic.call_args.args[1], bytes)
 
     with patch("eloquent_notes.search.llm.embed", side_effect=fake_embed) as mock_embed:
         results = SemanticIndex(cache_path).search(note_list, "food", CFG)

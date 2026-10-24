@@ -93,11 +93,14 @@ def test_load_notes_ignores_foreign_files(tmp_path, caplog):
     (tmp_path / "nulltitle.md").write_text(
         "---\ntitle: null\ncreated: 2026-10-22T10:00:00+02:00\ntype: note\n---\n", encoding="utf-8",
     )
+    (tmp_path / "binary.md").write_bytes(b"\xff\xfe\x00\x00")
+    (tmp_path / "subdir.md").mkdir()
+    (tmp_path / "broken_link.md").symlink_to(tmp_path / "nonexistent_target.md")
     (tmp_path / "notes.txt").write_text("not markdown", encoding="utf-8")
     notes.create_note(tmp_path, "Mine", "task", [], "")
 
     assert [note.title for note in notes.load_notes(tmp_path)] == ["Mine"]
-    assert caplog.text.count("Ignoring") == 12
+    assert caplog.text.count("Ignoring") == 15
 
 
 def test_load_notes_accepts_edits_from_other_tools(tmp_path):

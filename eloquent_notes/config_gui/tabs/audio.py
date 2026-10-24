@@ -86,15 +86,15 @@ class AudioTab(QWidget):
 
     def load_settings(self, config_data: dict) -> None:
         audio_cfg = config_data["audio"]
-        self.spn_sample_rate.setValue(int(audio_cfg["sample_rate"]))
+        self.spn_sample_rate.setValue(audio_cfg["sample_rate"])
         self.cmb_channels.setCurrentIndex(0 if audio_cfg["channels"] == 1 else 1)
-        self.spn_capture_duration.setValue(int(audio_cfg["capture_duration"]))
-        self.chk_recording_hud_enabled.setChecked(bool(audio_cfg["recording_hud_enabled"]))
-        beep_enabled = bool(audio_cfg["beep_enabled"])
+        self.spn_capture_duration.setValue(audio_cfg["capture_duration"])
+        self.chk_recording_hud_enabled.setChecked(audio_cfg["recording_hud_enabled"])
+        beep_enabled = audio_cfg["beep_enabled"]
         self.chk_beep_enabled.setChecked(beep_enabled)
         self._toggle_beep_controls(beep_enabled)
-        self.spn_beep_freq.setValue(int(audio_cfg["beep_frequency"]))
-        self.spn_beep_duration.setValue(float(audio_cfg["beep_duration"]))
+        self.spn_beep_freq.setValue(audio_cfg["beep_frequency"])
+        self.spn_beep_duration.setValue(audio_cfg["beep_duration"])
 
     def save_settings(self, config_data: dict) -> bool:
         config_data["audio"].update({

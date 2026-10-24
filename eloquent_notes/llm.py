@@ -27,6 +27,7 @@ silence, the model frequently answers false and invents text instead, so
 import base64
 import json
 import logging
+from functools import partial
 from typing import Any
 
 import requests
@@ -69,10 +70,12 @@ REWRITING_SCHEMA: dict[str, Any] = {
     "properties": {
         "title": {
             "type": "string",
+            "minLength": 1,
             "description": "Concise title (max 8 words) in the requested output language.",
         },
         "content": {
             "type": "string",
+            "minLength": 1,
             "description": "Clean, direct note prose in the requested output language.",
         },
     },
@@ -152,6 +155,8 @@ def _validate_property(key: str, val: Any, prop_schema: dict[str, Any]) -> None:
     if prop_type == "string":
         if not isinstance(val, str):
             raise TypeError(f"field {key!r} must be a string, got {type(val).__name__}")
+        if "minLength" in prop_schema and len(val.strip()) < prop_schema["minLength"]:
+            raise ValueError(f"field {key!r} must not be empty")
         if "enum" in prop_schema and val not in prop_schema["enum"]:
             raise ValueError(
                 f"field {key!r} has invalid value {val!r}, "
@@ -292,7 +297,9 @@ def transcribe_audio(
     )
 
 
-def rewrite_transcription(
+def _run_text_phase(
+    format_schema: dict[str, Any],
+    task_name: str,
     ollama_url: str,
     model: str,
     system_prompt: str,
@@ -303,10 +310,7 @@ def rewrite_transcription(
     max_retries: int,
     timeout: int,
 ) -> dict[str, Any]:
-    """Rewrite a transcription into a structured clean note (Phase 2).
-
-    Returns a dict with keys: 'title' and 'content'.
-    """
+    """Run a text-only Ollama pipeline phase."""
     messages: list[dict[str, Any]] = [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt},
@@ -315,44 +319,16 @@ def rewrite_transcription(
         ollama_url=ollama_url,
         model=model,
         messages=messages,
-        format_schema=REWRITING_SCHEMA,
+        format_schema=format_schema,
         retry_prompt=retry_prompt,
         context_length=context_length,
         keep_alive=keep_alive,
         max_retries=max_retries,
         timeout=timeout,
-        task_name="note rewriting",
+        task_name=task_name,
     )
 
 
-def classify_note(
-    ollama_url: str,
-    model: str,
-    system_prompt: str,
-    user_prompt: str,
-    retry_prompt: str,
-    context_length: int | None,
-    keep_alive: str,
-    max_retries: int,
-    timeout: int,
-) -> dict[str, Any]:
-    """Classify and extract metadata from a rewritten note (Phase 3).
+rewrite_transcription = partial(_run_text_phase, REWRITING_SCHEMA, "note rewriting")
+classify_note = partial(_run_text_phase, CLASSIFICATION_SCHEMA, "note classification")
 
-    Returns a dict with keys: 'type' and 'tags'.
-    """
-    messages: list[dict[str, Any]] = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": user_prompt},
-    ]
-    return _execute_ollama_json_request(
-        ollama_url=ollama_url,
-        model=model,
-        messages=messages,
-        format_schema=CLASSIFICATION_SCHEMA,
-        retry_prompt=retry_prompt,
-        context_length=context_length,
-        keep_alive=keep_alive,
-        max_retries=max_retries,
-        timeout=timeout,
-        task_name="note classification",
-    )

@@ -23,7 +23,7 @@ from eloquent_notes.autostart import (
     remove_autostart,
 )
 from eloquent_notes.i18n import _
-from eloquent_notes.logging_utils import _LOG_LEVELS, get_log_file_path
+from eloquent_notes.logging_utils import LOG_LEVELS, get_log_file_path
 
 
 class GeneralTab(QWidget):
@@ -52,7 +52,7 @@ class GeneralTab(QWidget):
         form_layout.setSpacing(10)
 
         self.cmb_log_level = QComboBox()
-        self.cmb_log_level.addItems(list(_LOG_LEVELS))
+        self.cmb_log_level.addItems(list(LOG_LEVELS))
         self.cmb_log_level.setToolTip(_("Verbosity level for app logging."))
         form_layout.addRow(QLabel(_("Logging Level:")), self.cmb_log_level)
 
@@ -94,9 +94,9 @@ class GeneralTab(QWidget):
         self.chk_autostart.setChecked(is_autostart_enabled())
 
         log_cfg = config_data["logging"]
-        self.cmb_log_level.setCurrentText(str(log_cfg["level"]).upper())
-        self.spn_log_max_mb.setValue(int(log_cfg["max_mb"]))
-        self.spn_log_backups.setValue(int(log_cfg["backup_count"]))
+        self.cmb_log_level.setCurrentText(log_cfg["level"].upper())
+        self.spn_log_max_mb.setValue(log_cfg["max_mb"])
+        self.spn_log_backups.setValue(log_cfg["backup_count"])
 
     def save_settings(self, config_data: dict) -> bool:
         config_data["logging"].update({

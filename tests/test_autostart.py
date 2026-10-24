@@ -68,6 +68,7 @@ def test_install_desktop_entry(tmp_path, monkeypatch):
     assert f"Icon={icon_path}\n" in content
     assert "StartupWMClass=eloquent-notes\n" in content
     assert "StartupNotify=false\n" in content
+    assert "X-GNOME-Autostart-enabled" not in content
     assert stat.S_IMODE(os.stat(filepath).st_mode) == 0o600
 
 
@@ -89,6 +90,7 @@ def test_install_autostart(tmp_path, monkeypatch):
     assert "Exec=/usr/local/bin/eloquent-notes\n" in content
     assert "Name=Eloquent Notes" in content
     assert f"Icon={autostart.get_icon_path()}" in content
+    assert "X-GNOME-Autostart-enabled=true\n" in content
 
     st_mode = os.stat(filepath).st_mode
     assert stat.S_IMODE(st_mode) == 0o600

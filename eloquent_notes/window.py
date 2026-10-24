@@ -42,7 +42,7 @@ DICTATE_STATES = {
     PROCESSING: ("orange", "Processing…"),
 }
 
-_TYPE_LABELS = {
+TYPE_LABELS = {
     "note": "Note",
     "task": "Task",
     "idea": "Idea",
@@ -121,7 +121,7 @@ class NoteCard(QFrame):
         when = format_time(note.created, "d MMM yyyy, HH:mm" if show_date else "HH:mm")
         meta = QLabel(
             f'{when} &nbsp;·&nbsp; <span style="color: {type_color}; font-weight: 600;">'
-            f"● {_(_TYPE_LABELS[note.type])}</span>"
+            f"● {_(TYPE_LABELS[note.type])}</span>"
         )
         meta.setObjectName("mutedLabel")
         layout.addWidget(meta)
@@ -253,8 +253,9 @@ class TimelinePage(QWidget):
 
     def show_search_results(self, query: str, results: list[Note]) -> None:
         if query == self._query:
+            by_path = {note.path: note for note in self._notes}
             self._error = ""
-            self._results = results
+            self._results = [by_path[note.path] for note in results if note.path in by_path]
             self._render()
 
     def show_search_error(self, query: str, message: str) -> None:
@@ -385,15 +386,19 @@ class TimelinePage(QWidget):
 
         content.column.addLayout(self._grid)
         content.column.addStretch(1)
+        scrollbar = self._scroll.verticalScrollBar()
+        scroll_value = scrollbar.value()  # type: ignore[union-attr]
         # Deferred: a card's own signal may have triggered this render.
         self._scroll.takeWidget().deleteLater()  # type: ignore[union-attr]
         self._scroll.setWidget(content)
+        scrollbar.setValue(scroll_value)  # type: ignore[union-attr]
 
 
 class ReaderPage(QWidget):
     """Editable view of a single note."""
 
     note: Note
+    _saved: tuple[str, str, list[str], str]
 
     back_clicked = pyqtSignal()
     dictate_clicked = pyqtSignal()
@@ -444,7 +449,7 @@ class ReaderPage(QWidget):
         self.type_box = QComboBox()
         self.type_box.setCursor(Qt.CursorShape.PointingHandCursor)
         for note_type in NOTE_TYPES:
-            self.type_box.addItem(_(_TYPE_LABELS[note_type]), note_type)
+            self.type_box.addItem(_(TYPE_LABELS[note_type]), note_type)
         meta.addWidget(self.type_box)
         meta.addStretch()
         self.date_label = QLabel()
@@ -478,21 +483,35 @@ class ReaderPage(QWidget):
 
     def show_note(self, note: Note) -> None:
         self.note = note
+        self._saved = (note.title, note.type, list(note.tags), note.body)
         self.type_box.setCurrentIndex(self.type_box.findData(note.type))
         self.date_label.setText(format_time(note.created, "dddd, d MMMM yyyy, HH:mm"))
         self.title_edit.setText(note.title)
         self.tags_edit.setText(", ".join(note.tags))
         self.body_edit.setPlainText(note.body)
 
-    def commit(self) -> bool:
-        """Copy the edited fields into the note; return True if anything changed."""
-        note = self.note
-        edited = (
+    def has_unsaved_edits(self) -> bool:
+        return (
             self.title_edit.text().strip(),
             self.type_box.currentData(),
             parse_tags(self.tags_edit.text()),
             self.body_edit.toPlainText().strip(),
+        ) != self._saved
+
+    def commit(self) -> bool:
+        """Copy the edited fields into the note; return True if anything changed."""
+        note = self.note
+        title = self.title_edit.text().strip()
+        if not title:
+            title = note.title
+            self.title_edit.setText(title)
+        edited = (
+            title,
+            self.type_box.currentData(),
+            parse_tags(self.tags_edit.text()),
+            self.body_edit.toPlainText().strip(),
         )
+        self._saved = edited
         if edited == (note.title, note.type, note.tags, note.body):
             return False
         note.title, note.type, note.tags, note.body = edited
@@ -563,8 +582,13 @@ class MainWindow(QMainWindow):
         if self.stack.currentWidget() is self.reader:
             for note in notes:
                 if note.path == self.reader.note.path:
-                    self.reader.show_note(note)
-                    break
+                    if not self.reader.has_unsaved_edits():
+                        if (note.title, note.type, note.tags, note.body) != self.reader._saved:
+                            self.reader.show_note(note)
+                        else:
+                            self.reader.note = note
+                    return
+            self.stack.setCurrentWidget(self.timeline)
 
     def show_search_results(self, query: str, results: list[Note]) -> None:
         self.timeline.show_search_results(query, results)
@@ -598,6 +622,7 @@ class MainWindow(QMainWindow):
         QGuiApplication.clipboard().setText(self.reader.note.markdown)  # type: ignore[union-attr]
 
     def _on_delete(self) -> None:
+        self.save_open_note()
         note = self.reader.note
         confirm = QMessageBox.question(
             self,

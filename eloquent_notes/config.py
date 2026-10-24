@@ -8,12 +8,15 @@ import copy
 import os
 import re
 import shutil
+from urllib.parse import urlparse
 
 import yaml
 
 from eloquent_notes.i18n import _
+from eloquent_notes.logging_utils import LOG_LEVELS
 
 _HEX_COLOR_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
+KEEP_ALIVE_RE = re.compile(r"^-?\d+(ns|us|µs|ms|s|m|h)?$")
 
 
 def get_config_home():
@@ -39,6 +42,7 @@ PROMPTS_DIR = os.path.join(CONFIG_DIR, "prompts")
 
 PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_CONFIG_SRC = os.path.join(PACKAGE_DIR, "config.yaml")
+DEFAULT_PROMPTS_DIR = os.path.join(PACKAGE_DIR, "prompts")
 
 RETRY_PROMPT_PATH = os.path.join(PROMPTS_DIR, "retry_prompt.md")
 TRANSCRIPTION_SYSTEM_PROMPT_PATH = os.path.join(PROMPTS_DIR, "transcription_system.md")
@@ -48,26 +52,25 @@ REWRITING_USER_PROMPT_PATH = os.path.join(PROMPTS_DIR, "rewriting_user.md")
 CLASSIFICATION_SYSTEM_PROMPT_PATH = os.path.join(PROMPTS_DIR, "classification_system.md")
 CLASSIFICATION_USER_PROMPT_PATH = os.path.join(PROMPTS_DIR, "classification_user.md")
 
-DEFAULT_RETRY_PROMPT_SRC = os.path.join(PACKAGE_DIR, "prompts", "retry_prompt.md")
-DEFAULT_TRANSCRIPTION_SYSTEM_SRC = os.path.join(PACKAGE_DIR, "prompts", "transcription_system.md")
-DEFAULT_TRANSCRIPTION_USER_SRC = os.path.join(PACKAGE_DIR, "prompts", "transcription_user.md")
-DEFAULT_REWRITING_SYSTEM_SRC = os.path.join(PACKAGE_DIR, "prompts", "rewriting_system.md")
-DEFAULT_REWRITING_USER_SRC = os.path.join(PACKAGE_DIR, "prompts", "rewriting_user.md")
-DEFAULT_CLASSIFICATION_SYSTEM_SRC = os.path.join(PACKAGE_DIR, "prompts", "classification_system.md")
-DEFAULT_CLASSIFICATION_USER_SRC = os.path.join(PACKAGE_DIR, "prompts", "classification_user.md")
+PROMPT_PATHS = (
+    RETRY_PROMPT_PATH,
+    TRANSCRIPTION_SYSTEM_PROMPT_PATH,
+    TRANSCRIPTION_USER_PROMPT_PATH,
+    REWRITING_SYSTEM_PROMPT_PATH,
+    REWRITING_USER_PROMPT_PATH,
+    CLASSIFICATION_SYSTEM_PROMPT_PATH,
+    CLASSIFICATION_USER_PROMPT_PATH,
+)
+
+PROMPT_DEFAULTS = {
+    path: os.path.join(DEFAULT_PROMPTS_DIR, os.path.basename(path))
+    for path in PROMPT_PATHS
+}
 
 _FILES_TO_COPY = (
     (DEFAULT_CONFIG_SRC, CONFIG_PATH),
-    (DEFAULT_RETRY_PROMPT_SRC, RETRY_PROMPT_PATH),
-    (DEFAULT_TRANSCRIPTION_SYSTEM_SRC, TRANSCRIPTION_SYSTEM_PROMPT_PATH),
-    (DEFAULT_TRANSCRIPTION_USER_SRC, TRANSCRIPTION_USER_PROMPT_PATH),
-    (DEFAULT_REWRITING_SYSTEM_SRC, REWRITING_SYSTEM_PROMPT_PATH),
-    (DEFAULT_REWRITING_USER_SRC, REWRITING_USER_PROMPT_PATH),
-    (DEFAULT_CLASSIFICATION_SYSTEM_SRC, CLASSIFICATION_SYSTEM_PROMPT_PATH),
-    (DEFAULT_CLASSIFICATION_USER_SRC, CLASSIFICATION_USER_PROMPT_PATH),
+    *((src, dst) for dst, src in PROMPT_DEFAULTS.items()),
 )
-
-PROMPT_PATHS = tuple(dst for _, dst in _FILES_TO_COPY[1:])
 
 
 def init_config_dir():
@@ -81,12 +84,42 @@ def init_config_dir():
 
 
 def _validate_override(key: str, value, default_val) -> None:
-    if default_val is None or (key == "context_length" and value is None):
+    if key == "context_length" and value is None:
         return
     expected = (int, float) if type(default_val) is float else (type(default_val),)
     if type(value) not in expected:
         raise TypeError(_("Invalid configuration value for '{key}'").format(key=key))
-    if isinstance(default_val, str) and default_val.startswith("#") and not _HEX_COLOR_RE.match(value):
+
+    valid = True
+    if isinstance(value, str):
+        if default_val.startswith("#"):
+            valid = bool(_HEX_COLOR_RE.fullmatch(value))
+        elif key == "ollama_url":
+            parsed = urlparse(value)
+            valid = (
+                not any(c.isspace() for c in value)
+                and parsed.scheme in ("http", "https")
+                and bool(parsed.netloc)
+            )
+        elif key in ("keep_alive", "preload_keep_alive", "search_keep_alive"):
+            valid = bool(KEEP_ALIVE_RE.fullmatch(value))
+        elif key == "level":
+            valid = value.upper() in LOG_LEVELS
+        else:
+            valid = bool(value.strip())
+    elif type(value) in (int, float):
+        if key == "sample_rate":
+            valid = value >= 8000
+        elif key == "channels":
+            valid = value in (1, 2)
+        elif key == "min_similarity":
+            valid = 0.0 <= value <= 1.0
+        elif key in ("max_retries", "backup_count"):
+            valid = value >= 0
+        else:
+            valid = 0 < value < float("inf")
+
+    if not valid:
         raise ValueError(_("Invalid configuration value for '{key}'").format(key=key))
 
 
@@ -94,7 +127,9 @@ def _merge_configs(base: dict, overrides: dict) -> dict:
     """Recursively merge overrides into base config dict."""
     result = copy.deepcopy(base)
     for k, v in overrides.items():
-        default_val = result.get(k)
+        if k not in result:
+            raise ValueError(f"Unknown configuration key '{k}'")
+        default_val = result[k]
         if isinstance(default_val, dict):
             if not isinstance(v, dict):
                 raise TypeError(
@@ -152,14 +187,18 @@ def load_file(path):
         return f.read()
 
 
-def atomic_write(path, content):
+def atomic_write(path: str, content: str | bytes) -> None:
     """Write content to a file atomically via a temporary replacement file."""
     dir_path = os.path.dirname(path)
     if dir_path:
         os.makedirs(dir_path, exist_ok=True)
     tmp_path = f"{path}.tmp"
-    with open(tmp_path, "w", encoding="utf-8") as f:
-        f.write(content)
+    if isinstance(content, bytes):
+        with open(tmp_path, "wb") as f:
+            f.write(content)
+    else:
+        with open(tmp_path, "w", encoding="utf-8") as f:
+            f.write(content)
     os.replace(tmp_path, path)
 
 

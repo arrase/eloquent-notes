@@ -1,5 +1,7 @@
 """Configuration GUI dialog for Eloquent Notes."""
 
+import copy
+
 import yaml
 from PyQt6.QtCore import QEvent
 from PyQt6.QtWidgets import (
@@ -53,7 +55,7 @@ class ConfigurationDialog(QDialog):
 
     def changeEvent(self, event):
         """Update theme stylesheet when the system palette changes."""
-        if event is not None and event.type() == QEvent.Type.PaletteChange:
+        if event.type() == QEvent.Type.PaletteChange:
             dark = ui.is_dark_theme()
             if dark != self._dark:
                 self._dark = dark
@@ -127,17 +129,8 @@ class ConfigurationDialog(QDialog):
         if confirm != QMessageBox.StandardButton.Yes:
             return
 
-        default_data = config.load_default_config()
-        self.config_data = default_data
-
-        for tab_widget in (
-            self.general_tab,
-            self.notes_tab,
-            self.appearance_tab,
-            self.ai_tab,
-            self.audio_tab,
-        ):
-            tab_widget.load_settings(default_data)
+        self.config_data = config.load_default_config()
+        self.load_settings_to_ui()
         self.general_tab.chk_autostart.setChecked(False)
         self.prompts_tab.restore_defaults()
 
@@ -157,14 +150,15 @@ class ConfigurationDialog(QDialog):
             self.general_tab,
             self.prompts_tab,
         )
+        new_config = copy.deepcopy(self.config_data)
         try:
             for tab_widget in save_order:
-                if not tab_widget.save_settings(self.config_data):
+                if not tab_widget.save_settings(new_config):
                     self.tab_widget.setCurrentWidget(tab_widget)
                     return False
 
             default_config = config.load_default_config()
-            overrides = diff_configs(default_config, self.config_data)
+            overrides = diff_configs(default_config, new_config)
             config.save_config(overrides)
         except (OSError, yaml.YAMLError) as e:
             QMessageBox.critical(
@@ -172,25 +166,12 @@ class ConfigurationDialog(QDialog):
             )
             return False
         else:
+            self.config_data = new_config
             return True
 
-    def cleanup_tabs(self):
-        """Clean up resources before closing."""
-        self.ai_tab.cleanup()
-
-    def closeEvent(self, event):
-        """Ensure background threads and resources are cleaned up on window close."""
-        self.cleanup_tabs()
-        super().closeEvent(event)
-
-    def reject(self):
-        """Cancel changes and close, ensuring threads are stopped."""
-        self.cleanup_tabs()
-        super().reject()
-
     def accept(self):
-        """Save settings and close the dialog with Accepted code, ensuring threads are stopped."""
+        """Save settings and close the dialog with Accepted code."""
         if self.save_settings_from_ui():
-            self.cleanup_tabs()
             super().accept()
+
 

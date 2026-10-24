@@ -18,8 +18,8 @@ from eloquent_notes.config_gui.tabs.ai import VALIDATION_ERROR_TITLE, AITab
 from eloquent_notes.recording_hud import RecordingHUD
 from eloquent_notes.window import (
     DICTATE_STATES,
+    TYPE_LABELS,
     _TYPE_FILTER_LABELS,
-    _TYPE_LABELS,
     MainWindow,
     day_label,
     format_time,
@@ -64,7 +64,7 @@ def _extract_codebase_msgids() -> tuple[set[str], set[tuple[str, str]]]:
 
     for _color, label in DICTATE_STATES.values():
         strings.add(label)
-    for label in _TYPE_LABELS.values():
+    for label in TYPE_LABELS.values():
         strings.add(label)
     for _note_type, label in _TYPE_FILTER_LABELS:
         strings.add(label)
@@ -119,6 +119,17 @@ def test_detect_system_languages_falls_back_to_qlocale(monkeypatch):
         assert i18n.detect_system_languages() == ["en"]
 
 
+def test_detect_system_languages_posix_precedence(monkeypatch):
+    monkeypatch.delenv("LANGUAGE", raising=False)
+    monkeypatch.setenv("LC_ALL", "en_US.UTF-8")
+    monkeypatch.setenv("LC_MESSAGES", "fr_FR.UTF-8")
+    monkeypatch.setenv("LANG", "es_ES.UTF-8")
+    assert i18n.detect_system_languages() == ["en_US", "en"]
+
+    monkeypatch.delenv("LC_ALL", raising=False)
+    assert i18n.detect_system_languages() == ["fr_FR", "fr"]
+
+
 def test_load_translations_defaults_to_system_detection(monkeypatch):
     monkeypatch.delenv("LC_ALL", raising=False)
     monkeypatch.delenv("LC_MESSAGES", raising=False)
@@ -130,6 +141,37 @@ def test_load_translations_defaults_to_system_detection(monkeypatch):
     assert tr.info().get("language") == "es"
     assert i18n._("Settings") == "Ajustes"
     assert i18n.ui_locale().language() == QLocale.Language.Spanish
+
+
+def test_load_translations_stops_at_english_before_later_languages(monkeypatch):
+    monkeypatch.delenv("LANGUAGE", raising=False)
+    monkeypatch.setenv("LC_ALL", "en_US.UTF-8")
+    monkeypatch.setenv("LANG", "es_ES.UTF-8")
+
+    tr = i18n.load_translations()
+    assert type(tr) is gettext.NullTranslations
+    assert i18n._("Settings") == "Settings"
+    assert i18n.ui_locale() == i18n._EN_LOCALE
+
+    monkeypatch.delenv("LC_ALL", raising=False)
+    monkeypatch.setenv("LANGUAGE", "en:es")
+    tr = i18n.load_translations()
+    assert type(tr) is gettext.NullTranslations
+    assert i18n._("Settings") == "Settings"
+    assert i18n.ui_locale() == i18n._EN_LOCALE
+
+    tr = i18n.load_translations(["en_US", "es"])
+    assert type(tr) is gettext.NullTranslations
+    assert i18n._("Settings") == "Settings"
+    assert i18n.ui_locale() == i18n._EN_LOCALE
+
+    tr = i18n.load_translations(["xx_YY", "en", "es"])
+    assert type(tr) is gettext.NullTranslations
+    assert i18n._("Settings") == "Settings"
+
+    tr = i18n.load_translations(["es_ES", "en", "fr"])
+    assert isinstance(tr, gettext.GNUTranslations)
+    assert tr.info().get("language") == "es"
 
 
 def test_all_40_catalogs_cover_every_codebase_string():
@@ -186,5 +228,4 @@ def test_ui_components_render_translated_strings(qapp):
         dialog = ConfigurationDialog()
     assert dialog.windowTitle() == i18n._("Eloquent Notes Configuration")
     assert dialog.btn_save.text() == i18n._("Save")
-    dialog.cleanup_tabs()
     dialog.close()
