@@ -3,9 +3,11 @@
 import os
 from unittest.mock import MagicMock, patch
 
+from PyQt6 import sip
 from PyQt6.QtGui import QColor
 
 from eloquent_notes import ui
+from eloquent_notes.config_gui.loader import OllamaModelLoader
 from eloquent_notes.config_gui.tabs import text_files
 from eloquent_notes.config_gui.tabs.ai import AITab
 from eloquent_notes.config_gui.tabs.appearance import AppearanceTab
@@ -75,8 +77,6 @@ def test_ai_tab_load_and_save_valid(qapp):
         "min_similarity": 0.45,
     }
 
-    tab.cleanup()
-
 
 def test_ai_tab_context_default_toggle(qapp):
     with patch.object(AITab, "_fetch_models"):
@@ -112,8 +112,6 @@ def test_ai_tab_context_default_toggle(qapp):
 
     tab.chk_context_default.setChecked(False)
     assert tab.spn_context_length.isEnabled()
-
-    tab.cleanup()
 
 
 def test_ai_tab_save_validation_failures(qapp):
@@ -187,32 +185,32 @@ def test_ai_tab_save_validation_failures(qapp):
     with patch("PyQt6.QtWidgets.QMessageBox.warning"):
         assert tab.save_settings(config_data) is False
 
-    tab.cleanup()
-
 
 def test_ai_tab_fetch_models_and_loader_lifecycle(qapp):
     with patch.object(AITab, "_fetch_models"):
         tab = AITab()
 
-    # Empty URL does not start a loader
+    # Empty URL does not start a loader and invalidates any in-flight loader
+    in_flight = MagicMock()
+    tab._model_loader = in_flight
+    tab.btn_refresh_models.setEnabled(False)
     tab.txt_ollama_url.setText("   ")
     tab._fetch_models()
     assert tab.lbl_model_status.text() == "Ollama URL is empty."
     assert tab._model_loader is None
+    assert tab.btn_refresh_models.isEnabled()
 
-    # Starting a loader when a previous one is running interrupts the previous one
+    with patch.object(tab, "sender", return_value=in_flight):
+        tab._on_models_fetched(["late-model"], ["late-embed"])
+        assert tab.lbl_model_status.text() == "Ollama URL is empty."
+
     prev_loader = MagicMock()
-    prev_loader.isRunning.return_value = True
-    tab._model_loader = prev_loader
-
     new_loader = MagicMock()
     tab.txt_ollama_url.setText("http://localhost:11434")
     with patch("eloquent_notes.config_gui.tabs.ai.OllamaModelLoader", return_value=new_loader):
         tab._fetch_models()
 
-    prev_loader.requestInterruption.assert_called_once()
     assert tab._model_loader is new_loader
-    assert new_loader in tab._running_loaders
     assert not tab.btn_refresh_models.isEnabled()
     new_loader.start.assert_called_once()
 
@@ -222,43 +220,45 @@ def test_ai_tab_fetch_models_and_loader_lifecycle(qapp):
         tab._on_models_fetch_failed("Stale error")
         assert tab.lbl_model_status.text() == "Fetching models..."
 
-    # Active loader callbacks update UI
+    # Active loader callback updates UI, clears _model_loader, and re-enables refresh button
     with patch.object(tab, "sender", return_value=new_loader):
         tab._on_models_fetched(["model_a", "model_b"], ["embed_a"])
+        assert tab._model_loader is None
+        assert tab.btn_refresh_models.isEnabled()
         assert tab.cmb_model.count() == 2
         assert tab.cmb_embedding_model.count() == 1
         assert tab.lbl_model_status.text() == "Models loaded successfully."
 
         # Unknown current selections are kept alongside the fetched models
+        tab._model_loader = new_loader
         tab.cmb_model.setCurrentText("custom-model")
         tab._on_models_fetched([], ["embed_a"])
         assert tab.lbl_model_status.text() == "No audio-capable models found."
         assert tab.cmb_model.currentText() == "custom-model"
 
+        tab._model_loader = new_loader
         tab._on_models_fetch_failed("Server error 500")
+        assert tab._model_loader is None
+        assert tab.btn_refresh_models.isEnabled()
         assert "Connection failed: Server error 500" in tab.lbl_model_status.text()
 
-        # _on_loader_finished cleans up active loader and re-enables refresh button
-        tab._on_loader_finished()
-        assert tab._model_loader is None
-        assert new_loader not in tab._running_loaders
-        assert tab.btn_refresh_models.isEnabled()
 
-
-def test_ai_tab_cleanup_disconnects_and_waits(qapp):
+def test_ai_tab_loader_signal_after_widget_deleted(qapp):
     with patch.object(AITab, "_fetch_models"):
         tab = AITab()
 
-    mock_loader = MagicMock()
-    tab._model_loader = mock_loader
-    tab._running_loaders.add(mock_loader)
+    tab.txt_ollama_url.setText("http://localhost:11434")
+    with patch.object(OllamaModelLoader, "start"):
+        tab._fetch_models()
+        loader1 = tab._model_loader
+        tab._fetch_models()
+        loader2 = tab._model_loader
 
-    tab.cleanup()
-    mock_loader.models_fetched.disconnect.assert_called_once_with(tab._on_models_fetched)
-    mock_loader.error_occurred.disconnect.assert_called_once_with(tab._on_models_fetch_failed)
-    mock_loader.finished.disconnect.assert_called_once_with(tab._on_loader_finished)
-    mock_loader.requestInterruption.assert_called_once()
-    mock_loader.wait.assert_called_once_with(2500)
+    assert loader1 is not loader2
+    sip.delete(tab)
+    loader1.models_fetched.emit(["model_a"], ["embed_a"])
+    loader2.error_occurred.emit("some error")
+    qapp.processEvents()
 
 
 # --- AUDIO TAB TESTS ---

@@ -37,7 +37,6 @@ def test_dialog_init(qapp):
     ]
     assert dialog.styleSheet() == ui.dialog_stylesheet(ui.current_theme())
     assert not dialog.windowIcon().isNull()
-    dialog.cleanup_tabs()
 
 
 def test_dialog_palette_change_updates_stylesheet(qapp):
@@ -54,7 +53,6 @@ def test_dialog_palette_change_updates_stylesheet(qapp):
         dialog.changeEvent(QEvent(QEvent.Type.PaletteChange))
 
     assert dialog.styleSheet() == ui.dialog_stylesheet(ui.DARK_THEME)
-    dialog.cleanup_tabs()
 
 
 def test_dialog_init_falls_back_to_default_on_corrupt_config(qapp):
@@ -71,7 +69,6 @@ def test_dialog_init_falls_back_to_default_on_corrupt_config(qapp):
 
     mock_warn.assert_called_once()
     assert dialog.config_data == default_config
-    dialog.cleanup_tabs()
 
 
 def test_dialog_load_settings(qapp):
@@ -116,8 +113,6 @@ def test_dialog_load_settings(qapp):
     assert dialog.ai_tab.txt_search_keep_alive.text() == "15m"
     assert dialog.ai_tab.spn_min_similarity.value() == 0.5
 
-    dialog.cleanup_tabs()
-
 
 def test_dialog_restore_defaults(qapp):
     dummy_config = config.load_default_config()
@@ -153,7 +148,6 @@ def test_dialog_restore_defaults(qapp):
     assert dialog.appearance_tab.spn_columns.value() == 2
     assert dialog.appearance_tab.color_buttons["idea"].text() == ui.DEFAULT_TYPE_COLORS["idea"]
     assert dialog.general_tab.chk_autostart.isChecked() is False
-    dialog.cleanup_tabs()
 
 
 def test_dialog_save_settings(qapp):
@@ -191,8 +185,6 @@ def test_dialog_save_settings(qapp):
         assert dialog.save_settings_from_ui() is False
         mock_crit.assert_called_once()
 
-    dialog.cleanup_tabs()
-
 
 def test_dialog_save_validation_failure_does_not_mutate_disk(qapp):
     dummy_config = config.load_default_config()
@@ -204,6 +196,11 @@ def test_dialog_save_validation_failure_does_not_mutate_disk(qapp):
     ):
         dialog = ConfigurationDialog()
 
+    original_folder = dialog.config_data["notes"]["folder"]
+    original_columns = dialog.config_data["notes"]["columns"]
+
+    dialog.notes_tab.txt_folder.setText("/mutated/folder")
+    dialog.appearance_tab.spn_columns.setValue(5)
     dialog.ai_tab.txt_ollama_url.setText("")
     with patch("PyQt6.QtWidgets.QMessageBox.warning"), patch(
         "eloquent_notes.config_gui.tabs.general.install_autostart"
@@ -215,31 +212,24 @@ def test_dialog_save_validation_failure_does_not_mutate_disk(qapp):
         res = dialog.save_settings_from_ui()
         assert res is False
         assert dialog.tab_widget.currentWidget() is dialog.ai_tab
+        assert dialog.config_data["notes"]["folder"] == original_folder
+        assert dialog.config_data["notes"]["columns"] == original_columns
         mock_install.assert_not_called()
         mock_remove.assert_not_called()
         mock_write.assert_not_called()
 
-    dialog.cleanup_tabs()
 
-
-def test_dialog_cleanup_on_close(qapp):
+def test_dialog_accept(qapp):
     dummy_config = config.load_default_config()
 
     with patch("eloquent_notes.config.load_config", return_value=dummy_config):
         dialog = ConfigurationDialog()
 
-    with patch.object(dialog, "cleanup_tabs") as mock_cleanup:
-        dialog.reject()
-        mock_cleanup.assert_called_once()
-
-    with patch.object(dialog, "cleanup_tabs") as mock_cleanup, patch.object(
-        dialog, "save_settings_from_ui", return_value=True
-    ):
+    with patch.object(dialog, "save_settings_from_ui", return_value=False):
         dialog.accept()
-        mock_cleanup.assert_called_once()
+        assert dialog.result() != ConfigurationDialog.DialogCode.Accepted
 
-    dialog.show()
-    assert dialog.isVisible()
-    with patch.object(dialog, "cleanup_tabs") as mock_cleanup:
-        dialog.close()
-        mock_cleanup.assert_called()
+    with patch.object(dialog, "save_settings_from_ui", return_value=True):
+        dialog.accept()
+        assert dialog.result() == ConfigurationDialog.DialogCode.Accepted
+

@@ -19,7 +19,7 @@ def get_log_dir():
     return os.path.join(xdg_state, "eloquent-notes")
 
 
-_LOG_LEVELS = {
+LOG_LEVELS = {
     "DEBUG": logging.DEBUG,
     "INFO": logging.INFO,
     "WARNING": logging.WARNING,
@@ -39,9 +39,9 @@ def get_log_file_path():
 def parse_log_level(name):
     """Translate a configuration log-level name into a logging constant."""
     try:
-        return _LOG_LEVELS[str(name).upper()]
+        return LOG_LEVELS[str(name).upper()]
     except KeyError:
-        valid = ", ".join(_LOG_LEVELS)
+        valid = ", ".join(LOG_LEVELS)
         raise ValueError(
             f"Invalid log level {name!r}. Expected one of: {valid}"
         ) from None

@@ -112,6 +112,98 @@ def test_merge_configs():
     with pytest.raises(ValueError, match="Invalid configuration value for 'idea'"):
         config._merge_configs(base, {"notes": {"type_colors": {"idea": "not-a-color"}}})
 
+    with pytest.raises(ValueError, match="Unknown configuration key 'unknown_section'"):
+        config._merge_configs(base, {"unknown_section": {}})
+
+    with pytest.raises(ValueError, match="Unknown configuration key 'unknown_key'"):
+        config._merge_configs(base, {"audio": {"unknown_key": 1}})
+
+    with pytest.raises(ValueError, match="Unknown configuration key 'custom_type'"):
+        config._merge_configs(base, {"notes": {"type_colors": {"custom_type": "#112233"}}})
+
+
+@pytest.mark.parametrize(
+    ("override", "key"),
+    [
+        ({"audio": {"capture_duration": 0}}, "capture_duration"),
+        ({"audio": {"capture_duration": -5}}, "capture_duration"),
+        ({"audio": {"sample_rate": 7999}}, "sample_rate"),
+        ({"audio": {"sample_rate": 10}}, "sample_rate"),
+        ({"audio": {"channels": 0}}, "channels"),
+        ({"audio": {"channels": 3}}, "channels"),
+        ({"audio": {"beep_duration": float("inf")}}, "beep_duration"),
+        ({"audio": {"beep_duration": float("nan")}}, "beep_duration"),
+        ({"notes": {"type_colors": {"idea": "#112233\n"}}}, "idea"),
+        ({"notes": {"columns": 0}}, "columns"),
+        ({"notes": {"columns": -1}}, "columns"),
+        ({"notes": {"folder": ""}}, "folder"),
+        ({"notes": {"folder": "   "}}, "folder"),
+        ({"ai": {"ollama_url": ""}}, "ollama_url"),
+        ({"ai": {"ollama_url": "localhost:11434"}}, "ollama_url"),
+        ({"ai": {"ollama_url": "ftp://localhost:11434"}}, "ollama_url"),
+        ({"ai": {"ollama_url": "http://"}}, "ollama_url"),
+        ({"ai": {"ollama_url": "https://"}}, "ollama_url"),
+        ({"ai": {"ollama_url": "http://localhost:11434 "}}, "ollama_url"),
+        ({"ai": {"ollama_url": "http://localhost:11434\n"}}, "ollama_url"),
+        ({"ai": {"model": "  "}}, "model"),
+        ({"ai": {"output_language": ""}}, "output_language"),
+        ({"ai": {"context_length": 0}}, "context_length"),
+        ({"ai": {"context_length": -100}}, "context_length"),
+        ({"ai": {"keep_alive": ""}}, "keep_alive"),
+        ({"ai": {"keep_alive": "5d"}}, "keep_alive"),
+        ({"ai": {"keep_alive": "5m\n"}}, "keep_alive"),
+        ({"ai": {"preload_keep_alive": "invalid"}}, "preload_keep_alive"),
+        ({"search": {"keep_alive": "bad"}}, "keep_alive"),
+        ({"search": {"embedding_model": ""}}, "embedding_model"),
+        ({"ai": {"max_retries": -1}}, "max_retries"),
+        ({"ai": {"request_timeout": 0}}, "request_timeout"),
+        ({"ai": {"preload_timeout": 0}}, "preload_timeout"),
+        ({"search": {"min_similarity": -0.1}}, "min_similarity"),
+        ({"search": {"min_similarity": 1.1}}, "min_similarity"),
+        ({"logging": {"level": "TRACE"}}, "level"),
+        ({"logging": {"level": ""}}, "level"),
+        ({"logging": {"max_mb": 0}}, "max_mb"),
+        ({"logging": {"backup_count": -1}}, "backup_count"),
+    ],
+)
+def test_merge_configs_rejects_invalid_domain_values(override, key):
+    default_cfg = config.load_default_config()
+    with pytest.raises(ValueError, match=f"Invalid configuration value for '{key}'"):
+        config._merge_configs(default_cfg, override)
+
+
+def test_merge_configs_accepts_valid_domain_boundaries():
+    default_cfg = config.load_default_config()
+    overrides = {
+        "audio": {
+            "capture_duration": 1,
+            "sample_rate": 8000,
+            "channels": 2,
+            "beep_enabled": False,
+        },
+        "notes": {"columns": 1, "folder": "/tmp/notes"},
+        "ai": {
+            "ollama_url": "https://ollama.example.com:11434",
+            "context_length": 512,
+            "keep_alive": "-1",
+            "preload_keep_alive": "500ms",
+            "max_retries": 0,
+            "request_timeout": 1,
+            "preload_timeout": 1,
+        },
+        "search": {"keep_alive": "100µs", "min_similarity": 0.0},
+        "logging": {"level": "debug", "max_mb": 1, "backup_count": 0},
+    }
+    merged = config._merge_configs(default_cfg, overrides)
+    assert merged["audio"]["channels"] == 2
+    assert merged["audio"]["beep_enabled"] is False
+    assert merged["ai"]["max_retries"] == 0
+    assert merged["search"]["min_similarity"] == 0.0
+    assert merged["logging"]["backup_count"] == 0
+
+    with pytest.raises(TypeError, match="Invalid configuration value for 'context_length'"):
+        config._merge_configs(default_cfg, {"ai": {"context_length": True}})
+
 
 def test_load_config(tmp_config_dir, monkeypatch):
     """Test load_config merges default config and user config."""
@@ -165,7 +257,7 @@ def test_load_config_non_dict_user_config(tmp_config_dir, monkeypatch):
 
 
 def test_load_and_atomic_write(tmp_path):
-    """Test loading and atomically writing text files."""
+    """Test loading and atomically writing text and binary files."""
     file_path = tmp_path / "sub" / "test.txt"
     content = "Hello World\nLine 2"
 
@@ -174,6 +266,11 @@ def test_load_and_atomic_write(tmp_path):
 
     loaded = config.load_file(str(file_path))
     assert loaded == content
+
+    bin_path = tmp_path / "sub" / "test.bin"
+    raw = b"\x00\x01\x02\xff"
+    config.atomic_write(str(bin_path), raw)
+    assert bin_path.read_bytes() == raw
 
 
 def test_atomic_write_flat_path(tmp_path, monkeypatch):
@@ -224,6 +321,8 @@ def test_load_default_config():
 def test_prompt_paths_cover_every_copied_prompt():
     assert config.PROMPT_PATHS == tuple(dst for _, dst in config._FILES_TO_COPY[1:])
     assert all(path.startswith(config.PROMPTS_DIR) for path in config.PROMPT_PATHS)
+    assert tuple(config.PROMPT_DEFAULTS) == config.PROMPT_PATHS
+    assert all(os.path.isfile(src) for src in config.PROMPT_DEFAULTS.values())
 
 
 def test_cache_dir_follows_xdg_cache_home():

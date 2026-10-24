@@ -7,6 +7,7 @@ re-embedding on the next search without any explicit indexing step.
 """
 
 import hashlib
+import io
 import os
 import threading
 from typing import Any
@@ -93,14 +94,12 @@ class SemanticIndex:
             if os.path.exists(self._cache_path):
                 os.remove(self._cache_path)
             return
-        os.makedirs(os.path.dirname(self._cache_path), exist_ok=True)
         names = list(self._entries)
-        tmp_path = f"{self._cache_path}.tmp"
-        with open(tmp_path, "wb") as f:
-            np.savez(
-                f,
-                names=np.array(names),
-                digests=np.array([self._entries[name][0] for name in names]),
-                vectors=np.stack([self._entries[name][1] for name in names]),
-            )
-        os.replace(tmp_path, self._cache_path)
+        buf = io.BytesIO()
+        np.savez(
+            buf,
+            names=np.array(names),
+            digests=np.array([self._entries[name][0] for name in names]),
+            vectors=np.stack([self._entries[name][1] for name in names]),
+        )
+        config.atomic_write(self._cache_path, buf.getvalue())

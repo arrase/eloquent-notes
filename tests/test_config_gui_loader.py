@@ -53,76 +53,14 @@ def test_ollama_loader_get_failure():
     assert "Connection refused" in error_signal_data[0]
 
 
-def test_ollama_loader_interruption_at_start(monkeypatch):
+def test_ollama_loader_start_runs_daemon_thread():
     loader = OllamaModelLoader("http://localhost:11434")
 
-    models_signal_data = []
-    error_signal_data = []
-    loader.models_fetched.connect(lambda audio, embedding: models_signal_data.append((audio, embedding)))
-    loader.error_occurred.connect(error_signal_data.append)
+    with patch("eloquent_notes.config_gui.loader.threading.Thread") as mock_thread_cls:
+        loader.start()
 
-    monkeypatch.setattr(loader, "isInterruptionRequested", lambda: True)
-
-    with patch("requests.get") as mock_get:
-        loader.run()
-        mock_get.assert_not_called()
-
-    assert models_signal_data == []
-    assert error_signal_data == []
-
-
-def test_ollama_loader_interruption_during_tags(monkeypatch):
-    loader = OllamaModelLoader("http://localhost:11434")
-
-    models_signal_data = []
-    loader.models_fetched.connect(lambda audio, embedding: models_signal_data.append((audio, embedding)))
-
-    interrupted = False
-    monkeypatch.setattr(loader, "isInterruptionRequested", lambda: interrupted)
-
-    def mock_get(url, timeout):
-        nonlocal interrupted
-        interrupted = True
-        return MagicMock()
-
-    with patch("requests.get", side_effect=mock_get), patch("requests.post") as mock_post:
-        loader.run()
-        mock_post.assert_not_called()
-
-    assert models_signal_data == []
-
-
-def test_ollama_loader_interruption_during_show(monkeypatch):
-    loader = OllamaModelLoader("http://localhost:11434")
-
-    models_signal_data = []
-    loader.models_fetched.connect(lambda audio, embedding: models_signal_data.append((audio, embedding)))
-
-    mock_tags_response = MagicMock()
-    mock_tags_response.json.return_value = {
-        "models": [{"name": "model1"}, {"name": "model2"}]
-    }
-
-    interrupted = False
-
-    def mock_is_interrupted():
-        return interrupted
-
-    monkeypatch.setattr(loader, "isInterruptionRequested", mock_is_interrupted)
-
-    def mock_post(url, json, timeout):
-        nonlocal interrupted
-        interrupted = True
-        mock_resp = MagicMock()
-        mock_resp.json.return_value = {"capabilities": ["audio"]}
-        return mock_resp
-
-    with patch("requests.get", return_value=mock_tags_response), patch(
-        "requests.post", side_effect=mock_post
-    ):
-        loader.run()
-
-    assert models_signal_data == []
+    mock_thread_cls.assert_called_once_with(target=loader.run, daemon=True)
+    mock_thread_cls.return_value.start.assert_called_once()
 
 
 def test_ollama_loader_show_exception_resilience():

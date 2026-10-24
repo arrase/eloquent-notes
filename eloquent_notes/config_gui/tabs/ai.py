@@ -1,8 +1,6 @@
 """AI settings tab for configuration."""
 
-import re
-
-from PyQt6.QtCore import QCoreApplication, Qt
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -19,10 +17,10 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from eloquent_notes.config import KEEP_ALIVE_RE
 from eloquent_notes.config_gui.loader import OllamaModelLoader
 from eloquent_notes.i18n import OUTPUT_LANGUAGES, _
 
-_DURATION_PATTERN = re.compile(r"^-?\d+[smh]?$")
 VALIDATION_ERROR_TITLE = "Validation Error"
 _LABEL_WIDTH = 140
 
@@ -39,7 +37,6 @@ class AITab(QWidget):
     def __init__(self):
         super().__init__()
         self._model_loader = None
-        self._running_loaders = set()
         self._init_ui()
 
     def _init_ui(self):
@@ -94,7 +91,6 @@ class AITab(QWidget):
         self.spn_context_length = QSpinBox()
         self.spn_context_length.setRange(512, 262144)
         self.spn_context_length.setSingleStep(1024)
-        self.spn_context_length.setValue(8192)
         self.spn_context_length.setToolTip(
             _(
                 "Context length in tokens to pass to Ollama. "
@@ -184,31 +180,25 @@ class AITab(QWidget):
     def _fetch_models(self):
         url = self.txt_ollama_url.text().strip()
         if not url:
+            self._model_loader = None
+            self.btn_refresh_models.setEnabled(True)
             self.lbl_model_status.setText(_("Ollama URL is empty."))
             return
 
         self.lbl_model_status.setText(_("Fetching models..."))
         self.btn_refresh_models.setEnabled(False)
 
-        if self._model_loader is not None and self._model_loader.isRunning():
-            self._model_loader.requestInterruption()
-
-        loader = OllamaModelLoader(url, QCoreApplication.instance())
+        loader = OllamaModelLoader(url)
         self._model_loader = loader
-        self._running_loaders.add(loader)
-
-        loader.finished.connect(self._on_loader_finished)
         loader.models_fetched.connect(self._on_models_fetched)
         loader.error_occurred.connect(self._on_models_fetch_failed)
-        loader.finished.connect(loader.deleteLater)
         loader.start()
 
-    def _on_loader_finished(self):
-        loader = self.sender()
-        self._running_loaders.discard(loader)
-        if loader is self._model_loader:
-            self._model_loader = None
-            self.btn_refresh_models.setEnabled(True)
+    @staticmethod
+    def _set_combo_value(combo: QComboBox, value: str) -> None:
+        if combo.findText(value) == -1:
+            combo.addItem(value)
+        combo.setCurrentText(value)
 
     @staticmethod
     def _fill_models(combo, models):
@@ -216,13 +206,14 @@ class AITab(QWidget):
         current_text = combo.currentText()
         combo.clear()
         combo.addItems(models)
-        if current_text and current_text not in models:
-            combo.addItem(current_text)
-        combo.setCurrentText(current_text)
+        if current_text:
+            AITab._set_combo_value(combo, current_text)
 
     def _on_models_fetched(self, audio_models, embedding_models):
-        if self.sender() is not self._model_loader:
+        if self._model_loader is None or self.sender() is not self._model_loader:
             return
+        self._model_loader = None
+        self.btn_refresh_models.setEnabled(True)
 
         self._fill_models(self.cmb_model, audio_models)
         self._fill_models(self.cmb_embedding_model, embedding_models)
@@ -233,58 +224,36 @@ class AITab(QWidget):
             self.lbl_model_status.setText(_("Models loaded successfully."))
 
     def _on_models_fetch_failed(self, error_msg):
-        if self.sender() is not self._model_loader:
+        if self._model_loader is None or self.sender() is not self._model_loader:
             return
-        self.lbl_model_status.setText(_("Connection failed: {error}").format(error=error_msg))
-
-    def cleanup(self):
-        """Asynchronously cancel active loaders and wait with a timeout."""
-        for loader in self._running_loaders:
-            loader.models_fetched.disconnect(self._on_models_fetched)
-            loader.error_occurred.disconnect(self._on_models_fetch_failed)
-            loader.finished.disconnect(self._on_loader_finished)
-            loader.requestInterruption()
-            loader.wait(2500)
-        self._running_loaders.clear()
         self._model_loader = None
+        self.btn_refresh_models.setEnabled(True)
+        self.lbl_model_status.setText(_("Connection failed: {error}").format(error=error_msg))
 
     def load_settings(self, config_data: dict) -> None:
         ai_cfg = config_data["ai"]
-        self.txt_ollama_url.setText(str(ai_cfg["ollama_url"]))
-
-        curr_model = str(ai_cfg["model"])
-        if self.cmb_model.findText(curr_model) == -1:
-            self.cmb_model.addItem(curr_model)
-        self.cmb_model.setCurrentText(curr_model)
+        self.txt_ollama_url.setText(ai_cfg["ollama_url"])
+        self._set_combo_value(self.cmb_model, ai_cfg["model"])
 
         context_len = ai_cfg["context_length"]
-        if context_len is None:
-            self.chk_context_default.setChecked(True)
-            self.spn_context_length.setEnabled(False)
-            self.spn_context_length.setValue(8192)
-        else:
-            self.chk_context_default.setChecked(False)
-            self.spn_context_length.setEnabled(True)
-            self.spn_context_length.setValue(int(context_len))
+        is_default = context_len is None
+        self.chk_context_default.setChecked(is_default)
+        self.spn_context_length.setEnabled(not is_default)
+        if not is_default:
+            self.spn_context_length.setValue(context_len)
 
-        self.txt_keep_alive.setText(str(ai_cfg["keep_alive"]))
-        self.txt_preload_keep_alive.setText(str(ai_cfg["preload_keep_alive"]))
-        self.spn_max_retries.setValue(int(ai_cfg["max_retries"]))
-        self.spn_preload_timeout.setValue(int(ai_cfg["preload_timeout"]))
-        self.spn_request_timeout.setValue(int(ai_cfg["request_timeout"]))
+        self.txt_keep_alive.setText(ai_cfg["keep_alive"])
+        self.txt_preload_keep_alive.setText(ai_cfg["preload_keep_alive"])
+        self.spn_max_retries.setValue(ai_cfg["max_retries"])
+        self.spn_preload_timeout.setValue(ai_cfg["preload_timeout"])
+        self.spn_request_timeout.setValue(ai_cfg["request_timeout"])
 
         search_cfg = config_data["search"]
-        curr_embedding = str(search_cfg["embedding_model"])
-        if self.cmb_embedding_model.findText(curr_embedding) == -1:
-            self.cmb_embedding_model.addItem(curr_embedding)
-        self.cmb_embedding_model.setCurrentText(curr_embedding)
-        self.txt_search_keep_alive.setText(str(search_cfg["keep_alive"]))
-        self.spn_min_similarity.setValue(float(search_cfg["min_similarity"]))
+        self._set_combo_value(self.cmb_embedding_model, search_cfg["embedding_model"])
+        self.txt_search_keep_alive.setText(search_cfg["keep_alive"])
+        self.spn_min_similarity.setValue(search_cfg["min_similarity"])
 
-        curr_lang = str(ai_cfg["output_language"])
-        if self.cmb_language.findText(curr_lang) == -1:
-            self.cmb_language.addItem(curr_lang)
-        self.cmb_language.setCurrentText(curr_lang)
+        self._set_combo_value(self.cmb_language, ai_cfg["output_language"])
 
         self._fetch_models()
 
@@ -322,36 +291,36 @@ class AITab(QWidget):
         preload_keep_alive = self.txt_preload_keep_alive.text().strip()
         search_keep_alive = self.txt_search_keep_alive.text().strip()
 
-        if not _DURATION_PATTERN.match(keep_alive):
-            QMessageBox.warning(
-                self,
-                _(VALIDATION_ERROR_TITLE),
+        for value, error_template in (
+            (
+                keep_alive,
                 _(
                     "Invalid Keep Alive format: '{value}'. "
                     "Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
-                ).format(value=keep_alive),
-            )
-            return False
-        if not _DURATION_PATTERN.match(preload_keep_alive):
-            QMessageBox.warning(
-                self,
-                _(VALIDATION_ERROR_TITLE),
+                ),
+            ),
+            (
+                preload_keep_alive,
                 _(
                     "Invalid Preload Keep Alive format: '{value}'. "
                     "Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
-                ).format(value=preload_keep_alive),
-            )
-            return False
-        if not _DURATION_PATTERN.match(search_keep_alive):
-            QMessageBox.warning(
-                self,
-                _(VALIDATION_ERROR_TITLE),
+                ),
+            ),
+            (
+                search_keep_alive,
                 _(
                     "Invalid Search Keep Alive format: '{value}'. "
                     "Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
-                ).format(value=search_keep_alive),
-            )
-            return False
+                ),
+            ),
+        ):
+            if not KEEP_ALIVE_RE.fullmatch(value):
+                QMessageBox.warning(
+                    self,
+                    _(VALIDATION_ERROR_TITLE),
+                    error_template.format(value=value),
+                )
+                return False
 
         context_len = None if self.chk_context_default.isChecked() else self.spn_context_length.value()
 
@@ -372,4 +341,5 @@ class AITab(QWidget):
             "min_similarity": round(self.spn_min_similarity.value(), 2),
         })
         return True
+
 

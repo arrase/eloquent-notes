@@ -89,13 +89,7 @@ def is_silent(data: np.ndarray, sample_rate: int) -> bool:
     return int(np.count_nonzero(speech_frame_mask(data, sample_rate))) < MIN_SPEECH_FRAMES
 
 
-def trim_silence(data: np.ndarray, sample_rate: int) -> np.ndarray:
-    """Drop leading and trailing non-speech frames around the spoken segment.
-
-    Trimming removes surrounding silence and start/stop click transients so the
-    model encodes only the spoken dictation while keeping interior pauses intact.
-    """
-    active = speech_frame_mask(data, sample_rate)
+def _trim_frames(data: np.ndarray, sample_rate: int, active: np.ndarray) -> np.ndarray:
     if not np.any(active):
         return data
 
@@ -103,6 +97,15 @@ def trim_silence(data: np.ndarray, sample_rate: int) -> np.ndarray:
     first = int(np.argmax(active))
     last = len(active) - int(np.argmax(active[::-1]))
     return data[first * frame_len : last * frame_len]
+
+
+def trim_silence(data: np.ndarray, sample_rate: int) -> np.ndarray:
+    """Drop leading and trailing non-speech frames around the spoken segment.
+
+    Trimming removes surrounding silence and start/stop click transients so the
+    model encodes only the spoken dictation while keeping interior pauses intact.
+    """
+    return _trim_frames(data, sample_rate, speech_frame_mask(data, sample_rate))
 
 
 def encode_wav_bytes(data: np.ndarray, sample_rate: int, channels: int) -> bytes:
@@ -128,6 +131,9 @@ class AudioRecorder:
         self.sample_rate = sample_rate
         self.channels = channels
         self._chunks: list[np.ndarray] = []
+        self._cached_chunks = 0
+        self._samples = np.empty(0, dtype=np.float32)
+        self._active = np.empty(0, dtype=bool)
         self._stream: sd.InputStream | None = None
 
     def _on_audio(
@@ -165,16 +171,21 @@ class AudioRecorder:
         finally:
             stream.close()
 
-    @property
-    def _samples(self) -> np.ndarray:
+    def _analyze(self) -> tuple[np.ndarray, np.ndarray]:
         if not self._chunks:
-            return np.empty(0, dtype=np.float32)
-        return np.concatenate(self._chunks)
+            self._cached_chunks = 0
+            return np.empty(0, dtype=np.float32), np.empty(0, dtype=bool)
+        if self._cached_chunks != len(self._chunks):
+            self._samples = np.concatenate(self._chunks)
+            self._active = speech_frame_mask(self._samples, self.sample_rate)
+            self._cached_chunks = len(self._chunks)
+        return self._samples, self._active
 
     @property
     def wav_bytes(self) -> bytes:
         """Encode captured speech as 16-bit PCM WAV."""
-        trimmed = trim_silence(self._samples, self.sample_rate)
+        samples, active = self._analyze()
+        trimmed = _trim_frames(samples, self.sample_rate, active)
         return encode_wav_bytes(trimmed, self.sample_rate, self.channels)
 
     @property
@@ -184,7 +195,8 @@ class AudioRecorder:
         Checked locally so an accidental trigger, ambient noise or click never
         reaches the model, which cannot reliably report empty audio on its own.
         """
-        return is_silent(self._samples, self.sample_rate)
+        _, active = self._analyze()
+        return int(np.count_nonzero(active)) < MIN_SPEECH_FRAMES
 
 
 def play_beep(

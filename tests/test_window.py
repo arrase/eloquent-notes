@@ -298,6 +298,21 @@ def test_search_results_follow_refreshed_notes(window, sample_notes):
     assert card_titles(window) == ["Renamed"]
 
 
+def test_show_search_results_reconciles_with_current_notes(window, sample_notes):
+    window.timeline.search.setText("work")
+    window.timeline.search.returnPressed.emit()
+
+    # While search is in flight, note 0 is renamed and note 2 is deleted.
+    renamed = notes.Note(sample_notes[0].path, "Updated while searching", sample_notes[0].created, "decision", [], "")
+    window.set_notes([renamed, sample_notes[1]])
+
+    # Search completes with stale Note instances from before the edit/deletion.
+    window.show_search_results("work", [sample_notes[0], sample_notes[2]])
+
+    assert card_titles(window) == ["Updated while searching"]
+    assert window.timeline._results == [renamed]
+
+
 # --- Reader ----------------------------------------------------------------------
 
 
@@ -324,6 +339,106 @@ def test_set_notes_refreshes_open_reader_note(window, sample_notes):
     assert window.reader.type_box.currentData() == "task"
     assert window.reader.tags_edit.text() == "updated"
     assert window.reader.body_edit.toPlainText() == "New body."
+
+
+def test_set_notes_preserves_unsaved_reader_edits(window, sample_notes):
+    window.show_note(sample_notes[0])
+    window.reader.title_edit.setText("In-progress title")
+    window.reader.body_edit.setPlainText("In-progress body")
+
+    stale = notes.Note(
+        sample_notes[0].path, "Launch decision", sample_notes[0].created, "decision", ["work"], "Ship on Friday.",
+    )
+    window.set_notes([stale, *sample_notes[1:]])
+
+    assert window.reader.title_edit.text() == "In-progress title"
+    assert window.reader.body_edit.toPlainText() == "In-progress body"
+
+    edited = MagicMock()
+    window.note_edited.connect(edited)
+    window.show_timeline()
+    edited.assert_called_once()
+    assert sample_notes[0].title == "In-progress title"
+    assert sample_notes[0].body == "In-progress body"
+
+
+def test_set_notes_returns_to_timeline_when_open_note_disappears(window, sample_notes):
+    window.show_note(sample_notes[0])
+    assert window.stack.currentWidget() is window.reader
+
+    window.set_notes(sample_notes[1:])
+    assert window.stack.currentWidget() is window.timeline
+
+
+def test_commit_rejects_empty_title_and_restores_original(window, sample_notes, tmp_path):
+    edited = MagicMock()
+    window.note_edited.connect(edited)
+    window.show_note(sample_notes[0])
+
+    # Clearing only the title restores it without emitting note_edited.
+    window.reader.title_edit.setText("   ")
+    window.show_timeline()
+    edited.assert_not_called()
+    assert sample_notes[0].title == "Launch decision"
+    assert window.reader.title_edit.text() == "Launch decision"
+
+    # Clearing the title while editing the body keeps the original title and saves the body.
+    window.show_note(sample_notes[0])
+    window.reader.title_edit.setText("")
+    window.reader.body_edit.setPlainText("Updated body with kept title.")
+    window.show_timeline()
+    edited.assert_called_once_with(sample_notes[0])
+    assert sample_notes[0].title == "Launch decision"
+    assert sample_notes[0].body == "Updated body with kept title."
+    assert window.reader.title_edit.text() == "Launch decision"
+
+    notes.save_note(sample_notes[0])
+    loaded = notes.load_notes(tmp_path)
+    assert any(n.path == sample_notes[0].path and n.title == "Launch decision" for n in loaded)
+
+
+def test_copy_and_dictate_preserve_cursor_selection_and_undo(window, sample_notes, tmp_path):
+    def on_edited(note):
+        notes.save_note(note)
+        window.set_notes(notes.load_notes(tmp_path))
+
+    window.note_edited.connect(on_edited)
+    window.show_note(sample_notes[0])
+    window.reader.tags_edit.setText("work, ")
+    body_edit = window.reader.body_edit
+
+    cursor = body_edit.textCursor()
+    cursor.movePosition(cursor.MoveOperation.End)
+    cursor.insertText(" Extra text.")
+    cursor.setPosition(0)
+    cursor.setPosition(4, cursor.MoveMode.KeepAnchor)
+    body_edit.setTextCursor(cursor)
+
+    assert body_edit.document().isUndoAvailable()
+
+    with patch.object(body_edit, "setPlainText", wraps=body_edit.setPlainText) as spy_set_plain:
+        window.reader.copy_clicked.emit()
+        window.reader.btn_dictate.click()
+
+    spy_set_plain.assert_not_called()
+    assert body_edit.document().isUndoAvailable()
+    assert body_edit.textCursor().selectionStart() == 0
+    assert body_edit.textCursor().selectionEnd() == 4
+    assert window.reader.tags_edit.text() == "work, "
+
+
+def test_show_note_resets_body_edit_when_switching_notes(window, sample_notes):
+    window.show_note(sample_notes[0])
+    cursor = window.reader.body_edit.textCursor()
+    cursor.select(cursor.SelectionType.Document)
+    cursor.insertText("   ")
+    assert window.reader.body_edit.document().isUndoAvailable()
+    window.show_timeline()
+
+    # sample_notes[3] also has body == ""; opening it must reset text and undo stack.
+    window.show_note(sample_notes[3])
+    assert window.reader.body_edit.toPlainText() == ""
+    assert not window.reader.body_edit.document().isUndoAvailable()
 
 
 def test_back_saves_edits(window, sample_notes):
@@ -382,12 +497,20 @@ def test_copy_puts_markdown_on_clipboard(window, sample_notes):
 
 
 def test_delete_requires_confirmation(window, sample_notes):
+    events = []
+    window.note_edited.connect(lambda note: events.append(("edited", note.title)))
     deleted = MagicMock()
     window.delete_requested.connect(deleted)
     window.show_note(sample_notes[0])
+    window.reader.title_edit.setText("Renamed before delete")
 
-    with patch("eloquent_notes.window.QMessageBox.question", return_value=QMessageBox.StandardButton.No):
+    with patch(
+        "eloquent_notes.window.QMessageBox.question",
+        return_value=QMessageBox.StandardButton.No,
+    ) as mock_question:
         window.reader.delete_clicked.emit()
+    assert events == [("edited", "Renamed before delete")]
+    assert "Renamed before delete" in mock_question.call_args.args[2]
     deleted.assert_not_called()
     assert window.stack.currentWidget() is window.reader
 
@@ -423,3 +546,12 @@ def test_scroll_content_aligns_right_margin_with_scrollbar(window):
     margins = content.column.contentsMargins()
     assert margins.left() == PAGE_MARGIN
     assert margins.right() == PAGE_MARGIN - 8
+
+
+def test_timeline_preserves_vertical_scroll_position_on_rerender(window, sample_notes):
+    scrollbar = window.timeline._scroll.verticalScrollBar()
+    scrollbar.setValue(80)
+    assert scrollbar.value() == 80
+
+    window.set_notes(sample_notes)
+    assert scrollbar.value() == 80

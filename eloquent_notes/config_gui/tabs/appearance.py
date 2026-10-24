@@ -13,10 +13,9 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from eloquent_notes import ui
 from eloquent_notes.i18n import _
 from eloquent_notes.notes import NOTE_TYPES
-from eloquent_notes.window import _TYPE_LABELS
+from eloquent_notes.window import TYPE_LABELS
 
 
 class AppearanceTab(QWidget):
@@ -24,7 +23,7 @@ class AppearanceTab(QWidget):
 
     def __init__(self) -> None:
         super().__init__()
-        self._colors: dict[str, str] = dict(ui.DEFAULT_TYPE_COLORS)
+        self._colors: dict[str, str] = {}
         self.color_buttons: dict[str, QPushButton] = {}
         self._init_ui()
 
@@ -53,8 +52,7 @@ class AppearanceTab(QWidget):
             btn.setFixedWidth(120)
             btn.clicked.connect(lambda _checked=False, nt=note_type: self._pick_color(nt))
             self.color_buttons[note_type] = btn
-            self._set_color(note_type, self._colors[note_type])
-            colors_layout.addRow(QLabel(f"{_(_TYPE_LABELS[note_type])}:"), btn)
+            colors_layout.addRow(QLabel(f"{_(TYPE_LABELS[note_type])}:"), btn)
 
         layout.addWidget(grp_colors)
         layout.addStretch()
@@ -72,19 +70,20 @@ class AppearanceTab(QWidget):
         color = QColorDialog.getColor(
             QColor(self._colors[note_type]),
             self,
-            _(_TYPE_LABELS[note_type]),
+            _(TYPE_LABELS[note_type]),
         )
         if color.isValid():
             self._set_color(note_type, color.name())
 
     def load_settings(self, config_data: dict) -> None:
         notes_cfg = config_data["notes"]
-        self.spn_columns.setValue(int(notes_cfg["columns"]))
+        self.spn_columns.setValue(notes_cfg["columns"])
         type_colors = notes_cfg["type_colors"]
         for note_type in NOTE_TYPES:
-            self._set_color(note_type, str(type_colors[note_type]))
+            self._set_color(note_type, type_colors[note_type])
 
     def save_settings(self, config_data: dict) -> bool:
         config_data["notes"]["columns"] = self.spn_columns.value()
         config_data["notes"]["type_colors"] = dict(self._colors)
         return True
+

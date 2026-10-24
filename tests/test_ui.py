@@ -48,6 +48,7 @@ def test_app_icon_pixmap_and_cached_qicon(qapp):
     assert pixmap.width() == 64
     assert pixmap.height() == 64
     assert pixmap.toImage().pixelColor(32, 32).alpha() == 255
+    assert pixmap.toImage().pixelColor(8, 8).name() == "#2c4c7e"
 
     icon = ui.get_app_icon()
     assert isinstance(icon, QIcon)

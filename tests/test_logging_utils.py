@@ -8,6 +8,7 @@ from eloquent_notes import logging_utils
 
 
 def test_parse_log_level_valid():
+    assert set(logging_utils.LOG_LEVELS) == {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
     assert logging_utils.parse_log_level("debug") == logging.DEBUG
     assert logging_utils.parse_log_level("INFO") == logging.INFO
     assert logging_utils.parse_log_level("Warning") == logging.WARNING

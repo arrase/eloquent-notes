@@ -479,6 +479,44 @@ def test_rewrite_transcription(mock_exec):
     assert kwargs["format_schema"] is llm.REWRITING_SCHEMA
 
 
+def test_rewriting_schema_rejects_blank_title_or_content_and_triggers_retry():
+    with pytest.raises(ValueError, match="field 'title' must not be empty"):
+        llm._parse_json_response('{"title": "   ", "content": "ok"}', llm.REWRITING_SCHEMA)
+
+    with pytest.raises(ValueError, match="field 'content' must not be empty"):
+        llm._parse_json_response('{"title": "Title", "content": ""}', llm.REWRITING_SCHEMA)
+
+    # Empty transcription string remains valid when empty=true in TRANSCRIPTION_SCHEMA
+    assert llm._parse_json_response(
+        '{"transcription": "", "empty": true}',
+        llm.TRANSCRIPTION_SCHEMA,
+    ) == {"transcription": "", "empty": True}
+
+    resp1 = MagicMock()
+    resp1.raise_for_status.return_value = None
+    resp1.json.return_value = {"message": {"content": '{"title": "", "content": "Body"}'}}
+
+    resp2 = MagicMock()
+    resp2.raise_for_status.return_value = None
+    resp2.json.return_value = {"message": {"content": '{"title": "Valid", "content": "Body"}'}}
+
+    with patch("eloquent_notes.llm.requests.post", side_effect=[resp1, resp2]) as mock_post:
+        res = llm.rewrite_transcription(
+            ollama_url="http://localhost:11434",
+            model="gemma",
+            system_prompt="sys",
+            user_prompt="usr",
+            retry_prompt="retry",
+            context_length=2048,
+            keep_alive="5m",
+            max_retries=1,
+            timeout=30,
+        )
+
+    assert res == {"title": "Valid", "content": "Body"}
+    assert mock_post.call_count == 2
+
+
 @patch("eloquent_notes.llm._execute_ollama_json_request")
 def test_classify_note(mock_exec):
     mock_exec.return_value = {

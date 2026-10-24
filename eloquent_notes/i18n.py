@@ -87,21 +87,21 @@ def _expand_tag(raw: str) -> list[str]:
 
 def detect_system_languages() -> list[str]:
     """Return ordered gettext language codes detected from the system environment."""
+    locale_val = ""
     for var in ("LC_ALL", "LC_MESSAGES", "LANG"):
         val = os.environ.get(var, "").strip()
         if val:
             if val.split(".")[0].upper() in ("C", "POSIX"):
                 return ["en"]
+            locale_val = val
             break
 
     raw_tags: list[str] = []
     language_env = os.environ.get("LANGUAGE", "").strip()
     if language_env:
         raw_tags.extend(language_env.split(":"))
-    for var in ("LC_ALL", "LC_MESSAGES", "LANG"):
-        val = os.environ.get(var, "").strip()
-        if val:
-            raw_tags.append(val)
+    if locale_val:
+        raw_tags.append(locale_val)
 
     if not raw_tags:
         raw_tags.append(QLocale.system().name())
@@ -121,7 +121,10 @@ _ui_locale: QLocale = _EN_LOCALE
 def load_translations(languages: list[str] | None = None) -> gettext.NullTranslations:
     """Load the gettext catalog for the given languages or the system locale."""
     global _translation, _ui_locale
-    langs = detect_system_languages() if languages is None else languages
+    raw_langs = detect_system_languages() if languages is None else languages
+    langs = [tag for raw in raw_langs for tag in _expand_tag(raw)]
+    if "en" in langs:
+        langs = langs[: langs.index("en")]
     _translation = gettext.translation(
         DOMAIN,
         localedir=LOCALES_DIR,

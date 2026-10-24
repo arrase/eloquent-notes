@@ -18,37 +18,16 @@ from eloquent_notes import config
 from eloquent_notes.i18n import _
 
 PROMPTS = [
-    (
-        "Transcription - System Prompt",
-        config.TRANSCRIPTION_SYSTEM_PROMPT_PATH,
-        config.DEFAULT_TRANSCRIPTION_SYSTEM_SRC,
-    ),
-    (
-        "Transcription - User Prompt",
-        config.TRANSCRIPTION_USER_PROMPT_PATH,
-        config.DEFAULT_TRANSCRIPTION_USER_SRC,
-    ),
-    (
-        "Rewriting - System Prompt",
-        config.REWRITING_SYSTEM_PROMPT_PATH,
-        config.DEFAULT_REWRITING_SYSTEM_SRC,
-    ),
-    (
-        "Rewriting - User Prompt",
-        config.REWRITING_USER_PROMPT_PATH,
-        config.DEFAULT_REWRITING_USER_SRC,
-    ),
-    (
-        "Classification - System Prompt",
-        config.CLASSIFICATION_SYSTEM_PROMPT_PATH,
-        config.DEFAULT_CLASSIFICATION_SYSTEM_SRC,
-    ),
-    (
-        "Classification - User Prompt",
-        config.CLASSIFICATION_USER_PROMPT_PATH,
-        config.DEFAULT_CLASSIFICATION_USER_SRC,
-    ),
-    ("Retry Prompt", config.RETRY_PROMPT_PATH, config.DEFAULT_RETRY_PROMPT_SRC),
+    (label, path, config.PROMPT_DEFAULTS[path])
+    for label, path in (
+        ("Transcription - System Prompt", config.TRANSCRIPTION_SYSTEM_PROMPT_PATH),
+        ("Transcription - User Prompt", config.TRANSCRIPTION_USER_PROMPT_PATH),
+        ("Rewriting - System Prompt", config.REWRITING_SYSTEM_PROMPT_PATH),
+        ("Rewriting - User Prompt", config.REWRITING_USER_PROMPT_PATH),
+        ("Classification - System Prompt", config.CLASSIFICATION_SYSTEM_PROMPT_PATH),
+        ("Classification - User Prompt", config.CLASSIFICATION_USER_PROMPT_PATH),
+        ("Retry Prompt", config.RETRY_PROMPT_PATH),
+    )
 ]
 
 
@@ -102,21 +81,20 @@ class TextFilesTab(QWidget):
 
         self.lst_items.currentItemChanged.connect(self._on_item_changed)
 
+    def _load_current_into_editor(self) -> None:
+        path = self.lst_items.currentItem().data(Qt.ItemDataRole.UserRole)
+        self.editor.setPlainText(self.loaded_contents[path])
+
     def _on_item_changed(self, current, previous):
         if previous:
             prev_path = previous.data(Qt.ItemDataRole.UserRole)
             self.loaded_contents[prev_path] = self.editor.toPlainText()
-
-        if current:
-            path = current.data(Qt.ItemDataRole.UserRole)
-            self.editor.setPlainText(self.loaded_contents[path])
+        self._load_current_into_editor()
 
     def commit_active_editor(self):
         """Commit current editor contents to memory cache."""
-        current = self.lst_items.currentItem()
-        if current:
-            path = current.data(Qt.ItemDataRole.UserRole)
-            self.loaded_contents[path] = self.editor.toPlainText()
+        path = self.lst_items.currentItem().data(Qt.ItemDataRole.UserRole)
+        self.loaded_contents[path] = self.editor.toPlainText()
 
     def load_settings(self, config_data: dict) -> None:
         self.lst_items.blockSignals(True)
@@ -126,24 +104,15 @@ class TextFilesTab(QWidget):
             src = path if os.path.exists(path) else default_path
             self.loaded_contents[path] = config.load_file(src)
 
-        if self.lst_items.count() > 0:
-            self.lst_items.setCurrentRow(0)
-
-        current = self.lst_items.currentItem()
-        if current:
-            path = current.data(Qt.ItemDataRole.UserRole)
-            self.editor.setPlainText(self.loaded_contents[path])
-
+        self.lst_items.setCurrentRow(0)
+        self._load_current_into_editor()
         self.lst_items.blockSignals(False)
 
     def restore_defaults(self) -> None:
         self.loaded_contents.clear()
         for _label, path, default_path in PROMPTS:
             self.loaded_contents[path] = config.load_file(default_path)
-        current = self.lst_items.currentItem()
-        if current:
-            path = current.data(Qt.ItemDataRole.UserRole)
-            self.editor.setPlainText(self.loaded_contents[path])
+        self._load_current_into_editor()
 
     def save_settings(self, config_data: dict) -> bool:
         self.commit_active_editor()
@@ -152,3 +121,4 @@ class TextFilesTab(QWidget):
             if not os.path.exists(path) or config.load_file(path) != content:
                 config.atomic_write(path, content)
         return True
+

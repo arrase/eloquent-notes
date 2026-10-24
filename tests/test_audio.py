@@ -184,6 +184,10 @@ def test_recorder_is_silent_for_quiet_and_loud_capture():
     recorder._chunks.append(_speech_signal(0.3))
     assert recorder.is_silent is False
 
+    recorder._chunks.clear()
+    assert recorder.is_silent is True
+    assert recorder.wav_bytes == b""
+
 
 def test_wav_bytes_trims_surrounding_silence():
     recorder = AudioRecorder(sample_rate=SAMPLE_RATE, channels=1)
@@ -194,6 +198,25 @@ def test_wav_bytes_trims_surrounding_silence():
 
     with wave.open(io.BytesIO(recorder.wav_bytes), "rb") as wf:
         assert wf.getnframes() == len(speech)
+
+
+def test_recorder_reuses_analysis_across_is_silent_and_wav_bytes():
+    recorder = AudioRecorder(sample_rate=SAMPLE_RATE, channels=1)
+    speech = _speech_signal(0.3)
+    recorder._chunks.append(speech[:2400])
+    recorder._chunks.append(speech[2400:])
+
+    with (
+        patch("eloquent_notes.audio.np.concatenate", wraps=np.concatenate) as mock_concat,
+        patch("eloquent_notes.audio.speech_frame_mask", wraps=speech_frame_mask) as mock_mask,
+    ):
+        assert recorder.is_silent is False
+        assert len(recorder.wav_bytes) > 0
+        assert len(recorder.wav_bytes) > 0
+
+    chunk_concats = [c for c in mock_concat.call_args_list if c.args[0] is recorder._chunks]
+    assert len(chunk_concats) == 1
+    assert mock_mask.call_count == 1
 
 
 @patch("sounddevice.wait")

@@ -68,7 +68,7 @@ class NotesTab(QWidget):
             self.txt_folder.setText(dir_path)
 
     def load_settings(self, config_data: dict) -> None:
-        self.txt_folder.setText(str(config_data["notes"]["folder"]))
+        self.txt_folder.setText(config_data["notes"]["folder"])
 
     def save_settings(self, config_data: dict) -> bool:
         folder = self.txt_folder.text().strip()
