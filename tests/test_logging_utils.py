@@ -1,6 +1,6 @@
 import logging
-import os
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
 
 import pytest
 
@@ -19,13 +19,13 @@ def test_parse_log_level_invalid_fails_fast():
         logging_utils.parse_log_level("NOT_A_LEVEL")
 
 
-def test_get_log_dir_custom_env(monkeypatch):
+def test_get_log_dir_custom_env(tmp_path, monkeypatch):
     """Test get_log_dir when XDG_STATE_HOME environment variable is set."""
-    custom_state = "/tmp/custom_state"
+    custom_state = str(tmp_path / "custom_state")
     monkeypatch.setenv("XDG_STATE_HOME", custom_state)
 
     log_dir = logging_utils.get_log_dir()
-    assert log_dir == os.path.join(custom_state, "eloquent-notes")
+    assert log_dir == str(Path(custom_state, "eloquent-notes"))
 
 
 def test_get_log_dir_default(monkeypatch):
@@ -33,7 +33,7 @@ def test_get_log_dir_default(monkeypatch):
     monkeypatch.delenv("XDG_STATE_HOME", raising=False)
 
     log_dir = logging_utils.get_log_dir()
-    expected = os.path.expanduser("~/.local/state/eloquent-notes")
+    expected = str(Path("~/.local/state/eloquent-notes").expanduser())
     assert log_dir == expected
 
 

@@ -57,8 +57,7 @@ TRANSCRIPTION_SCHEMA: dict[str, Any] = {
         "empty": {
             "type": "boolean",
             "description": (
-                "True if the audio contains only silence, background"
-                " noise, or no spoken words; False otherwise."
+                "True if the audio contains only silence, background noise, or no spoken words; False otherwise."
             ),
         },
     },
@@ -158,10 +157,7 @@ def _validate_property(key: str, val: Any, prop_schema: dict[str, Any]) -> None:
         if "minLength" in prop_schema and len(val.strip()) < prop_schema["minLength"]:
             raise ValueError(f"field {key!r} must not be empty")
         if "enum" in prop_schema and val not in prop_schema["enum"]:
-            raise ValueError(
-                f"field {key!r} has invalid value {val!r}, "
-                f"expected one of {prop_schema['enum']}"
-            )
+            raise ValueError(f"field {key!r} has invalid value {val!r}, expected one of {prop_schema['enum']}")
     elif prop_type == "boolean":
         if not isinstance(val, bool):
             raise TypeError(f"field {key!r} must be a boolean, got {type(val).__name__}")
@@ -225,7 +221,9 @@ def _execute_ollama_json_request(
         if attempt > 0:
             logger.warning(
                 "Retrying %s with Ollama (attempt %d/%d)...",
-                task_name, attempt, max_retries,
+                task_name,
+                attempt,
+                max_retries,
             )
 
         payload: dict[str, Any] = {
@@ -247,18 +245,25 @@ def _execute_ollama_json_request(
         except (KeyError, TypeError, ValueError):
             logger.warning(
                 "Invalid JSON output for %s (attempt %d/%d): %r",
-                task_name, attempt + 1, max_retries + 1, content,
+                task_name,
+                attempt + 1,
+                max_retries + 1,
+                content,
             )
             if attempt >= max_retries:
                 raise
-            conversation.append({
-                "role": "assistant",
-                "content": content if isinstance(content, str) else response.text,
-            })
-            conversation.append({
-                "role": "user",
-                "content": f"{retry_prompt}\n\nExpected fields: {', '.join(keys)}.",
-            })
+            conversation.append(
+                {
+                    "role": "assistant",
+                    "content": content if isinstance(content, str) else response.text,
+                }
+            )
+            conversation.append(
+                {
+                    "role": "user",
+                    "content": f"{retry_prompt}\n\nExpected fields: {', '.join(keys)}.",
+                }
+            )
             attempt += 1
 
 
@@ -331,4 +336,3 @@ def _run_text_phase(
 
 rewrite_transcription = partial(_run_text_phase, REWRITING_SCHEMA, "note rewriting")
 classify_note = partial(_run_text_phase, CLASSIFICATION_SCHEMA, "note classification")
-

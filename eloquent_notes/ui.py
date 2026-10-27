@@ -27,12 +27,20 @@ _PEN_WHITE_3 = QPen(
     Qt.PenCapStyle.RoundCap,
     Qt.PenJoinStyle.RoundJoin,
 )
-_HOURGLASS_TOP = QPolygonF([
-    QPointF(24.0, 20.0), QPointF(40.0, 20.0), QPointF(32.0, 32.0),
-])
-_HOURGLASS_BOTTOM = QPolygonF([
-    QPointF(24.0, 44.0), QPointF(32.0, 32.0), QPointF(40.0, 44.0),
-])
+_HOURGLASS_TOP = QPolygonF(
+    [
+        QPointF(24.0, 20.0),
+        QPointF(40.0, 20.0),
+        QPointF(32.0, 32.0),
+    ]
+)
+_HOURGLASS_BOTTOM = QPolygonF(
+    [
+        QPointF(24.0, 44.0),
+        QPointF(32.0, 32.0),
+        QPointF(40.0, 44.0),
+    ]
+)
 
 
 DEFAULT_TYPE_COLORS = {
@@ -187,7 +195,9 @@ def _common_controls_qss(t: Theme) -> str:
 
 def window_stylesheet(t: Theme) -> str:
     """Build the QSS stylesheet for MainWindow using the given theme."""
-    return _common_controls_qss(t) + f"""
+    return (
+        _common_controls_qss(t)
+        + f"""
     QMainWindow, QStackedWidget, QWidget#timelinePage, QWidget#readerPage, QWidget#columnContainer {{
         background-color: {t.window};
         color: {t.text};
@@ -322,11 +332,14 @@ def window_stylesheet(t: Theme) -> str:
         background-color: {t.border};
     }}
     """
+    )
 
 
 def dialog_stylesheet(t: Theme) -> str:
     """Build the QSS stylesheet for ConfigurationDialog using the given theme."""
-    return _common_controls_qss(t) + f"""
+    return (
+        _common_controls_qss(t)
+        + f"""
     QDialog {{
         background-color: {t.window};
         color: {t.text};
@@ -431,6 +444,7 @@ def dialog_stylesheet(t: Theme) -> str:
         width: 12px;
     }}
     """
+    )
 
 
 def create_icon_pixmap(color: str) -> QPixmap:
@@ -485,4 +499,3 @@ def create_app_icon_pixmap() -> QPixmap:
 def get_app_icon() -> QIcon:
     """Return the cached application window QIcon."""
     return QIcon(create_app_icon_pixmap())
-

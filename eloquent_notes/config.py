@@ -8,6 +8,7 @@ import copy
 import os
 import re
 import shutil
+from pathlib import Path
 from urllib.parse import urlparse
 
 import yaml
@@ -21,36 +22,36 @@ KEEP_ALIVE_RE = re.compile(r"^-?\d+(ns|us|µs|ms|s|m|h)?$")
 
 def get_config_home():
     """Return the XDG base directory for user configuration files."""
-    return os.environ.get("XDG_CONFIG_HOME") or os.path.expanduser("~/.config")
+    return os.environ.get("XDG_CONFIG_HOME") or str(Path("~/.config").expanduser())
 
 
 def get_cache_home():
     """Return the XDG base directory for user cache files."""
-    return os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache")
+    return os.environ.get("XDG_CACHE_HOME") or str(Path("~/.cache").expanduser())
 
 
 def get_data_home():
     """Return the XDG base directory for user data files."""
-    return os.environ.get("XDG_DATA_HOME") or os.path.expanduser("~/.local/share")
+    return os.environ.get("XDG_DATA_HOME") or str(Path("~/.local/share").expanduser())
 
 
-CONFIG_DIR = os.path.join(get_config_home(), "eloquent-notes")
-CONFIG_PATH = os.path.join(CONFIG_DIR, "config.yaml")
-CACHE_DIR = os.path.join(get_cache_home(), "eloquent-notes")
+CONFIG_DIR = str(Path(get_config_home(), "eloquent-notes"))
+CONFIG_PATH = str(Path(CONFIG_DIR, "config.yaml"))
+CACHE_DIR = str(Path(get_cache_home(), "eloquent-notes"))
 
-PROMPTS_DIR = os.path.join(CONFIG_DIR, "prompts")
+PROMPTS_DIR = str(Path(CONFIG_DIR, "prompts"))
 
-PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
-DEFAULT_CONFIG_SRC = os.path.join(PACKAGE_DIR, "config.yaml")
-DEFAULT_PROMPTS_DIR = os.path.join(PACKAGE_DIR, "prompts")
+PACKAGE_DIR = str(Path(__file__).resolve().parent)
+DEFAULT_CONFIG_SRC = str(Path(PACKAGE_DIR, "config.yaml"))
+DEFAULT_PROMPTS_DIR = str(Path(PACKAGE_DIR, "prompts"))
 
-RETRY_PROMPT_PATH = os.path.join(PROMPTS_DIR, "retry_prompt.md")
-TRANSCRIPTION_SYSTEM_PROMPT_PATH = os.path.join(PROMPTS_DIR, "transcription_system.md")
-TRANSCRIPTION_USER_PROMPT_PATH = os.path.join(PROMPTS_DIR, "transcription_user.md")
-REWRITING_SYSTEM_PROMPT_PATH = os.path.join(PROMPTS_DIR, "rewriting_system.md")
-REWRITING_USER_PROMPT_PATH = os.path.join(PROMPTS_DIR, "rewriting_user.md")
-CLASSIFICATION_SYSTEM_PROMPT_PATH = os.path.join(PROMPTS_DIR, "classification_system.md")
-CLASSIFICATION_USER_PROMPT_PATH = os.path.join(PROMPTS_DIR, "classification_user.md")
+RETRY_PROMPT_PATH = str(Path(PROMPTS_DIR, "retry_prompt.md"))
+TRANSCRIPTION_SYSTEM_PROMPT_PATH = str(Path(PROMPTS_DIR, "transcription_system.md"))
+TRANSCRIPTION_USER_PROMPT_PATH = str(Path(PROMPTS_DIR, "transcription_user.md"))
+REWRITING_SYSTEM_PROMPT_PATH = str(Path(PROMPTS_DIR, "rewriting_system.md"))
+REWRITING_USER_PROMPT_PATH = str(Path(PROMPTS_DIR, "rewriting_user.md"))
+CLASSIFICATION_SYSTEM_PROMPT_PATH = str(Path(PROMPTS_DIR, "classification_system.md"))
+CLASSIFICATION_USER_PROMPT_PATH = str(Path(PROMPTS_DIR, "classification_user.md"))
 
 PROMPT_PATHS = (
     RETRY_PROMPT_PATH,
@@ -62,10 +63,7 @@ PROMPT_PATHS = (
     CLASSIFICATION_USER_PROMPT_PATH,
 )
 
-PROMPT_DEFAULTS = {
-    path: os.path.join(DEFAULT_PROMPTS_DIR, os.path.basename(path))
-    for path in PROMPT_PATHS
-}
+PROMPT_DEFAULTS = {path: str(Path(DEFAULT_PROMPTS_DIR, Path(path).name)) for path in PROMPT_PATHS}
 
 _FILES_TO_COPY = (
     (DEFAULT_CONFIG_SRC, CONFIG_PATH),
@@ -75,12 +73,37 @@ _FILES_TO_COPY = (
 
 def init_config_dir():
     """Create config directories and copy default files if they don't exist."""
-    os.makedirs(CONFIG_DIR, exist_ok=True)
-    os.makedirs(PROMPTS_DIR, exist_ok=True)
+    Path(CONFIG_DIR).mkdir(parents=True, exist_ok=True)
+    Path(PROMPTS_DIR).mkdir(parents=True, exist_ok=True)
 
     for src, dst in _FILES_TO_COPY:
-        if not os.path.exists(dst):
+        if not Path(dst).exists():
             shutil.copy(src, dst)
+
+
+def _is_valid_str(key: str, value: str, default_val: str) -> bool:
+    if default_val.startswith("#"):
+        return bool(_HEX_COLOR_RE.fullmatch(value))
+    if key == "ollama_url":
+        parsed = urlparse(value)
+        return not any(c.isspace() for c in value) and parsed.scheme in ("http", "https") and bool(parsed.netloc)
+    if key in ("keep_alive", "preload_keep_alive", "search_keep_alive"):
+        return bool(KEEP_ALIVE_RE.fullmatch(value))
+    if key == "level":
+        return value.upper() in LOG_LEVELS
+    return bool(value.strip())
+
+
+def _is_valid_number(key: str, value: int | float) -> bool:
+    if key == "sample_rate":
+        return value >= 8000
+    if key == "channels":
+        return value in (1, 2)
+    if key == "min_similarity":
+        return 0.0 <= value <= 1.0
+    if key in ("max_retries", "backup_count"):
+        return value >= 0
+    return 0 < value < float("inf")
 
 
 def _validate_override(key: str, value, default_val) -> None:
@@ -92,32 +115,9 @@ def _validate_override(key: str, value, default_val) -> None:
 
     valid = True
     if isinstance(value, str):
-        if default_val.startswith("#"):
-            valid = bool(_HEX_COLOR_RE.fullmatch(value))
-        elif key == "ollama_url":
-            parsed = urlparse(value)
-            valid = (
-                not any(c.isspace() for c in value)
-                and parsed.scheme in ("http", "https")
-                and bool(parsed.netloc)
-            )
-        elif key in ("keep_alive", "preload_keep_alive", "search_keep_alive"):
-            valid = bool(KEEP_ALIVE_RE.fullmatch(value))
-        elif key == "level":
-            valid = value.upper() in LOG_LEVELS
-        else:
-            valid = bool(value.strip())
+        valid = _is_valid_str(key, value, default_val)
     elif type(value) in (int, float):
-        if key == "sample_rate":
-            valid = value >= 8000
-        elif key == "channels":
-            valid = value in (1, 2)
-        elif key == "min_similarity":
-            valid = 0.0 <= value <= 1.0
-        elif key in ("max_retries", "backup_count"):
-            valid = value >= 0
-        else:
-            valid = 0 < value < float("inf")
+        valid = _is_valid_number(key, value)
 
     if not valid:
         raise ValueError(_("Invalid configuration value for '{key}'").format(key=key))
@@ -160,7 +160,7 @@ def diff_configs(default: dict, current: dict) -> dict:
 
 def load_default_config():
     """Load and return the packaged default configuration dictionary."""
-    with open(DEFAULT_CONFIG_SRC, encoding="utf-8") as f:
+    with Path(DEFAULT_CONFIG_SRC).open(encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 
@@ -170,7 +170,7 @@ def load_config():
 
     default_config = load_default_config()
 
-    with open(CONFIG_PATH, encoding="utf-8") as f:
+    with Path(CONFIG_PATH).open(encoding="utf-8") as f:
         user_config = yaml.safe_load(f)
 
     if user_config is None:
@@ -183,23 +183,19 @@ def load_config():
 
 def load_file(path):
     """Load and return the text content of a file."""
-    with open(path, encoding="utf-8") as f:
-        return f.read()
+    return Path(path).read_text(encoding="utf-8")
 
 
 def atomic_write(path: str, content: str | bytes) -> None:
     """Write content to a file atomically via a temporary replacement file."""
-    dir_path = os.path.dirname(path)
-    if dir_path:
-        os.makedirs(dir_path, exist_ok=True)
-    tmp_path = f"{path}.tmp"
+    target = Path(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = Path(f"{path}.tmp")
     if isinstance(content, bytes):
-        with open(tmp_path, "wb") as f:
-            f.write(content)
+        tmp_path.write_bytes(content)
     else:
-        with open(tmp_path, "w", encoding="utf-8") as f:
-            f.write(content)
-    os.replace(tmp_path, path)
+        tmp_path.write_text(content, encoding="utf-8")
+    tmp_path.replace(target)
 
 
 def save_config(config_data):

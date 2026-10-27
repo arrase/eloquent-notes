@@ -8,7 +8,6 @@ import requests
 
 from eloquent_notes import llm
 
-
 SIMPLE_SCHEMA = {
     "type": "object",
     "properties": {
@@ -62,9 +61,7 @@ def test_preload_model_without_context_length(mock_post):
 def test_execute_ollama_json_request_success_first_try(mock_post):
     mock_response = MagicMock()
     mock_response.raise_for_status.return_value = None
-    mock_response.json.return_value = {
-        "message": {"content": '{"result": "ok"}'}
-    }
+    mock_response.json.return_value = {"message": {"content": '{"result": "ok"}'}}
     mock_post.return_value = mock_response
 
     messages = [{"role": "user", "content": "hi"}]
@@ -89,9 +86,7 @@ def test_execute_ollama_json_request_success_first_try(mock_post):
 def test_execute_ollama_json_request_without_context_length(mock_post):
     mock_response = MagicMock()
     mock_response.raise_for_status.return_value = None
-    mock_response.json.return_value = {
-        "message": {"content": '{"result": "ok"}'}
-    }
+    mock_response.json.return_value = {"message": {"content": '{"result": "ok"}'}}
     mock_post.return_value = mock_response
 
     llm._execute_ollama_json_request(
@@ -411,8 +406,12 @@ def test_execute_ollama_json_request_rejects_non_dict_and_raises():
 
 
 def test_execute_ollama_json_request_negative_retries_raises():
-    with patch("eloquent_notes.llm.requests.post") as mock_post, pytest.raises(
-        ValueError, match="max_retries must be >= 0",
+    with (
+        patch("eloquent_notes.llm.requests.post") as mock_post,
+        pytest.raises(
+            ValueError,
+            match="max_retries must be >= 0",
+        ),
     ):
         llm._execute_ollama_json_request(
             ollama_url="http://localhost:11434",

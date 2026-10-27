@@ -1,12 +1,14 @@
 """Unit tests for eloquent_notes.notes (Markdown note storage)."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from eloquent_notes import notes
 
 
 def test_create_note_round_trip(tmp_path):
-    note = notes.create_note(tmp_path, "Reunión con Marta", "decision", ["equipo", "lanzamiento"], "Lanzamos el viernes.")
+    note = notes.create_note(
+        tmp_path, "Reunión con Marta", "decision", ["equipo", "lanzamiento"], "Lanzamos el viernes."
+    )
 
     [loaded] = notes.load_notes(tmp_path)
 
@@ -53,7 +55,7 @@ def test_create_note_normalizes_fields_and_disambiguates_same_second_collisions(
 
 
 def test_load_notes_newest_first(tmp_path):
-    base = datetime(2026, 10, 20, 9, 0, tzinfo=timezone.utc)
+    base = datetime(2026, 10, 20, 9, 0, tzinfo=UTC)
     for offset, title in [(0, "oldest"), (2, "newest"), (1, "middle")]:
         notes.save_note(notes.Note(tmp_path / f"{title}.md", title, base + timedelta(hours=offset), "note", [], ""))
 
@@ -70,28 +72,36 @@ def test_load_notes_ignores_foreign_files(tmp_path, caplog):
     (tmp_path / "broken.md").write_text("---\ntitle: [unclosed\n---\n", encoding="utf-8")
     (tmp_path / "list.md").write_text("---\n- a\n---\n", encoding="utf-8")
     (tmp_path / "badtype.md").write_text(
-        "---\ntitle: T\ncreated: 2026-10-22T10:00:00+02:00\ntype: memo\n---\n", encoding="utf-8",
+        "---\ntitle: T\ncreated: 2026-10-22T10:00:00+02:00\ntype: memo\n---\n",
+        encoding="utf-8",
     )
     (tmp_path / "dateonly.md").write_text(
-        "---\ntitle: T\ncreated: 2026-10-22\ntype: note\n---\n", encoding="utf-8",
+        "---\ntitle: T\ncreated: 2026-10-22\ntype: note\n---\n",
+        encoding="utf-8",
     )
     (tmp_path / "baddate.md").write_text(
-        '---\ntitle: T\ncreated: "not-a-date"\ntype: note\n---\n', encoding="utf-8",
+        '---\ntitle: T\ncreated: "not-a-date"\ntype: note\n---\n',
+        encoding="utf-8",
     )
     (tmp_path / "intdate.md").write_text(
-        "---\ntitle: T\ncreated: 123\ntype: note\n---\n", encoding="utf-8",
+        "---\ntitle: T\ncreated: 123\ntype: note\n---\n",
+        encoding="utf-8",
     )
     (tmp_path / "strtags.md").write_text(
-        "---\ntitle: T\ncreated: 2026-10-22T10:00:00+02:00\ntype: note\ntags: work\n---\n", encoding="utf-8",
+        "---\ntitle: T\ncreated: 2026-10-22T10:00:00+02:00\ntype: note\ntags: work\n---\n",
+        encoding="utf-8",
     )
     (tmp_path / "inttags.md").write_text(
-        "---\ntitle: T\ncreated: 2026-10-22T10:00:00+02:00\ntype: note\ntags: 123\n---\n", encoding="utf-8",
+        "---\ntitle: T\ncreated: 2026-10-22T10:00:00+02:00\ntype: note\ntags: 123\n---\n",
+        encoding="utf-8",
     )
     (tmp_path / "blanktitle.md").write_text(
-        '---\ntitle: "   "\ncreated: 2026-10-22T10:00:00+02:00\ntype: note\n---\n', encoding="utf-8",
+        '---\ntitle: "   "\ncreated: 2026-10-22T10:00:00+02:00\ntype: note\n---\n',
+        encoding="utf-8",
     )
     (tmp_path / "nulltitle.md").write_text(
-        "---\ntitle: null\ncreated: 2026-10-22T10:00:00+02:00\ntype: note\n---\n", encoding="utf-8",
+        "---\ntitle: null\ncreated: 2026-10-22T10:00:00+02:00\ntype: note\n---\n",
+        encoding="utf-8",
     )
     (tmp_path / "binary.md").write_bytes(b"\xff\xfe\x00\x00")
     (tmp_path / "subdir.md").mkdir()

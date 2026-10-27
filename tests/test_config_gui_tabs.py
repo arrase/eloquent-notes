@@ -1,6 +1,6 @@
 """Unit tests for configuration GUI tabs (AITab, AppearanceTab, AudioTab, GeneralTab, NotesTab, TextFilesTab)."""
 
-import os
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from PyQt6 import sip
@@ -306,11 +306,9 @@ def test_audio_tab_load_and_save(qapp):
 
 def test_general_tab_load_and_save(qapp):
     tab = GeneralTab()
-    config_data = {
-        "logging": {"level": "WARNING", "max_mb": 15, "backup_count": 3}
-    }
+    config_data = {"logging": {"level": "WARNING", "max_mb": 15, "backup_count": 3}}
 
-    with patch("os.path.exists", return_value=False):
+    with patch("pathlib.Path.exists", return_value=False):
         tab.load_settings(config_data)
 
     assert tab.cmb_log_level.currentText() == "WARNING"
@@ -327,16 +325,14 @@ def test_general_tab_load_and_save(qapp):
 
 def test_general_tab_autostart_removal(qapp):
     tab = GeneralTab()
-    config_data = {
-        "logging": {"level": "INFO", "max_mb": 5, "backup_count": 3}
-    }
+    config_data = {"logging": {"level": "INFO", "max_mb": 5, "backup_count": 3}}
 
-    with patch("os.path.exists", return_value=True):
+    with patch("pathlib.Path.exists", return_value=True):
         tab.load_settings(config_data)
     assert tab.chk_autostart.isChecked()
 
     tab.chk_autostart.setChecked(False)
-    with patch("os.path.exists", return_value=True), patch("os.remove") as mock_remove:
+    with patch("pathlib.Path.exists", return_value=True), patch("pathlib.Path.unlink") as mock_remove:
         res = tab.save_settings(config_data)
         assert res is True
         mock_remove.assert_called_once()
@@ -344,24 +340,25 @@ def test_general_tab_autostart_removal(qapp):
 
 def test_general_tab_view_log_file(qapp, tmp_path):
     tab = GeneralTab()
-    log_dir = str(tmp_path / "logs")
-    log_file = os.path.join(log_dir, "app.log")
+    log_dir = tmp_path / "logs"
+    log_file = str(log_dir / "app.log")
 
     # Missing log file
-    with patch("eloquent_notes.config_gui.tabs.general.get_log_file_path", return_value=log_file), patch(
-        "PyQt6.QtWidgets.QMessageBox.information"
-    ) as mock_info:
+    with (
+        patch("eloquent_notes.config_gui.tabs.general.get_log_file_path", return_value=log_file),
+        patch("PyQt6.QtWidgets.QMessageBox.information") as mock_info,
+    ):
         tab._view_log_file()
         mock_info.assert_called_once()
 
     # Existing log file
-    os.makedirs(log_dir, exist_ok=True)
-    with open(log_file, "w") as f:
-        f.write("Log line")
+    log_dir.mkdir(parents=True, exist_ok=True)
+    Path(log_file).write_text("Log line", encoding="utf-8")
 
-    with patch("eloquent_notes.config_gui.tabs.general.get_log_file_path", return_value=log_file), patch(
-        "PyQt6.QtGui.QDesktopServices.openUrl"
-    ) as mock_open:
+    with (
+        patch("eloquent_notes.config_gui.tabs.general.get_log_file_path", return_value=log_file),
+        patch("PyQt6.QtGui.QDesktopServices.openUrl") as mock_open,
+    ):
         tab._view_log_file()
         mock_open.assert_called_once()
 
@@ -412,7 +409,7 @@ def test_notes_tab_browse_folder(qapp, tmp_path):
     with patch("PyQt6.QtWidgets.QFileDialog.getExistingDirectory", return_value="") as mock_dialog:
         tab._browse_folder()
     assert tab.txt_folder.text() == "/nonexistent/folder"
-    assert mock_dialog.call_args.args[2] == os.path.expanduser("~/")
+    assert mock_dialog.call_args.args[2] == str(Path("~/").expanduser())
 
 
 # --- APPEARANCE TAB TESTS ---
@@ -466,12 +463,9 @@ def test_text_files_tab_flow(qapp, tmp_path, monkeypatch):
     def1 = str(tmp_path / "def1.md")
     def2 = str(tmp_path / "def2.md")
 
-    with open(f1, "w") as f:
-        f.write("Custom Prompt 1")
-    with open(def1, "w") as f:
-        f.write("Default Prompt 1")
-    with open(def2, "w") as f:
-        f.write("Default Prompt 2")
+    Path(f1).write_text("Custom Prompt 1", encoding="utf-8")
+    Path(def1).write_text("Default Prompt 1", encoding="utf-8")
+    Path(def2).write_text("Default Prompt 2", encoding="utf-8")
 
     items = [("Prompt 1", f1, def1), ("Prompt 2", f2, def2)]
     monkeypatch.setattr(text_files, "PROMPTS", items)
@@ -497,10 +491,8 @@ def test_text_files_tab_flow(qapp, tmp_path, monkeypatch):
         assert mock_write.call_count == 2
 
     # When both files already exist on disk with identical content, save_settings skips writing
-    with open(f1, "w") as f:
-        f.write("Modified Prompt 1")
-    with open(f2, "w") as f:
-        f.write("Default Prompt 2")
+    Path(f1).write_text("Modified Prompt 1", encoding="utf-8")
+    Path(f2).write_text("Default Prompt 2", encoding="utf-8")
 
     with patch("eloquent_notes.config.atomic_write") as mock_write:
         tab.save_settings(config_data)
@@ -514,8 +506,7 @@ def test_text_files_tab_flow(qapp, tmp_path, monkeypatch):
 
 def test_text_files_tab_load_settings_row0_already_selected(qapp, tmp_path, monkeypatch):
     f1 = str(tmp_path / "prompt1.md")
-    with open(f1, "w") as f:
-        f.write("Initial Text")
+    Path(f1).write_text("Initial Text", encoding="utf-8")
 
     monkeypatch.setattr(text_files, "PROMPTS", [("Prompt 1", f1, f1)])
     tab = TextFilesTab()
@@ -527,8 +518,7 @@ def test_text_files_tab_load_settings_row0_already_selected(qapp, tmp_path, monk
     tab.editor.setPlainText("Unsaved Dirty Edits")
 
     # Reload settings while row 0 is already selected
-    with open(f1, "w") as f:
-        f.write("Updated Disk Text")
+    Path(f1).write_text("Updated Disk Text", encoding="utf-8")
 
     tab.load_settings({})
     assert tab.editor.toPlainText() == "Updated Disk Text"

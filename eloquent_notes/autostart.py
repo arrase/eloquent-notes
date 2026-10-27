@@ -5,7 +5,6 @@ the application SVG icon in $XDG_DATA_HOME/icons/hicolor/scalable/apps/,
 and the optional login autostart entry in $XDG_CONFIG_HOME/autostart/.
 """
 
-import os
 import sys
 from pathlib import Path
 
@@ -33,31 +32,29 @@ APP_ICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" wi
 
 def get_icon_path():
     """Return the path of the Eloquent Notes application SVG icon."""
-    return os.path.join(
-        get_data_home(), "icons", "hicolor", "scalable", "apps", "eloquent-notes.svg"
-    )
+    return str(Path(get_data_home(), "icons", "hicolor", "scalable", "apps", "eloquent-notes.svg"))
 
 
 def get_desktop_entry_path():
     """Return the path of the Eloquent Notes application launcher desktop entry."""
-    return os.path.join(get_data_home(), "applications", "eloquent-notes.desktop")
+    return str(Path(get_data_home(), "applications", "eloquent-notes.desktop"))
 
 
 def get_autostart_path():
     """Return the path of the Eloquent Notes autostart desktop entry."""
-    return os.path.join(get_config_home(), "autostart", "eloquent-notes.desktop")
+    return str(Path(get_config_home(), "autostart", "eloquent-notes.desktop"))
 
 
 def is_autostart_enabled():
     """Return True if autostart desktop entry exists."""
-    return os.path.exists(get_autostart_path())
+    return Path(get_autostart_path()).exists()
 
 
 def remove_autostart():
     """Remove the autostart desktop entry if it exists."""
-    path = get_autostart_path()
-    if os.path.exists(path):
-        os.remove(path)
+    path = Path(get_autostart_path())
+    if path.exists():
+        path.unlink()
 
 
 def install_app_icon():
@@ -91,7 +88,7 @@ def _write_desktop_entry(path, exec_cmd, icon_path, *extra_lines):
         *extra_lines,
     ]
     atomic_write(path, "\n".join(lines) + "\n")
-    os.chmod(path, 0o600)
+    Path(path).chmod(0o600)
     return path
 
 
@@ -121,4 +118,3 @@ def install_autostart():
         "NoDisplay=false",
         "X-GNOME-Autostart-enabled=true",
     )
-

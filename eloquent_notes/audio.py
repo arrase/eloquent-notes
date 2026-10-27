@@ -66,11 +66,7 @@ def speech_frame_mask(data: np.ndarray, sample_rate: int) -> np.ndarray:
     noise_floor = float(np.percentile(noise_estimate, 20))
     threshold = max(SPEECH_RMS_THRESHOLD, noise_floor * SPEECH_SNR_FACTOR)
 
-    active = (
-        (band_rms >= threshold)
-        & (band_ratio >= MIN_VOICE_BAND_RATIO)
-        & (flatness <= MAX_SPEECH_FLATNESS)
-    )
+    active = (band_rms >= threshold) & (band_ratio >= MIN_VOICE_BAND_RATIO) & (flatness <= MAX_SPEECH_FLATNESS)
     pair = active[:-1] & active[1:]
     sustained = np.zeros_like(active)
     sustained[:-1] |= pair

@@ -2,11 +2,12 @@
 
 import gettext
 import os
+from pathlib import Path
 
 from PyQt6.QtCore import QLocale
 
 DOMAIN = "eloquent_notes"
-LOCALES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "locales")
+LOCALES_DIR = str(Path(__file__).resolve().parent / "locales")
 
 _EN_LOCALE = QLocale(QLocale.Language.English, QLocale.Country.UnitedKingdom)
 
@@ -70,15 +71,16 @@ OUTPUT_LANGUAGES = [
 
 
 def _expand_tag(raw: str) -> list[str]:
-    base = raw.split(".")[0].split("@")[0].replace("-", "_").strip()
+    base = raw.split(".", maxsplit=1)[0].split("@", maxsplit=1)[0].replace("-", "_").strip()
     if not base or base.upper() in ("C", "POSIX"):
         return []
+    lang = base.split("_", maxsplit=1)[0].lower()
     candidates: list[str] = []
     for candidate in (
         _LANGUAGE_ALIASES.get(base.lower()),
         base,
-        _LANGUAGE_ALIASES.get(base.split("_")[0].lower()),
-        base.split("_")[0].lower(),
+        _LANGUAGE_ALIASES.get(lang),
+        lang,
     ):
         if candidate and candidate not in candidates:
             candidates.append(candidate)
@@ -91,7 +93,7 @@ def detect_system_languages() -> list[str]:
     for var in ("LC_ALL", "LC_MESSAGES", "LANG"):
         val = os.environ.get(var, "").strip()
         if val:
-            if val.split(".")[0].upper() in ("C", "POSIX"):
+            if val.split(".", maxsplit=1)[0].upper() in ("C", "POSIX"):
                 return ["en"]
             locale_val = val
             break

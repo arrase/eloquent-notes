@@ -200,8 +200,10 @@ class EloquentApp(QObject):
     def _notify(self, title, message):
         if self.tray is not None:
             self.tray.showMessage(
-                title, message,
-                QSystemTrayIcon.MessageIcon.Information, 5000,
+                title,
+                message,
+                QSystemTrayIcon.MessageIcon.Information,
+                5000,
             )
 
     @staticmethod
@@ -319,10 +321,7 @@ class EloquentApp(QObject):
         logger.info("Starting audio recording...")
         try:
             snapshot = copy.deepcopy(self.config)
-            snapshot["_loaded_files"] = {
-                path: config.load_file(path)
-                for path in config.PROMPT_PATHS
-            }
+            snapshot["_loaded_files"] = {path: config.load_file(path) for path in config.PROMPT_PATHS}
             audio_cfg = snapshot["audio"]
             # Played synchronously so the tone finishes before the
             # microphone opens and cannot leak into the recording.
@@ -669,7 +668,10 @@ def main():
     """Daemon entry point — configure logging and launch the tray app."""
     parser = argparse.ArgumentParser(description=_("Eloquent Notes Daemon"))
     parser.add_argument(
-        "command", nargs="?", choices=["toggle", "open"], metavar="command",
+        "command",
+        nargs="?",
+        choices=["toggle", "open"],
+        metavar="command",
     )
     args = parser.parse_args()
 

@@ -1,6 +1,6 @@
 """Configuration tab for editing a list of text files."""
 
-import os
+from pathlib import Path
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
@@ -101,7 +101,7 @@ class TextFilesTab(QWidget):
         self.loaded_contents.clear()
 
         for _label, path, default_path in PROMPTS:
-            src = path if os.path.exists(path) else default_path
+            src = path if Path(path).exists() else default_path
             self.loaded_contents[path] = config.load_file(src)
 
         self.lst_items.setCurrentRow(0)
@@ -118,7 +118,6 @@ class TextFilesTab(QWidget):
         self.commit_active_editor()
         for _label, path, _default in PROMPTS:
             content = self.loaded_contents[path]
-            if not os.path.exists(path) or config.load_file(path) != content:
+            if not Path(path).exists() or config.load_file(path) != content:
                 config.atomic_write(path, content)
         return True
-

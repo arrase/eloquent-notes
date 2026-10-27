@@ -8,15 +8,13 @@ import logging
 import os
 import sys
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
 
 
 def get_log_dir():
     """Return the log directory path following XDG conventions."""
-    xdg_state = (
-        os.environ.get("XDG_STATE_HOME")
-        or os.path.expanduser("~/.local/state")
-    )
-    return os.path.join(xdg_state, "eloquent-notes")
+    xdg_state = os.environ.get("XDG_STATE_HOME") or str(Path("~/.local/state").expanduser())
+    return str(Path(xdg_state, "eloquent-notes"))
 
 
 LOG_LEVELS = {
@@ -33,7 +31,7 @@ LOG_FILE_NAME = "app.log"
 
 def get_log_file_path():
     """Return the absolute path to the application log file."""
-    return os.path.join(get_log_dir(), LOG_FILE_NAME)
+    return str(Path(get_log_dir(), LOG_FILE_NAME))
 
 
 def parse_log_level(name):
@@ -42,9 +40,7 @@ def parse_log_level(name):
         return LOG_LEVELS[str(name).upper()]
     except KeyError:
         valid = ", ".join(LOG_LEVELS)
-        raise ValueError(
-            f"Invalid log level {name!r}. Expected one of: {valid}"
-        ) from None
+        raise ValueError(f"Invalid log level {name!r}. Expected one of: {valid}") from None
 
 
 def setup_logging(log_level_str, max_mb, backup_count):
@@ -63,15 +59,12 @@ def setup_logging(log_level_str, max_mb, backup_count):
         return logger
 
     formatter = logging.Formatter(
-        fmt=(
-            "%(asctime)s [%(levelname)s] (%(threadName)s)"
-            " %(name)s.%(funcName)s:%(lineno)d - %(message)s"
-        ),
+        fmt=("%(asctime)s [%(levelname)s] (%(threadName)s) %(name)s.%(funcName)s:%(lineno)d - %(message)s"),
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
     log_dir = get_log_dir()
-    os.makedirs(log_dir, exist_ok=True)
+    Path(log_dir).mkdir(parents=True, exist_ok=True)
     log_file_path = get_log_file_path()
 
     file_handler = RotatingFileHandler(
@@ -91,4 +84,3 @@ def setup_logging(log_level_str, max_mb, backup_count):
     logger.addHandler(file_handler)
 
     return logger
-

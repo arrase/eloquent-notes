@@ -23,8 +23,7 @@ def parse_args(cli_args=None):
     parser = argparse.ArgumentParser(
         prog="eloquent-notes",
         description=_(
-            "Eloquent Notes - Linux system tray utility"
-            " that turns offline voice dictations into organized notes."
+            "Eloquent Notes - Linux system tray utility that turns offline voice dictations into organized notes."
         ),
     )
     parser.add_argument(
@@ -43,7 +42,8 @@ def parse_args(cli_args=None):
         ),
     )
     parser.add_argument(
-        "-t", "--toggle",
+        "-t",
+        "--toggle",
         action="store_true",
         help=_("Alias for 'toggle' command."),
     )

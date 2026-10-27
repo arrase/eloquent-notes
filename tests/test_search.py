@@ -1,6 +1,6 @@
 """Unit tests for eloquent_notes.search (semantic search with cached embeddings)."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import patch
 
 import numpy as np
@@ -41,7 +41,7 @@ def fake_embed(ollama_url, model, texts, keep_alive, timeout):
 
 @pytest.fixture
 def note_list(tmp_path):
-    created = datetime(2026, 10, 22, 10, 0, tzinfo=timezone.utc)
+    created = datetime(2026, 10, 22, 10, 0, tzinfo=UTC)
     result = []
     for title in VECTORS:
         note = notes.Note(tmp_path / "notes" / f"{title}.md", title, created, "note", [], f"About {title}")
