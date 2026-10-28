@@ -403,11 +403,6 @@ msgstr "دوبارہ لکھنا - سسٹم پرامپٹ"
 msgid "Rewriting - User Prompt"
 msgstr "دوبارہ لکھنا - صارف پرامپٹ"
 
-msgid "Sample Rate:"
-msgstr "سیمپل ریٹ:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "مائیکروفون ریکارڈنگ کے لیے سیمپل ریٹ (صوتی املا ماڈلز کے لیے 16000 Hz تجویز کیا جاتا ہے)۔"
 
 msgid "Save"
 msgstr "محفوظ کریں"

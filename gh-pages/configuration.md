@@ -72,8 +72,7 @@ The dialog has six tabs plus **Restore Defaults**, **Cancel** and **Save** butto
 * **Minimum Similarity**: cosine similarity below which search results are hidden (default `0.6`).
 
 #### 5. Audio
-* **Sample Rate**: recording rate in Hz (default `16000`).
-* **Audio Channels**: `1` (mono) or `2` (stereo).
+* **Audio Channels**: `1` (mono) or `2` (stereo). Audio is always captured at 16 kHz.
 * **Capture Duration**: maximum recording length in seconds before recording stops automatically (default `30`, the Gemma 4 audio limit).
 * **Show floating countdown HUD**: overlay with the remaining time while recording; clicking it stops the recording.
 * **Play beep on recording start and stop**: audio cues, with **Beep Frequency** (default `440` Hz) and **Beep Duration** (default `0.1` s).
@@ -119,7 +118,6 @@ search:
   min_similarity: 0.6   # Hide search results below this cosine similarity.
 
 audio:
-  sample_rate: 16000
   channels: 1
   capture_duration: 30
   recording_hud_enabled: true

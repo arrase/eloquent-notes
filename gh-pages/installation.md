@@ -10,7 +10,7 @@ Eloquent Notes is engineered for Linux desktop environments. Ensure your system 
 
 | Component | Minimum Requirement | Notes |
 | :--- | :--- | :--- |
-| **Operating System** | Linux (Ubuntu, Debian, Fedora, Arch, openSUSE, etc.) | Uses XDG directory standards and X11/Wayland system tray. |
+| **Operating System** | Linux `x86_64` (Ubuntu, Debian, Fedora, Arch, openSUSE, etc.) | Uses XDG directory standards and X11/Wayland system tray. Linux `x86_64` is required because `silero-vad-lite` publishes prebuilt wheels for `x86_64` only (not `aarch64`). |
 | **Python** | Python 3.11+ | Standard Python runtime environment. |
 | **Audio Subsystem** | PortAudio (`libportaudio2`) | Required by `sounddevice` for microphone capture and sine tone playback. |
 | **Notifications** | DBus Notification Server | Required for desktop status popups (`dunst`, `mako`, GNOME/KDE built-in). |

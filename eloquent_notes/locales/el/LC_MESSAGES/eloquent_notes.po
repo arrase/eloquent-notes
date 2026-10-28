@@ -403,11 +403,6 @@ msgstr "Αναδιατύπωση - Προτροπή συστήματος"
 msgid "Rewriting - User Prompt"
 msgstr "Αναδιατύπωση - Προτροπή χρήστη"
 
-msgid "Sample Rate:"
-msgstr "Ρυθμός δειγματοληψίας:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "Ρυθμός δειγματοληψίας για εγγραφή μικροφώνου (συνιστώνται 16000 Hz για μοντέλα φωνητικής υπαγόρευσης)."
 
 msgid "Save"
 msgstr "Αποθήκευση"

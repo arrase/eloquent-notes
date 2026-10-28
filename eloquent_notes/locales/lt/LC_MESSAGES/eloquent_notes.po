@@ -403,11 +403,6 @@ msgstr "Perrašymas – sisteminė užklausa"
 msgid "Rewriting - User Prompt"
 msgstr "Perrašymas – naudotojo užklausa"
 
-msgid "Sample Rate:"
-msgstr "Diskretizavimo dažnis:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "Mikrofono įrašymo diskretizavimo dažnis (kalbos diktavimo modeliams rekomenduojama 16000 Hz)."
 
 msgid "Save"
 msgstr "Išsaugoti"

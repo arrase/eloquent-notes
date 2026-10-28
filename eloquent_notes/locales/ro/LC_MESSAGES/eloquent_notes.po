@@ -403,11 +403,6 @@ msgstr "Rescriere - Prompt de sistem"
 msgid "Rewriting - User Prompt"
 msgstr "Rescriere - Prompt utilizator"
 
-msgid "Sample Rate:"
-msgstr "Rată de eșantionare:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "Rata de eșantionare pentru înregistrarea cu microfonul (16000 Hz este recomandat pentru modelele de dictare vocală)."
 
 msgid "Save"
 msgstr "Salvează"

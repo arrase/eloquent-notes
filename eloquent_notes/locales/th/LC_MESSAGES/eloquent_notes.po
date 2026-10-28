@@ -403,11 +403,6 @@ msgstr "การเขียนใหม่ - พรอมต์ระบบ"
 msgid "Rewriting - User Prompt"
 msgstr "การเขียนใหม่ - พรอมต์ผู้ใช้"
 
-msgid "Sample Rate:"
-msgstr "อัตราสุ่มสัญญาณ:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "อัตราสุ่มสัญญาณสำหรับการบันทึกไมโครโฟน (แนะนำ 16000 Hz สำหรับโมเดลป้อนด้วยเสียง)"
 
 msgid "Save"
 msgstr "บันทึก"

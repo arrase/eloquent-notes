@@ -403,11 +403,6 @@ msgstr "Réécriture - Prompt système"
 msgid "Rewriting - User Prompt"
 msgstr "Réécriture - Prompt utilisateur"
 
-msgid "Sample Rate:"
-msgstr "Fréquence d'échantillonnage :"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "Fréquence d'échantillonnage pour l'enregistrement micro (16000 Hz recommandé pour les modèles de dictée vocale)."
 
 msgid "Save"
 msgstr "Enregistrer"

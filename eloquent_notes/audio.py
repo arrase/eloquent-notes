@@ -1,8 +1,9 @@
-"""Audio capture and feedback tones.
+"""Audio capture, voice activity detection and feedback tones.
 
-AudioRecorder captures default-input microphone audio via sounddevice and
-encodes it as 16-bit PCM WAV bytes. play_beep generates short sine-wave
-feedback tones with fade in/out to avoid speaker clicks.
+AudioRecorder captures 16 kHz microphone audio via sounddevice, filters and
+trims speech locally with Silero VAD, and encodes it as 16-bit PCM WAV bytes.
+play_beep generates short sine-wave feedback tones with fade in/out to avoid
+speaker clicks.
 """
 
 import io
@@ -10,98 +11,49 @@ import wave
 
 import numpy as np
 import sounddevice as sd
+from silero_vad_lite import SileroVAD
 
 PCM16_MAX = 32767.0
 PCM16_MIN_INT = -32768
 PCM16_MAX_INT = 32767
 BYTES_PER_SAMPLE_16BIT = 2
 
-# Voice activity detection constants (20 ms framing at the configured sample rate).
-FRAME_DURATION_S = 0.02
-SPEECH_LOW_HZ = 85.0
-SPEECH_HIGH_HZ = 3500.0
-SPEECH_RMS_THRESHOLD = 0.012
-SPEECH_SNR_FACTOR = 2.0
-MIN_VOICE_BAND_RATIO = 0.5
-MAX_SPEECH_FLATNESS = 0.25
-MIN_SPEECH_FRAMES = 10
-EPSILON = 1e-12
+SAMPLE_RATE = 16000
+# Silero VAD scores fixed 32 ms windows (512 samples at 16 kHz).
+VAD_WINDOW_SAMPLES = 512
+SPEECH_PROBABILITY = 0.5
+MIN_SPEECH_S = 0.5
+# Silero reacts a few windows late at word onsets/offsets; keep a margin when trimming.
+SPEECH_PAD_S = 0.2
 
 
-def speech_frame_mask(data: np.ndarray, sample_rate: int) -> np.ndarray:
-    """Return a boolean mask of 20 ms frames containing sustained human speech.
-
-    Each frame is evaluated in the frequency domain and must simultaneously:
-    1. Concentrate at least 50% of its AC energy in the 85-3500 Hz voice band
-       (rejecting low-frequency mic bumps/pops and high-frequency clicks/hiss).
-    2. Exhibit harmonic/formant structure via low spectral flatness <= 0.25
-       (rejecting broadband white/pink noise, fan hum and breath noise).
-    3. Exceed both the absolute RMS floor (-38 dBFS) and 2x the recording's
-       adaptive broadband noise floor (+6 dB SNR).
-    Isolated single-frame transients (< 40 ms) are discarded.
-    """
+def speech_window_mask(data: np.ndarray) -> np.ndarray:
+    """Return one boolean per 32 ms window: True where Silero VAD detects speech."""
     mono = data.mean(axis=1) if data.ndim > 1 else data
-    frame_len = int(sample_rate * FRAME_DURATION_S)
-    num_frames = len(mono) // frame_len
-    if num_frames < 2:
-        return np.zeros(num_frames, dtype=bool)
-
-    frames = mono[: num_frames * frame_len].reshape(num_frames, frame_len)
-    spectrum = np.abs(np.fft.rfft(frames, axis=1)) ** 2
-    freqs = np.fft.rfftfreq(frame_len, d=1.0 / sample_rate)
-    band_mask = (freqs >= SPEECH_LOW_HZ) & (freqs <= SPEECH_HIGH_HZ)
-
-    weights = np.full(len(freqs), 2.0 / (frame_len**2))
-    weights[0] = 0.0
-
-    total_power = spectrum @ weights
-    band_power = spectrum[:, band_mask] @ weights[band_mask]
-    band_rms = np.sqrt(band_power)
-    band_ratio = band_power / np.maximum(total_power, EPSILON)
-
-    band_spec = spectrum[:, band_mask] + EPSILON
-    flatness = np.exp(np.mean(np.log(band_spec), axis=1)) / np.mean(band_spec, axis=1)
-
-    noise_estimate = band_rms * np.clip(flatness / MAX_SPEECH_FLATNESS, 0.0, 1.0)
-    noise_floor = float(np.percentile(noise_estimate, 20))
-    threshold = max(SPEECH_RMS_THRESHOLD, noise_floor * SPEECH_SNR_FACTOR)
-
-    active = (band_rms >= threshold) & (band_ratio >= MIN_VOICE_BAND_RATIO) & (flatness <= MAX_SPEECH_FLATNESS)
-    pair = active[:-1] & active[1:]
-    sustained = np.zeros_like(active)
-    sustained[:-1] |= pair
-    sustained[1:] |= pair
-    return sustained
+    num_windows = len(mono) // VAD_WINDOW_SAMPLES
+    if num_windows == 0:
+        return np.empty(0, dtype=bool)
+    windows = np.ascontiguousarray(mono[: num_windows * VAD_WINDOW_SAMPLES], dtype=np.float32)
+    vad = SileroVAD(SAMPLE_RATE)
+    return np.array(
+        [
+            vad.process(memoryview(w.data)) > SPEECH_PROBABILITY
+            for w in windows.reshape(num_windows, VAD_WINDOW_SAMPLES)
+        ],
+        dtype=bool,
+    )
 
 
-def is_silent(data: np.ndarray, sample_rate: int) -> bool:
-    """Report whether an audio buffer lacks sustained human speech.
-
-    The transcription model cannot be trusted to flag empty recordings: given
-    silence or noise it frequently answers empty=false and invents text or a
-    refusal, which the pipeline would then save as a note. This gate decides
-    locally and deterministically before any audio is sent to the model.
-    """
-    return int(np.count_nonzero(speech_frame_mask(data, sample_rate))) < MIN_SPEECH_FRAMES
-
-
-def _trim_frames(data: np.ndarray, sample_rate: int, active: np.ndarray) -> np.ndarray:
+def _trim_speech(data: np.ndarray, active: np.ndarray) -> np.ndarray:
     if not np.any(active):
         return data
 
-    frame_len = int(sample_rate * FRAME_DURATION_S)
+    pad = int(SAMPLE_RATE * SPEECH_PAD_S)
     first = int(np.argmax(active))
     last = len(active) - int(np.argmax(active[::-1]))
-    return data[first * frame_len : last * frame_len]
-
-
-def trim_silence(data: np.ndarray, sample_rate: int) -> np.ndarray:
-    """Drop leading and trailing non-speech frames around the spoken segment.
-
-    Trimming removes surrounding silence and start/stop click transients so the
-    model encodes only the spoken dictation while keeping interior pauses intact.
-    """
-    return _trim_frames(data, sample_rate, speech_frame_mask(data, sample_rate))
+    start = max(0, first * VAD_WINDOW_SAMPLES - pad)
+    end = min(len(data), last * VAD_WINDOW_SAMPLES + pad)
+    return data[start:end]
 
 
 def encode_wav_bytes(data: np.ndarray, sample_rate: int, channels: int) -> bytes:
@@ -123,8 +75,7 @@ def encode_wav_bytes(data: np.ndarray, sample_rate: int, channels: int) -> bytes
 class AudioRecorder:
     """Single-use microphone recorder producing WAV bytes once stopped."""
 
-    def __init__(self, sample_rate: int, channels: int) -> None:
-        self.sample_rate = sample_rate
+    def __init__(self, channels: int) -> None:
         self.channels = channels
         self._chunks: list[np.ndarray] = []
         self._cached_chunks = 0
@@ -145,7 +96,7 @@ class AudioRecorder:
     def start(self) -> None:
         """Open the input stream and begin recording."""
         stream = sd.InputStream(
-            samplerate=self.sample_rate,
+            samplerate=SAMPLE_RATE,
             channels=self.channels,
             dtype="float32",
             callback=self._on_audio,
@@ -173,32 +124,37 @@ class AudioRecorder:
             return np.empty(0, dtype=np.float32), np.empty(0, dtype=bool)
         if self._cached_chunks != len(self._chunks):
             self._samples = np.concatenate(self._chunks)
-            self._active = speech_frame_mask(self._samples, self.sample_rate)
+            self._active = speech_window_mask(self._samples)
             self._cached_chunks = len(self._chunks)
         return self._samples, self._active
 
     @property
     def wav_bytes(self) -> bytes:
-        """Encode captured speech as 16-bit PCM WAV."""
+        """Trim surrounding non-speech windows and encode captured speech as 16-bit PCM WAV.
+
+        Trimming drops leading and trailing silence or click transients while keeping
+        a short padding margin and interior pauses intact for the transcription model.
+        """
         samples, active = self._analyze()
-        trimmed = _trim_frames(samples, self.sample_rate, active)
-        return encode_wav_bytes(trimmed, self.sample_rate, self.channels)
+        trimmed = _trim_speech(samples, active)
+        return encode_wav_bytes(trimmed, SAMPLE_RATE, self.channels)
 
     @property
     def is_silent(self) -> bool:
         """Report whether the recording lacks sustained human speech.
 
-        Checked locally so an accidental trigger, ambient noise or click never
-        reaches the model, which cannot reliably report empty audio on its own.
+        The transcription model cannot be trusted to flag empty recordings: given
+        silence or noise it frequently answers empty=false and invents text or a
+        refusal, which the pipeline would then save as a note. Silero VAD gates
+        recordings locally before any audio is sent to the model.
         """
         _, active = self._analyze()
-        return int(np.count_nonzero(active)) < MIN_SPEECH_FRAMES
+        return int(np.count_nonzero(active)) * VAD_WINDOW_SAMPLES / SAMPLE_RATE < MIN_SPEECH_S
 
 
 def play_beep(
     frequency: float,
     duration: float,
-    sample_rate: int,
     wait: bool,
 ) -> None:
     """Play a short sine-wave beep for audible feedback.
@@ -206,18 +162,18 @@ def play_beep(
     When wait=True the call blocks until playback finishes; callers use this
     before opening the microphone so the tone cannot leak into the recording.
     """
-    num_samples = int(sample_rate * duration)
+    num_samples = int(SAMPLE_RATE * duration)
     if num_samples <= 0:
         return
 
     t = np.linspace(0.0, duration, num_samples, endpoint=False, dtype=np.float32)
     tone = np.sin(2.0 * np.pi * frequency * t, dtype=np.float32)
 
-    fade_len = min(int(sample_rate * 0.01), num_samples // 2)
+    fade_len = min(int(SAMPLE_RATE * 0.01), num_samples // 2)
     if fade_len > 0:
         tone[:fade_len] *= np.linspace(0.0, 1.0, fade_len, dtype=np.float32)
         tone[-fade_len:] *= np.linspace(1.0, 0.0, fade_len, dtype=np.float32)
 
-    sd.play(tone, sample_rate)
+    sd.play(tone, SAMPLE_RATE)
     if wait:
         sd.wait()

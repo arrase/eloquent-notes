@@ -403,11 +403,6 @@ msgstr "Omskrivning - Systemprompt"
 msgid "Rewriting - User Prompt"
 msgstr "Omskrivning - Användarprompt"
 
-msgid "Sample Rate:"
-msgstr "Samplingsfrekvens:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "Samplingsfrekvens för mikrofoninspelning (16000 Hz rekommenderas för taldikteringsmodeller)."
 
 msgid "Save"
 msgstr "Spara"

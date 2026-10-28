@@ -403,11 +403,6 @@ msgstr "重寫 - 系統提示詞"
 msgid "Rewriting - User Prompt"
 msgstr "重寫 - 使用者提示詞"
 
-msgid "Sample Rate:"
-msgstr "取樣率："
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "麥克風錄音的取樣率（語音聽寫模型建議使用 16000 Hz）。"
 
 msgid "Save"
 msgstr "儲存"

@@ -31,15 +31,6 @@ class AudioTab(QWidget):
         form_layout = QFormLayout(grp_audio)
         form_layout.setSpacing(10)
 
-        self.spn_sample_rate = QSpinBox()
-        self.spn_sample_rate.setRange(8000, 96000)
-        self.spn_sample_rate.setSingleStep(8000)
-        self.spn_sample_rate.setSuffix(_(" Hz"))
-        self.spn_sample_rate.setToolTip(
-            _("Sample rate for microphone recording (16000 Hz is recommended for speech dictation models).")
-        )
-        form_layout.addRow(QLabel(_("Sample Rate:")), self.spn_sample_rate)
-
         self.cmb_channels = QComboBox()
         self.cmb_channels.addItems([_("Mono (1 channel)"), _("Stereo (2 channels)")])
         self.cmb_channels.setToolTip(_("Number of audio input channels."))
@@ -86,7 +77,6 @@ class AudioTab(QWidget):
 
     def load_settings(self, config_data: dict) -> None:
         audio_cfg = config_data["audio"]
-        self.spn_sample_rate.setValue(audio_cfg["sample_rate"])
         self.cmb_channels.setCurrentIndex(0 if audio_cfg["channels"] == 1 else 1)
         self.spn_capture_duration.setValue(audio_cfg["capture_duration"])
         self.chk_recording_hud_enabled.setChecked(audio_cfg["recording_hud_enabled"])
@@ -99,7 +89,6 @@ class AudioTab(QWidget):
     def save_settings(self, config_data: dict) -> bool:
         config_data["audio"].update(
             {
-                "sample_rate": self.spn_sample_rate.value(),
                 "channels": 1 if self.cmb_channels.currentIndex() == 0 else 2,
                 "capture_duration": self.spn_capture_duration.value(),
                 "recording_hud_enabled": self.chk_recording_hud_enabled.isChecked(),

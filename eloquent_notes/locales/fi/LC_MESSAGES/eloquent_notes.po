@@ -403,11 +403,6 @@ msgstr "Uudelleenkirjoitus - Järjestelmäkehote"
 msgid "Rewriting - User Prompt"
 msgstr "Uudelleenkirjoitus - Käyttäjäkehote"
 
-msgid "Sample Rate:"
-msgstr "Näytteenottotaajuus:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "Mikrofonitallennuksen näytteenottotaajuus (16000 Hz suositellaan puhesanelumalleille)."
 
 msgid "Save"
 msgstr "Tallenna"

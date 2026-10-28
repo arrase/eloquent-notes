@@ -403,11 +403,6 @@ msgstr "بازنویسی - پرامپت سیستم"
 msgid "Rewriting - User Prompt"
 msgstr "بازنویسی - پرامپت کاربر"
 
-msgid "Sample Rate:"
-msgstr "نرخ نمونه‌برداری:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "نرخ نمونه‌برداری برای ضبط میکروفون (۱۶۰۰۰ هرتز برای مدل‌های دیکته گفتار توصیه می‌شود)."
 
 msgid "Save"
 msgstr "ذخیره"

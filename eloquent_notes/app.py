@@ -214,7 +214,6 @@ class EloquentApp(QObject):
             audio.play_beep(
                 frequency=audio_cfg["beep_frequency"],
                 duration=audio_cfg["beep_duration"],
-                sample_rate=audio_cfg["sample_rate"],
                 wait=wait,
             )
         except Exception as e:
@@ -326,10 +325,7 @@ class EloquentApp(QObject):
             # Played synchronously so the tone finishes before the
             # microphone opens and cannot leak into the recording.
             self._play_beep(audio_cfg, wait=True)
-            recorder = audio.AudioRecorder(
-                sample_rate=audio_cfg["sample_rate"],
-                channels=audio_cfg["channels"],
-            )
+            recorder = audio.AudioRecorder(channels=audio_cfg["channels"])
             recorder.start()
         except Exception as e:
             logger.exception("Failed to start recording")

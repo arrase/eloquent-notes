@@ -76,10 +76,10 @@ Audio beeps are generated dynamically using NumPy sound wave synthesis:
 
 ```python
 # Pure sine wave with 10ms anti-click envelope
-t = np.linspace(0, duration, int(sample_rate * duration), False)
+t = np.linspace(0, duration, int(SAMPLE_RATE * duration), False)
 sine_wave = np.sin(frequency * t * 2 * np.pi)
 
-fade_len = min(int(sample_rate * 0.01), len(sine_wave) // 2)
+fade_len = min(int(SAMPLE_RATE * 0.01), len(sine_wave) // 2)
 if fade_len > 0:
     sine_wave[:fade_len] *= np.linspace(0.0, 1.0, fade_len)
     sine_wave[-fade_len:] *= np.linspace(1.0, 0.0, fade_len)

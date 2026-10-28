@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "eloquent-notes"
-version = "0.4.3"
+version = "0.5.0"
 description = "A Linux system tray utility that turns offline voice dictations into organized Markdown notes using Gemma 4."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -21,6 +21,7 @@ dependencies = [
     "PyQt6>=6.11.0",
     "pyyaml>=6.0.3",
     "requests>=2.34.2",
+    "silero-vad-lite>=0.4.0",
 ]
 
 [project.scripts]

@@ -403,11 +403,6 @@ msgstr "إعادة الصياغة - موجه النظام"
 msgid "Rewriting - User Prompt"
 msgstr "إعادة الصياغة - موجه المستخدم"
 
-msgid "Sample Rate:"
-msgstr "معدل العينة:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "معدل العينة لتسجيل الميكروفون (يوصى بـ 16000 هرتز لنماذج إملاء الكلام)."
 
 msgid "Save"
 msgstr "حفظ"

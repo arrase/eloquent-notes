@@ -403,11 +403,6 @@ msgstr "Penulisan Ulang - Prompt Sistem"
 msgid "Rewriting - User Prompt"
 msgstr "Penulisan Ulang - Prompt Pengguna"
 
-msgid "Sample Rate:"
-msgstr "Laju Sampel:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "Laju sampel untuk perekaman mikrofon (16000 Hz disarankan untuk model dikte suara)."
 
 msgid "Save"
 msgstr "Simpan"

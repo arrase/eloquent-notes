@@ -403,11 +403,6 @@ msgstr "Prepisovanie – Systémový prompt"
 msgid "Rewriting - User Prompt"
 msgstr "Prepisovanie – Používateľský prompt"
 
-msgid "Sample Rate:"
-msgstr "Vzorkovacia frekvencia:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "Vzorkovacia frekvencia pre záznam z mikrofónu (pre modely diktovania reči sa odporúča 16000 Hz)."
 
 msgid "Save"
 msgstr "Uložiť"

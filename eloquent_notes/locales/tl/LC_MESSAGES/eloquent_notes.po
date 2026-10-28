@@ -403,11 +403,6 @@ msgstr "Pagsusulat Muli - System Prompt"
 msgid "Rewriting - User Prompt"
 msgstr "Pagsusulat Muli - User Prompt"
 
-msgid "Sample Rate:"
-msgstr "Sample Rate:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "Sample rate para sa pag-record ng mikropono (inirerekomenda ang 16000 Hz para sa mga modelo ng diktasyon ng boses)."
 
 msgid "Save"
 msgstr "I-save"

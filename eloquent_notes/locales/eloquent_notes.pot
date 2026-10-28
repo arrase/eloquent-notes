@@ -401,12 +401,6 @@ msgstr ""
 msgid "Rewriting - User Prompt"
 msgstr ""
 
-msgid "Sample Rate:"
-msgstr ""
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr ""
-
 msgid "Save"
 msgstr ""
 

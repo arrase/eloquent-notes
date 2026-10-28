@@ -268,7 +268,6 @@ def test_audio_tab_load_and_save(qapp):
     tab = AudioTab()
     config_data = {
         "audio": {
-            "sample_rate": 48000,
             "channels": 2,
             "capture_duration": 45,
             "recording_hud_enabled": False,
@@ -279,7 +278,6 @@ def test_audio_tab_load_and_save(qapp):
     }
 
     tab.load_settings(config_data)
-    assert tab.spn_sample_rate.value() == 48000
     assert tab.cmb_channels.currentIndex() == 1
     assert tab.spn_capture_duration.value() == 45
     assert not tab.chk_recording_hud_enabled.isChecked()
