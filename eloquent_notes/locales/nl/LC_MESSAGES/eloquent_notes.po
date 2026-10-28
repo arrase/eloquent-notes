@@ -403,11 +403,6 @@ msgstr "Herschrijven - Systeemprompt"
 msgid "Rewriting - User Prompt"
 msgstr "Herschrijven - Gebruikersprompt"
 
-msgid "Sample Rate:"
-msgstr "Samplefrequentie:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "Samplefrequentie voor microfoonopname (16000 Hz wordt aanbevolen voor spraakdicteermodellen)."
 
 msgid "Save"
 msgstr "Opslaan"

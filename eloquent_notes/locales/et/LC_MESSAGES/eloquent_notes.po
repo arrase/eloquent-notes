@@ -403,11 +403,6 @@ msgstr "Ümberkirjutamine – süsteemiviip"
 msgid "Rewriting - User Prompt"
 msgstr "Ümberkirjutamine – kasutajaviip"
 
-msgid "Sample Rate:"
-msgstr "Diskreetimissagedus:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "Mikrofonisalvestuse diskreetimissagedus (kõnedikteerimismudelite jaoks on soovitatav 16000 Hz)."
 
 msgid "Save"
 msgstr "Salvesta"

@@ -10,7 +10,7 @@ Eloquent Notes is a Linux tray daemon with one job: turn voice dictations into w
 | :--- | :--- |
 | `main.py` | CLI entry point: `install-autostart`, `toggle`, `open`, `config`; single-instance IPC client; launches the daemon. |
 | `app.py` | `EloquentApp` controller: tray icon and menu, IPC server, recording lifecycle, processing pipeline, notes window wiring, config reload. |
-| `audio.py` | In-memory recording (`AudioRecorder`), silence detection and trimming, WAV encoding, beeps. |
+| `audio.py` | In-memory 16 kHz recording (`AudioRecorder`), Silero VAD silence detection and speech trimming (`speech_window_mask`, `_trim_speech`), WAV encoding, beeps. |
 | `llm.py` | Ollama client: model preload, the three pipeline phases (`transcribe_audio`, `rewrite_note`, `classify_note`) with JSON-schema output and retries, `/api/embed`. |
 | `notes.py` | Note storage: `Note` dataclass, load / create / save / append, frontmatter parsing, tag normalization. |
 | `search.py` | `SemanticIndex`: embedding cache and cosine-similarity ranking. |
@@ -102,9 +102,9 @@ While processing, further toggles only show a "System is busy" notification; the
 
 ## 3. In-Memory Audio Capture & Zero Disk-IO
 
-- **Stream capture:** `sounddevice.InputStream` appends float32 NumPy blocks to an internal chunk list during recording, which is concatenated and encoded once stopped.
-- **Local silence gate:** `AudioRecorder.is_silent` analyzes 20 ms frames in the frequency domain (`85–3500 Hz` voice band concentration, spectral flatness, adaptive SNR and minimum sustained speech duration). Silent or noise-only recordings never reach the model.
-- **Silence trimming & WAV encoding:** `AudioRecorder.wav_bytes` trims leading/trailing non-speech frames and click transients, converts to 16-bit PCM and writes a WAV file into an `io.BytesIO` buffer.
+- **Stream capture:** `sounddevice.InputStream` captures 16 kHz (`SAMPLE_RATE = 16000`) float32 NumPy blocks into an internal chunk list during recording, which is concatenated and encoded once stopped.
+- **Local silence gate:** `AudioRecorder.is_silent` scores 32 ms windows (512 samples at 16 kHz) with Silero VAD (`silero-vad-lite`, `speech_window_mask()`) and requires at least `0.5 s` of accumulated speech (`MIN_SPEECH_S = 0.5`). Silent or noise-only recordings never reach the model.
+- **Silence trimming & WAV encoding:** `AudioRecorder.wav_bytes` trims leading/trailing non-speech windows and click transients with a `0.2 s` padding margin (`_trim_speech()`, `SPEECH_PAD_S = 0.2`), converts to 16-bit PCM and writes a 16 kHz WAV file into an `io.BytesIO` buffer.
 - **Base64 transmission:** the WAV bytes are base64-encoded and sent in the JSON body of `/api/chat`. No audio file is ever written to disk.
 
 ### Audible Feedback Cues

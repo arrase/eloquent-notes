@@ -403,11 +403,6 @@ msgstr "Viết lại - Lời nhắc hệ thống"
 msgid "Rewriting - User Prompt"
 msgstr "Viết lại - Lời nhắc người dùng"
 
-msgid "Sample Rate:"
-msgstr "Tần số lấy mẫu:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "Tần số lấy mẫu cho ghi âm micro (khuyến nghị 16000 Hz cho các mô hình đọc chính tả giọng nói)."
 
 msgid "Save"
 msgstr "Lưu"

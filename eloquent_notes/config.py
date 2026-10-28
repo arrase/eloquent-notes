@@ -95,8 +95,6 @@ def _is_valid_str(key: str, value: str, default_val: str) -> bool:
 
 
 def _is_valid_number(key: str, value: int | float) -> bool:
-    if key == "sample_rate":
-        return value >= 8000
     if key == "channels":
         return value in (1, 2)
     if key == "min_similarity":

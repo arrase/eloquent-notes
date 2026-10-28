@@ -403,11 +403,6 @@ msgstr "Átírás - Rendszerprompt"
 msgid "Rewriting - User Prompt"
 msgstr "Átírás - Felhasználói prompt"
 
-msgid "Sample Rate:"
-msgstr "Mintavételi frekvencia:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "Mintavételi frekvencia mikrofonfelvételhez (beszéddiktáló modellekhez 16000 Hz ajánlott)."
 
 msgid "Save"
 msgstr "Mentés"

@@ -403,11 +403,6 @@ msgstr "書き直し - システムプロンプト"
 msgid "Rewriting - User Prompt"
 msgstr "書き直し - ユーザープロンプト"
 
-msgid "Sample Rate:"
-msgstr "サンプルレート:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "マイク録音のサンプルレート（音声入力モデルには16000 Hzを推奨）。"
 
 msgid "Save"
 msgstr "保存"

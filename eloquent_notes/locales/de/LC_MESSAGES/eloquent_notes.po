@@ -403,11 +403,6 @@ msgstr "Umschreiben - System-Prompt"
 msgid "Rewriting - User Prompt"
 msgstr "Umschreiben - Benutzer-Prompt"
 
-msgid "Sample Rate:"
-msgstr "Abtastrate:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "Abtastrate für die Mikrofonaufnahme (16000 Hz wird für Sprachdiktiermodelle empfohlen)."
 
 msgid "Save"
 msgstr "Speichern"

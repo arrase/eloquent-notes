@@ -61,7 +61,7 @@ Prints the installed version and exits, for example:
 
 ```bash
 $ eloquent-notes --version
-eloquent-notes 0.4.0
+eloquent-notes 0.5.0
 ```
 
 The value is read from the installed distribution metadata, so it always matches the release you actually have installed rather than a separately maintained constant.

@@ -403,11 +403,6 @@ msgstr "Yeniden Yazma - Sistem İstemi"
 msgid "Rewriting - User Prompt"
 msgstr "Yeniden Yazma - Kullanıcı İstemi"
 
-msgid "Sample Rate:"
-msgstr "Örnekleme Hızı:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "Mikrofon kaydı için örnekleme hızı (konuşma dikte modelleri için 16000 Hz önerilir)."
 
 msgid "Save"
 msgstr "Kaydet"

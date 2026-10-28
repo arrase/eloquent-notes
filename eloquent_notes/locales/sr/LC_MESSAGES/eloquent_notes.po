@@ -403,11 +403,6 @@ msgstr "Преобликовање – Системски упит"
 msgid "Rewriting - User Prompt"
 msgstr "Преобликовање – Кориснички упит"
 
-msgid "Sample Rate:"
-msgstr "Фреквенција узорковања:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "Фреквенција узорковања за снимање микрофоном (16000 Hz се препоручује за моделе гласовног диктирања)."
 
 msgid "Save"
 msgstr "Сачувај"

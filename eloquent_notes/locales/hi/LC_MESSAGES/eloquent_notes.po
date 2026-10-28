@@ -403,11 +403,6 @@ msgstr "पुनर्लेखन - सिस्टम प्रॉम्प�
 msgid "Rewriting - User Prompt"
 msgstr "पुनर्लेखन - उपयोगकर्ता प्रॉम्प्ट"
 
-msgid "Sample Rate:"
-msgstr "सैंपल रेट:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "माइक्रोफ़ोन रिकॉर्डिंग के लिए सैंपल रेट (स्पीच डिक्टेशन मॉडल के लिए 16000 Hz अनुशंसित है)।"
 
 msgid "Save"
 msgstr "सहेजें"

@@ -403,11 +403,6 @@ msgstr "Pārrakstīšana – sistēmas uzvedne"
 msgid "Rewriting - User Prompt"
 msgstr "Pārrakstīšana – lietotāja uzvedne"
 
-msgid "Sample Rate:"
-msgstr "Diskretizācijas frekvence:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "Mikrofona ierakstīšanas diskretizācijas frekvence (runas diktēšanas modeļiem ieteicams 16000 Hz)."
 
 msgid "Save"
 msgstr "Saglabāt"

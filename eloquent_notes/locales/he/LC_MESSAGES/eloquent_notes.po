@@ -403,11 +403,6 @@ msgstr "שכתוב - הנחיית מערכת"
 msgid "Rewriting - User Prompt"
 msgstr "שכתוב - הנחיית משתמש"
 
-msgid "Sample Rate:"
-msgstr "קצב דגימה:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "קצב דגימה להקלטת מיקרופון (מומלץ 16000 הרץ עבור מודלים להכתבת דיבור)."
 
 msgid "Save"
 msgstr "שמור"

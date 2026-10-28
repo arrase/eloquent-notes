@@ -403,11 +403,6 @@ msgstr "Reescrita - Prompt de sistema"
 msgid "Rewriting - User Prompt"
 msgstr "Reescrita - Prompt de utilizador"
 
-msgid "Sample Rate:"
-msgstr "Taxa de amostragem:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "Taxa de amostragem para gravação do microfone (recomenda-se 16000 Hz para modelos de ditado de voz)."
 
 msgid "Save"
 msgstr "Guardar"

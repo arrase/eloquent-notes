@@ -174,7 +174,7 @@ Open it from the tray menu (**Configuration**), the **Settings** button in the n
 - **Notes:** the notes folder.
 - **Appearance:** timeline grid columns and custom badge colors for each note type.
 - **AI Settings:** Ollama URL, audio model, output language, context length, keep-alive, retries and timeouts; **Semantic Search** group with the embedding model and minimum similarity. **Refresh** lists the audio-capable and embedding models installed in Ollama.
-- **Audio:** sample rate, channels, maximum capture duration, recording HUD, beeps.
+- **Audio:** channels, maximum capture duration, recording HUD, beeps.
 - **Prompts:** edit the transcription, rewriting, classification and retry prompts.
 
 <p align="center">
@@ -224,7 +224,6 @@ search:
   min_similarity: 0.6   # Hide search results below this cosine similarity.
 
 audio:
-  sample_rate: 16000
   channels: 1
   capture_duration: 30
   recording_hud_enabled: true

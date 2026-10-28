@@ -29,7 +29,6 @@ def mock_config(tmp_path):
             "output_language": "English",
         },
         "audio": {
-            "sample_rate": 16000,
             "channels": 1,
             "capture_duration": 30,
             "beep_enabled": False,
@@ -140,7 +139,6 @@ def test_start_recording_plays_blocking_beep_when_enabled(qapp, mock_config):
     mock_beep.assert_called_once_with(
         frequency=440,
         duration=0.1,
-        sample_rate=16000,
         wait=True,
     )
 
@@ -237,7 +235,6 @@ def test_toggle_from_recording_stops_and_processes(qapp):
             "beep_enabled": True,
             "beep_frequency": 440,
             "beep_duration": 0.1,
-            "sample_rate": 16000,
         },
     }
     call_order = []
@@ -262,7 +259,6 @@ def test_toggle_from_recording_stops_and_processes(qapp):
     mock_beep.assert_called_once_with(
         frequency=440,
         duration=0.1,
-        sample_rate=16000,
         wait=False,
     )
     assert eloquent_app.state == "PROCESSING"

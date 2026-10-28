@@ -403,11 +403,6 @@ msgstr "재작성 - 시스템 프롬프트"
 msgid "Rewriting - User Prompt"
 msgstr "재작성 - 사용자 프롬프트"
 
-msgid "Sample Rate:"
-msgstr "샘플 레이트:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "마이크 녹음 샘플 레이트입니다(음성 받아쓰기 모델에는 16000 Hz 권장)."
 
 msgid "Save"
 msgstr "저장"

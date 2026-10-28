@@ -93,7 +93,6 @@ def test_dialog_load_settings(qapp):
     )
     dummy_config["audio"].update(
         {
-            "sample_rate": 44100,
             "channels": 2,
             "capture_duration": 45,
             "beep_enabled": False,
@@ -113,7 +112,7 @@ def test_dialog_load_settings(qapp):
     assert dialog.ai_tab.txt_ollama_url.text() == "http://127.0.0.1:11434"
     assert dialog.ai_tab.cmb_model.currentText() == "gemma4:e4b"
     assert dialog.ai_tab.cmb_language.currentText() == "Spanish"
-    assert dialog.audio_tab.spn_sample_rate.value() == 44100
+    assert dialog.audio_tab.spn_capture_duration.value() == 45
     assert dialog.general_tab.cmb_log_level.currentText() == "DEBUG"
     assert dialog.notes_tab.txt_folder.text() == "/home/user/notes"
     assert dialog.appearance_tab.spn_columns.value() == 3

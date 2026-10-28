@@ -403,11 +403,6 @@ msgstr "Переписування — Системний промпт"
 msgid "Rewriting - User Prompt"
 msgstr "Переписування — Промпт користувача"
 
-msgid "Sample Rate:"
-msgstr "Частота дискретизації:"
-
-msgid "Sample rate for microphone recording (16000 Hz is recommended for speech dictation models)."
-msgstr "Частота дискретизації для запису з мікрофона (16000 Гц рекомендовано для моделей розпізнавання мовлення)."
 
 msgid "Save"
 msgstr "Зберегти"
