@@ -574,8 +574,10 @@ def test_scroll_content_aligns_right_margin_with_scrollbar(window):
 
 def test_timeline_preserves_vertical_scroll_position_on_rerender(window, sample_notes):
     scrollbar = window.timeline._scroll.verticalScrollBar()
-    scrollbar.setValue(80)
-    assert scrollbar.value() == 80
+    target_scroll = min(80, scrollbar.maximum())
+    assert target_scroll > 0
+    scrollbar.setValue(target_scroll)
+    assert scrollbar.value() == target_scroll
 
     window.set_notes(sample_notes)
-    assert scrollbar.value() == 80
+    assert scrollbar.value() == target_scroll
