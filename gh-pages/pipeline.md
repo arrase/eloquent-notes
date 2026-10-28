@@ -272,14 +272,18 @@ def _execute_ollama_json_request(
         except (KeyError, TypeError, ValueError):
             if attempt >= max_retries:
                 raise
-            conversation.append({
-                "role": "assistant",
-                "content": content if content is not None else response.text,
-            })
-            conversation.append({
-                "role": "user",
-                "content": f"{retry_prompt}\n\nExpected fields: {', '.join(keys)}.",
-            })
+            conversation.append(
+                {
+                    "role": "assistant",
+                    "content": content if content is not None else response.text,
+                }
+            )
+            conversation.append(
+                {
+                    "role": "user",
+                    "content": f"{retry_prompt}\n\nExpected fields: {', '.join(keys)}.",
+                }
+            )
             attempt += 1
 ```
 

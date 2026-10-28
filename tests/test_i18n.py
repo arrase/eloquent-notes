@@ -2,10 +2,9 @@
 
 import ast
 import gettext
-import glob
-import os
 import re
 from datetime import date, datetime
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -17,19 +16,55 @@ from eloquent_notes.config_gui.tabs import text_files
 from eloquent_notes.config_gui.tabs.ai import VALIDATION_ERROR_TITLE, AITab
 from eloquent_notes.recording_hud import RecordingHUD
 from eloquent_notes.window import (
+    _TYPE_FILTER_LABELS,
     DICTATE_STATES,
     TYPE_LABELS,
-    _TYPE_FILTER_LABELS,
     MainWindow,
     day_label,
     format_time,
 )
 
 EXPECTED_LOCALES = (
-    "ar", "bg", "bn", "cs", "da", "de", "el", "es", "et", "fa",
-    "fi", "fr", "he", "hi", "hr", "hu", "id", "it", "ja", "ko",
-    "lt", "lv", "ms", "nl", "no", "pl", "pt", "ro", "ru", "sk",
-    "sr", "sv", "th", "tl", "tr", "uk", "ur", "vi", "zh_CN", "zh_TW",
+    "ar",
+    "bg",
+    "bn",
+    "cs",
+    "da",
+    "de",
+    "el",
+    "es",
+    "et",
+    "fa",
+    "fi",
+    "fr",
+    "he",
+    "hi",
+    "hr",
+    "hu",
+    "id",
+    "it",
+    "ja",
+    "ko",
+    "lt",
+    "lv",
+    "ms",
+    "nl",
+    "no",
+    "pl",
+    "pt",
+    "ro",
+    "ru",
+    "sk",
+    "sr",
+    "sv",
+    "th",
+    "tl",
+    "tr",
+    "uk",
+    "ur",
+    "vi",
+    "zh_CN",
+    "zh_TW",
 )
 
 PLACEHOLDER_RE = re.compile(r"\{[a-zA-Z0-9_]+\}")
@@ -47,10 +82,9 @@ def _extract_codebase_msgids() -> tuple[set[str], set[tuple[str, str]]]:
     strings: set[str] = set()
     plurals: set[tuple[str, str]] = set()
 
-    pkg_dir = os.path.dirname(os.path.abspath(i18n.__file__))
-    for path in sorted(glob.glob(os.path.join(pkg_dir, "**", "*.py"), recursive=True)):
-        with open(path, encoding="utf-8") as f:
-            tree = ast.parse(f.read(), path)
+    pkg_dir = Path(i18n.__file__).resolve().parent
+    for path in sorted(pkg_dir.rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"), str(path))
         for node in ast.walk(tree):
             if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
                 if node.func.id == "_" and node.args:
@@ -179,10 +213,7 @@ def test_all_40_catalogs_cover_every_codebase_string():
     assert len(msgids) == 173
     assert plurals == {("{count} result", "{count} results")}
 
-    installed_locales = sorted(
-        d for d in os.listdir(i18n.LOCALES_DIR)
-        if os.path.isdir(os.path.join(i18n.LOCALES_DIR, d))
-    )
+    installed_locales = sorted(entry.name for entry in Path(i18n.LOCALES_DIR).iterdir() if entry.is_dir())
     assert tuple(installed_locales) == EXPECTED_LOCALES
 
     for lang in EXPECTED_LOCALES:

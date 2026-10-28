@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import pytest
 import yaml
@@ -15,9 +16,7 @@ def tmp_config_dir(tmp_path):
     config_path = config_dir / "config.yaml"
 
     default_config_src = tmp_path / "default_config.yaml"
-    default_config_src.write_text(
-        "audio:\n  sample_rate: 16000\nai:\n  model: gemma\n", encoding="utf-8"
-    )
+    default_config_src.write_text("audio:\n  sample_rate: 16000\nai:\n  model: gemma\n", encoding="utf-8")
 
     default_prompt_src = tmp_path / "default_prompt.md"
     default_prompt_src.write_text("System Prompt Content", encoding="utf-8")
@@ -46,21 +45,19 @@ def test_init_config_dir(tmp_config_dir, monkeypatch):
 
     config.init_config_dir()
 
-    assert os.path.isdir(tmp_config_dir["config_dir"])
-    assert os.path.isdir(tmp_config_dir["prompts_dir"])
-    assert os.path.isfile(tmp_config_dir["config_path"])
+    assert Path(tmp_config_dir["config_dir"]).is_dir()
+    assert Path(tmp_config_dir["prompts_dir"]).is_dir()
+    cfg_path = Path(tmp_config_dir["config_path"])
+    assert cfg_path.is_file()
 
-    with open(tmp_config_dir["config_path"], "r", encoding="utf-8") as f:
-        content = f.read()
+    content = cfg_path.read_text(encoding="utf-8")
     assert "audio:" in content
 
     # Test existing destination is not overwritten
-    with open(tmp_config_dir["config_path"], "w", encoding="utf-8") as f:
-        f.write("custom: true\n")
+    cfg_path.write_text("custom: true\n", encoding="utf-8")
 
     config.init_config_dir()
-    with open(tmp_config_dir["config_path"], "r", encoding="utf-8") as f:
-        content = f.read()
+    content = cfg_path.read_text(encoding="utf-8")
     assert content == "custom: true\n"
 
 
@@ -181,7 +178,7 @@ def test_merge_configs_accepts_valid_domain_boundaries():
             "channels": 2,
             "beep_enabled": False,
         },
-        "notes": {"columns": 1, "folder": "/tmp/notes"},
+        "notes": {"columns": 1, "folder": "/var/empty/notes"},
         "ai": {
             "ollama_url": "https://ollama.example.com:11434",
             "context_length": 512,
@@ -207,25 +204,23 @@ def test_merge_configs_accepts_valid_domain_boundaries():
 
 def test_load_config(tmp_config_dir, monkeypatch):
     """Test load_config merges default config and user config."""
-    user_cfg_path = tmp_config_dir["config_path"]
+    user_cfg_path = Path(tmp_config_dir["config_path"])
     user_cfg_content = "audio:\n  sample_rate: 48000\n"
 
     monkeypatch.setattr(config, "CONFIG_DIR", tmp_config_dir["config_dir"])
     monkeypatch.setattr(config, "PROMPTS_DIR", tmp_config_dir["prompts_dir"])
-    monkeypatch.setattr(config, "CONFIG_PATH", user_cfg_path)
+    monkeypatch.setattr(config, "CONFIG_PATH", str(user_cfg_path))
     monkeypatch.setattr(config, "DEFAULT_CONFIG_SRC", tmp_config_dir["default_config_src"])
     monkeypatch.setattr(config, "_FILES_TO_COPY", [])
 
-    os.makedirs(tmp_config_dir["config_dir"], exist_ok=True)
-    with open(user_cfg_path, "w", encoding="utf-8") as f:
-        f.write(user_cfg_content)
+    Path(tmp_config_dir["config_dir"]).mkdir(parents=True, exist_ok=True)
+    user_cfg_path.write_text(user_cfg_content, encoding="utf-8")
 
     cfg = config.load_config()
     assert cfg["audio"]["sample_rate"] == 48000
     assert cfg["ai"]["model"] == "gemma"
 
-    with open(user_cfg_path, "w", encoding="utf-8") as f:
-        f.write("")
+    user_cfg_path.write_text("", encoding="utf-8")
 
     cfg = config.load_config()
     assert cfg["audio"]["sample_rate"] == 16000
@@ -234,23 +229,21 @@ def test_load_config(tmp_config_dir, monkeypatch):
 
 def test_load_config_non_dict_user_config(tmp_config_dir, monkeypatch):
     """Test load_config raises TypeError if user config is not a YAML mapping."""
-    user_cfg_path = tmp_config_dir["config_path"]
+    user_cfg_path = Path(tmp_config_dir["config_path"])
 
     monkeypatch.setattr(config, "CONFIG_DIR", tmp_config_dir["config_dir"])
     monkeypatch.setattr(config, "PROMPTS_DIR", tmp_config_dir["prompts_dir"])
-    monkeypatch.setattr(config, "CONFIG_PATH", user_cfg_path)
+    monkeypatch.setattr(config, "CONFIG_PATH", str(user_cfg_path))
     monkeypatch.setattr(config, "DEFAULT_CONFIG_SRC", tmp_config_dir["default_config_src"])
     monkeypatch.setattr(config, "_FILES_TO_COPY", [])
 
-    os.makedirs(tmp_config_dir["config_dir"], exist_ok=True)
-    with open(user_cfg_path, "w", encoding="utf-8") as f:
-        f.write("just a string\n")
+    Path(tmp_config_dir["config_dir"]).mkdir(parents=True, exist_ok=True)
+    user_cfg_path.write_text("just a string\n", encoding="utf-8")
 
     with pytest.raises(TypeError, match="is not a valid YAML mapping"):
         config.load_config()
 
-    with open(user_cfg_path, "w", encoding="utf-8") as f:
-        f.write("[]\n")
+    user_cfg_path.write_text("[]\n", encoding="utf-8")
 
     with pytest.raises(TypeError, match="is not a valid YAML mapping"):
         config.load_config()
@@ -262,7 +255,7 @@ def test_load_and_atomic_write(tmp_path):
     content = "Hello World\nLine 2"
 
     config.atomic_write(str(file_path), content)
-    assert os.path.isfile(file_path)
+    assert file_path.is_file()
 
     loaded = config.load_file(str(file_path))
     assert loaded == content
@@ -279,7 +272,7 @@ def test_atomic_write_flat_path(tmp_path, monkeypatch):
     filename = "flat_file.txt"
     config.atomic_write(filename, "flat content")
 
-    assert os.path.isfile(filename)
+    assert Path(filename).is_file()
     assert config.load_file(filename) == "flat content"
 
 
@@ -291,8 +284,9 @@ def test_save_config(tmp_config_dir, monkeypatch):
     data = {"audio": {"sample_rate": 48000}}
     config.save_config(data)
 
-    assert os.path.isfile(tmp_config_dir["config_path"])
-    with open(tmp_config_dir["config_path"], "r", encoding="utf-8") as f:
+    cfg_path = Path(tmp_config_dir["config_path"])
+    assert cfg_path.is_file()
+    with cfg_path.open(encoding="utf-8") as f:
         loaded_data = yaml.safe_load(f)
 
     assert loaded_data == data
@@ -319,21 +313,21 @@ def test_load_default_config():
 
 
 def test_prompt_paths_cover_every_copied_prompt():
-    assert config.PROMPT_PATHS == tuple(dst for _, dst in config._FILES_TO_COPY[1:])
+    assert tuple(dst for _, dst in config._FILES_TO_COPY[1:]) == config.PROMPT_PATHS
     assert all(path.startswith(config.PROMPTS_DIR) for path in config.PROMPT_PATHS)
     assert tuple(config.PROMPT_DEFAULTS) == config.PROMPT_PATHS
-    assert all(os.path.isfile(src) for src in config.PROMPT_DEFAULTS.values())
+    assert all(Path(src).is_file() for src in config.PROMPT_DEFAULTS.values())
 
 
 def test_cache_dir_follows_xdg_cache_home():
-    assert config.CACHE_DIR == os.path.join(os.environ["XDG_CACHE_HOME"], "eloquent-notes")
+    assert str(Path(os.environ["XDG_CACHE_HOME"], "eloquent-notes")) == config.CACHE_DIR
 
 
 def test_get_data_home_follows_xdg_data_home(monkeypatch):
     monkeypatch.setenv("XDG_DATA_HOME", "/custom/data")
     assert config.get_data_home() == "/custom/data"
     monkeypatch.delenv("XDG_DATA_HOME", raising=False)
-    assert config.get_data_home() == os.path.expanduser("~/.local/share")
+    assert config.get_data_home() == str(Path("~/.local/share").expanduser())
 
 
 def test_diff_configs_identical():

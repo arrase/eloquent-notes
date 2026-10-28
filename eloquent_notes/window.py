@@ -135,11 +135,14 @@ class NoteCard(QFrame):
         layout.addStretch()
 
         if note.tags:
-            tags = QLabel(" &nbsp; ".join(
-                f'<a href="{html.escape(tag)}" style="text-decoration: none; color: {theme.tag}; font-weight: 500;">'
-                f"#{html.escape(tag)}</a>"
-                for tag in note.tags
-            ))
+            tags = QLabel(
+                " &nbsp; ".join(
+                    f'<a href="{html.escape(tag)}" '
+                    f'style="text-decoration: none; color: {theme.tag}; font-weight: 500;">'
+                    f"#{html.escape(tag)}</a>"
+                    for tag in note.tags
+                )
+            )
             tags.setObjectName("cardTags")
             tags.setWordWrap(True)
             tags.setTextInteractionFlags(Qt.TextInteractionFlag.LinksAccessibleByMouse)

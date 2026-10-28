@@ -86,4 +86,3 @@ class AppearanceTab(QWidget):
         config_data["notes"]["columns"] = self.spn_columns.value()
         config_data["notes"]["type_colors"] = dict(self._colors)
         return True
-

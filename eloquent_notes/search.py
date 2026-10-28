@@ -8,8 +8,8 @@ re-embedding on the next search without any explicit indexing step.
 
 import hashlib
 import io
-import os
 import threading
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -21,7 +21,7 @@ from eloquent_notes.notes import Note
 QUERY_PROMPT = "task: search result | query: {}"
 DOCUMENT_PROMPT = "title: {} | text: {}"
 
-CACHE_PATH = os.path.join(config.CACHE_DIR, "embeddings.npz")
+CACHE_PATH = str(Path(config.CACHE_DIR, "embeddings.npz"))
 
 # Embedding similarities cluster in a narrow band (about 0.5-0.75 for
 # EmbeddingGemma), so an absolute threshold alone either floods the results
@@ -41,11 +41,11 @@ class SemanticIndex:
         self._cache_path = cache_path
         self._lock = threading.Lock()
         self._entries: dict[str, tuple[str, np.ndarray]] = {}
-        if os.path.exists(cache_path):
+        if Path(cache_path).exists():
             with np.load(cache_path) as cache:
                 self._entries = {
                     str(name): (str(digest), vector)
-                    for name, digest, vector in zip(cache["names"], cache["digests"], cache["vectors"])
+                    for name, digest, vector in zip(cache["names"], cache["digests"], cache["vectors"], strict=True)
                 }
 
     def search(self, notes: list[Note], query: str, cfg: dict[str, Any]) -> list[Note]:
@@ -58,7 +58,7 @@ class SemanticIndex:
         query_vector = _unit(self._embed([QUERY_PROMPT.format(query)], cfg))[0]
         scores = matrix @ query_vector
         cutoff = max(cfg["search"]["min_similarity"], float(scores.max()) - RESULT_MARGIN)
-        ranked = sorted(zip(scores, notes), key=lambda pair: pair[0], reverse=True)
+        ranked = sorted(zip(scores, notes, strict=True), key=lambda pair: pair[0], reverse=True)
         return [note for score, note in ranked if score >= cutoff]
 
     def _refresh(self, notes: list[Note], cfg: dict[str, Any]) -> None:
@@ -66,15 +66,14 @@ class SemanticIndex:
         model = cfg["search"]["embedding_model"]
         documents = {note.path.name: DOCUMENT_PROMPT.format(note.title, note.body) for note in notes}
         digests = {
-            name: hashlib.sha256(f"{model}\n{document}".encode()).hexdigest()
-            for name, document in documents.items()
+            name: hashlib.sha256(f"{model}\n{document}".encode()).hexdigest() for name, document in documents.items()
         }
         fresh = {name: entry for name, entry in self._entries.items() if digests.get(name) == entry[0]}
         dropped = len(fresh) != len(self._entries)
         stale = [name for name in digests if name not in fresh]
         if stale:
             vectors = _unit(self._embed([documents[name] for name in stale], cfg))
-            fresh.update({name: (digests[name], vector) for name, vector in zip(stale, vectors)})
+            fresh.update({name: (digests[name], vector) for name, vector in zip(stale, vectors, strict=True)})
         self._entries = fresh
         if stale or dropped:
             self._save()
@@ -91,8 +90,9 @@ class SemanticIndex:
 
     def _save(self) -> None:
         if not self._entries:
-            if os.path.exists(self._cache_path):
-                os.remove(self._cache_path)
+            cache_file = Path(self._cache_path)
+            if cache_file.exists():
+                cache_file.unlink()
             return
         names = list(self._entries)
         buf = io.BytesIO()

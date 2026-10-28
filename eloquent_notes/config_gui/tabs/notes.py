@@ -1,6 +1,6 @@
 """Notes storage tab for configuration."""
 
-import os
+from pathlib import Path
 
 from PyQt6.QtWidgets import (
     QFileDialog,
@@ -57,13 +57,11 @@ class NotesTab(QWidget):
         layout.addStretch()
 
     def _browse_folder(self):
-        initial_dir = os.path.expanduser(self.txt_folder.text())
-        if not os.path.exists(initial_dir):
-            initial_dir = os.path.expanduser("~/")
+        initial_dir = Path(self.txt_folder.text()).expanduser()
+        if not initial_dir.exists():
+            initial_dir = Path("~/").expanduser()
 
-        dir_path = QFileDialog.getExistingDirectory(
-            self, _("Select Notes Folder"), initial_dir
-        )
+        dir_path = QFileDialog.getExistingDirectory(self, _("Select Notes Folder"), str(initial_dir))
         if dir_path:
             self.txt_folder.setText(dir_path)
 

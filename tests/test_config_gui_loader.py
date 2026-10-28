@@ -30,9 +30,7 @@ def test_ollama_loader_success():
     def mock_post(url, json, timeout):
         return {"audio-model": mock_show_audio, "embed-model": mock_show_embed}.get(json["name"], mock_show_text)
 
-    with patch("requests.get", return_value=mock_tags_response), patch(
-        "requests.post", side_effect=mock_post
-    ):
+    with patch("requests.get", return_value=mock_tags_response), patch("requests.post", side_effect=mock_post):
         loader.run()
 
     assert models_signal_data == [(["audio-model"], ["embed-model"])]
@@ -44,9 +42,7 @@ def test_ollama_loader_get_failure():
     error_signal_data = []
     loader.error_occurred.connect(error_signal_data.append)
 
-    with patch(
-        "requests.get", side_effect=requests.RequestException("Connection refused")
-    ):
+    with patch("requests.get", side_effect=requests.RequestException("Connection refused")):
         loader.run()
 
     assert len(error_signal_data) == 1
@@ -70,9 +66,7 @@ def test_ollama_loader_show_exception_resilience():
     loader.models_fetched.connect(lambda audio, embedding: models_signal_data.append((audio, embedding)))
 
     mock_tags_response = MagicMock()
-    mock_tags_response.json.return_value = {
-        "models": [{"name": "failing-model"}, {"name": "audio-model"}]
-    }
+    mock_tags_response.json.return_value = {"models": [{"name": "failing-model"}, {"name": "audio-model"}]}
 
     mock_show_audio = MagicMock()
     mock_show_audio.json.return_value = {"capabilities": ["audio"]}
@@ -82,9 +76,7 @@ def test_ollama_loader_show_exception_resilience():
             raise requests.RequestException("Timeout on show")
         return mock_show_audio
 
-    with patch("requests.get", return_value=mock_tags_response), patch(
-        "requests.post", side_effect=mock_post
-    ):
+    with patch("requests.get", return_value=mock_tags_response), patch("requests.post", side_effect=mock_post):
         loader.run()
 
     assert models_signal_data == [(["audio-model"], [])]
@@ -128,9 +120,7 @@ def test_ollama_loader_invalid_json_body_resilience():
             return mock_show_non_list_caps
         return mock_show_audio
 
-    with patch("requests.get", return_value=mock_tags_response), patch(
-        "requests.post", side_effect=mock_post
-    ):
+    with patch("requests.get", return_value=mock_tags_response), patch("requests.post", side_effect=mock_post):
         loader.run()
 
     assert models_signal_data == [(["audio-model"], [])]

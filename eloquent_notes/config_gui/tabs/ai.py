@@ -92,10 +92,7 @@ class AITab(QWidget):
         self.spn_context_length.setRange(512, 262144)
         self.spn_context_length.setSingleStep(1024)
         self.spn_context_length.setToolTip(
-            _(
-                "Context length in tokens to pass to Ollama. "
-                "Larger values allow longer dictations but use more memory."
-            )
+            _("Context length in tokens to pass to Ollama. Larger values allow longer dictations but use more memory.")
         )
 
         self.chk_context_default = QCheckBox(_("Use default context length"))
@@ -294,10 +291,7 @@ class AITab(QWidget):
         for value, error_template in (
             (
                 keep_alive,
-                _(
-                    "Invalid Keep Alive format: '{value}'. "
-                    "Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."
-                ),
+                _("Invalid Keep Alive format: '{value}'. Must be an integer or duration (e.g., 5m, 10s, 1h, 0, -1)."),
             ),
             (
                 preload_keep_alive,
@@ -324,22 +318,24 @@ class AITab(QWidget):
 
         context_len = None if self.chk_context_default.isChecked() else self.spn_context_length.value()
 
-        config_data["ai"].update({
-            "ollama_url": url,
-            "model": model,
-            "output_language": output_lang,
-            "context_length": context_len,
-            "keep_alive": keep_alive,
-            "preload_keep_alive": preload_keep_alive,
-            "max_retries": self.spn_max_retries.value(),
-            "preload_timeout": self.spn_preload_timeout.value(),
-            "request_timeout": self.spn_request_timeout.value(),
-        })
-        config_data["search"].update({
-            "embedding_model": embedding_model,
-            "keep_alive": search_keep_alive,
-            "min_similarity": round(self.spn_min_similarity.value(), 2),
-        })
+        config_data["ai"].update(
+            {
+                "ollama_url": url,
+                "model": model,
+                "output_language": output_lang,
+                "context_length": context_len,
+                "keep_alive": keep_alive,
+                "preload_keep_alive": preload_keep_alive,
+                "max_retries": self.spn_max_retries.value(),
+                "preload_timeout": self.spn_preload_timeout.value(),
+                "request_timeout": self.spn_request_timeout.value(),
+            }
+        )
+        config_data["search"].update(
+            {
+                "embedding_model": embedding_model,
+                "keep_alive": search_keep_alive,
+                "min_similarity": round(self.spn_min_similarity.value(), 2),
+            }
+        )
         return True
-
-

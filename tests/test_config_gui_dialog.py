@@ -42,8 +42,9 @@ def test_dialog_init(qapp):
 def test_dialog_palette_change_updates_stylesheet(qapp):
     dummy_config = config.load_default_config()
 
-    with patch("eloquent_notes.config.load_config", return_value=dummy_config), patch(
-        "eloquent_notes.ui.is_dark_theme", return_value=False
+    with (
+        patch("eloquent_notes.config.load_config", return_value=dummy_config),
+        patch("eloquent_notes.ui.is_dark_theme", return_value=False),
     ):
         dialog = ConfigurationDialog()
 
@@ -58,13 +59,17 @@ def test_dialog_palette_change_updates_stylesheet(qapp):
 def test_dialog_init_falls_back_to_default_on_corrupt_config(qapp):
     default_config = config.load_default_config()
 
-    with patch(
-        "eloquent_notes.config.load_config",
-        side_effect=yaml.YAMLError("Corrupt YAML"),
-    ), patch(
-        "eloquent_notes.config.load_default_config",
-        return_value=default_config,
-    ), patch("PyQt6.QtWidgets.QMessageBox.warning") as mock_warn:
+    with (
+        patch(
+            "eloquent_notes.config.load_config",
+            side_effect=yaml.YAMLError("Corrupt YAML"),
+        ),
+        patch(
+            "eloquent_notes.config.load_default_config",
+            return_value=default_config,
+        ),
+        patch("PyQt6.QtWidgets.QMessageBox.warning") as mock_warn,
+    ):
         dialog = ConfigurationDialog()
 
     mock_warn.assert_called_once()
@@ -73,25 +78,29 @@ def test_dialog_init_falls_back_to_default_on_corrupt_config(qapp):
 
 def test_dialog_load_settings(qapp):
     dummy_config = config.load_default_config()
-    dummy_config["ai"].update({
-        "ollama_url": "http://127.0.0.1:11434",
-        "model": "gemma4:e4b",
-        "output_language": "Spanish",
-        "context_length": 4096,
-        "keep_alive": "10m",
-        "preload_keep_alive": "2m",
-        "max_retries": 5,
-        "preload_timeout": 30,
-        "request_timeout": 60,
-    })
-    dummy_config["audio"].update({
-        "sample_rate": 44100,
-        "channels": 2,
-        "capture_duration": 45,
-        "beep_enabled": False,
-        "beep_frequency": 800,
-        "beep_duration": 0.2,
-    })
+    dummy_config["ai"].update(
+        {
+            "ollama_url": "http://127.0.0.1:11434",
+            "model": "gemma4:e4b",
+            "output_language": "Spanish",
+            "context_length": 4096,
+            "keep_alive": "10m",
+            "preload_keep_alive": "2m",
+            "max_retries": 5,
+            "preload_timeout": 30,
+            "request_timeout": 60,
+        }
+    )
+    dummy_config["audio"].update(
+        {
+            "sample_rate": 44100,
+            "channels": 2,
+            "capture_duration": 45,
+            "beep_enabled": False,
+            "beep_frequency": 800,
+            "beep_duration": 0.2,
+        }
+    )
     dummy_config["logging"].update({"level": "DEBUG", "max_mb": 20, "backup_count": 2})
     dummy_config["notes"]["folder"] = "/home/user/notes"
     dummy_config["notes"]["columns"] = 3
@@ -132,15 +141,13 @@ def test_dialog_restore_defaults(qapp):
     default_data["ai"]["ollama_url"] = "http://default:11434"
     default_data["notes"]["folder"] = "/default/notes"
 
-    with patch(
-        "PyQt6.QtWidgets.QMessageBox.question", return_value=QMessageBox.StandardButton.Yes
-    ), patch(
-        "eloquent_notes.config.load_default_config", return_value=default_data
-    ), patch(
-        "eloquent_notes.config.load_file", return_value="sample prompt text"
-    ), patch(
-        "eloquent_notes.config_gui.tabs.general.is_autostart_enabled", return_value=True
-    ), patch("PyQt6.QtWidgets.QMessageBox.information"):
+    with (
+        patch("PyQt6.QtWidgets.QMessageBox.question", return_value=QMessageBox.StandardButton.Yes),
+        patch("eloquent_notes.config.load_default_config", return_value=default_data),
+        patch("eloquent_notes.config.load_file", return_value="sample prompt text"),
+        patch("eloquent_notes.config_gui.tabs.general.is_autostart_enabled", return_value=True),
+        patch("PyQt6.QtWidgets.QMessageBox.information"),
+    ):
         dialog.restore_defaults()
 
     assert dialog.ai_tab.txt_ollama_url.text() == "http://default:11434"
@@ -153,35 +160,33 @@ def test_dialog_restore_defaults(qapp):
 def test_dialog_save_settings(qapp):
     dummy_config = config.load_default_config()
 
-    with patch("eloquent_notes.config.load_config", return_value=dummy_config), patch(
-        "eloquent_notes.config.load_file", return_value=""
-    ), patch(
-        "os.path.exists", return_value=True
+    with (
+        patch("eloquent_notes.config.load_config", return_value=dummy_config),
+        patch("eloquent_notes.config.load_file", return_value=""),
+        patch("pathlib.Path.exists", return_value=True),
     ):
         dialog = ConfigurationDialog()
 
-    with patch(
-        "eloquent_notes.config.load_default_config", return_value=dummy_config
-    ), patch("eloquent_notes.config.save_config") as mock_save, patch(
-        "eloquent_notes.config.atomic_write"
-    ), patch(
-        "eloquent_notes.config.load_file", return_value=""
-    ), patch("os.path.exists", return_value=True), patch(
-        "eloquent_notes.config_gui.tabs.general.install_autostart"
+    with (
+        patch("eloquent_notes.config.load_default_config", return_value=dummy_config),
+        patch("eloquent_notes.config.save_config") as mock_save,
+        patch("eloquent_notes.config.atomic_write"),
+        patch("eloquent_notes.config.load_file", return_value=""),
+        patch("pathlib.Path.exists", return_value=True),
+        patch("eloquent_notes.config_gui.tabs.general.install_autostart"),
     ):
         res = dialog.save_settings_from_ui()
         assert res is True
         mock_save.assert_called_once()
 
-    with patch(
-        "eloquent_notes.config.load_default_config", return_value=dummy_config
-    ), patch(
-        "eloquent_notes.config.save_config", side_effect=OSError("disk full")
-    ), patch(
-        "eloquent_notes.config.load_file", return_value=""
-    ), patch("os.path.exists", return_value=True), patch(
-        "eloquent_notes.config_gui.tabs.general.install_autostart"
-    ), patch("PyQt6.QtWidgets.QMessageBox.critical") as mock_crit:
+    with (
+        patch("eloquent_notes.config.load_default_config", return_value=dummy_config),
+        patch("eloquent_notes.config.save_config", side_effect=OSError("disk full")),
+        patch("eloquent_notes.config.load_file", return_value=""),
+        patch("pathlib.Path.exists", return_value=True),
+        patch("eloquent_notes.config_gui.tabs.general.install_autostart"),
+        patch("PyQt6.QtWidgets.QMessageBox.critical") as mock_crit,
+    ):
         assert dialog.save_settings_from_ui() is False
         mock_crit.assert_called_once()
 
@@ -189,10 +194,10 @@ def test_dialog_save_settings(qapp):
 def test_dialog_save_validation_failure_does_not_mutate_disk(qapp):
     dummy_config = config.load_default_config()
 
-    with patch("eloquent_notes.config.load_config", return_value=dummy_config), patch(
-        "eloquent_notes.config.load_file", return_value=""
-    ), patch(
-        "os.path.exists", return_value=True
+    with (
+        patch("eloquent_notes.config.load_config", return_value=dummy_config),
+        patch("eloquent_notes.config.load_file", return_value=""),
+        patch("pathlib.Path.exists", return_value=True),
     ):
         dialog = ConfigurationDialog()
 
@@ -202,13 +207,12 @@ def test_dialog_save_validation_failure_does_not_mutate_disk(qapp):
     dialog.notes_tab.txt_folder.setText("/mutated/folder")
     dialog.appearance_tab.spn_columns.setValue(5)
     dialog.ai_tab.txt_ollama_url.setText("")
-    with patch("PyQt6.QtWidgets.QMessageBox.warning"), patch(
-        "eloquent_notes.config_gui.tabs.general.install_autostart"
-    ) as mock_install, patch(
-        "eloquent_notes.config_gui.tabs.general.remove_autostart"
-    ) as mock_remove, patch(
-        "eloquent_notes.config.atomic_write"
-    ) as mock_write:
+    with (
+        patch("PyQt6.QtWidgets.QMessageBox.warning"),
+        patch("eloquent_notes.config_gui.tabs.general.install_autostart") as mock_install,
+        patch("eloquent_notes.config_gui.tabs.general.remove_autostart") as mock_remove,
+        patch("eloquent_notes.config.atomic_write") as mock_write,
+    ):
         res = dialog.save_settings_from_ui()
         assert res is False
         assert dialog.tab_widget.currentWidget() is dialog.ai_tab
@@ -232,4 +236,3 @@ def test_dialog_accept(qapp):
     with patch.object(dialog, "save_settings_from_ui", return_value=True):
         dialog.accept()
         assert dialog.result() == ConfigurationDialog.DialogCode.Accepted
-

@@ -99,9 +99,7 @@ def test_run_cli_config_accepted(monkeypatch, qapp):
     mock_dialog.exec.return_value = QDialog.DialogCode.Accepted
     mock_send_ipc = MagicMock()
 
-    monkeypatch.setattr(
-        "eloquent_notes.main.ConfigurationDialog", lambda: mock_dialog
-    )
+    monkeypatch.setattr("eloquent_notes.main.ConfigurationDialog", lambda: mock_dialog)
     monkeypatch.setattr("eloquent_notes.main.send_ipc_command", mock_send_ipc)
 
     main.run_cli(["config"])
@@ -116,9 +114,7 @@ def test_run_cli_config_rejected(monkeypatch, qapp):
     mock_dialog.exec.return_value = QDialog.DialogCode.Rejected
     mock_send_ipc = MagicMock()
 
-    monkeypatch.setattr(
-        "eloquent_notes.main.ConfigurationDialog", lambda: mock_dialog
-    )
+    monkeypatch.setattr("eloquent_notes.main.ConfigurationDialog", lambda: mock_dialog)
     monkeypatch.setattr("eloquent_notes.main.send_ipc_command", mock_send_ipc)
 
     main.run_cli(["config"])
@@ -179,10 +175,7 @@ def test_run_cli_launch_daemon(monkeypatch):
     main.run_cli(["toggle"], launcher=mock_launcher)
 
     mock_send_ipc.assert_called_once_with("toggle")
-    mock_launcher.assert_called_once_with(
-        sys.executable,
-        [sys.executable, "-m", "eloquent_notes.app", "toggle"]
-    )
+    mock_launcher.assert_called_once_with(sys.executable, [sys.executable, "-m", "eloquent_notes.app", "toggle"])
 
 
 def test_run_cli_launch_daemon_default_no_args(monkeypatch):
@@ -195,10 +188,7 @@ def test_run_cli_launch_daemon_default_no_args(monkeypatch):
     main.run_cli([], launcher=mock_launcher)
 
     mock_send_ipc.assert_called_once_with("open")
-    mock_launcher.assert_called_once_with(
-        sys.executable,
-        [sys.executable, "-m", "eloquent_notes.app"]
-    )
+    mock_launcher.assert_called_once_with(sys.executable, [sys.executable, "-m", "eloquent_notes.app"])
 
 
 def test_main_function(monkeypatch):
@@ -220,7 +210,4 @@ def test_run_cli_open_launches_daemon_with_window(monkeypatch):
     main.run_cli(["open"], launcher=mock_launcher)
 
     mock_send_ipc.assert_called_once_with("open")
-    mock_launcher.assert_called_once_with(
-        sys.executable,
-        [sys.executable, "-m", "eloquent_notes.app", "open"]
-    )
+    mock_launcher.assert_called_once_with(sys.executable, [sys.executable, "-m", "eloquent_notes.app", "open"])

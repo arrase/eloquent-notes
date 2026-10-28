@@ -24,7 +24,12 @@ def sample_notes(tmp_path):
     result = []
     for index, (days, title, note_type, tags, body) in enumerate(specs):
         note = notes.Note(
-            tmp_path / f"{index}.md", title, now - timedelta(days=days, minutes=index), note_type, tags, body,
+            tmp_path / f"{index}.md",
+            title,
+            now - timedelta(days=days, minutes=index),
+            note_type,
+            tags,
+            body,
         )
         notes.save_note(note)
         result.append(note)
@@ -59,10 +64,16 @@ def list_texts(win):
 
 def click(widget):
     for event_type in (QMouseEvent.Type.MouseButtonPress, QMouseEvent.Type.MouseButtonRelease):
-        widget.event(QMouseEvent(
-            event_type, QPointF(5, 5), QPointF(5, 5),
-            Qt.MouseButton.LeftButton, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier,
-        ))
+        widget.event(
+            QMouseEvent(
+                event_type,
+                QPointF(5, 5),
+                QPointF(5, 5),
+                Qt.MouseButton.LeftButton,
+                Qt.MouseButton.LeftButton,
+                Qt.KeyboardModifier.NoModifier,
+            )
+        )
 
 
 def chip(win, label):
@@ -330,7 +341,12 @@ def test_reader_shows_all_fields(window, sample_notes):
 def test_set_notes_refreshes_open_reader_note(window, sample_notes):
     window.show_note(sample_notes[0])
     updated = notes.Note(
-        sample_notes[0].path, "Updated title", sample_notes[0].created, "task", ["updated"], "New body.",
+        sample_notes[0].path,
+        "Updated title",
+        sample_notes[0].created,
+        "task",
+        ["updated"],
+        "New body.",
     )
     window.set_notes([updated, *sample_notes[1:]])
 
@@ -347,7 +363,12 @@ def test_set_notes_preserves_unsaved_reader_edits(window, sample_notes):
     window.reader.body_edit.setPlainText("In-progress body")
 
     stale = notes.Note(
-        sample_notes[0].path, "Launch decision", sample_notes[0].created, "decision", ["work"], "Ship on Friday.",
+        sample_notes[0].path,
+        "Launch decision",
+        sample_notes[0].created,
+        "decision",
+        ["work"],
+        "Ship on Friday.",
     )
     window.set_notes([stale, *sample_notes[1:]])
 
@@ -456,7 +477,10 @@ def test_back_saves_edits(window, sample_notes):
     edited.assert_called_once_with(sample_notes[1])
     note = sample_notes[1]
     assert (note.title, note.type, note.tags, note.body) == (
-        "Buy milk and bread", "reminder", ["home", "shopping"], "Milk, eggs and bread.",
+        "Buy milk and bread",
+        "reminder",
+        ["home", "shopping"],
+        "Milk, eggs and bread.",
     )
     assert window.stack.currentWidget() is window.timeline
 
@@ -550,8 +574,10 @@ def test_scroll_content_aligns_right_margin_with_scrollbar(window):
 
 def test_timeline_preserves_vertical_scroll_position_on_rerender(window, sample_notes):
     scrollbar = window.timeline._scroll.verticalScrollBar()
-    scrollbar.setValue(80)
-    assert scrollbar.value() == 80
+    target_scroll = min(80, scrollbar.maximum())
+    assert target_scroll > 0
+    scrollbar.setValue(target_scroll)
+    assert scrollbar.value() == target_scroll
 
     window.set_notes(sample_notes)
-    assert scrollbar.value() == 80
+    assert scrollbar.value() == target_scroll

@@ -85,11 +85,17 @@ def test_toggle_from_idle_starts_recording(qapp):
     eloquent_app = make_app(qapp)
     recorder = MagicMock()
 
-    with patch("eloquent_notes.app.audio.play_beep") as mock_beep, patch(
-        "eloquent_notes.app.audio.AudioRecorder", return_value=recorder,
-    ), patch("eloquent_notes.app.config.load_file", return_value="content"), patch(
-        "eloquent_notes.app.threading.Thread",
-    ) as mock_thread_cls:
+    with (
+        patch("eloquent_notes.app.audio.play_beep") as mock_beep,
+        patch(
+            "eloquent_notes.app.audio.AudioRecorder",
+            return_value=recorder,
+        ),
+        patch("eloquent_notes.app.config.load_file", return_value="content"),
+        patch(
+            "eloquent_notes.app.threading.Thread",
+        ) as mock_thread_cls,
+    ):
         eloquent_app.toggle_action()
 
     assert eloquent_app.state == "RECORDING"
@@ -118,15 +124,24 @@ def test_start_recording_plays_blocking_beep_when_enabled(qapp, mock_config):
     mock_config["audio"]["beep_enabled"] = True
     eloquent_app = make_app(qapp)
 
-    with patch("eloquent_notes.app.audio.play_beep") as mock_beep, patch(
-        "eloquent_notes.app.audio.AudioRecorder", return_value=MagicMock(),
-    ), patch("eloquent_notes.app.config.load_file", return_value="c"), patch(
-        "eloquent_notes.app.threading.Thread",
+    with (
+        patch("eloquent_notes.app.audio.play_beep") as mock_beep,
+        patch(
+            "eloquent_notes.app.audio.AudioRecorder",
+            return_value=MagicMock(),
+        ),
+        patch("eloquent_notes.app.config.load_file", return_value="c"),
+        patch(
+            "eloquent_notes.app.threading.Thread",
+        ),
     ):
         eloquent_app.toggle_action()
 
     mock_beep.assert_called_once_with(
-        frequency=440, duration=0.1, sample_rate=16000, wait=True,
+        frequency=440,
+        duration=0.1,
+        sample_rate=16000,
+        wait=True,
     )
 
 
@@ -135,13 +150,19 @@ def test_beep_failure_does_not_abort_recording(qapp, mock_config):
     eloquent_app = make_app(qapp)
     recorder = MagicMock()
 
-    with patch(
-        "eloquent_notes.app.audio.play_beep",
-        side_effect=RuntimeError("No output device"),
-    ), patch(
-        "eloquent_notes.app.audio.AudioRecorder", return_value=recorder,
-    ), patch("eloquent_notes.app.config.load_file", return_value="c"), patch(
-        "eloquent_notes.app.threading.Thread",
+    with (
+        patch(
+            "eloquent_notes.app.audio.play_beep",
+            side_effect=RuntimeError("No output device"),
+        ),
+        patch(
+            "eloquent_notes.app.audio.AudioRecorder",
+            return_value=recorder,
+        ),
+        patch("eloquent_notes.app.config.load_file", return_value="c"),
+        patch(
+            "eloquent_notes.app.threading.Thread",
+        ),
     ):
         eloquent_app.toggle_action()
 
@@ -154,8 +175,10 @@ def test_start_recording_failure_notifies_and_stays_idle(qapp):
     failing_recorder = MagicMock()
     failing_recorder.start.side_effect = RuntimeError("No mic")
 
-    with patch("eloquent_notes.app.audio.AudioRecorder", return_value=failing_recorder), \
-            patch("eloquent_notes.app.config.load_file", return_value="c"):
+    with (
+        patch("eloquent_notes.app.audio.AudioRecorder", return_value=failing_recorder),
+        patch("eloquent_notes.app.config.load_file", return_value="c"),
+    ):
         eloquent_app.toggle_action()
 
     assert eloquent_app.state == "IDLE"
@@ -189,11 +212,16 @@ def test_start_recording_skips_preload_if_thread_alive(qapp):
     alive_thread.is_alive.return_value = True
     eloquent_app._preload_thread = alive_thread
 
-    with patch(
-        "eloquent_notes.app.audio.AudioRecorder", return_value=MagicMock(),
-    ), patch("eloquent_notes.app.config.load_file", return_value="c"), patch(
-        "eloquent_notes.app.threading.Thread",
-    ) as mock_thread_cls:
+    with (
+        patch(
+            "eloquent_notes.app.audio.AudioRecorder",
+            return_value=MagicMock(),
+        ),
+        patch("eloquent_notes.app.config.load_file", return_value="c"),
+        patch(
+            "eloquent_notes.app.threading.Thread",
+        ) as mock_thread_cls,
+    ):
         eloquent_app.toggle_action()
 
     mock_thread_cls.assert_not_called()
@@ -221,21 +249,28 @@ def test_toggle_from_recording_stops_and_processes(qapp):
     eloquent_app._preload_thread = preload_thread
     eloquent_app._tick_timer.start(100)
 
-    with patch(
-        "eloquent_notes.app.audio.play_beep",
-        side_effect=lambda **kwargs: call_order.append("beep"),
-    ) as mock_beep, patch("eloquent_notes.app.threading.Thread") as mock_thread_cls:
+    with (
+        patch(
+            "eloquent_notes.app.audio.play_beep",
+            side_effect=lambda **kwargs: call_order.append("beep"),
+        ) as mock_beep,
+        patch("eloquent_notes.app.threading.Thread") as mock_thread_cls,
+    ):
         eloquent_app.toggle_action()
 
     assert call_order == ["stop", "beep"]
     mock_beep.assert_called_once_with(
-        frequency=440, duration=0.1, sample_rate=16000, wait=False,
+        frequency=440,
+        duration=0.1,
+        sample_rate=16000,
+        wait=False,
     )
     assert eloquent_app.state == "PROCESSING"
     assert not eloquent_app._tick_timer.isActive()
     eloquent_app._hud.hide.assert_called_once()
     eloquent_app._update_icon.assert_called_with(
-        "orange", "Eloquent Notes (Processing...)",
+        "orange",
+        "Eloquent Notes (Processing...)",
     )
     recorder.stop.assert_called_once()
     assert eloquent_app._processing_thread is mock_thread_cls.return_value
@@ -270,7 +305,8 @@ def test_toggle_while_processing_notifies_busy(qapp):
     eloquent_app.toggle_action()
 
     eloquent_app._notify.assert_called_once_with(
-        "Eloquent Notes", "System is busy. Please wait.",
+        "Eloquent Notes",
+        "System is busy. Please wait.",
     )
 
 
@@ -283,8 +319,11 @@ def test_recording_tick_timeout_stops_and_processes(qapp):
     eloquent_app._capture_duration = 30.0
     eloquent_app._hud.isVisible.return_value = True
 
-    with patch("eloquent_notes.app.time.monotonic", return_value=100.0), patch(
-        "eloquent_notes.app.threading.Thread",
+    with (
+        patch("eloquent_notes.app.time.monotonic", return_value=100.0),
+        patch(
+            "eloquent_notes.app.threading.Thread",
+        ),
     ):
         eloquent_app._recording_started_at = 60.0
         eloquent_app._on_recording_tick()
@@ -300,10 +339,15 @@ def test_start_recording_creates_hud_lazily(qapp):
     eloquent_app._update_icon = MagicMock()
     assert eloquent_app._hud is None
 
-    with patch(
-        "eloquent_notes.app.audio.AudioRecorder", return_value=MagicMock(),
-    ), patch("eloquent_notes.app.config.load_file", return_value="c"), patch(
-        "eloquent_notes.app.threading.Thread",
+    with (
+        patch(
+            "eloquent_notes.app.audio.AudioRecorder",
+            return_value=MagicMock(),
+        ),
+        patch("eloquent_notes.app.config.load_file", return_value="c"),
+        patch(
+            "eloquent_notes.app.threading.Thread",
+        ),
     ):
         eloquent_app.toggle_action()
 
@@ -318,10 +362,15 @@ def test_start_recording_when_hud_disabled(qapp, mock_config):
     eloquent_app._notify = MagicMock()
     eloquent_app._update_icon = MagicMock()
 
-    with patch(
-        "eloquent_notes.app.audio.AudioRecorder", return_value=MagicMock(),
-    ), patch("eloquent_notes.app.config.load_file", return_value="c"), patch(
-        "eloquent_notes.app.threading.Thread",
+    with (
+        patch(
+            "eloquent_notes.app.audio.AudioRecorder",
+            return_value=MagicMock(),
+        ),
+        patch("eloquent_notes.app.config.load_file", return_value="c"),
+        patch(
+            "eloquent_notes.app.threading.Thread",
+        ),
     ):
         eloquent_app.toggle_action()
         assert eloquent_app._hud is None
@@ -414,18 +463,14 @@ def _pipeline_snapshot():
             "output_language": "English",
         },
         "notes": {
-            "folder": "/tmp/notes",
+            "folder": "/var/empty/notes",
         },
         "_loaded_files": {
             config.RETRY_PROMPT_PATH: "retry prompt",
             config.REWRITING_SYSTEM_PROMPT_PATH: "sys rewrite",
-            config.REWRITING_USER_PROMPT_PATH: (
-                "{transcription}\n{language_instruction}"
-            ),
+            config.REWRITING_USER_PROMPT_PATH: ("{transcription}\n{language_instruction}"),
             config.CLASSIFICATION_SYSTEM_PROMPT_PATH: "sys class",
-            config.CLASSIFICATION_USER_PROMPT_PATH: (
-                "{transcription}\n{language_instruction}"
-            ),
+            config.CLASSIFICATION_USER_PROMPT_PATH: ("{transcription}\n{language_instruction}"),
             config.TRANSCRIPTION_SYSTEM_PROMPT_PATH: "sys trans",
             config.TRANSCRIPTION_USER_PROMPT_PATH: "usr trans",
         },
@@ -445,10 +490,13 @@ def test_process_audio_empty_transcription(qapp):
     recorder.is_silent = False
     snapshot = _pipeline_snapshot()
 
-    with patch(
-        "eloquent_notes.app.llm.transcribe_audio",
-        return_value={"empty": False, "transcription": "   "},
-    ) as mock_transcribe, patch("eloquent_notes.app.llm.preload_model") as mock_preload:
+    with (
+        patch(
+            "eloquent_notes.app.llm.transcribe_audio",
+            return_value={"empty": False, "transcription": "   "},
+        ) as mock_transcribe,
+        patch("eloquent_notes.app.llm.preload_model") as mock_preload,
+    ):
         eloquent_app._process_audio(recorder, snapshot, False, preload_thread)
 
     preload_thread.join.assert_called_once_with(timeout=10)
@@ -466,10 +514,13 @@ def test_process_audio_empty_transcription(qapp):
     # Also verify empty=True returns before stripping transcription
     eloquent_app.processing_completed.reset_mock()
     preload_thread.is_alive.return_value = False
-    with patch(
-        "eloquent_notes.app.llm.transcribe_audio",
-        return_value={"empty": True, "transcription": ""},
-    ), patch("eloquent_notes.app.llm.preload_model"):
+    with (
+        patch(
+            "eloquent_notes.app.llm.transcribe_audio",
+            return_value={"empty": True, "transcription": ""},
+        ),
+        patch("eloquent_notes.app.llm.preload_model"),
+    ):
         eloquent_app._process_audio(recorder, snapshot, False, preload_thread)
     eloquent_app.processing_completed.emit.assert_called_once_with("empty", "")
 
@@ -485,9 +536,10 @@ def test_process_audio_local_silence_never_reaches_model(qapp):
     recorder.is_silent = True
     snapshot = _pipeline_snapshot()
 
-    with patch("eloquent_notes.app.llm.transcribe_audio") as mock_transcribe, patch(
-        "eloquent_notes.app.llm.preload_model"
-    ) as mock_preload:
+    with (
+        patch("eloquent_notes.app.llm.transcribe_audio") as mock_transcribe,
+        patch("eloquent_notes.app.llm.preload_model") as mock_preload,
+    ):
         eloquent_app._process_audio(recorder, snapshot, False, None)
 
     wav_prop.assert_not_called()
@@ -512,16 +564,21 @@ def test_process_audio_full_pipeline_success(qapp, tmp_path):
     snapshot = _pipeline_snapshot()
     snapshot["notes"]["folder"] = str(tmp_path / "notes")
 
-    with patch(
-        "eloquent_notes.app.llm.transcribe_audio",
-        return_value={"empty": False, "transcription": "Hello note"},
-    ) as mock_transcribe, patch(
-        "eloquent_notes.app.llm.rewrite_transcription",
-        return_value={"title": "Note Title", "content": "Clean note"},
-    ), patch(
-        "eloquent_notes.app.llm.classify_note",
-        return_value={"type": "idea", "tags": ["#Tag1", "tag1", "two"]},
-    ) as mock_classify, patch("eloquent_notes.app.llm.preload_model") as mock_preload:
+    with (
+        patch(
+            "eloquent_notes.app.llm.transcribe_audio",
+            return_value={"empty": False, "transcription": "Hello note"},
+        ) as mock_transcribe,
+        patch(
+            "eloquent_notes.app.llm.rewrite_transcription",
+            return_value={"title": "Note Title", "content": "Clean note"},
+        ),
+        patch(
+            "eloquent_notes.app.llm.classify_note",
+            return_value={"type": "idea", "tags": ["#Tag1", "tag1", "two"]},
+        ) as mock_classify,
+        patch("eloquent_notes.app.llm.preload_model") as mock_preload,
+    ):
         eloquent_app._process_audio(recorder, snapshot, False, None)
 
     eloquent_app.processing_completed.emit.assert_called_once_with("success", "Note Title")
@@ -549,15 +606,21 @@ def test_process_audio_append_stops_after_rewriting(qapp):
     recorder.is_silent = False
     snapshot = _pipeline_snapshot()
 
-    with patch(
-        "eloquent_notes.app.llm.transcribe_audio",
-        return_value={"empty": False, "transcription": "more"},
-    ), patch(
-        "eloquent_notes.app.llm.rewrite_transcription",
-        return_value={"title": "Ignored", "content": "More text"},
-    ) as mock_rewrite, patch("eloquent_notes.app.llm.classify_note") as mock_classify, patch(
-        "eloquent_notes.app.notes.create_note",
-    ) as mock_create, patch("eloquent_notes.app.llm.preload_model") as mock_preload:
+    with (
+        patch(
+            "eloquent_notes.app.llm.transcribe_audio",
+            return_value={"empty": False, "transcription": "more"},
+        ),
+        patch(
+            "eloquent_notes.app.llm.rewrite_transcription",
+            return_value={"title": "Ignored", "content": "More text"},
+        ) as mock_rewrite,
+        patch("eloquent_notes.app.llm.classify_note") as mock_classify,
+        patch(
+            "eloquent_notes.app.notes.create_note",
+        ) as mock_create,
+        patch("eloquent_notes.app.llm.preload_model") as mock_preload,
+    ):
         eloquent_app._process_audio(recorder, snapshot, True, None)
 
     eloquent_app.processing_completed.emit.assert_called_once_with("appended", "More text")
@@ -575,17 +638,22 @@ def test_process_audio_rejects_empty_rewrite(qapp):
     recorder.is_silent = False
     snapshot = _pipeline_snapshot()
 
-    with patch(
-        "eloquent_notes.app.llm.transcribe_audio",
-        return_value={"empty": False, "transcription": "hello"},
-    ), patch(
-        "eloquent_notes.app.llm.rewrite_transcription",
-        return_value={"title": "Title", "content": "   "},
-    ), patch("eloquent_notes.app.llm.preload_model"):
+    with (
+        patch(
+            "eloquent_notes.app.llm.transcribe_audio",
+            return_value={"empty": False, "transcription": "hello"},
+        ),
+        patch(
+            "eloquent_notes.app.llm.rewrite_transcription",
+            return_value={"title": "Title", "content": "   "},
+        ),
+        patch("eloquent_notes.app.llm.preload_model"),
+    ):
         eloquent_app._process_audio(recorder, snapshot, False, None)
 
     eloquent_app.processing_completed.emit.assert_called_once_with(
-        "error", "Model returned empty note content",
+        "error",
+        "Model returned empty note content",
     )
 
 
@@ -598,17 +666,21 @@ def test_process_audio_exception_emits_error(qapp):
     recorder.is_silent = False
     snapshot = _pipeline_snapshot()
 
-    with patch(
-        "eloquent_notes.app.llm.transcribe_audio",
-        side_effect=RuntimeError("Ollama failed"),
-    ), patch(
-        "eloquent_notes.app.llm.preload_model",
-        side_effect=requests.RequestException("Unload failed"),
-    ) as mock_preload:
+    with (
+        patch(
+            "eloquent_notes.app.llm.transcribe_audio",
+            side_effect=RuntimeError("Ollama failed"),
+        ),
+        patch(
+            "eloquent_notes.app.llm.preload_model",
+            side_effect=requests.RequestException("Unload failed"),
+        ) as mock_preload,
+    ):
         eloquent_app._process_audio(recorder, snapshot, False, None)
 
     eloquent_app.processing_completed.emit.assert_called_once_with(
-        "error", "Ollama failed",
+        "error",
+        "Ollama failed",
     )
     mock_preload.assert_called_once()
 
@@ -618,8 +690,12 @@ def test_user_prompts_preserve_literal_braces(qapp):
     snapshot = _pipeline_snapshot()
     ai_cfg = snapshot["ai"]
     loaded = snapshot["_loaded_files"]
-    loaded[config.REWRITING_USER_PROMPT_PATH] = "JSON example: {{\"a\": 1}} {unknown_key} {transcription} {language_instruction}"
-    loaded[config.CLASSIFICATION_USER_PROMPT_PATH] = "Rule {custom_brace}: {content} {transcription} {language_instruction}"
+    loaded[config.REWRITING_USER_PROMPT_PATH] = (
+        'JSON example: {{"a": 1}} {unknown_key} {transcription} {language_instruction}'
+    )
+    loaded[config.CLASSIFICATION_USER_PROMPT_PATH] = (
+        "Rule {custom_brace}: {content} {transcription} {language_instruction}"
+    )
 
     lang_inst = EloquentApp._language_instruction("Spanish")
     assert "translating from the transcription language if necessary" in lang_inst
@@ -653,7 +729,8 @@ def test_on_processing_completed_branches(qapp):
     eloquent_app._on_processing_completed("empty", "")
     assert eloquent_app.state == "IDLE"
     eloquent_app._notify.assert_called_with(
-        "Dictation Empty", "No note was created because the audio was empty.",
+        "Dictation Empty",
+        "No note was created because the audio was empty.",
     )
 
     # Error branch
@@ -661,7 +738,8 @@ def test_on_processing_completed_branches(qapp):
     eloquent_app._on_processing_completed("error", "API timeout")
     assert eloquent_app.state == "IDLE"
     eloquent_app._notify.assert_called_with(
-        "Processing Error", "Error processing dictation: API timeout",
+        "Processing Error",
+        "Error processing dictation: API timeout",
     )
 
 
@@ -699,32 +777,42 @@ def test_reload_config_success_and_failure(qapp, mock_config):
     valid_config = copy.deepcopy(mock_config)
     valid_config["logging"] = {"level": "DEBUG", "max_mb": 10, "backup_count": 2}
 
-    with patch(
-        "eloquent_notes.app.config.load_config",
-        return_value=valid_config,
-    ), patch("eloquent_notes.app.setup_logging") as mock_setup:
+    with (
+        patch(
+            "eloquent_notes.app.config.load_config",
+            return_value=valid_config,
+        ),
+        patch("eloquent_notes.app.setup_logging") as mock_setup,
+    ):
         eloquent_app.reload_config()
         mock_setup.assert_called_once_with(
-            log_level_str="DEBUG", max_mb=10, backup_count=2,
+            log_level_str="DEBUG",
+            max_mb=10,
+            backup_count=2,
         )
         assert eloquent_app.config == valid_config
         eloquent_app._notify.assert_called_with(
-            "Eloquent Notes", "Configuration reloaded successfully.",
+            "Eloquent Notes",
+            "Configuration reloaded successfully.",
         )
 
     invalid_log_config = copy.deepcopy(valid_config)
     invalid_log_config["logging"]["level"] = "INVALID"
-    with patch(
-        "eloquent_notes.app.config.load_config",
-        return_value=invalid_log_config,
-    ), patch(
-        "eloquent_notes.app.setup_logging",
-        side_effect=ValueError("Invalid log level"),
+    with (
+        patch(
+            "eloquent_notes.app.config.load_config",
+            return_value=invalid_log_config,
+        ),
+        patch(
+            "eloquent_notes.app.setup_logging",
+            side_effect=ValueError("Invalid log level"),
+        ),
     ):
         eloquent_app.reload_config()
         assert eloquent_app.config == valid_config
         eloquent_app._notify.assert_called_with(
-            "Configuration Error", "Failed to reload configuration: Invalid log level",
+            "Configuration Error",
+            "Failed to reload configuration: Invalid log level",
         )
 
     with patch(
@@ -734,7 +822,8 @@ def test_reload_config_success_and_failure(qapp, mock_config):
         eloquent_app.reload_config()
         assert eloquent_app.config == valid_config
         eloquent_app._notify.assert_called_with(
-            "Configuration Error", "Failed to reload configuration: Corrupt YAML",
+            "Configuration Error",
+            "Failed to reload configuration: Corrupt YAML",
         )
 
 
@@ -782,15 +871,14 @@ def test_init_ipc_server_and_tray_ui(qapp):
         eloquent_app._init_ipc_server()
         mock_server_cls.removeServer.assert_called_once()
         mock_server.listen.assert_called_once()
-        mock_server.newConnection.connect.assert_called_once_with(
-            eloquent_app._handle_ipc_connection
-        )
+        mock_server.newConnection.connect.assert_called_once_with(eloquent_app._handle_ipc_connection)
 
     failing_server = MagicMock()
     failing_server.listen.return_value = False
     failing_server.errorString.return_value = "Address in use"
-    with patch("eloquent_notes.app.QLocalServer", return_value=failing_server), pytest.raises(
-        RuntimeError, match="Address in use"
+    with (
+        patch("eloquent_notes.app.QLocalServer", return_value=failing_server),
+        pytest.raises(RuntimeError, match="Address in use"),
     ):
         eloquent_app._init_ipc_server()
 
@@ -854,9 +942,15 @@ def test_run_schedules_initial_toggle_after_tray_init(qapp):
 
         eloquent_app.app = MagicMock()
         eloquent_app.app.exec.return_value = 0
-        with patch("eloquent_notes.app.QSystemTrayIcon"), patch.object(
-            eloquent_app, "_init_ipc_server",
-        ), patch.object(eloquent_app, "_init_tray_ui"), pytest.raises(SystemExit):
+        with (
+            patch("eloquent_notes.app.QSystemTrayIcon"),
+            patch.object(
+                eloquent_app,
+                "_init_ipc_server",
+            ),
+            patch.object(eloquent_app, "_init_tray_ui"),
+            pytest.raises(SystemExit),
+        ):
             eloquent_app.run()
 
         mock_single_shot.assert_called_once_with(100, eloquent_app.toggle_action)
@@ -903,10 +997,14 @@ def test_app_main_invalid_config_logs_notifies_and_exits(monkeypatch, mock_confi
 
     assert exc_info.value.code == 1
     mock_setup_logging.assert_called_once_with(
-        log_level_str="INFO", max_mb=5, backup_count=3,
+        log_level_str="INFO",
+        max_mb=5,
+        backup_count=3,
     )
     mock_critical.assert_called_once_with(
-        None, "Configuration Error", "Invalid configuration value for 'capture_duration'",
+        None,
+        "Configuration Error",
+        "Invalid configuration value for 'capture_duration'",
     )
 
 
@@ -1079,7 +1177,8 @@ def test_appended_dictation_does_not_resurrect_deleted_note(qapp, tmp_path):
     eloquent_app._notify.reset_mock()
     eloquent_app._on_processing_completed("appended", "Orphaned text.")
     eloquent_app._notify.assert_called_once_with(
-        "Processing Error", "Error processing dictation: <none>",
+        "Processing Error",
+        "Error processing dictation: <none>",
     )
 
 
@@ -1141,9 +1240,15 @@ def test_run_schedules_window_when_requested(qapp):
         eloquent_app = EloquentApp(qapp, open_window_immediately=True)
         eloquent_app.app = MagicMock()
         eloquent_app.app.exec.return_value = 0
-        with patch("eloquent_notes.app.QSystemTrayIcon"), patch.object(
-            eloquent_app, "_init_ipc_server",
-        ), patch.object(eloquent_app, "_init_tray_ui"), pytest.raises(SystemExit):
+        with (
+            patch("eloquent_notes.app.QSystemTrayIcon"),
+            patch.object(
+                eloquent_app,
+                "_init_ipc_server",
+            ),
+            patch.object(eloquent_app, "_init_tray_ui"),
+            pytest.raises(SystemExit),
+        ):
             eloquent_app.run()
 
         mock_single_shot.assert_called_once_with(100, eloquent_app.show_window)

@@ -161,9 +161,7 @@ class ConfigurationDialog(QDialog):
             overrides = diff_configs(default_config, new_config)
             config.save_config(overrides)
         except (OSError, yaml.YAMLError) as e:
-            QMessageBox.critical(
-                self, _("Save Error"), _("Failed to save settings: {error}").format(error=e)
-            )
+            QMessageBox.critical(self, _("Save Error"), _("Failed to save settings: {error}").format(error=e))
             return False
         else:
             self.config_data = new_config
@@ -173,5 +171,3 @@ class ConfigurationDialog(QDialog):
         """Save settings and close the dialog with Accepted code."""
         if self.save_settings_from_ui():
             super().accept()
-
-

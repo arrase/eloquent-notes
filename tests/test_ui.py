@@ -56,7 +56,6 @@ def test_app_icon_pixmap_and_cached_qicon(qapp):
     assert ui.get_app_icon() is icon
 
 
-
 def test_theme_selection_and_stylesheets(qapp):
     """Test light and dark theme detection and stylesheet builders."""
     light_palette = QPalette()

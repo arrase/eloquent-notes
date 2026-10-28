@@ -97,14 +97,15 @@ class AudioTab(QWidget):
         self.spn_beep_duration.setValue(audio_cfg["beep_duration"])
 
     def save_settings(self, config_data: dict) -> bool:
-        config_data["audio"].update({
-            "sample_rate": self.spn_sample_rate.value(),
-            "channels": 1 if self.cmb_channels.currentIndex() == 0 else 2,
-            "capture_duration": self.spn_capture_duration.value(),
-            "recording_hud_enabled": self.chk_recording_hud_enabled.isChecked(),
-            "beep_enabled": self.chk_beep_enabled.isChecked(),
-            "beep_frequency": self.spn_beep_freq.value(),
-            "beep_duration": round(self.spn_beep_duration.value(), 2),
-        })
+        config_data["audio"].update(
+            {
+                "sample_rate": self.spn_sample_rate.value(),
+                "channels": 1 if self.cmb_channels.currentIndex() == 0 else 2,
+                "capture_duration": self.spn_capture_duration.value(),
+                "recording_hud_enabled": self.chk_recording_hud_enabled.isChecked(),
+                "beep_enabled": self.chk_beep_enabled.isChecked(),
+                "beep_frequency": self.spn_beep_freq.value(),
+                "beep_duration": round(self.spn_beep_duration.value(), 2),
+            }
+        )
         return True
-

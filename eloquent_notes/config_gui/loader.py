@@ -59,5 +59,3 @@ class OllamaModelLoader(QObject):
             self.models_fetched.emit(audio_models, embedding_models)
         except (requests.RequestException, KeyError, TypeError, ValueError) as e:
             self.error_occurred.emit(str(e))
-
-
