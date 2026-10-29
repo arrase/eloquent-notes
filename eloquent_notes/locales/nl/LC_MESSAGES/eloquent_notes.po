@@ -70,9 +70,6 @@ msgstr "Bladeren..."
 msgid "Cancel"
 msgstr "Annuleren"
 
-msgid "Capture Duration:"
-msgstr "Opnameduur:"
-
 msgid "Classification - System Prompt"
 msgstr "Classificatie - Systeemprompt"
 
@@ -231,9 +228,6 @@ msgstr "Max. logbestandsgrootte:"
 
 msgid "Max Retries:"
 msgstr "Max. pogingen:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Maximale duur in seconden voor audio-opname voordat automatisch wordt verwerkt."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Maximale grootte van het logbestand voordat het wordt geroteerd."
@@ -402,7 +396,6 @@ msgstr "Herschrijven - Systeemprompt"
 
 msgid "Rewriting - User Prompt"
 msgstr "Herschrijven - Gebruikersprompt"
-
 
 msgid "Save"
 msgstr "Opslaan"

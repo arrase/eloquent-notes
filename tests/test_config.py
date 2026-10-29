@@ -16,7 +16,7 @@ def tmp_config_dir(tmp_path):
     config_path = config_dir / "config.yaml"
 
     default_config_src = tmp_path / "default_config.yaml"
-    default_config_src.write_text("audio:\n  capture_duration: 30\nai:\n  model: gemma\n", encoding="utf-8")
+    default_config_src.write_text("audio:\n  channels: 1\nai:\n  model: gemma\n", encoding="utf-8")
 
     default_prompt_src = tmp_path / "default_prompt.md"
     default_prompt_src.write_text("System Prompt Content", encoding="utf-8")
@@ -64,13 +64,13 @@ def test_init_config_dir(tmp_config_dir, monkeypatch):
 def test_merge_configs():
     """Test recursive merging and type validation of base config and overrides."""
     base = {
-        "audio": {"capture_duration": 30, "channels": 1, "beep_enabled": True},
+        "audio": {"channels": 1, "beep_enabled": True, "beep_frequency": 440},
         "ai": {"model": "gemma", "context_length": 8192},
         "search": {"min_similarity": 0.6},
         "notes": {"type_colors": {"idea": "#C27821", "note": "#64748B"}},
     }
     overrides = {
-        "audio": {"capture_duration": 45},
+        "audio": {"channels": 2, "beep_frequency": 880},
         "ai": {"model": "gemma4:e4b", "context_length": None},
         "search": {"min_similarity": 1},
         "notes": {"type_colors": {"idea": "#112233"}},
@@ -78,27 +78,28 @@ def test_merge_configs():
 
     merged = config._merge_configs(base, overrides)
 
-    assert merged["audio"]["capture_duration"] == 45
-    assert merged["audio"]["channels"] == 1
+    assert merged["audio"]["channels"] == 2
+    assert merged["audio"]["beep_frequency"] == 880
     assert merged["ai"]["model"] == "gemma4:e4b"
     assert merged["ai"]["context_length"] is None
     assert merged["search"]["min_similarity"] == 1
     assert merged["notes"]["type_colors"] == {"idea": "#112233", "note": "#64748B"}
 
     # Verify base was not mutated
-    assert base["audio"]["capture_duration"] == 30
+    assert base["audio"]["channels"] == 1
+    assert base["audio"]["beep_frequency"] == 440
 
     with pytest.raises(TypeError, match="Configuration section 'audio' must be a mapping"):
         config._merge_configs(base, {"audio": None})
 
-    with pytest.raises(TypeError, match="Invalid configuration value for 'capture_duration'"):
-        config._merge_configs(base, {"audio": {"capture_duration": None}})
+    with pytest.raises(TypeError, match="Invalid configuration value for 'channels'"):
+        config._merge_configs(base, {"audio": {"channels": None}})
 
-    with pytest.raises(TypeError, match="Invalid configuration value for 'capture_duration'"):
-        config._merge_configs(base, {"audio": {"capture_duration": True}})
+    with pytest.raises(TypeError, match="Invalid configuration value for 'channels'"):
+        config._merge_configs(base, {"audio": {"channels": True}})
 
-    with pytest.raises(TypeError, match="Invalid configuration value for 'capture_duration'"):
-        config._merge_configs(base, {"audio": {"capture_duration": "30"}})
+    with pytest.raises(TypeError, match="Invalid configuration value for 'channels'"):
+        config._merge_configs(base, {"audio": {"channels": "2"}})
 
     with pytest.raises(TypeError, match="Invalid configuration value for 'beep_enabled'"):
         config._merge_configs(base, {"audio": {"beep_enabled": 1}})
@@ -122,8 +123,8 @@ def test_merge_configs():
 @pytest.mark.parametrize(
     ("override", "key"),
     [
-        ({"audio": {"capture_duration": 0}}, "capture_duration"),
-        ({"audio": {"capture_duration": -5}}, "capture_duration"),
+        ({"audio": {"beep_frequency": 0}}, "beep_frequency"),
+        ({"audio": {"beep_frequency": -5}}, "beep_frequency"),
         ({"audio": {"channels": 0}}, "channels"),
         ({"audio": {"channels": 3}}, "channels"),
         ({"audio": {"beep_duration": float("inf")}}, "beep_duration"),
@@ -171,7 +172,6 @@ def test_merge_configs_accepts_valid_domain_boundaries():
     default_cfg = config.load_default_config()
     overrides = {
         "audio": {
-            "capture_duration": 1,
             "channels": 2,
             "beep_enabled": False,
         },
@@ -202,7 +202,7 @@ def test_merge_configs_accepts_valid_domain_boundaries():
 def test_load_config(tmp_config_dir, monkeypatch):
     """Test load_config merges default config and user config."""
     user_cfg_path = Path(tmp_config_dir["config_path"])
-    user_cfg_content = "audio:\n  capture_duration: 45\n"
+    user_cfg_content = "audio:\n  channels: 2\n"
 
     monkeypatch.setattr(config, "CONFIG_DIR", tmp_config_dir["config_dir"])
     monkeypatch.setattr(config, "PROMPTS_DIR", tmp_config_dir["prompts_dir"])
@@ -214,13 +214,13 @@ def test_load_config(tmp_config_dir, monkeypatch):
     user_cfg_path.write_text(user_cfg_content, encoding="utf-8")
 
     cfg = config.load_config()
-    assert cfg["audio"]["capture_duration"] == 45
+    assert cfg["audio"]["channels"] == 2
     assert cfg["ai"]["model"] == "gemma"
 
     user_cfg_path.write_text("", encoding="utf-8")
 
     cfg = config.load_config()
-    assert cfg["audio"]["capture_duration"] == 30
+    assert cfg["audio"]["channels"] == 1
     assert cfg["ai"]["model"] == "gemma"
 
 
@@ -278,7 +278,7 @@ def test_save_config(tmp_config_dir, monkeypatch):
     monkeypatch.setattr(config, "CONFIG_DIR", tmp_config_dir["config_dir"])
     monkeypatch.setattr(config, "CONFIG_PATH", tmp_config_dir["config_path"])
 
-    data = {"audio": {"capture_duration": 45}}
+    data = {"audio": {"channels": 2}}
     config.save_config(data)
 
     cfg_path = Path(tmp_config_dir["config_path"])
@@ -292,7 +292,8 @@ def test_save_config(tmp_config_dir, monkeypatch):
 def test_load_default_config():
     """Verify the packaged default configuration values."""
     default_config = config.load_default_config()
-    assert default_config["audio"]["capture_duration"] == 30
+    assert default_config["audio"]["channels"] == 1
+    assert "capture_duration" not in default_config["audio"]
     assert default_config["audio"]["recording_hud_enabled"] is True
     assert default_config["notes"]["folder"] == "~/Documents/Eloquent Notes"
     assert default_config["notes"]["columns"] == 2
@@ -354,11 +355,11 @@ def test_diff_configs_bool_vs_int():
 def test_diff_configs_nested_dicts():
     default = {
         "ai": {"model": "gemma", "context_length": 8192},
-        "audio": {"capture_duration": 30},
+        "audio": {"channels": 1},
     }
     current = {
         "ai": {"model": "gemma4:e4b", "context_length": 8192},
-        "audio": {"capture_duration": 30},
+        "audio": {"channels": 1},
     }
     assert diff_configs(default, current) == {"ai": {"model": "gemma4:e4b"}}
 
@@ -373,3 +374,9 @@ def test_legacy_sample_rate_key_rejected():
     default_cfg = config.load_default_config()
     with pytest.raises(ValueError, match="Unknown configuration key 'sample_rate'"):
         config._merge_configs(default_cfg, {"audio": {"sample_rate": 16000}})
+
+
+def test_legacy_capture_duration_key_rejected():
+    default_cfg = config.load_default_config()
+    with pytest.raises(ValueError, match="Unknown configuration key 'capture_duration'"):
+        config._merge_configs(default_cfg, {"audio": {"capture_duration": 30}})

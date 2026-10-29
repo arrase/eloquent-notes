@@ -70,9 +70,6 @@ msgstr "찾아보기..."
 msgid "Cancel"
 msgstr "취소"
 
-msgid "Capture Duration:"
-msgstr "녹음 시간:"
-
 msgid "Classification - System Prompt"
 msgstr "분류 - 시스템 프롬프트"
 
@@ -231,9 +228,6 @@ msgstr "최대 로그 파일 크기:"
 
 msgid "Max Retries:"
 msgstr "최대 재시도 횟수:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "자동으로 처리하기 전 오디오 녹음의 최대 시간(초)입니다."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "순환하기 전 로그 파일의 최대 크기입니다."
@@ -402,7 +396,6 @@ msgstr "재작성 - 시스템 프롬프트"
 
 msgid "Rewriting - User Prompt"
 msgstr "재작성 - 사용자 프롬프트"
-
 
 msgid "Save"
 msgstr "저장"

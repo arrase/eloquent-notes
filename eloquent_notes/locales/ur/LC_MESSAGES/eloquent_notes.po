@@ -70,9 +70,6 @@ msgstr "براؤز کریں..."
 msgid "Cancel"
 msgstr "منسوخ کریں"
 
-msgid "Capture Duration:"
-msgstr "کیپچر کا دورانیہ:"
-
 msgid "Classification - System Prompt"
 msgstr "درجہ بندی - سسٹم پرامپٹ"
 
@@ -231,9 +228,6 @@ msgstr "لاگ فائل کا زیادہ سے زیادہ سائز:"
 
 msgid "Max Retries:"
 msgstr "زیادہ سے زیادہ دوبارہ کوششیں:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "خودکار طور پر پروسیس کرنے سے پہلے آڈیو ریکارڈنگ کا سیکنڈز میں زیادہ سے زیادہ دورانیہ۔"
 
 msgid "Maximum size of the log file before rotating."
 msgstr "روٹیٹ کرنے سے پہلے لاگ فائل کا زیادہ سے زیادہ سائز۔"
@@ -402,7 +396,6 @@ msgstr "دوبارہ لکھنا - سسٹم پرامپٹ"
 
 msgid "Rewriting - User Prompt"
 msgstr "دوبارہ لکھنا - صارف پرامپٹ"
-
 
 msgid "Save"
 msgstr "محفوظ کریں"

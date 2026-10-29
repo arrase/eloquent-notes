@@ -70,9 +70,6 @@ msgstr "Semak imbas..."
 msgid "Cancel"
 msgstr "Batal"
 
-msgid "Capture Duration:"
-msgstr "Tempoh Rakaman:"
-
 msgid "Classification - System Prompt"
 msgstr "Klasifikasi - Prompt Sistem"
 
@@ -231,9 +228,6 @@ msgstr "Saiz Fail Log Maks:"
 
 msgid "Max Retries:"
 msgstr "Cuba Semula Maks:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Tempoh maksimum dalam saat untuk rakaman audio sebelum diproses secara automatik."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Saiz maksimum fail log sebelum digilirkan."
@@ -402,7 +396,6 @@ msgstr "Penulisan Semula - Prompt Sistem"
 
 msgid "Rewriting - User Prompt"
 msgstr "Penulisan Semula - Prompt Pengguna"
-
 
 msgid "Save"
 msgstr "Simpan"

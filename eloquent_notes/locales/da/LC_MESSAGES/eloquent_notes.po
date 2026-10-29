@@ -70,9 +70,6 @@ msgstr "Gennemse..."
 msgid "Cancel"
 msgstr "Annuller"
 
-msgid "Capture Duration:"
-msgstr "Optagelsesvarighed:"
-
 msgid "Classification - System Prompt"
 msgstr "Klassificering - Systemprompt"
 
@@ -231,9 +228,6 @@ msgstr "Maks. størrelse på logfil:"
 
 msgid "Max Retries:"
 msgstr "Maks. forsøg:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Maksimal varighed i sekunder for lydoptagelse før automatisk behandling."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Maksimal størrelse på logfilen før rotation."
@@ -402,7 +396,6 @@ msgstr "Omskrivning - Systemprompt"
 
 msgid "Rewriting - User Prompt"
 msgstr "Omskrivning - Brugerprompt"
-
 
 msgid "Save"
 msgstr "Gem"

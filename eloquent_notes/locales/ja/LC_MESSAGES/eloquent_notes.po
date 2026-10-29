@@ -70,9 +70,6 @@ msgstr "参照..."
 msgid "Cancel"
 msgstr "キャンセル"
 
-msgid "Capture Duration:"
-msgstr "録音時間:"
-
 msgid "Classification - System Prompt"
 msgstr "分類 - システムプロンプト"
 
@@ -231,9 +228,6 @@ msgstr "最大ログファイルサイズ:"
 
 msgid "Max Retries:"
 msgstr "最大リトライ回数:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "自動的に処理を開始するまでの音声録音の最大秒数。"
 
 msgid "Maximum size of the log file before rotating."
 msgstr "ローテーションする前のログファイルの最大サイズ。"
@@ -402,7 +396,6 @@ msgstr "書き直し - システムプロンプト"
 
 msgid "Rewriting - User Prompt"
 msgstr "書き直し - ユーザープロンプト"
-
 
 msgid "Save"
 msgstr "保存"

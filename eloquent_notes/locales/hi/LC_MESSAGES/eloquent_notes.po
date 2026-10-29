@@ -70,9 +70,6 @@ msgstr "ब्राउज़ करें..."
 msgid "Cancel"
 msgstr "रद्द करें"
 
-msgid "Capture Duration:"
-msgstr "कैप्चर अवधि:"
-
 msgid "Classification - System Prompt"
 msgstr "वर्गीकरण - सिस्टम प्रॉम्प्ट"
 
@@ -231,9 +228,6 @@ msgstr "अधिकतम लॉग फ़ाइल आकार:"
 
 msgid "Max Retries:"
 msgstr "अधिकतम पुनः प्रयास:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "स्वचालित रूप से प्रोसेस करने से पहले ऑडियो रिकॉर्डिंग की सेकंड में अधिकतम अवधि।"
 
 msgid "Maximum size of the log file before rotating."
 msgstr "रोटेट करने से पहले लॉग फ़ाइल का अधिकतम आकार।"
@@ -402,7 +396,6 @@ msgstr "पुनर्लेखन - सिस्टम प्रॉम्प�
 
 msgid "Rewriting - User Prompt"
 msgstr "पुनर्लेखन - उपयोगकर्ता प्रॉम्प्ट"
-
 
 msgid "Save"
 msgstr "सहेजें"

@@ -68,9 +68,6 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-msgid "Capture Duration:"
-msgstr ""
-
 msgid "Classification - System Prompt"
 msgstr ""
 
@@ -228,9 +225,6 @@ msgid "Max Log File Size:"
 msgstr ""
 
 msgid "Max Retries:"
-msgstr ""
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
 msgstr ""
 
 msgid "Maximum size of the log file before rotating."

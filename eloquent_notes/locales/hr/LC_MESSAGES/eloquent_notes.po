@@ -70,9 +70,6 @@ msgstr "Pretraži..."
 msgid "Cancel"
 msgstr "Odustani"
 
-msgid "Capture Duration:"
-msgstr "Trajanje snimanja:"
-
 msgid "Classification - System Prompt"
 msgstr "Klasifikacija - Sustavni upit"
 
@@ -231,9 +228,6 @@ msgstr "Maks. veličina zapisnika:"
 
 msgid "Max Retries:"
 msgstr "Maks. broj pokušaja:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Maksimalno trajanje snimanja zvuka u sekundama prije automatske obrade."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Maksimalna veličina datoteke zapisnika prije rotacije."
@@ -402,7 +396,6 @@ msgstr "Preoblikovanje - Sustavni upit"
 
 msgid "Rewriting - User Prompt"
 msgstr "Preoblikovanje - Korisnički upit"
-
 
 msgid "Save"
 msgstr "Spremi"

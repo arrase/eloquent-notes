@@ -70,9 +70,6 @@ msgstr "Pārlūkot..."
 msgid "Cancel"
 msgstr "Atcelt"
 
-msgid "Capture Duration:"
-msgstr "Tveršanas ilgums:"
-
 msgid "Classification - System Prompt"
 msgstr "Klasifikācija – sistēmas uzvedne"
 
@@ -231,9 +228,6 @@ msgstr "Maks. žurnāla faila izmērs:"
 
 msgid "Max Retries:"
 msgstr "Maks. mēģinājumu skaits:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Maksimālais audio ierakstīšanas ilgums sekundēs pirms automātiskas apstrādes."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Maksimālais žurnāla faila izmērs pirms rotācijas."
@@ -402,7 +396,6 @@ msgstr "Pārrakstīšana – sistēmas uzvedne"
 
 msgid "Rewriting - User Prompt"
 msgstr "Pārrakstīšana – lietotāja uzvedne"
-
 
 msgid "Save"
 msgstr "Saglabāt"

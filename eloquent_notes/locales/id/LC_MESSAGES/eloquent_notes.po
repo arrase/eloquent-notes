@@ -70,9 +70,6 @@ msgstr "Jelajahi..."
 msgid "Cancel"
 msgstr "Batal"
 
-msgid "Capture Duration:"
-msgstr "Durasi Perekaman:"
-
 msgid "Classification - System Prompt"
 msgstr "Klasifikasi - Prompt Sistem"
 
@@ -231,9 +228,6 @@ msgstr "Ukuran Maks File Log:"
 
 msgid "Max Retries:"
 msgstr "Percobaan Ulang Maks:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Durasi maksimum dalam detik untuk perekaman audio sebelum diproses secara otomatis."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Ukuran maksimum file log sebelum dirotasi."
@@ -402,7 +396,6 @@ msgstr "Penulisan Ulang - Prompt Sistem"
 
 msgid "Rewriting - User Prompt"
 msgstr "Penulisan Ulang - Prompt Pengguna"
-
 
 msgid "Save"
 msgstr "Simpan"

@@ -70,9 +70,6 @@ msgstr "Sfoglia..."
 msgid "Cancel"
 msgstr "Annulla"
 
-msgid "Capture Duration:"
-msgstr "Durata acquisizione:"
-
 msgid "Classification - System Prompt"
 msgstr "Classificazione - Prompt di sistema"
 
@@ -231,9 +228,6 @@ msgstr "Dimensione max file di registro:"
 
 msgid "Max Retries:"
 msgstr "Tentativi massimi:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Durata massima in secondi della registrazione audio prima dell'elaborazione automatica."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Dimensione massima del file di registro prima della rotazione."
@@ -402,7 +396,6 @@ msgstr "Riscrittura - Prompt di sistema"
 
 msgid "Rewriting - User Prompt"
 msgstr "Riscrittura - Prompt utente"
-
 
 msgid "Save"
 msgstr "Salva"

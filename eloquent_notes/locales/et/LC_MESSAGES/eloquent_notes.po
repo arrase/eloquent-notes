@@ -70,9 +70,6 @@ msgstr "Sirvi..."
 msgid "Cancel"
 msgstr "Tühista"
 
-msgid "Capture Duration:"
-msgstr "Salvestuse kestus:"
-
 msgid "Classification - System Prompt"
 msgstr "Klassifitseerimine – süsteemiviip"
 
@@ -231,9 +228,6 @@ msgstr "Logifaili max suurus:"
 
 msgid "Max Retries:"
 msgstr "Max korduskatseid:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Helisalvestuse maksimaalne kestus sekundites enne automaatset töötlemist."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Logifaili maksimaalne suurus enne roteerimist."
@@ -402,7 +396,6 @@ msgstr "Ümberkirjutamine – süsteemiviip"
 
 msgid "Rewriting - User Prompt"
 msgstr "Ümberkirjutamine – kasutajaviip"
-
 
 msgid "Save"
 msgstr "Salvesta"

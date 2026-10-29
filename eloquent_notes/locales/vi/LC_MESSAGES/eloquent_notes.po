@@ -70,9 +70,6 @@ msgstr "Duyệt..."
 msgid "Cancel"
 msgstr "Hủy"
 
-msgid "Capture Duration:"
-msgstr "Thời lượng thu âm:"
-
 msgid "Classification - System Prompt"
 msgstr "Phân loại - Lời nhắc hệ thống"
 
@@ -231,9 +228,6 @@ msgstr "Kích thước tệp nhật ký tối đa:"
 
 msgid "Max Retries:"
 msgstr "Số lần thử lại tối đa:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Thời lượng tối đa tính bằng giây cho việc ghi âm trước khi tự động xử lý."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Kích thước tối đa của tệp nhật ký trước khi xoay vòng."
@@ -402,7 +396,6 @@ msgstr "Viết lại - Lời nhắc hệ thống"
 
 msgid "Rewriting - User Prompt"
 msgstr "Viết lại - Lời nhắc người dùng"
-
 
 msgid "Save"
 msgstr "Lưu"

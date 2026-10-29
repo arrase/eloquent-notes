@@ -70,9 +70,6 @@ msgstr "Mag-browse..."
 msgid "Cancel"
 msgstr "Kanselahin"
 
-msgid "Capture Duration:"
-msgstr "Tagal ng Pag-record:"
-
 msgid "Classification - System Prompt"
 msgstr "Klasipikasyon - System Prompt"
 
@@ -231,9 +228,6 @@ msgstr "Max na Laki ng Log File:"
 
 msgid "Max Retries:"
 msgstr "Max na Pag-ulit:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Maximum na tagal sa segundo para sa pag-record ng audio bago awtomatikong iproseso."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Maximum na laki ng log file bago i-rotate."
@@ -402,7 +396,6 @@ msgstr "Pagsusulat Muli - System Prompt"
 
 msgid "Rewriting - User Prompt"
 msgstr "Pagsusulat Muli - User Prompt"
-
 
 msgid "Save"
 msgstr "I-save"

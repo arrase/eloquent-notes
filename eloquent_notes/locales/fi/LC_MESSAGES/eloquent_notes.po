@@ -70,9 +70,6 @@ msgstr "Selaa..."
 msgid "Cancel"
 msgstr "Peruuta"
 
-msgid "Capture Duration:"
-msgstr "Tallennuksen kesto:"
-
 msgid "Classification - System Prompt"
 msgstr "Luokittelu - Järjestelmäkehote"
 
@@ -231,9 +228,6 @@ msgstr "Lokitiedoston enimmäiskoko:"
 
 msgid "Max Retries:"
 msgstr "Uudelleenyritysten enimmäismäärä:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Äänentallennuksen enimmäiskesto sekunteina ennen automaattista käsittelyä."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Lokitiedoston enimmäiskoko ennen kiertoa."
@@ -402,7 +396,6 @@ msgstr "Uudelleenkirjoitus - Järjestelmäkehote"
 
 msgid "Rewriting - User Prompt"
 msgstr "Uudelleenkirjoitus - Käyttäjäkehote"
-
 
 msgid "Save"
 msgstr "Tallenna"

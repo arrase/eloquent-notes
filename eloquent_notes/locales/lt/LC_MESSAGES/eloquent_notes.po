@@ -70,9 +70,6 @@ msgstr "Naršyti..."
 msgid "Cancel"
 msgstr "Atšaukti"
 
-msgid "Capture Duration:"
-msgstr "Įrašymo trukmė:"
-
 msgid "Classification - System Prompt"
 msgstr "Klasifikavimas – sisteminė užklausa"
 
@@ -231,9 +228,6 @@ msgstr "Maks. žurnalo failo dydis:"
 
 msgid "Max Retries:"
 msgstr "Maks. bandymų skaičius:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Maksimali garso įrašymo trukmė sekundėmis prieš automatinį apdorojimą."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Maksimalus žurnalo failo dydis prieš rotaciją."
@@ -402,7 +396,6 @@ msgstr "Perrašymas – sisteminė užklausa"
 
 msgid "Rewriting - User Prompt"
 msgstr "Perrašymas – naudotojo užklausa"
-
 
 msgid "Save"
 msgstr "Išsaugoti"

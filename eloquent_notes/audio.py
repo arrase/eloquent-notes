@@ -1,12 +1,13 @@
 """Audio capture, voice activity detection and feedback tones.
 
-AudioRecorder captures 16 kHz microphone audio via sounddevice, filters and
-trims speech locally with Silero VAD, and encodes it as 16-bit PCM WAV bytes.
-play_beep generates short sine-wave feedback tones with fade in/out to avoid
-speaker clicks.
+AudioRecorder captures 16 kHz microphone audio via sounddevice, trims and
+splits speech locally with Silero VAD into <= 30 s chunks, and encodes them as
+16-bit PCM WAV bytes. play_beep generates short sine-wave feedback tones with
+fade in/out to avoid speaker clicks.
 """
 
 import io
+import math
 import wave
 
 import numpy as np
@@ -25,6 +26,12 @@ SPEECH_PROBABILITY = 0.5
 MIN_SPEECH_S = 0.5
 # Silero reacts a few windows late at word onsets/offsets; keep a margin when trimming.
 SPEECH_PAD_S = 0.2
+MAX_CHUNK_S = 30.0
+MIN_SPEECH_WINDOWS = math.ceil(MIN_SPEECH_S * SAMPLE_RATE / VAD_WINDOW_SAMPLES)
+MIN_PAUSE_WINDOWS = 8
+PAD_SAMPLES = int(SAMPLE_RATE * SPEECH_PAD_S)
+MAX_CHUNK_SAMPLES = int(SAMPLE_RATE * MAX_CHUNK_S)
+MAX_CHUNK_WINDOWS = (MAX_CHUNK_SAMPLES - 2 * PAD_SAMPLES) // VAD_WINDOW_SAMPLES
 
 
 def speech_window_mask(data: np.ndarray) -> np.ndarray:
@@ -44,16 +51,84 @@ def speech_window_mask(data: np.ndarray) -> np.ndarray:
     )
 
 
-def _trim_speech(data: np.ndarray, active: np.ndarray) -> np.ndarray:
-    if not np.any(active):
-        return data
+def _find_runs(active: np.ndarray, w_start: int, limit: int) -> list[tuple[int, int]]:
+    runs: list[tuple[int, int]] = []
+    idx = w_start
+    while idx < limit:
+        if active[idx]:
+            idx += 1
+            continue
+        run_end = idx + 1
+        while run_end < limit and not active[run_end]:
+            run_end += 1
+        runs.append((idx, run_end))
+        idx = run_end
+    return runs
 
-    pad = int(SAMPLE_RATE * SPEECH_PAD_S)
+
+def _skip_leading_transients(active: np.ndarray, w_start: int, last: int) -> int:
+    """Advance past short noise bursts (< MIN_SPEECH_WINDOWS) separated by a real pause."""
+    while w_start < last:
+        w_start += int(np.argmax(active[w_start:last]))
+        limit = min(last, w_start + MAX_CHUNK_WINDOWS)
+        pauses = [r for r in _find_runs(active, w_start, limit) if r[1] - r[0] >= MIN_PAUSE_WINDOWS]
+        if pauses and int(np.count_nonzero(active[w_start : pauses[0][0]])) < MIN_SPEECH_WINDOWS:
+            w_start = pauses[0][1]
+            continue
+        break
+    return w_start
+
+
+def _find_split(active: np.ndarray, w_start: int, limit: int) -> tuple[int, int]:
+    """Return (chunk_end, next_start) window indices within active[w_start:limit]."""
+    runs = _find_runs(active, w_start, limit)
+    if not runs:
+        return limit, limit
+
+    midpoint = w_start + (limit - w_start) // 2
+    pauses = [r for r in runs if r[1] - r[0] >= MIN_PAUSE_WINDOWS]
+    pool = pauses or runs
+    late = [r for r in pool if r[0] >= midpoint]
+    mid = [r for r in pool if r[1] > midpoint]
+    candidates = late or mid or pool
+    return max(candidates, key=lambda r: (r[1] - r[0], r[1]))
+
+
+def _split_speech(data: np.ndarray, active: np.ndarray) -> list[np.ndarray]:
+    if int(np.count_nonzero(active)) < MIN_SPEECH_WINDOWS:
+        return []
+
     first = int(np.argmax(active))
     last = len(active) - int(np.argmax(active[::-1]))
-    start = max(0, first * VAD_WINDOW_SAMPLES - pad)
-    end = min(len(data), last * VAD_WINDOW_SAMPLES + pad)
-    return data[start:end]
+    spans: list[tuple[int, int]] = []
+    w_start = first
+
+    while w_start < last:
+        w_start = _skip_leading_transients(active, w_start, last)
+        if last - w_start <= MAX_CHUNK_WINDOWS:
+            chunk_end = last
+            next_start = last
+        else:
+            chunk_end, next_start = _find_split(active, w_start, w_start + MAX_CHUNK_WINDOWS)
+
+        trimmed_end = chunk_end - int(np.argmax(active[w_start:chunk_end][::-1]))
+        if int(np.count_nonzero(active[w_start:trimmed_end])) >= MIN_SPEECH_WINDOWS:
+            spans.append((w_start, trimmed_end))
+        w_start = next_start
+
+    chunks: list[np.ndarray] = []
+    for idx, (s_win, e_win) in enumerate(spans):
+        start = max(0, s_win * VAD_WINDOW_SAMPLES - PAD_SAMPLES)
+        end = min(len(data), e_win * VAD_WINDOW_SAMPLES + PAD_SAMPLES)
+        if idx > 0:
+            prev_end = spans[idx - 1][1]
+            start = max(start, (prev_end + s_win) * VAD_WINDOW_SAMPLES // 2)
+        if idx + 1 < len(spans):
+            next_s = spans[idx + 1][0]
+            end = min(end, (e_win + next_s) * VAD_WINDOW_SAMPLES // 2)
+        chunks.append(data[start:end])
+
+    return chunks
 
 
 def encode_wav_bytes(data: np.ndarray, sample_rate: int, channels: int) -> bytes:
@@ -73,14 +148,13 @@ def encode_wav_bytes(data: np.ndarray, sample_rate: int, channels: int) -> bytes
 
 
 class AudioRecorder:
-    """Single-use microphone recorder producing WAV bytes once stopped."""
+    """Single-use microphone recorder producing WAV chunks once stopped."""
 
     def __init__(self, channels: int) -> None:
         self.channels = channels
         self._chunks: list[np.ndarray] = []
         self._cached_chunks = 0
-        self._samples = np.empty(0, dtype=np.float32)
-        self._active = np.empty(0, dtype=bool)
+        self._speech_chunks: list[np.ndarray] = []
         self._stream: sd.InputStream | None = None
 
     def _on_audio(
@@ -118,26 +192,20 @@ class AudioRecorder:
         finally:
             stream.close()
 
-    def _analyze(self) -> tuple[np.ndarray, np.ndarray]:
+    def _analyze(self) -> list[np.ndarray]:
         if not self._chunks:
             self._cached_chunks = 0
-            return np.empty(0, dtype=np.float32), np.empty(0, dtype=bool)
+            return []
         if self._cached_chunks != len(self._chunks):
-            self._samples = np.concatenate(self._chunks)
-            self._active = speech_window_mask(self._samples)
+            samples = np.concatenate(self._chunks)
+            self._speech_chunks = _split_speech(samples, speech_window_mask(samples))
             self._cached_chunks = len(self._chunks)
-        return self._samples, self._active
+        return self._speech_chunks
 
     @property
-    def wav_bytes(self) -> bytes:
-        """Trim surrounding non-speech windows and encode captured speech as 16-bit PCM WAV.
-
-        Trimming drops leading and trailing silence or click transients while keeping
-        a short padding margin and interior pauses intact for the transcription model.
-        """
-        samples, active = self._analyze()
-        trimmed = _trim_speech(samples, active)
-        return encode_wav_bytes(trimmed, SAMPLE_RATE, self.channels)
+    def wav_chunks(self) -> list[bytes]:
+        """Trim surrounding silence, split speech at pauses into <= 30 s chunks, and encode as WAV."""
+        return [encode_wav_bytes(chunk, SAMPLE_RATE, self.channels) for chunk in self._analyze()]
 
     @property
     def is_silent(self) -> bool:
@@ -148,8 +216,7 @@ class AudioRecorder:
         refusal, which the pipeline would then save as a note. Silero VAD gates
         recordings locally before any audio is sent to the model.
         """
-        _, active = self._analyze()
-        return int(np.count_nonzero(active)) * VAD_WINDOW_SAMPLES / SAMPLE_RATE < MIN_SPEECH_S
+        return not self._analyze()
 
 
 def play_beep(

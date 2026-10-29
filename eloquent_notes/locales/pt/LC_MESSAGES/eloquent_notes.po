@@ -70,9 +70,6 @@ msgstr "Procurar..."
 msgid "Cancel"
 msgstr "Cancelar"
 
-msgid "Capture Duration:"
-msgstr "Duração da captura:"
-
 msgid "Classification - System Prompt"
 msgstr "Classificação - Prompt de sistema"
 
@@ -231,9 +228,6 @@ msgstr "Tamanho máx. do registo:"
 
 msgid "Max Retries:"
 msgstr "Máx. de tentativas:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Duração máxima em segundos para a gravação de áudio antes do processamento automático."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Tamanho máximo do ficheiro de registo antes da rotação."
@@ -402,7 +396,6 @@ msgstr "Reescrita - Prompt de sistema"
 
 msgid "Rewriting - User Prompt"
 msgstr "Reescrita - Prompt de utilizador"
-
 
 msgid "Save"
 msgstr "Guardar"

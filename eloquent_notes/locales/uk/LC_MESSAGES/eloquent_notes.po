@@ -70,9 +70,6 @@ msgstr "Огляд..."
 msgid "Cancel"
 msgstr "Скасувати"
 
-msgid "Capture Duration:"
-msgstr "Тривалість запису:"
-
 msgid "Classification - System Prompt"
 msgstr "Класифікація — Системний промпт"
 
@@ -231,9 +228,6 @@ msgstr "Макс. розмір файлу журналу:"
 
 msgid "Max Retries:"
 msgstr "Макс. кількість спроб:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Максимальна тривалість запису аудіо в секундах перед автоматичною обробкою."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Максимальний розмір файлу журналу перед ротацією."
@@ -402,7 +396,6 @@ msgstr "Переписування — Системний промпт"
 
 msgid "Rewriting - User Prompt"
 msgstr "Переписування — Промпт користувача"
-
 
 msgid "Save"
 msgstr "Зберегти"

@@ -70,9 +70,6 @@ msgstr "เรียกดู..."
 msgid "Cancel"
 msgstr "ยกเลิก"
 
-msgid "Capture Duration:"
-msgstr "ระยะเวลาการบันทึก:"
-
 msgid "Classification - System Prompt"
 msgstr "การจัดหมวดหมู่ - พรอมต์ระบบ"
 
@@ -231,9 +228,6 @@ msgstr "ขนาดไฟล์บันทึกสูงสุด:"
 
 msgid "Max Retries:"
 msgstr "จำนวนครั้งที่ลองใหม่สูงสุด:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "ระยะเวลาสูงสุดเป็นวินาทีสำหรับการบันทึกเสียงก่อนที่จะประมวลผลโดยอัตโนมัติ"
 
 msgid "Maximum size of the log file before rotating."
 msgstr "ขนาดสูงสุดของไฟล์บันทึกก่อนที่จะหมุนเวียนไฟล์"
@@ -402,7 +396,6 @@ msgstr "การเขียนใหม่ - พรอมต์ระบบ"
 
 msgid "Rewriting - User Prompt"
 msgstr "การเขียนใหม่ - พรอมต์ผู้ใช้"
-
 
 msgid "Save"
 msgstr "บันทึก"

@@ -70,9 +70,6 @@ msgstr "עיון..."
 msgid "Cancel"
 msgstr "ביטול"
 
-msgid "Capture Duration:"
-msgstr "משך הקלטה:"
-
 msgid "Classification - System Prompt"
 msgstr "סיווג - הנחיית מערכת"
 
@@ -231,9 +228,6 @@ msgstr "גודל מרבי לקובץ יומן:"
 
 msgid "Max Retries:"
 msgstr "מספר ניסיונות חוזרים מרבי:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "משך זמן מרבי בשניות להקלטת שמע לפני עיבוד אוטומטי."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "גודל מרבי של קובץ היומן לפני תחלופה."
@@ -402,7 +396,6 @@ msgstr "שכתוב - הנחיית מערכת"
 
 msgid "Rewriting - User Prompt"
 msgstr "שכתוב - הנחיית משתמש"
-
 
 msgid "Save"
 msgstr "שמור"

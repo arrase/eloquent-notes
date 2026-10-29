@@ -70,9 +70,6 @@ msgstr "Αναζήτηση..."
 msgid "Cancel"
 msgstr "Ακύρωση"
 
-msgid "Capture Duration:"
-msgstr "Διάρκεια εγγραφής:"
-
 msgid "Classification - System Prompt"
 msgstr "Ταξινόμηση - Προτροπή συστήματος"
 
@@ -231,9 +228,6 @@ msgstr "Μέγ. μέγεθος αρχείου καταγραφής:"
 
 msgid "Max Retries:"
 msgstr "Μέγ. προσπάθειες:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Μέγιστη διάρκεια σε δευτερόλεπτα για εγγραφή ήχου πριν από την αυτόματη επεξεργασία."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Μέγιστο μέγεθος του αρχείου καταγραφής πριν από την εναλλαγή."
@@ -402,7 +396,6 @@ msgstr "Αναδιατύπωση - Προτροπή συστήματος"
 
 msgid "Rewriting - User Prompt"
 msgstr "Αναδιατύπωση - Προτροπή χρήστη"
-
 
 msgid "Save"
 msgstr "Αποθήκευση"

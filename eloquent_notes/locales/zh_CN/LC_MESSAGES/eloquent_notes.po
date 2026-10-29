@@ -70,9 +70,6 @@ msgstr "浏览..."
 msgid "Cancel"
 msgstr "取消"
 
-msgid "Capture Duration:"
-msgstr "采集时长："
-
 msgid "Classification - System Prompt"
 msgstr "分类 - 系统提示词"
 
@@ -231,9 +228,6 @@ msgstr "最大日志文件大小："
 
 msgid "Max Retries:"
 msgstr "最大重试次数："
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "自动处理前的音频录制最长持续时间（秒）。"
 
 msgid "Maximum size of the log file before rotating."
 msgstr "日志文件轮转前的最大大小。"
@@ -402,7 +396,6 @@ msgstr "重写 - 系统提示词"
 
 msgid "Rewriting - User Prompt"
 msgstr "重写 - 用户提示词"
-
 
 msgid "Save"
 msgstr "保存"

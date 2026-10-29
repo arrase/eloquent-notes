@@ -70,9 +70,6 @@ msgstr "Răsfoire..."
 msgid "Cancel"
 msgstr "Anulează"
 
-msgid "Capture Duration:"
-msgstr "Durată captură:"
-
 msgid "Classification - System Prompt"
 msgstr "Clasificare - Prompt de sistem"
 
@@ -231,9 +228,6 @@ msgstr "Dimensiune max. fișier jurnal:"
 
 msgid "Max Retries:"
 msgstr "Număr max. reîncercări:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Durata maximă în secunde pentru înregistrarea audio înainte de procesarea automată."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Dimensiunea maximă a fișierului jurnal înainte de rotație."
@@ -402,7 +396,6 @@ msgstr "Rescriere - Prompt de sistem"
 
 msgid "Rewriting - User Prompt"
 msgstr "Rescriere - Prompt utilizator"
-
 
 msgid "Save"
 msgstr "Salvează"

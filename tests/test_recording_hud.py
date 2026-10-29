@@ -12,51 +12,42 @@ def test_recording_hud_initialization(qapp):
     """Test that RecordingHUD initializes with proper flags, layout, and defaults."""
     hud = RecordingHUD()
     assert hud.lbl_status.text() == "Recording Note..."
-    assert hud.lbl_timer.text() == "00:30"
-    assert hud.progress_bar.value() == 0
+    assert hud.lbl_timer.text() == "00:00"
     assert hud.testAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
     assert hud.testAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
 
 
 def test_recording_hud_show_recording(qapp):
-    """Test show_recording resets timer and labels correctly."""
+    """Test show_recording resets timer and shows the widget."""
     hud = RecordingHUD()
-    hud.show_recording(45.0)
+    hud.update_timer(45.0)
+    assert hud.lbl_timer.text() == "00:45"
+
+    hud.show_recording()
+    qapp.processEvents()
 
     assert hud.lbl_status.text() == "Recording Note..."
-    assert hud.lbl_timer.text() == "00:45"
-    assert hud.progress_bar.value() == 0
+    assert hud.lbl_timer.text() == "00:00"
     assert hud.isVisible()
     hud.hide()
     assert not hud.isVisible()
 
 
-def test_recording_hud_update_progress(qapp):
-    """Test update_progress updates progress value, timer label, and color schemes."""
+def test_recording_hud_update_timer(qapp):
+    """Test update_timer formats elapsed seconds and keeps styling intact."""
     hud = RecordingHUD()
-    hud.show_recording(30.0)
+    hud.show_recording()
 
-    # Normal state (> 10s left)
-    hud.update_progress(10.0, 20.0, 30.0)
-    assert hud.lbl_timer.text() == "00:20"
-    assert hud.progress_bar.value() == int((10.0 / 30.0) * 1000)
+    hud.update_timer(10.0)
+    assert hud.lbl_timer.text() == "00:10"
     assert "#FFFFFF" in hud.lbl_timer.styleSheet()
-    assert "#E5E7EB" in hud.progress_bar.styleSheet()
     assert "#EF4444" in hud.lbl_dot.styleSheet()
 
-    # Warning state (<= 10s left)
-    hud.update_progress(22.0, 8.0, 30.0)
-    assert hud.lbl_timer.text() == "00:08"
-    assert "#F59E0B" in hud.lbl_timer.styleSheet()
-    assert "#F59E0B" in hud.progress_bar.styleSheet()
-    assert "#EF4444" in hud.lbl_dot.styleSheet()
+    hud.update_timer(65.8)
+    assert hud.lbl_timer.text() == "01:05"
 
-    # Critical alert state (<= 5s left)
-    hud.update_progress(27.0, 3.0, 30.0)
-    assert hud.lbl_timer.text() == "00:03"
-    assert "#EF4444" in hud.lbl_timer.styleSheet()
-    assert "#EF4444" in hud.progress_bar.styleSheet()
-    assert "#EF4444" in hud.lbl_dot.styleSheet()
+    hud.update_timer(-3.0)
+    assert hud.lbl_timer.text() == "00:00"
 
     hud.hide()
 

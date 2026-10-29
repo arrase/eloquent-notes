@@ -70,9 +70,6 @@ msgstr "مرور..."
 msgid "Cancel"
 msgstr "انصراف"
 
-msgid "Capture Duration:"
-msgstr "مدت زمان ضبط:"
-
 msgid "Classification - System Prompt"
 msgstr "دسته‌بندی - پرامپت سیستم"
 
@@ -231,9 +228,6 @@ msgstr "حداکثر اندازه فایل گزارش:"
 
 msgid "Max Retries:"
 msgstr "حداکثر تلاش مجدد:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "حداکثر مدت زمان ضبط صدا به ثانیه پیش از پردازش خودکار."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "حداکثر اندازه فایل گزارش پیش از چرخش."
@@ -402,7 +396,6 @@ msgstr "بازنویسی - پرامپت سیستم"
 
 msgid "Rewriting - User Prompt"
 msgstr "بازنویسی - پرامپت کاربر"
-
 
 msgid "Save"
 msgstr "ذخیره"

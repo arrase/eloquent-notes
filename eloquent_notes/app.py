@@ -94,7 +94,6 @@ class EloquentApp(QObject):
         self._processing_thread = None
         self._config_dialog = None
         self._hud = None
-        self._capture_duration = 0.0
         self._recording_started_at = 0.0
         self._index = SemanticIndex()
 
@@ -335,7 +334,6 @@ class EloquentApp(QObject):
         self.state = RECORDING
         self._snapshot = snapshot
         self._recorder = recorder
-        self._capture_duration = float(audio_cfg["capture_duration"])
         self._recording_started_at = time.monotonic()
 
         self._update_icon("red", _("Eloquent Notes (Recording...)"))
@@ -343,7 +341,7 @@ class EloquentApp(QObject):
             if self._hud is None:
                 self._hud = recording_hud.RecordingHUD()
                 self._hud.clicked.connect(self.toggle_action)
-            self._hud.show_recording(self._capture_duration)
+            self._hud.show_recording()
         self._tick_timer.start(100)
 
         if self._preload_thread is None or not self._preload_thread.is_alive():
@@ -370,14 +368,9 @@ class EloquentApp(QObject):
             logger.warning("Model preload skipped: %s", e)
 
     def _on_recording_tick(self):
-        elapsed = time.monotonic() - self._recording_started_at
-        remaining = max(0.0, self._capture_duration - elapsed)
         if self._hud is not None and self._hud.isVisible():
-            self._hud.update_progress(elapsed, remaining, self._capture_duration)
-
-        if elapsed >= self._capture_duration:
-            logger.info("Maximum capture duration reached, stopping recording...")
-            self._stop_and_process()
+            elapsed = time.monotonic() - self._recording_started_at
+            self._hud.update_timer(elapsed)
 
     def _stop_and_process(self):
         self.state = PROCESSING
@@ -493,15 +486,18 @@ class EloquentApp(QObject):
             if recorder.is_silent:
                 return
 
-            wav_bytes = recorder.wav_bytes
-
-            logger.info("Phase 1: Transcribing audio...")
-            transcription_result = self._transcribe(ai_cfg, loaded, wav_bytes)
-            if transcription_result["empty"]:
+            wav_chunks = recorder.wav_chunks
+            transcriptions = []
+            for index, wav_bytes in enumerate(wav_chunks, start=1):
+                logger.info("Phase 1: Transcribing audio chunk %d/%d...", index, len(wav_chunks))
+                transcription_result = self._transcribe(ai_cfg, loaded, wav_bytes)
+                if not transcription_result["empty"]:
+                    chunk_text = transcription_result["transcription"].strip()
+                    if chunk_text:
+                        transcriptions.append(chunk_text)
+            if not transcriptions:
                 return
-            transcription = transcription_result["transcription"].strip()
-            if not transcription:
-                return
+            transcription = " ".join(transcriptions)
             logger.info("Transcription: %s", transcription)
 
             language_instruction = self._language_instruction(ai_cfg["output_language"])

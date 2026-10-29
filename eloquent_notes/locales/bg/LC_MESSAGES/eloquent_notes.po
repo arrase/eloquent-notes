@@ -70,9 +70,6 @@ msgstr "Преглед..."
 msgid "Cancel"
 msgstr "Отказ"
 
-msgid "Capture Duration:"
-msgstr "Продължителност на записа:"
-
 msgid "Classification - System Prompt"
 msgstr "Класификация – Системен промпт"
 
@@ -231,9 +228,6 @@ msgstr "Макс. размер на лог файла:"
 
 msgid "Max Retries:"
 msgstr "Макс. брой опити:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Максимална продължителност в секунди за аудио запис преди автоматична обработка."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Максимален размер на лог файла преди ротация."
@@ -402,7 +396,6 @@ msgstr "Пренаписване – Системен промпт"
 
 msgid "Rewriting - User Prompt"
 msgstr "Пренаписване – Потребителски промпт"
-
 
 msgid "Save"
 msgstr "Запази"

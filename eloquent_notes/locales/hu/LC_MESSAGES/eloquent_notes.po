@@ -70,9 +70,6 @@ msgstr "Tallózás..."
 msgid "Cancel"
 msgstr "Mégse"
 
-msgid "Capture Duration:"
-msgstr "Felvétel időtartama:"
-
 msgid "Classification - System Prompt"
 msgstr "Osztályozás - Rendszerprompt"
 
@@ -231,9 +228,6 @@ msgstr "Max. naplófájlméret:"
 
 msgid "Max Retries:"
 msgstr "Max. újrapróbálkozások:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "A hangrögzítés maximális időtartama másodpercben az automatikus feldolgozás előtt."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "A naplófájl maximális mérete forgatás előtt."
@@ -402,7 +396,6 @@ msgstr "Átírás - Rendszerprompt"
 
 msgid "Rewriting - User Prompt"
 msgstr "Átírás - Felhasználói prompt"
-
 
 msgid "Save"
 msgstr "Mentés"

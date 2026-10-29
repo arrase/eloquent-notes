@@ -70,9 +70,6 @@ msgstr "Durchsuchen..."
 msgid "Cancel"
 msgstr "Abbrechen"
 
-msgid "Capture Duration:"
-msgstr "Aufnahmedauer:"
-
 msgid "Classification - System Prompt"
 msgstr "Klassifizierung - System-Prompt"
 
@@ -231,9 +228,6 @@ msgstr "Max. Protokolldateigröße:"
 
 msgid "Max Retries:"
 msgstr "Max. Wiederholungen:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Maximale Dauer in Sekunden für die Audioaufnahme vor der automatischen Verarbeitung."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Maximale Größe der Protokolldatei vor der Rotation."
@@ -402,7 +396,6 @@ msgstr "Umschreiben - System-Prompt"
 
 msgid "Rewriting - User Prompt"
 msgstr "Umschreiben - Benutzer-Prompt"
-
 
 msgid "Save"
 msgstr "Speichern"

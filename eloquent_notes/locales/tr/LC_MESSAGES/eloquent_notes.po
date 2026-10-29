@@ -70,9 +70,6 @@ msgstr "Gözat..."
 msgid "Cancel"
 msgstr "İptal"
 
-msgid "Capture Duration:"
-msgstr "Kayıt Süresi:"
-
 msgid "Classification - System Prompt"
 msgstr "Sınıflandırma - Sistem İstemi"
 
@@ -231,9 +228,6 @@ msgstr "Maks. Günlük Dosyası Boyutu:"
 
 msgid "Max Retries:"
 msgstr "Maks. Yeniden Deneme:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Otomatik işlemeden önce ses kaydı için saniye cinsinden maksimum süre."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Döndürmeden önce günlük dosyasının maksimum boyutu."
@@ -402,7 +396,6 @@ msgstr "Yeniden Yazma - Sistem İstemi"
 
 msgid "Rewriting - User Prompt"
 msgstr "Yeniden Yazma - Kullanıcı İstemi"
-
 
 msgid "Save"
 msgstr "Kaydet"

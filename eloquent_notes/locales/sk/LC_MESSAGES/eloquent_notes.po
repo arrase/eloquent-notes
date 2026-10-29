@@ -70,9 +70,6 @@ msgstr "Prehľadávať..."
 msgid "Cancel"
 msgstr "Zrušiť"
 
-msgid "Capture Duration:"
-msgstr "Dĺžka záznamu:"
-
 msgid "Classification - System Prompt"
 msgstr "Klasifikácia – Systémový prompt"
 
@@ -231,9 +228,6 @@ msgstr "Max. veľkosť súboru záznamu:"
 
 msgid "Max Retries:"
 msgstr "Max. počet opakovaní:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Maximálna dĺžka zvukového záznamu v sekundách pred automatickým spracovaním."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Maximálna veľkosť súboru záznamu pred rotáciou."
@@ -402,7 +396,6 @@ msgstr "Prepisovanie – Systémový prompt"
 
 msgid "Rewriting - User Prompt"
 msgstr "Prepisovanie – Používateľský prompt"
-
 
 msgid "Save"
 msgstr "Uložiť"

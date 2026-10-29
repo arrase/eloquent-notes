@@ -70,9 +70,6 @@ msgstr "ব্রাউজ করুন..."
 msgid "Cancel"
 msgstr "বাতিল"
 
-msgid "Capture Duration:"
-msgstr "ক্যাপচার স্থিতিকাল:"
-
 msgid "Classification - System Prompt"
 msgstr "শ্রেণীবিভাগ - সিস্টেম প্রম্পট"
 
@@ -231,9 +228,6 @@ msgstr "সর্বোচ্চ লগ ফাইল আকার:"
 
 msgid "Max Retries:"
 msgstr "সর্বোচ্চ পুনরায় চেষ্টা:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "স্বয়ংক্রিয়ভাবে প্রক্রিয়াকরণের আগে অডিও রেকর্ডিংয়ের সর্বোচ্চ স্থিতিকাল (সেকেন্ডে)।"
 
 msgid "Maximum size of the log file before rotating."
 msgstr "রোটেট করার আগে লগ ফাইলের সর্বোচ্চ আকার।"
@@ -402,7 +396,6 @@ msgstr "পুনর্লিখন - সিস্টেম প্রম্প�
 
 msgid "Rewriting - User Prompt"
 msgstr "পুনর্লিখন - ব্যবহারকারী প্রম্পট"
-
 
 msgid "Save"
 msgstr "সংরক্ষণ করুন"

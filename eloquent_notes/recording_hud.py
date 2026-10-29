@@ -1,11 +1,8 @@
 """Floating recording HUD overlay widget for Eloquent Notes.
 
-Displays a modern, non-intrusive floating pill indicator with live countdown,
-visual recording status, and progress bar during audio dictation.
+Displays a modern, non-intrusive floating pill indicator with live elapsed
+time and visual recording status during audio dictation.
 """
-
-import math
-from typing import ClassVar
 
 from PyQt6.QtCore import QRectF, Qt, pyqtSignal
 from PyQt6.QtGui import (
@@ -19,7 +16,6 @@ from PyQt6.QtGui import (
 from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLabel,
-    QProgressBar,
     QVBoxLayout,
     QWidget,
 )
@@ -28,33 +24,21 @@ from eloquent_notes.i18n import _
 
 _BG_COLOR = QColor(24, 24, 27, 240)
 _BORDER_PEN = QPen(QColor(255, 255, 255, 38), 1.0)
-_TIMER_LABEL_QSS = "color: {}; font-size: 12px; font-weight: bold; font-family: monospace;"
-_PROGRESS_BAR_QSS = (
-    "QProgressBar {{ background-color: rgba(255, 255, 255, 0.15); border: none; border-radius: 1px; }}"
-    "QProgressBar::chunk {{ background-color: {}; border-radius: 1px; }}"
-)
+_TIMER_LABEL_QSS = "color: #FFFFFF; font-size: 12px; font-weight: bold; font-family: monospace;"
 
 
 def _format_time(seconds: float) -> str:
-    secs = max(0, math.ceil(seconds))
+    secs = max(0, int(seconds))
     return f"{secs // 60:02d}:{secs % 60:02d}"
 
 
 class RecordingHUD(QWidget):
-    """Minimalist floating recording indicator and countdown HUD."""
+    """Minimalist floating recording indicator and elapsed-time HUD."""
 
     clicked = pyqtSignal()
 
-    # Urgency tiers: (timer label color, progress chunk color).
-    _TIERS: ClassVar[dict[str, tuple[str, str]]] = {
-        "normal": ("#FFFFFF", "#E5E7EB"),
-        "warning": ("#F59E0B", "#F59E0B"),
-        "critical": ("#EF4444", "#EF4444"),
-    }
-
     def __init__(self) -> None:
         super().__init__()
-        self._style_tier: str = ""
         self._init_window()
         self._init_ui()
 
@@ -69,7 +53,7 @@ class RecordingHUD(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating, True)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setToolTip(_("Recording in progress — click to stop and process note"))
-        self.setFixedSize(260, 52)
+        self.setFixedSize(260, 40)
 
     def _init_ui(self) -> None:
         layout = QVBoxLayout(self)
@@ -92,21 +76,12 @@ class RecordingHUD(QWidget):
 
         header_layout.addStretch()
 
-        self.lbl_timer = QLabel("00:30")
+        self.lbl_timer = QLabel("00:00")
+        self.lbl_timer.setStyleSheet(_TIMER_LABEL_QSS)
         self.lbl_timer.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
         header_layout.addWidget(self.lbl_timer)
 
         layout.addLayout(header_layout)
-
-        self.progress_bar = QProgressBar()
-        self.progress_bar.setFixedHeight(3)
-        self.progress_bar.setTextVisible(False)
-        self.progress_bar.setRange(0, 1000)
-        self.progress_bar.setValue(0)
-        self.progress_bar.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
-        layout.addWidget(self.progress_bar)
-
-        self._apply_tier("normal")
 
     def paintEvent(self, event: QPaintEvent | None) -> None:
         """Render antialiased dark rounded pill background and subtle border."""
@@ -131,39 +106,14 @@ class RecordingHUD(QWidget):
             y = geom.y() + 40
             self.move(x, y)
 
-    def _apply_tier(self, tier: str) -> None:
-        """Apply timer/progress styles for an urgency tier (skip if unchanged)."""
-        if tier == self._style_tier:
-            return
-        self._style_tier = tier
-        timer_color, chunk_color = self._TIERS[tier]
-        self.lbl_timer.setStyleSheet(_TIMER_LABEL_QSS.format(timer_color))
-        self.progress_bar.setStyleSheet(_PROGRESS_BAR_QSS.format(chunk_color))
-
-    def show_recording(self, total_duration: float) -> None:
-        """Show HUD configured for recording with total duration in seconds."""
-        self.progress_bar.setValue(0)
-        self._apply_tier("normal")
-        self.lbl_timer.setText(_format_time(total_duration))
+    def show_recording(self) -> None:
+        """Show HUD configured for recording with elapsed time reset to zero."""
+        self.update_timer(0.0)
         self.reposition()
         self.show()
         self.raise_()
         self.update()
 
-    def update_progress(
-        self,
-        elapsed_seconds: float,
-        remaining_seconds: float,
-        total_duration: float,
-    ) -> None:
-        """Update countdown timer, color state, and progress bar."""
-        fraction = min(1.0, max(0.0, elapsed_seconds / total_duration))
-        self.progress_bar.setValue(int(fraction * 1000))
-        self.lbl_timer.setText(_format_time(remaining_seconds))
-
-        if remaining_seconds <= 5.0:
-            self._apply_tier("critical")
-        elif remaining_seconds <= 10.0:
-            self._apply_tier("warning")
-        else:
-            self._apply_tier("normal")
+    def update_timer(self, elapsed_seconds: float) -> None:
+        """Update the elapsed recording timer display."""
+        self.lbl_timer.setText(_format_time(elapsed_seconds))

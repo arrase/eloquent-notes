@@ -70,9 +70,6 @@ msgstr "استعراض..."
 msgid "Cancel"
 msgstr "إلغاء"
 
-msgid "Capture Duration:"
-msgstr "مدة التسجيل:"
-
 msgid "Classification - System Prompt"
 msgstr "التصنيف - موجه النظام"
 
@@ -231,9 +228,6 @@ msgstr "الحد الأقصى لحجم ملف السجل:"
 
 msgid "Max Retries:"
 msgstr "الحد الأقصى لإعادة المحاولة:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "المدة القصوى بالثواني لتسجيل الصوت قبل المعالجة التلقائية."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "الحجم الأقصى لملف السجل قبل التدوير."
@@ -402,7 +396,6 @@ msgstr "إعادة الصياغة - موجه النظام"
 
 msgid "Rewriting - User Prompt"
 msgstr "إعادة الصياغة - موجه المستخدم"
-
 
 msgid "Save"
 msgstr "حفظ"

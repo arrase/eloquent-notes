@@ -70,9 +70,6 @@ msgstr "Прегледај..."
 msgid "Cancel"
 msgstr "Откажи"
 
-msgid "Capture Duration:"
-msgstr "Трајање снимања:"
-
 msgid "Classification - System Prompt"
 msgstr "Класификација – Системски упит"
 
@@ -231,9 +228,6 @@ msgstr "Макс. величина дневника:"
 
 msgid "Max Retries:"
 msgstr "Макс. број покушаја:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Максимално трајање снимања звука у секундама пре аутоматске обраде."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Максимална величина датотеке дневника пре ротације."
@@ -402,7 +396,6 @@ msgstr "Преобликовање – Системски упит"
 
 msgid "Rewriting - User Prompt"
 msgstr "Преобликовање – Кориснички упит"
-
 
 msgid "Save"
 msgstr "Сачувај"

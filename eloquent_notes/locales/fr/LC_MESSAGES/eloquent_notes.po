@@ -70,9 +70,6 @@ msgstr "Parcourir..."
 msgid "Cancel"
 msgstr "Annuler"
 
-msgid "Capture Duration:"
-msgstr "Durée de capture :"
-
 msgid "Classification - System Prompt"
 msgstr "Classification - Prompt système"
 
@@ -231,9 +228,6 @@ msgstr "Taille max. du journal :"
 
 msgid "Max Retries:"
 msgstr "Tentatives max. :"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Durée maximale en secondes pour l'enregistrement audio avant le traitement automatique."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Taille maximale du fichier journal avant rotation."
@@ -402,7 +396,6 @@ msgstr "Réécriture - Prompt système"
 
 msgid "Rewriting - User Prompt"
 msgstr "Réécriture - Prompt utilisateur"
-
 
 msgid "Save"
 msgstr "Enregistrer"
