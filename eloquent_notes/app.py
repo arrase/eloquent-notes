@@ -410,19 +410,27 @@ class EloquentApp(QObject):
         )
 
     @staticmethod
-    def _transcribe(ai_cfg, loaded, wav_bytes):
-        return llm.transcribe_audio(
-            ollama_url=ai_cfg["ollama_url"],
-            model=ai_cfg["model"],
-            system_prompt=loaded[config.TRANSCRIPTION_SYSTEM_PROMPT_PATH],
-            user_prompt=loaded[config.TRANSCRIPTION_USER_PROMPT_PATH],
-            retry_prompt=loaded[config.RETRY_PROMPT_PATH],
-            context_length=ai_cfg["context_length"],
-            audio_bytes=wav_bytes,
-            keep_alive=ai_cfg["preload_keep_alive"],
-            max_retries=ai_cfg["max_retries"],
-            timeout=ai_cfg["request_timeout"],
-        )
+    def _transcribe(ai_cfg, loaded, wav_chunks):
+        transcriptions = []
+        for index, wav_bytes in enumerate(wav_chunks, start=1):
+            logger.info("Phase 1: Transcribing audio chunk %d/%d...", index, len(wav_chunks))
+            result = llm.transcribe_audio(
+                ollama_url=ai_cfg["ollama_url"],
+                model=ai_cfg["model"],
+                system_prompt=loaded[config.TRANSCRIPTION_SYSTEM_PROMPT_PATH],
+                user_prompt=loaded[config.TRANSCRIPTION_USER_PROMPT_PATH],
+                retry_prompt=loaded[config.RETRY_PROMPT_PATH],
+                context_length=ai_cfg["context_length"],
+                audio_bytes=wav_bytes,
+                keep_alive=ai_cfg["preload_keep_alive"],
+                max_retries=ai_cfg["max_retries"],
+                timeout=ai_cfg["request_timeout"],
+            )
+            if not result["empty"]:
+                chunk_text = result["transcription"].strip()
+                if chunk_text:
+                    transcriptions.append(chunk_text)
+        return " ".join(transcriptions)
 
     @staticmethod
     def _rewrite(ai_cfg, loaded, transcription, language_instruction, keep_alive):
@@ -486,18 +494,9 @@ class EloquentApp(QObject):
             if recorder.is_silent:
                 return
 
-            wav_chunks = recorder.wav_chunks
-            transcriptions = []
-            for index, wav_bytes in enumerate(wav_chunks, start=1):
-                logger.info("Phase 1: Transcribing audio chunk %d/%d...", index, len(wav_chunks))
-                transcription_result = self._transcribe(ai_cfg, loaded, wav_bytes)
-                if not transcription_result["empty"]:
-                    chunk_text = transcription_result["transcription"].strip()
-                    if chunk_text:
-                        transcriptions.append(chunk_text)
-            if not transcriptions:
+            transcription = self._transcribe(ai_cfg, loaded, recorder.wav_chunks)
+            if not transcription:
                 return
-            transcription = " ".join(transcriptions)
             logger.info("Transcription: %s", transcription)
 
             language_instruction = self._language_instruction(ai_cfg["output_language"])
