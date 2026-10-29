@@ -139,8 +139,8 @@ msgstr "Ditado adicionado"
 msgid "Dictation Empty"
 msgstr "Ditado vazio"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Apresenta uma cápsula flutuante elegante com contagem decrescente e barra de progresso durante o ditado."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Apresenta uma cápsula flutuante elegante com temporizador de gravação em tempo real durante o ditado."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Inativo)"
@@ -427,8 +427,8 @@ msgstr "Pesquisa semântica"
 msgid "Settings"
 msgstr "Definições"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Mostrar sobreposição flutuante com contagem decrescente durante a gravação"
+msgid "Show floating HUD overlay during recording"
+msgstr "Mostrar sobreposição HUD flutuante durante a gravação"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Iniciar o Eloquent Notes automaticamente ao iniciar sessão"

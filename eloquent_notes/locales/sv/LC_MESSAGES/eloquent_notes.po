@@ -139,8 +139,8 @@ msgstr "Diktering tillagd"
 msgid "Dictation Empty"
 msgstr "Diktering tom"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Visar en smidig svävande ruta med nedräkningstimer och förloppsindikator under diktering."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Visar en smidig svävande ruta med inspelningstimer under diktering."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Inaktiv)"
@@ -427,8 +427,8 @@ msgstr "Semantisk sökning"
 msgid "Settings"
 msgstr "Inställningar"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Visa svävande nedräkningsruta under inspelning"
+msgid "Show floating HUD overlay during recording"
+msgstr "Visa svävande HUD-ruta under inspelning"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Starta Eloquent Notes automatiskt vid inloggning"

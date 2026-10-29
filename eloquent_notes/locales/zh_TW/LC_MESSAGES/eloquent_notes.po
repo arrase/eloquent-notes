@@ -139,8 +139,8 @@ msgstr "已新增聽寫"
 msgid "Dictation Empty"
 msgstr "聽寫為空"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "聽寫時顯示帶有即時倒數計時和進度條的精緻懸浮膠囊視窗。"
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "聽寫時顯示帶有即時錄音計時器的精緻懸浮膠囊視窗。"
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes（閒置）"
@@ -427,8 +427,8 @@ msgstr "語意搜尋"
 msgid "Settings"
 msgstr "設定"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "錄音期間顯示懸浮倒數計時 HUD 視窗"
+msgid "Show floating HUD overlay during recording"
+msgstr "錄音期間顯示懸浮 HUD 視窗"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "登入時自動啟動 Eloquent Notes"

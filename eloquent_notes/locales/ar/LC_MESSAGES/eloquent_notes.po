@@ -139,8 +139,8 @@ msgstr "تمت إضافة الإملاء"
 msgid "Dictation Empty"
 msgstr "الإملاء فارغ"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "يعرض نافذة عائمة أنيقة مع مؤقت عد تنازلي مباشر وشريط تقدم أثناء الإملاء."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "يعرض نافذة عائمة أنيقة مع مؤقت تسجيل مباشر أثناء الإملاء."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (خامل)"
@@ -427,8 +427,8 @@ msgstr "البحث الدلالي"
 msgid "Settings"
 msgstr "الإعدادات"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "إظهار نافذة العد التنازلي العائمة أثناء التسجيل"
+msgid "Show floating HUD overlay during recording"
+msgstr "إظهار النافذة العائمة (HUD) أثناء التسجيل"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "بدء تشغيل Eloquent Notes تلقائيًا عند تسجيل الدخول"

@@ -139,8 +139,8 @@ msgstr "เพิ่มการป้อนด้วยเสียงแล้
 msgid "Dictation Empty"
 msgstr "การป้อนด้วยเสียงว่างเปล่า"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "แสดงโอเวอร์เลย์ลอยตัวพร้อมตัวนับเวลาถอยหลังและแถบความคืบหน้าขณะป้อนด้วยเสียง"
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "แสดงโอเวอร์เลย์ลอยตัวพร้อมตัวจับเวลาการบันทึกสดขณะป้อนด้วยเสียง"
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (ว่าง)"
@@ -427,8 +427,8 @@ msgstr "การค้นหาเชิงความหมาย"
 msgid "Settings"
 msgstr "การตั้งค่า"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "แสดงโอเวอร์เลย์ HUD นับถอยหลังแบบลอยตัวระหว่างการบันทึกเสียง"
+msgid "Show floating HUD overlay during recording"
+msgstr "แสดงโอเวอร์เลย์ HUD แบบลอยตัวระหว่างการบันทึกเสียง"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "เริ่ม Eloquent Notes อัตโนมัติเมื่อเข้าสู่ระบบ"

@@ -139,8 +139,8 @@ msgstr "Диктат је додат"
 msgid "Dictation Empty"
 msgstr "Диктат је празан"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Приказује елегантан плутајући панел са одбројавањем и траком напретка током диктирања."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Приказује елегантан плутајући панел са тајмером снимања уживо током диктирања."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Мировање)"
@@ -427,8 +427,8 @@ msgstr "Семантичка претрага"
 msgid "Settings"
 msgstr "Подешавања"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Прикажи плутајући HUD панел са одбројавањем током снимања"
+msgid "Show floating HUD overlay during recording"
+msgstr "Прикажи плутајући HUD панел током снимања"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Аутоматски покрени Eloquent Notes при пријави"

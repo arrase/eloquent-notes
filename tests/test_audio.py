@@ -187,11 +187,19 @@ def test_is_silent_accepts_real_speech():
 def test_short_burst_is_silent():
     speech = _load_speech()
     silence = np.zeros((SAMPLE_RATE, 1), dtype=np.float32)
-    short_burst = np.concatenate([silence, speech[: int(SAMPLE_RATE * 0.3)], silence])
+    burst = speech[: int(SAMPLE_RATE * 0.3)]
+    short_burst = np.concatenate([silence, burst, silence])
 
     recorder = AudioRecorder(channels=1)
     recorder._chunks.append(short_burst)
     assert recorder.is_silent is True
+
+    # Multiple short bursts whose combined active windows exceed MIN_SPEECH_WINDOWS remain silent
+    multi_burst = np.concatenate([silence, burst, silence, burst, silence, burst, silence])
+    assert int(np.count_nonzero(speech_window_mask(multi_burst))) >= MIN_SPEECH_WINDOWS
+    multi_recorder = AudioRecorder(channels=1)
+    multi_recorder._chunks.append(multi_burst)
+    assert multi_recorder.is_silent is True
 
 
 def test_trim_keeps_speech_with_padding():
@@ -262,6 +270,15 @@ def test_split_speech_splits_long_audio_at_real_pauses():
     assert int(chunks[0][-1, 0]) == pause_start * VAD_WINDOW_SAMPLES + PAD_SAMPLES - 1
     assert int(chunks[1][0, 0]) == pause_end * VAD_WINDOW_SAMPLES - PAD_SAMPLES
     assert int(chunks[1][-1, 0]) == total_windows * VAD_WINDOW_SAMPLES - 1
+
+    # A long pause crossing midpoint (312..906) beats a shorter pause in the second half (916..925)
+    crossing_active = np.ones(1100, dtype=bool)
+    crossing_active[312:906] = False
+    crossing_active[916:925] = False
+    crossing_chunks = _split_speech(data[: 1100 * VAD_WINDOW_SAMPLES], crossing_active)
+    assert len(crossing_chunks) == 2
+    assert int(crossing_chunks[0][0, 0]) == 0
+    assert int(crossing_chunks[0][-1, 0]) == 312 * VAD_WINDOW_SAMPLES + PAD_SAMPLES - 1
 
 
 def test_split_speech_prioritizes_first_half_real_pause_over_second_half_micro_pause():
@@ -334,6 +351,46 @@ def test_split_speech_discards_short_transients():
     assert int(chunks[0][-1, 0]) == 625 * VAD_WINDOW_SAMPLES + PAD_SAMPLES - 1
     assert int(chunks[1][0, 0]) == 675 * VAD_WINDOW_SAMPLES - PAD_SAMPLES
     assert int(chunks[1][-1, 0]) == 1580 * VAD_WINDOW_SAMPLES + PAD_SAMPLES - 1
+
+    # Single-chunk recording (<= MAX_CHUNK_WINDOWS) trims both leading (5..10) and trailing (650..655) transients
+    single_active = np.zeros(660, dtype=bool)
+    single_active[5:10] = True
+    single_active[25:625] = True
+    single_active[650:655] = True
+    [single_chunk] = _split_speech(data[: 660 * VAD_WINDOW_SAMPLES], single_active)
+    assert int(single_chunk[0, 0]) == 25 * VAD_WINDOW_SAMPLES - PAD_SAMPLES
+    assert int(single_chunk[-1, 0]) == 625 * VAD_WINDOW_SAMPLES + PAD_SAMPLES - 1
+
+    # Speech 0..900 (with internal pause 500..510) + pause 900..940 + trailing transient 940..945
+    # stays a single chunk once the trailing transient is trimmed before the split loop
+    near_limit_active = np.zeros(950, dtype=bool)
+    near_limit_active[0:900] = True
+    near_limit_active[500:510] = False
+    near_limit_active[940:945] = True
+    [near_limit_chunk] = _split_speech(data[: 950 * VAD_WINDOW_SAMPLES], near_limit_active)
+    assert int(near_limit_chunk[0, 0]) == 0
+    assert int(near_limit_chunk[-1, 0]) == 900 * VAD_WINDOW_SAMPLES + PAD_SAMPLES - 1
+
+    # Intermediate transient (650..655) followed by a longer pause (655..680, 25 windows) than its
+    # preceding pause (635..650, 15 windows): split occurs at 655..680 and the transient is trimmed
+    # off the end of Chunk 1
+    trailing_mid_active = np.zeros(total_windows, dtype=bool)
+    trailing_mid_active[25:635] = True
+    trailing_mid_active[650:655] = True
+    trailing_mid_active[680:1580] = True
+    trailing_mid_chunks = _split_speech(data, trailing_mid_active)
+    assert len(trailing_mid_chunks) == 2
+    assert int(trailing_mid_chunks[0][0, 0]) == 25 * VAD_WINDOW_SAMPLES - PAD_SAMPLES
+    assert int(trailing_mid_chunks[0][-1, 0]) == 635 * VAD_WINDOW_SAMPLES + PAD_SAMPLES - 1
+    assert int(trailing_mid_chunks[1][0, 0]) == 680 * VAD_WINDOW_SAMPLES - PAD_SAMPLES
+    assert int(trailing_mid_chunks[1][-1, 0]) == 1580 * VAD_WINDOW_SAMPLES + PAD_SAMPLES - 1
+
+    # Multiple short transients summing to >= MIN_SPEECH_WINDOWS across the recording yield no chunks
+    bursts_active = np.zeros(100, dtype=bool)
+    for start in (5, 25, 45, 65):
+        bursts_active[start : start + 5] = True
+    assert int(np.count_nonzero(bursts_active)) >= MIN_SPEECH_WINDOWS
+    assert _split_speech(data[: 100 * VAD_WINDOW_SAMPLES], bursts_active) == []
 
 
 def test_recorder_reuses_analysis_across_is_silent_and_wav_chunks():

@@ -139,8 +139,8 @@ msgstr "Diktát pridaný"
 msgid "Dictation Empty"
 msgstr "Diktát je prázdny"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Počas diktovania zobrazuje elegantný plávajúci panel s odpočítavaním a indikátorom priebehu."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Počas diktovania zobrazuje elegantný plávajúci panel s časovačom nahrávania."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Nečinný)"
@@ -427,8 +427,8 @@ msgstr "Sémantické vyhľadávanie"
 msgid "Settings"
 msgstr "Nastavenia"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Zobraziť plávajúci HUD panel s odpočítavaním počas nahrávania"
+msgid "Show floating HUD overlay during recording"
+msgstr "Zobraziť plávajúci HUD panel počas nahrávania"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Spúšťať Eloquent Notes automaticky pri prihlásení"

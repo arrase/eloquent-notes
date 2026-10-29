@@ -16,7 +16,6 @@ from PyQt6.QtGui import (
 from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLabel,
-    QVBoxLayout,
     QWidget,
 )
 
@@ -56,32 +55,26 @@ class RecordingHUD(QWidget):
         self.setFixedSize(260, 40)
 
     def _init_ui(self) -> None:
-        layout = QVBoxLayout(self)
+        layout = QHBoxLayout(self)
         layout.setContentsMargins(16, 8, 16, 8)
-        layout.setSpacing(5)
-
-        header_layout = QHBoxLayout()
-        header_layout.setSpacing(8)
-        header_layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(8)
 
         self.lbl_dot = QLabel("●")
         self.lbl_dot.setStyleSheet("color: #EF4444; font-size: 14px; font-weight: bold;")
         self.lbl_dot.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
-        header_layout.addWidget(self.lbl_dot)
+        layout.addWidget(self.lbl_dot)
 
         self.lbl_status = QLabel(_("Recording Note..."))
         self.lbl_status.setStyleSheet("color: #F3F4F6; font-size: 12px; font-weight: 600;")
         self.lbl_status.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
-        header_layout.addWidget(self.lbl_status)
+        layout.addWidget(self.lbl_status)
 
-        header_layout.addStretch()
+        layout.addStretch()
 
         self.lbl_timer = QLabel("00:00")
         self.lbl_timer.setStyleSheet(_TIMER_LABEL_QSS)
         self.lbl_timer.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
-        header_layout.addWidget(self.lbl_timer)
-
-        layout.addLayout(header_layout)
+        layout.addWidget(self.lbl_timer)
 
     def paintEvent(self, event: QPaintEvent | None) -> None:
         """Render antialiased dark rounded pill background and subtle border."""

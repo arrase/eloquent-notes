@@ -139,8 +139,8 @@ msgstr "Dikteering lisatud"
 msgid "Dictation Empty"
 msgstr "Dikteering on tühi"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Kuvab dikteerimise ajal hõljuva kapslikujulise ülekatte koos pöördloendustaimeri ja edenemisribaga."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Kuvab dikteerimise ajal hõljuva kapslikujulise ülekatte koos reaalajas salvestustaimeriga."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Ootel)"
@@ -427,8 +427,8 @@ msgstr "Semantiline otsing"
 msgid "Settings"
 msgstr "Seaded"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Kuva salvestamise ajal hõljuv pöördloenduse HUD-ülekate"
+msgid "Show floating HUD overlay during recording"
+msgstr "Kuva salvestamise ajal hõljuv HUD-ülekate"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Käivita Eloquent Notes sisselogimisel automaatselt"

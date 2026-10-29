@@ -139,8 +139,8 @@ msgstr "Dictaat toegevoegd"
 msgid "Dictation Empty"
 msgstr "Dictaat leeg"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Toont een zwevende balk met live afteltimer en voortgangsbalk tijdens het dicteren."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Toont een zwevende balk met live opnametimer tijdens het dicteren."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Inactief)"
@@ -427,8 +427,8 @@ msgstr "Semantisch zoeken"
 msgid "Settings"
 msgstr "Instellingen"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Zwevende aftel-overlay tonen tijdens opname"
+msgid "Show floating HUD overlay during recording"
+msgstr "Zwevende HUD-overlay tonen tijdens opname"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Eloquent Notes automatisch starten bij aanmelden"

@@ -361,6 +361,7 @@ def test_start_recording_when_hud_disabled(qapp, mock_config):
     ):
         eloquent_app.toggle_action()
         assert eloquent_app._hud is None
+        assert not eloquent_app._tick_timer.isActive()
         eloquent_app.toggle_action()
 
     assert eloquent_app._hud is None

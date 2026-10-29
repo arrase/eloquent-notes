@@ -139,8 +139,8 @@ msgstr "Диктовка добавлена"
 msgid "Dictation Empty"
 msgstr "Диктовка пуста"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Отображает компактную плавающую панель с таймером обратного отсчёта и индикатором прогресса во время диктовки."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Отображает компактную плавающую панель с таймером записи в реальном времени во время диктовки."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Ожидание)"
@@ -427,8 +427,8 @@ msgstr "Семантический поиск"
 msgid "Settings"
 msgstr "Настройки"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Показывать плавающий HUD-индикатор обратного отсчёта во время записи"
+msgid "Show floating HUD overlay during recording"
+msgstr "Показывать плавающий HUD-индикатор во время записи"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Автоматически запускать Eloquent Notes при входе в систему"

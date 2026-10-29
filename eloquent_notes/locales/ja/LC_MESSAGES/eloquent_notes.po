@@ -139,8 +139,8 @@ msgstr "音声入力を追加しました"
 msgid "Dictation Empty"
 msgstr "音声入力が空です"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "音声入力中にカウントダウンタイマーとプログレスバーを備えたフローティングオーバーレイを表示します。"
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "音声入力中にライブ録音タイマーを備えたフローティングオーバーレイを表示します。"
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (待機中)"
@@ -427,8 +427,8 @@ msgstr "セマンティック検索"
 msgid "Settings"
 msgstr "設定"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "録音中にフローティングカウントダウンHUDオーバーレイを表示"
+msgid "Show floating HUD overlay during recording"
+msgstr "録音中にフローティングHUDオーバーレイを表示"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "ログイン時にEloquent Notesを自動起動"

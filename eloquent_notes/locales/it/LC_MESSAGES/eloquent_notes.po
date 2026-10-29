@@ -139,8 +139,8 @@ msgstr "Dettatura aggiunta"
 msgid "Dictation Empty"
 msgstr "Dettatura vuota"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Mostra un'elegante pillola flottante con conto alla rovescia e barra di avanzamento durante la dettatura."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Mostra un'elegante pillola flottante con timer di registrazione in tempo reale durante la dettatura."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Inattivo)"
@@ -427,8 +427,8 @@ msgstr "Ricerca semantica"
 msgid "Settings"
 msgstr "Impostazioni"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Mostra overlay flottante con conto alla rovescia durante la registrazione"
+msgid "Show floating HUD overlay during recording"
+msgstr "Mostra overlay HUD flottante durante la registrazione"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Avvia automaticamente Eloquent Notes all'accesso"

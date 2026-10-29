@@ -139,8 +139,8 @@ msgstr "Imlak Ditambah"
 msgid "Dictation Empty"
 msgstr "Imlak Kosong"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Memaparkan tindihan kapsul terapung yang kemas dengan pemasa kira detik langsung dan bar kemajuan semasa mengimlak."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Memaparkan tindihan kapsul terapung yang kemas dengan pemasa rakaman langsung semasa mengimlak."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Melahu)"
@@ -427,8 +427,8 @@ msgstr "Carian Semantik"
 msgid "Settings"
 msgstr "Tetapan"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Tunjukkan tindihan HUD kira detik terapung semasa rakaman"
+msgid "Show floating HUD overlay during recording"
+msgstr "Tunjukkan tindihan HUD terapung semasa rakaman"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Mulakan Eloquent Notes secara automatik semasa log masuk"

@@ -139,8 +139,8 @@ msgstr "डिक्टेशन जोड़ा गया"
 msgid "Dictation Empty"
 msgstr "डिक्टेशन खाली है"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "डिक्टेशन के दौरान लाइव काउंटडाउन टाइमर और प्रोग्रेस बार के साथ एक आकर्षक फ़्लोटिंग पिल ओवरले प्रदर्शित करता है।"
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "डिक्टेशन के दौरान लाइव रिकॉर्डिंग टाइमर के साथ एक आकर्षक फ़्लोटिंग पिल ओवरले प्रदर्शित करता है।"
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (निष्क्रिय)"
@@ -427,8 +427,8 @@ msgstr "सिमेंटिक खोज"
 msgid "Settings"
 msgstr "सेटिंग्स"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "रिकॉर्डिंग के दौरान फ़्लोटिंग काउंटडाउन HUD ओवरले दिखाएं"
+msgid "Show floating HUD overlay during recording"
+msgstr "रिकॉर्डिंग के दौरान फ़्लोटिंग HUD ओवरले दिखाएं"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "लॉगिन पर स्वचालित रूप से Eloquent Notes शुरू करें"

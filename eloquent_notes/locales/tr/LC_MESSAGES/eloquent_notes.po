@@ -139,8 +139,8 @@ msgstr "Dikte Eklendi"
 msgid "Dictation Empty"
 msgstr "Dikte Boş"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Dikte sırasında canlı geri sayım sayacı ve ilerleme çubuğu içeren şık, yüzen bir kapsül katmanı görüntüler."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Dikte sırasında canlı kayıt sayacı içeren şık, yüzen bir kapsül katmanı görüntüler."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Boşta)"
@@ -427,8 +427,8 @@ msgstr "Anlamsal Arama"
 msgid "Settings"
 msgstr "Ayarlar"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Kayıt sırasında yüzen geri sayım HUD katmanını göster"
+msgid "Show floating HUD overlay during recording"
+msgstr "Kayıt sırasında yüzen HUD katmanını göster"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Oturum açıldığında Eloquent Notes'u otomatik olarak başlat"

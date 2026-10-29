@@ -79,6 +79,19 @@ def _skip_leading_transients(active: np.ndarray, w_start: int, last: int) -> int
     return w_start
 
 
+def _skip_trailing_transients(active: np.ndarray, first: int, w_end: int) -> int:
+    """Retreat before short noise bursts (< MIN_SPEECH_WINDOWS) preceded by a real pause."""
+    while w_end > first:
+        w_end -= int(np.argmax(active[first:w_end][::-1]))
+        start = max(first, w_end - MAX_CHUNK_WINDOWS)
+        pauses = [r for r in _find_runs(active, start, w_end) if r[1] - r[0] >= MIN_PAUSE_WINDOWS]
+        if pauses and int(np.count_nonzero(active[pauses[-1][1] : w_end])) < MIN_SPEECH_WINDOWS:
+            w_end = pauses[-1][0]
+            continue
+        break
+    return w_end
+
+
 def _find_split(active: np.ndarray, w_start: int, limit: int) -> tuple[int, int]:
     """Return (chunk_end, next_start) window indices within active[w_start:limit]."""
     runs = _find_runs(active, w_start, limit)
@@ -88,9 +101,8 @@ def _find_split(active: np.ndarray, w_start: int, limit: int) -> tuple[int, int]
     midpoint = w_start + (limit - w_start) // 2
     pauses = [r for r in runs if r[1] - r[0] >= MIN_PAUSE_WINDOWS]
     pool = pauses or runs
-    late = [r for r in pool if r[0] >= midpoint]
-    mid = [r for r in pool if r[1] > midpoint]
-    candidates = late or mid or pool
+    second_half = [r for r in pool if r[1] > midpoint]
+    candidates = second_half or pool
     return max(candidates, key=lambda r: (r[1] - r[0], r[1]))
 
 
@@ -100,6 +112,7 @@ def _split_speech(data: np.ndarray, active: np.ndarray) -> list[np.ndarray]:
 
     first = int(np.argmax(active))
     last = len(active) - int(np.argmax(active[::-1]))
+    last = _skip_trailing_transients(active, first, last)
     spans: list[tuple[int, int]] = []
     w_start = first
 
@@ -111,7 +124,7 @@ def _split_speech(data: np.ndarray, active: np.ndarray) -> list[np.ndarray]:
         else:
             chunk_end, next_start = _find_split(active, w_start, w_start + MAX_CHUNK_WINDOWS)
 
-        trimmed_end = chunk_end - int(np.argmax(active[w_start:chunk_end][::-1]))
+        trimmed_end = _skip_trailing_transients(active, w_start, chunk_end)
         if int(np.count_nonzero(active[w_start:trimmed_end])) >= MIN_SPEECH_WINDOWS:
             spans.append((w_start, trimmed_end))
         w_start = next_start

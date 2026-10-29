@@ -342,7 +342,7 @@ class EloquentApp(QObject):
                 self._hud = recording_hud.RecordingHUD()
                 self._hud.clicked.connect(self.toggle_action)
             self._hud.show_recording()
-        self._tick_timer.start(100)
+            self._tick_timer.start(100)
 
         if self._preload_thread is None or not self._preload_thread.is_alive():
             ai_cfg = snapshot["ai"]

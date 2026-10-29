@@ -139,8 +139,8 @@ msgstr "Diktálás hozzáadva"
 msgid "Dictation Empty"
 msgstr "Üres diktálás"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Elegáns lebegő sávot jelenít meg élő visszaszámlálóval és folyamatjelzővel diktálás közben."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Elegáns lebegő sávot jelenít meg élő felvételi időmérővel diktálás közben."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Tétlen)"
@@ -427,8 +427,8 @@ msgstr "Szemantikus keresés"
 msgid "Settings"
 msgstr "Beállítások"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Lebegő visszaszámláló HUD-sáv megjelenítése felvétel közben"
+msgid "Show floating HUD overlay during recording"
+msgstr "Lebegő HUD-sáv megjelenítése felvétel közben"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Az Eloquent Notes automatikus indítása bejelentkezéskor"

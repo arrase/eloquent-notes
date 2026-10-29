@@ -139,8 +139,8 @@ msgstr "Dictare adăugată"
 msgid "Dictation Empty"
 msgstr "Dictare goală"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Afișează o suprapunere flotantă elegantă cu cronometru invers și bară de progres în timpul dictării."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Afișează o suprapunere flotantă elegantă cu cronometru de înregistrare în timp real în timpul dictării."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Inactiv)"
@@ -427,8 +427,8 @@ msgstr "Căutare semantică"
 msgid "Settings"
 msgstr "Setări"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Afișează suprapunerea flotantă HUD cu cronometru invers în timpul înregistrării"
+msgid "Show floating HUD overlay during recording"
+msgstr "Afișează suprapunerea flotantă HUD în timpul înregistrării"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Pornește Eloquent Notes automat la autentificare"

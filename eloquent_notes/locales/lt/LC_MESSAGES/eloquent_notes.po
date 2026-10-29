@@ -139,8 +139,8 @@ msgstr "Diktavimas pridėtas"
 msgid "Dictation Empty"
 msgstr "Diktavimas tuščias"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Diktuojant rodo slankiąją kapsulės perdangą su atgalinio skaičiavimo laikmačiu ir eigos juosta."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Diktuojant rodo slankiąją kapsulės perdangą su tiesioginiu įrašymo laikmačiu."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Laukia)"
@@ -427,8 +427,8 @@ msgstr "Semantinė paieška"
 msgid "Settings"
 msgstr "Nustatymai"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Įrašymo metu rodyti slankiąją atgalinio skaičiavimo HUD perdangą"
+msgid "Show floating HUD overlay during recording"
+msgstr "Įrašymo metu rodyti slankiąją HUD perdangą"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Automatiškai paleisti „Eloquent Notes“ prisijungus"

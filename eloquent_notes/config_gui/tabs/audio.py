@@ -36,9 +36,9 @@ class AudioTab(QWidget):
         self.cmb_channels.setToolTip(_("Number of audio input channels."))
         form_layout.addRow(QLabel(_("Audio Channels:")), self.cmb_channels)
 
-        self.chk_recording_hud_enabled = QCheckBox(_("Show floating countdown HUD overlay during recording"))
+        self.chk_recording_hud_enabled = QCheckBox(_("Show floating HUD overlay during recording"))
         self.chk_recording_hud_enabled.setToolTip(
-            _("Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating.")
+            _("Displays a sleek floating pill overlay with live recording timer while dictating.")
         )
         form_layout.addRow(self.chk_recording_hud_enabled)
 

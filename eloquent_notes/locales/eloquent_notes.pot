@@ -137,7 +137,7 @@ msgstr ""
 msgid "Dictation Empty"
 msgstr ""
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
 msgstr ""
 
 msgid "Eloquent Notes (Idle)"
@@ -425,7 +425,7 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-msgid "Show floating countdown HUD overlay during recording"
+msgid "Show floating HUD overlay during recording"
 msgstr ""
 
 msgid "Start Eloquent Notes automatically on login"

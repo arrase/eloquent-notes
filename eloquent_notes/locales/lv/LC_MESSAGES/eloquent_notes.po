@@ -139,8 +139,8 @@ msgstr "Diktāts pievienots"
 msgid "Dictation Empty"
 msgstr "Diktāts ir tukšs"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Diktēšanas laikā rāda peldošu kapsulas pārklājumu ar atpakaļskaitīšanas taimeri un progresa joslu."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Diktēšanas laikā rāda peldošu kapsulas pārklājumu ar tiešraides ierakstīšanas taimeri."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Dīkstāve)"
@@ -427,8 +427,8 @@ msgstr "Semantiskā meklēšana"
 msgid "Settings"
 msgstr "Iestatījumi"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Ierakstīšanas laikā rādīt peldošo atpakaļskaitīšanas HUD pārklājumu"
+msgid "Show floating HUD overlay during recording"
+msgstr "Ierakstīšanas laikā rādīt peldošo HUD pārklājumu"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Automātiski palaist Eloquent Notes pēc pieteikšanās"

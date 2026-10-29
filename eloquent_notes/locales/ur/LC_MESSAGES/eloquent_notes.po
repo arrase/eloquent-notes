@@ -139,8 +139,8 @@ msgstr "املا شامل کر دیا گیا"
 msgid "Dictation Empty"
 msgstr "املا خالی ہے"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "املا کے دوران لائیو کاؤنٹ ڈاؤن ٹائمر اور پروگریس بار کے ساتھ ایک خوبصورت فلوٹنگ اوورلے دکھاتا ہے۔"
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "املا کے دوران لائیو ریکارڈنگ ٹائمر کے ساتھ ایک خوبصورت فلوٹنگ اوورلے دکھاتا ہے۔"
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (بیکار)"
@@ -427,8 +427,8 @@ msgstr "سیمینٹک تلاش"
 msgid "Settings"
 msgstr "ترتیبات"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "ریکارڈنگ کے دوران فلوٹنگ کاؤنٹ ڈاؤن HUD اوورلے دکھائیں"
+msgid "Show floating HUD overlay during recording"
+msgstr "ریکارڈنگ کے دوران فلوٹنگ HUD اوورلے دکھائیں"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "لاگ ان پر Eloquent Notes خودکار طور پر شروع کریں"

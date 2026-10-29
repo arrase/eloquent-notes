@@ -139,8 +139,8 @@ msgstr "Η υπαγόρευση προστέθηκε"
 msgid "Dictation Empty"
 msgstr "Κενή υπαγόρευση"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Εμφανίζει μια κομψή αιωρούμενη ένδειξη με αντίστροφη μέτρηση και γραμμή προόδου κατά την υπαγόρευση."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Εμφανίζει μια κομψή αιωρούμενη ένδειξη με χρονόμετρο εγγραφής κατά την υπαγόρευση."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Αδρανές)"
@@ -427,8 +427,8 @@ msgstr "Σημασιολογική αναζήτηση"
 msgid "Settings"
 msgstr "Ρυθμίσεις"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Εμφάνιση αιωρούμενης αντίστροφης μέτρησης κατά την εγγραφή"
+msgid "Show floating HUD overlay during recording"
+msgstr "Εμφάνιση αιωρούμενης ένδειξης HUD κατά την εγγραφή"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Αυτόματη εκκίνηση του Eloquent Notes κατά τη σύνδεση"
