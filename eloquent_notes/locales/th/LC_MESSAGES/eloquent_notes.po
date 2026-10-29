@@ -70,9 +70,6 @@ msgstr "เรียกดู..."
 msgid "Cancel"
 msgstr "ยกเลิก"
 
-msgid "Capture Duration:"
-msgstr "ระยะเวลาการบันทึก:"
-
 msgid "Classification - System Prompt"
 msgstr "การจัดหมวดหมู่ - พรอมต์ระบบ"
 
@@ -142,8 +139,8 @@ msgstr "เพิ่มการป้อนด้วยเสียงแล้
 msgid "Dictation Empty"
 msgstr "การป้อนด้วยเสียงว่างเปล่า"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "แสดงโอเวอร์เลย์ลอยตัวพร้อมตัวนับเวลาถอยหลังและแถบความคืบหน้าขณะป้อนด้วยเสียง"
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "แสดงโอเวอร์เลย์ลอยตัวพร้อมตัวจับเวลาการบันทึกสดขณะป้อนด้วยเสียง"
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (ว่าง)"
@@ -231,9 +228,6 @@ msgstr "ขนาดไฟล์บันทึกสูงสุด:"
 
 msgid "Max Retries:"
 msgstr "จำนวนครั้งที่ลองใหม่สูงสุด:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "ระยะเวลาสูงสุดเป็นวินาทีสำหรับการบันทึกเสียงก่อนที่จะประมวลผลโดยอัตโนมัติ"
 
 msgid "Maximum size of the log file before rotating."
 msgstr "ขนาดสูงสุดของไฟล์บันทึกก่อนที่จะหมุนเวียนไฟล์"
@@ -403,7 +397,6 @@ msgstr "การเขียนใหม่ - พรอมต์ระบบ"
 msgid "Rewriting - User Prompt"
 msgstr "การเขียนใหม่ - พรอมต์ผู้ใช้"
 
-
 msgid "Save"
 msgstr "บันทึก"
 
@@ -434,8 +427,8 @@ msgstr "การค้นหาเชิงความหมาย"
 msgid "Settings"
 msgstr "การตั้งค่า"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "แสดงโอเวอร์เลย์ HUD นับถอยหลังแบบลอยตัวระหว่างการบันทึกเสียง"
+msgid "Show floating HUD overlay during recording"
+msgstr "แสดงโอเวอร์เลย์ HUD แบบลอยตัวระหว่างการบันทึกเสียง"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "เริ่ม Eloquent Notes อัตโนมัติเมื่อเข้าสู่ระบบ"

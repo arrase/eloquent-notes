@@ -36,18 +36,9 @@ class AudioTab(QWidget):
         self.cmb_channels.setToolTip(_("Number of audio input channels."))
         form_layout.addRow(QLabel(_("Audio Channels:")), self.cmb_channels)
 
-        self.spn_capture_duration = QSpinBox()
-        self.spn_capture_duration.setRange(1, 3600)
-        self.spn_capture_duration.setSingleStep(5)
-        self.spn_capture_duration.setSuffix(_(" sec"))
-        self.spn_capture_duration.setToolTip(
-            _("Maximum duration in seconds for audio recording before automatically processing.")
-        )
-        form_layout.addRow(QLabel(_("Capture Duration:")), self.spn_capture_duration)
-
-        self.chk_recording_hud_enabled = QCheckBox(_("Show floating countdown HUD overlay during recording"))
+        self.chk_recording_hud_enabled = QCheckBox(_("Show floating HUD overlay during recording"))
         self.chk_recording_hud_enabled.setToolTip(
-            _("Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating.")
+            _("Displays a sleek floating pill overlay with live recording timer while dictating.")
         )
         form_layout.addRow(self.chk_recording_hud_enabled)
 
@@ -78,7 +69,6 @@ class AudioTab(QWidget):
     def load_settings(self, config_data: dict) -> None:
         audio_cfg = config_data["audio"]
         self.cmb_channels.setCurrentIndex(0 if audio_cfg["channels"] == 1 else 1)
-        self.spn_capture_duration.setValue(audio_cfg["capture_duration"])
         self.chk_recording_hud_enabled.setChecked(audio_cfg["recording_hud_enabled"])
         beep_enabled = audio_cfg["beep_enabled"]
         self.chk_beep_enabled.setChecked(beep_enabled)
@@ -90,7 +80,6 @@ class AudioTab(QWidget):
         config_data["audio"].update(
             {
                 "channels": 1 if self.cmb_channels.currentIndex() == 0 else 2,
-                "capture_duration": self.spn_capture_duration.value(),
                 "recording_hud_enabled": self.chk_recording_hud_enabled.isChecked(),
                 "beep_enabled": self.chk_beep_enabled.isChecked(),
                 "beep_frequency": self.spn_beep_freq.value(),

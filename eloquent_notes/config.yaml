@@ -27,7 +27,6 @@ search:
 
 audio:
   channels: 1
-  capture_duration: 30
   recording_hud_enabled: true
   beep_frequency: 440
   beep_duration: 0.1

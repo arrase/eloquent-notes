@@ -30,7 +30,6 @@ def mock_config(tmp_path):
         },
         "audio": {
             "channels": 1,
-            "capture_duration": 30,
             "beep_enabled": False,
             "beep_frequency": 440,
             "beep_duration": 0.1,
@@ -101,9 +100,8 @@ def test_toggle_from_idle_starts_recording(qapp):
     assert eloquent_app._recorder is recorder
     recorder.start.assert_called_once()
     eloquent_app._update_icon.assert_called_with("red", "Eloquent Notes (Recording...)")
-    eloquent_app._hud.show_recording.assert_called_once_with(30.0)
+    eloquent_app._hud.show_recording.assert_called_once_with()
     assert eloquent_app._tick_timer.isActive()
-    assert eloquent_app._capture_duration == 30.0
 
     # Prompts are snapshotted at recording start
     loaded = eloquent_app._snapshot["_loaded_files"]
@@ -306,27 +304,20 @@ def test_toggle_while_processing_notifies_busy(qapp):
     )
 
 
-def test_recording_tick_timeout_stops_and_processes(qapp):
+def test_recording_tick_updates_hud_timer(qapp):
     eloquent_app = make_app(qapp)
     recorder = MagicMock()
     eloquent_app.state = "RECORDING"
     eloquent_app._recorder = recorder
-    eloquent_app._snapshot = {"audio": {"beep_enabled": False}}
-    eloquent_app._capture_duration = 30.0
     eloquent_app._hud.isVisible.return_value = True
 
-    with (
-        patch("eloquent_notes.app.time.monotonic", return_value=100.0),
-        patch(
-            "eloquent_notes.app.threading.Thread",
-        ),
-    ):
+    with patch("eloquent_notes.app.time.monotonic", return_value=100.0):
         eloquent_app._recording_started_at = 60.0
         eloquent_app._on_recording_tick()
 
-    eloquent_app._hud.update_progress.assert_called_once_with(40.0, 0.0, 30.0)
-    assert eloquent_app.state == "PROCESSING"
-    recorder.stop.assert_called_once()
+    eloquent_app._hud.update_timer.assert_called_once_with(40.0)
+    assert eloquent_app.state == "RECORDING"
+    recorder.stop.assert_not_called()
 
 
 def test_start_recording_creates_hud_lazily(qapp):
@@ -370,6 +361,7 @@ def test_start_recording_when_hud_disabled(qapp, mock_config):
     ):
         eloquent_app.toggle_action()
         assert eloquent_app._hud is None
+        assert not eloquent_app._tick_timer.isActive()
         eloquent_app.toggle_action()
 
     assert eloquent_app._hud is None
@@ -428,7 +420,7 @@ def test_process_audio_empty_wav(qapp):
     eloquent_app.processing_completed = MagicMock()
 
     recorder = MagicMock()
-    recorder.wav_bytes = b""
+    recorder.wav_chunks = []
     recorder.is_silent = True
     snapshot = _pipeline_snapshot()
 
@@ -482,7 +474,7 @@ def test_process_audio_empty_transcription(qapp):
     eloquent_app._preload_thread = newer_preload_thread
 
     recorder = MagicMock()
-    recorder.wav_bytes = b"RIFF" + b"\x00" * 100
+    recorder.wav_chunks = [b"RIFF" + b"\x00" * 100]
     recorder.is_silent = False
     snapshot = _pipeline_snapshot()
 
@@ -527,8 +519,8 @@ def test_process_audio_local_silence_never_reaches_model(qapp):
     eloquent_app.processing_completed = MagicMock()
 
     recorder = MagicMock()
-    wav_prop = PropertyMock(return_value=b"RIFF" + b"\x00" * 100)
-    type(recorder).wav_bytes = wav_prop
+    wav_prop = PropertyMock(return_value=[b"RIFF" + b"\x00" * 100])
+    type(recorder).wav_chunks = wav_prop
     recorder.is_silent = True
     snapshot = _pipeline_snapshot()
 
@@ -555,7 +547,7 @@ def test_process_audio_full_pipeline_success(qapp, tmp_path):
     eloquent_app.processing_completed = MagicMock()
 
     recorder = MagicMock()
-    recorder.wav_bytes = b"RIFF" + b"\x00" * 100
+    recorder.wav_chunks = [b"RIFF" + b"\x00" * 100]
     recorder.is_silent = False
     snapshot = _pipeline_snapshot()
     snapshot["notes"]["folder"] = str(tmp_path / "notes")
@@ -580,7 +572,7 @@ def test_process_audio_full_pipeline_success(qapp, tmp_path):
     eloquent_app.processing_completed.emit.assert_called_once_with("success", "Note Title")
 
     # Audio bytes are forwarded to phase 1
-    assert mock_transcribe.call_args.kwargs["audio_bytes"] == recorder.wav_bytes
+    assert mock_transcribe.call_args.kwargs["audio_bytes"] == recorder.wav_chunks[0]
 
     # Phase 3 receives the rewritten content rather than raw transcription
     assert "Clean note" in mock_classify.call_args.kwargs["user_prompt"]
@@ -594,11 +586,53 @@ def test_process_audio_full_pipeline_success(qapp, tmp_path):
     assert (saved.title, saved.type, saved.tags, saved.body) == ("Note Title", "idea", ["tag1", "two"], "Clean note")
 
 
+def test_process_audio_multi_chunk_transcription(qapp, tmp_path):
+    eloquent_app = make_app(qapp)
+    eloquent_app.processing_completed = MagicMock()
+
+    recorder = MagicMock()
+    recorder.wav_chunks = [b"chunk1", b"chunk2", b"chunk3"]
+    recorder.is_silent = False
+    snapshot = _pipeline_snapshot()
+    snapshot["notes"]["folder"] = str(tmp_path / "notes")
+
+    with (
+        patch(
+            "eloquent_notes.app.llm.transcribe_audio",
+            side_effect=[
+                {"empty": False, "transcription": "First part."},
+                {"empty": True, "transcription": ""},
+                {"empty": False, "transcription": "  Second part.  "},
+            ],
+        ) as mock_transcribe,
+        patch(
+            "eloquent_notes.app.llm.rewrite_transcription",
+            return_value={"title": "Multi-chunk Note", "content": "Unified note."},
+        ) as mock_rewrite,
+        patch(
+            "eloquent_notes.app.llm.classify_note",
+            return_value={"type": "note", "tags": ["long"]},
+        ),
+        patch("eloquent_notes.app.llm.preload_model"),
+    ):
+        eloquent_app._process_audio(recorder, snapshot, False, None)
+
+    assert mock_transcribe.call_count == 3
+    assert [call.kwargs["audio_bytes"] for call in mock_transcribe.call_args_list] == [
+        b"chunk1",
+        b"chunk2",
+        b"chunk3",
+    ]
+    assert "First part. Second part." in mock_rewrite.call_args.kwargs["user_prompt"]
+    eloquent_app.processing_completed.emit.assert_called_once_with("success", "Multi-chunk Note")
+
+
 def test_process_audio_append_stops_after_rewriting(qapp):
     eloquent_app = make_app(qapp)
     eloquent_app.processing_completed = MagicMock()
 
     recorder = MagicMock()
+    recorder.wav_chunks = [b"RIFF" + b"\x00" * 100]
     recorder.is_silent = False
     snapshot = _pipeline_snapshot()
 
@@ -631,6 +665,7 @@ def test_process_audio_rejects_empty_rewrite(qapp):
     eloquent_app.processing_completed = MagicMock()
 
     recorder = MagicMock()
+    recorder.wav_chunks = [b"RIFF" + b"\x00" * 100]
     recorder.is_silent = False
     snapshot = _pipeline_snapshot()
 
@@ -658,7 +693,7 @@ def test_process_audio_exception_emits_error(qapp):
     eloquent_app.processing_completed = MagicMock()
 
     recorder = MagicMock()
-    recorder.wav_bytes = b"RIFF" + b"\x00" * 100
+    recorder.wav_chunks = [b"RIFF" + b"\x00" * 100]
     recorder.is_silent = False
     snapshot = _pipeline_snapshot()
 
@@ -981,7 +1016,7 @@ def test_app_main_invalid_config_logs_notifies_and_exits(monkeypatch, mock_confi
     monkeypatch.setattr("eloquent_notes.app.QApplication", lambda args: mock_qapp)
     monkeypatch.setattr(
         "eloquent_notes.app.config.load_config",
-        MagicMock(side_effect=ValueError("Invalid configuration value for 'capture_duration'")),
+        MagicMock(side_effect=ValueError("Invalid configuration value for 'channels'")),
     )
     monkeypatch.setattr("eloquent_notes.app.config.load_default_config", lambda: mock_config)
     monkeypatch.setattr("eloquent_notes.app.setup_logging", mock_setup_logging)
@@ -1000,7 +1035,7 @@ def test_app_main_invalid_config_logs_notifies_and_exits(monkeypatch, mock_confi
     mock_critical.assert_called_once_with(
         None,
         "Configuration Error",
-        "Invalid configuration value for 'capture_duration'",
+        "Invalid configuration value for 'channels'",
     )
 
 

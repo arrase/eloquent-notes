@@ -10,12 +10,12 @@ Eloquent Notes is a Linux tray daemon with one job: turn voice dictations into w
 | :--- | :--- |
 | `main.py` | CLI entry point: `install-autostart`, `toggle`, `open`, `config`; single-instance IPC client; launches the daemon. |
 | `app.py` | `EloquentApp` controller: tray icon and menu, IPC server, recording lifecycle, processing pipeline, notes window wiring, config reload. |
-| `audio.py` | In-memory 16 kHz recording (`AudioRecorder`), Silero VAD silence detection and speech trimming (`speech_window_mask`, `_trim_speech`), WAV encoding, beeps. |
+| `audio.py` | In-memory 16 kHz recording (`AudioRecorder`), Silero VAD silence detection and speech segmentation into `<= 30 s` WAV chunks (`speech_window_mask`, `_split_speech`, `wav_chunks`), WAV encoding, beeps. |
 | `llm.py` | Ollama client: model preload, the three pipeline phases (`transcribe_audio`, `rewrite_note`, `classify_note`) with JSON-schema output and retries, `/api/embed`. |
 | `notes.py` | Note storage: `Note` dataclass, load / create / save / append, frontmatter parsing, tag normalization. |
 | `search.py` | `SemanticIndex`: embedding cache and cosine-similarity ranking. |
 | `window.py` | `MainWindow`: timeline and reader pages. A pure view that reports user intent through signals. |
-| `recording_hud.py` | Floating countdown overlay shown while recording (click to stop). |
+| `recording_hud.py` | Floating elapsed-time overlay shown while recording (click to stop). |
 | `ui.py` | Application, tray and dictation state icons drawn with `QPainter`, plus explicit light/dark `Theme` palettes (`window_stylesheet`, `dialog_stylesheet`). |
 | `i18n.py` | System locale detection and `gettext` translation loader (`_`, `ngettext`, `ui_locale`, `OUTPUT_LANGUAGES`) with 40 packaged `.po`/`.mo` catalogs under `locales/`. |
 | `config.py` | XDG paths, default file installation, config loading/merging, diffing (`diff_configs`), atomic writes. |
@@ -92,7 +92,7 @@ The CLI entry point (`eloquent_notes.main`) works as a lightweight client:
 | :--- | :--- | :--- |
 | `IDLE` | Startup, processing finished | Gray microphone |
 | `RECORDING` | `toggle_action()` or `dictate_into(note)` while idle | Red dot |
-| `PROCESSING` | Stop request or `capture_duration` reached | Orange hourglass |
+| `PROCESSING` | Stop request | Orange hourglass |
 
 At recording start, the configuration and all prompt files are copied into a **snapshot**, so editing settings mid-dictation cannot affect the note being processed. `dictate_into(note)` records the same way but remembers the target note; the pipeline then stops after Phase 2 and the text is appended to that note (see [Three-Phase AI Pipeline](pipeline.md)).
 
@@ -104,8 +104,8 @@ While processing, further toggles only show a "System is busy" notification; the
 
 - **Stream capture:** `sounddevice.InputStream` captures 16 kHz (`SAMPLE_RATE = 16000`) float32 NumPy blocks into an internal chunk list during recording, which is concatenated and encoded once stopped.
 - **Local silence gate:** `AudioRecorder.is_silent` scores 32 ms windows (512 samples at 16 kHz) with Silero VAD (`silero-vad-lite`, `speech_window_mask()`) and requires at least `0.5 s` of accumulated speech (`MIN_SPEECH_S = 0.5`). Silent or noise-only recordings never reach the model.
-- **Silence trimming & WAV encoding:** `AudioRecorder.wav_bytes` trims leading/trailing non-speech windows and click transients with a `0.2 s` padding margin (`_trim_speech()`, `SPEECH_PAD_S = 0.2`), converts to 16-bit PCM and writes a 16 kHz WAV file into an `io.BytesIO` buffer.
-- **Base64 transmission:** the WAV bytes are base64-encoded and sent in the JSON body of `/api/chat`. No audio file is ever written to disk.
+- **Silence trimming, VAD segmentation & WAV encoding:** `AudioRecorder.wav_chunks` trims leading/trailing non-speech windows and click transients with a `0.2 s` padding margin (`SPEECH_PAD_S = 0.2`), splits recordings longer than 30 seconds at natural pauses (`>= 256 ms`, `MIN_PAUSE_WINDOWS = 8`) into `<= 30 s` spans (`_split_speech()`, `MAX_CHUNK_S = 30.0`), and encodes each span as 16-bit PCM in an in-memory 16 kHz WAV `io.BytesIO` buffer.
+- **Base64 transmission:** each WAV chunk is base64-encoded and sent in the JSON body of `/api/chat`. No audio file is ever written to disk.
 
 ### Audible Feedback Cues
 Start/stop beeps are sine waves synthesized with NumPy with a 10 ms linear fade-in/out to avoid clicks. The start beep plays synchronously before the microphone opens so it cannot leak into the recording.
@@ -183,8 +183,8 @@ flowchart TB
     end
 
     subgraph Process ["Processing Thread"]
-        P1["Silence gate + WAV bytes"]
-        T1["Phase 1: Transcription"]
+        P1["Silence gate + WAV chunks (<= 30 s)"]
+        T1["Phase 1: Transcription (per chunk)"]
         T3["Phase 2: Rewriting (title, content)"]
         A{"Add dictation?"}
         T5["Phase 3: Classification (type, tags)"]

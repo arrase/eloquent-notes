@@ -73,8 +73,7 @@ The dialog has six tabs plus **Restore Defaults**, **Cancel** and **Save** butto
 
 #### 5. Audio
 * **Audio Channels**: `1` (mono) or `2` (stereo). Audio is always captured at 16 kHz.
-* **Capture Duration**: maximum recording length in seconds before recording stops automatically (default `30`, the Gemma 4 audio limit).
-* **Show floating countdown HUD**: overlay with the remaining time while recording; clicking it stops the recording.
+* **Show floating HUD**: overlay with the elapsed recording time while dictating; clicking it stops the recording.
 * **Play beep on recording start and stop**: audio cues, with **Beep Frequency** (default `440` Hz) and **Beep Duration** (default `0.1` s).
 
 #### 6. Prompts
@@ -119,7 +118,6 @@ search:
 
 audio:
   channels: 1
-  capture_duration: 30
   recording_hud_enabled: true
   beep_frequency: 440
   beep_duration: 0.1

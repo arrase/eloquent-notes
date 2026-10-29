@@ -70,9 +70,6 @@ msgstr "ব্রাউজ করুন..."
 msgid "Cancel"
 msgstr "বাতিল"
 
-msgid "Capture Duration:"
-msgstr "ক্যাপচার স্থিতিকাল:"
-
 msgid "Classification - System Prompt"
 msgstr "শ্রেণীবিভাগ - সিস্টেম প্রম্পট"
 
@@ -142,8 +139,8 @@ msgstr "ডিক্টেশন যোগ করা হয়েছে"
 msgid "Dictation Empty"
 msgstr "ডিক্টেশন খালি"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "ডিক্টেশন চলাকালীন লাইভ কাউন্টডাউন টাইমার এবং প্রোগ্রেস বার সহ একটি সুন্দর ভাসমান পিল ওভারলে প্রদর্শন করে।"
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "ডিক্টেশন চলাকালীন লাইভ রেকর্ডিং টাইমার সহ একটি সুন্দর ভাসমান পিল ওভারলে প্রদর্শন করে।"
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (নিষ্ক্রিয়)"
@@ -231,9 +228,6 @@ msgstr "সর্বোচ্চ লগ ফাইল আকার:"
 
 msgid "Max Retries:"
 msgstr "সর্বোচ্চ পুনরায় চেষ্টা:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "স্বয়ংক্রিয়ভাবে প্রক্রিয়াকরণের আগে অডিও রেকর্ডিংয়ের সর্বোচ্চ স্থিতিকাল (সেকেন্ডে)।"
 
 msgid "Maximum size of the log file before rotating."
 msgstr "রোটেট করার আগে লগ ফাইলের সর্বোচ্চ আকার।"
@@ -403,7 +397,6 @@ msgstr "পুনর্লিখন - সিস্টেম প্রম্প�
 msgid "Rewriting - User Prompt"
 msgstr "পুনর্লিখন - ব্যবহারকারী প্রম্পট"
 
-
 msgid "Save"
 msgstr "সংরক্ষণ করুন"
 
@@ -434,8 +427,8 @@ msgstr "সিম্যান্টিক অনুসন্ধান"
 msgid "Settings"
 msgstr "সেটিংস"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "রেকর্ডিং চলাকালীন ভাসমান কাউন্টডাউন HUD ওভারলে দেখান"
+msgid "Show floating HUD overlay during recording"
+msgstr "রেকর্ডিং চলাকালীন ভাসমান HUD ওভারলে দেখান"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "লগইন করার সময় স্বয়ংক্রিয়ভাবে Eloquent Notes শুরু করুন"

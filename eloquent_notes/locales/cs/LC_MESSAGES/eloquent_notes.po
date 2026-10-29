@@ -70,9 +70,6 @@ msgstr "Procházet..."
 msgid "Cancel"
 msgstr "Zrušit"
 
-msgid "Capture Duration:"
-msgstr "Délka záznamu:"
-
 msgid "Classification - System Prompt"
 msgstr "Klasifikace – Systémový prompt"
 
@@ -142,8 +139,8 @@ msgstr "Diktát přidán"
 msgid "Dictation Empty"
 msgstr "Diktát je prázdný"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Během diktování zobrazuje elegantní plovoucí panel s odpočítáváním a ukazatelem průběhu."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Během diktování zobrazuje elegantní plovoucí panel s časovačem nahrávání."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Nečinný)"
@@ -231,9 +228,6 @@ msgstr "Max. velikost souboru protokolu:"
 
 msgid "Max Retries:"
 msgstr "Max. počet opakování:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Maximální délka zvukového záznamu v sekundách před automatickým zpracováním."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Maximální velikost souboru protokolu před rotací."
@@ -403,7 +397,6 @@ msgstr "Přepisování – Systémový prompt"
 msgid "Rewriting - User Prompt"
 msgstr "Přepisování – Uživatelský prompt"
 
-
 msgid "Save"
 msgstr "Uložit"
 
@@ -434,8 +427,8 @@ msgstr "Sémantické vyhledávání"
 msgid "Settings"
 msgstr "Nastavení"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Zobrazit plovoucí HUD panel s odpočítáváním během nahrávání"
+msgid "Show floating HUD overlay during recording"
+msgstr "Zobrazit plovoucí HUD panel během nahrávání"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Spouštět Eloquent Notes automaticky při přihlášení"

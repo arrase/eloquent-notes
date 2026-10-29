@@ -9,12 +9,17 @@ import numpy as np
 import pytest
 
 from eloquent_notes.audio import (
+    MAX_CHUNK_SAMPLES,
+    MAX_CHUNK_WINDOWS,
+    MIN_PAUSE_WINDOWS,
+    MIN_SPEECH_WINDOWS,
+    PAD_SAMPLES,
     PCM16_MAX,
     SAMPLE_RATE,
     SPEECH_PAD_S,
     VAD_WINDOW_SAMPLES,
     AudioRecorder,
-    _trim_speech,
+    _split_speech,
     encode_wav_bytes,
     play_beep,
     speech_window_mask,
@@ -99,21 +104,22 @@ def test_callback_enqueues_copy():
     assert queued_chunk is not chunk
 
 
-def test_wav_bytes_without_data_is_empty():
+def test_wav_chunks_without_data_is_empty():
     recorder = AudioRecorder(channels=1)
-    assert recorder.wav_bytes == b""
+    assert recorder.wav_chunks == []
     assert encode_wav_bytes(np.empty(0, dtype=np.float32), SAMPLE_RATE, 1) == b""
 
 
-def test_wav_bytes_encodes_captured_chunks():
+def test_wav_chunks_encodes_captured_chunks():
     recorder = AudioRecorder(channels=1)
     speech = _load_speech()
     recorder._chunks.append(speech[:24000])
     recorder._chunks.append(speech[24000:])
 
-    wav_bytes = recorder.wav_bytes
-    assert recorder.wav_bytes == wav_bytes
-    with wave.open(io.BytesIO(wav_bytes), "rb") as wf:
+    wav_chunks = recorder.wav_chunks
+    assert len(wav_chunks) == 1
+    assert recorder.wav_chunks == wav_chunks
+    with wave.open(io.BytesIO(wav_chunks[0]), "rb") as wf:
         assert wf.getnchannels() == 1
         assert wf.getsampwidth() == 2
         assert wf.getframerate() == SAMPLE_RATE
@@ -181,11 +187,19 @@ def test_is_silent_accepts_real_speech():
 def test_short_burst_is_silent():
     speech = _load_speech()
     silence = np.zeros((SAMPLE_RATE, 1), dtype=np.float32)
-    short_burst = np.concatenate([silence, speech[: int(SAMPLE_RATE * 0.3)], silence])
+    burst = speech[: int(SAMPLE_RATE * 0.3)]
+    short_burst = np.concatenate([silence, burst, silence])
 
     recorder = AudioRecorder(channels=1)
     recorder._chunks.append(short_burst)
     assert recorder.is_silent is True
+
+    # Multiple short bursts whose combined active windows exceed MIN_SPEECH_WINDOWS remain silent
+    multi_burst = np.concatenate([silence, burst, silence, burst, silence, burst, silence])
+    assert int(np.count_nonzero(speech_window_mask(multi_burst))) >= MIN_SPEECH_WINDOWS
+    multi_recorder = AudioRecorder(channels=1)
+    multi_recorder._chunks.append(multi_burst)
+    assert multi_recorder.is_silent is True
 
 
 def test_trim_keeps_speech_with_padding():
@@ -196,8 +210,9 @@ def test_trim_keeps_speech_with_padding():
 
     recorder = AudioRecorder(channels=1)
     recorder._chunks.extend([click, silence, speech, silence, click])
-    samples, active = recorder._analyze()
-    trimmed = _trim_speech(samples, active)
+    samples = np.concatenate(recorder._chunks)
+    active = speech_window_mask(samples)
+    [trimmed] = _split_speech(samples, active)
 
     pad = int(SAMPLE_RATE * SPEECH_PAD_S)
     first_speech_sample = int(np.argmax(active)) * VAD_WINDOW_SAMPLES
@@ -213,7 +228,9 @@ def test_trim_keeps_speech_with_padding():
     assert np.max(np.abs(trimmed[:speech_offset])) == 0.0
     assert np.max(np.abs(trimmed[speech_offset + len(speech) :])) == 0.0
 
-    with wave.open(io.BytesIO(recorder.wav_bytes), "rb") as wf:
+    wav_chunks = recorder.wav_chunks
+    assert len(wav_chunks) == 1
+    with wave.open(io.BytesIO(wav_chunks[0]), "rb") as wf:
         assert wf.getnframes() == len(trimmed)
 
 
@@ -224,18 +241,159 @@ def test_trim_keeps_interior_pauses():
 
     active = speech_window_mask(data)
     assert not np.all(active)
-    trimmed = _trim_speech(data, active)
+    [trimmed] = _split_speech(data, active)
     assert np.array_equal(trimmed, data)
 
 
-def test_trim_speech_returns_all_silent_audio_unchanged():
+def test_split_speech_returns_empty_for_silent_audio():
     quiet = np.zeros((SAMPLE_RATE, 1), dtype=np.float32)
     active = speech_window_mask(quiet)
     assert not np.any(active)
-    assert np.array_equal(_trim_speech(quiet, active), quiet)
+    assert _split_speech(quiet, active) == []
 
 
-def test_recorder_reuses_analysis_across_is_silent_and_wav_bytes():
+def test_split_speech_splits_long_audio_at_real_pauses():
+    total_windows = 1300
+    active = np.ones(total_windows, dtype=bool)
+    # Place a 20-window (640 ms > 2 * SPEECH_PAD_S) pause in the second half of the first 30 s window
+    pause_start, pause_end = 700, 720
+    active[pause_start:pause_end] = False
+    data = np.arange(total_windows * VAD_WINDOW_SAMPLES, dtype=np.float32).reshape(-1, 1)
+
+    chunks = _split_speech(data, active)
+    assert len(chunks) == 2
+    for chunk in chunks:
+        assert len(chunk) <= MAX_CHUNK_SAMPLES
+
+    # First chunk ends at pause_start + PAD_SAMPLES, second chunk starts at pause_end - PAD_SAMPLES
+    assert int(chunks[0][0, 0]) == 0
+    assert int(chunks[0][-1, 0]) == pause_start * VAD_WINDOW_SAMPLES + PAD_SAMPLES - 1
+    assert int(chunks[1][0, 0]) == pause_end * VAD_WINDOW_SAMPLES - PAD_SAMPLES
+    assert int(chunks[1][-1, 0]) == total_windows * VAD_WINDOW_SAMPLES - 1
+
+    # A long pause crossing midpoint (312..906) beats a shorter pause in the second half (916..925)
+    crossing_active = np.ones(1100, dtype=bool)
+    crossing_active[312:906] = False
+    crossing_active[916:925] = False
+    crossing_chunks = _split_speech(data[: 1100 * VAD_WINDOW_SAMPLES], crossing_active)
+    assert len(crossing_chunks) == 2
+    assert int(crossing_chunks[0][0, 0]) == 0
+    assert int(crossing_chunks[0][-1, 0]) == 312 * VAD_WINDOW_SAMPLES + PAD_SAMPLES - 1
+
+
+def test_split_speech_prioritizes_first_half_real_pause_over_second_half_micro_pause():
+    total_windows = 1200
+    active = np.ones(total_windows, dtype=bool)
+    # Real inter-word pause (>= MIN_PAUSE_WINDOWS) in the first half
+    real_pause_start, real_pause_end = 300, 300 + MIN_PAUSE_WINDOWS
+    active[real_pause_start:real_pause_end] = False
+    # Short stop-consonant closure (< MIN_PAUSE_WINDOWS) in the second half
+    micro_pause_start, micro_pause_end = 750, 753
+    active[micro_pause_start:micro_pause_end] = False
+    data = np.arange(total_windows * VAD_WINDOW_SAMPLES, dtype=np.float32).reshape(-1, 1)
+
+    chunks = _split_speech(data, active)
+    assert len(chunks) == 2
+    for chunk in chunks:
+        assert len(chunk) <= MAX_CHUNK_SAMPLES
+
+    # Must split at the real pause (300..308), never at the 3-window consonant closure (750..753)
+    midpoint_sample = (real_pause_start + real_pause_end) * VAD_WINDOW_SAMPLES // 2
+    assert int(chunks[0][-1, 0]) == midpoint_sample - 1
+    assert int(chunks[1][0, 0]) == midpoint_sample
+
+
+def test_split_speech_continuous_speech_no_pauses_and_short_pause_clamping():
+    # Continuous speech > 30 s with zero silent windows splits cleanly at MAX_CHUNK_WINDOWS
+    total_windows = 1100
+    active = np.ones(total_windows, dtype=bool)
+    data = np.arange(total_windows * VAD_WINDOW_SAMPLES, dtype=np.float32).reshape(-1, 1)
+
+    chunks = _split_speech(data, active)
+    assert len(chunks) == 2
+    for chunk in chunks:
+        assert len(chunk) <= MAX_CHUNK_SAMPLES
+
+    split_sample = MAX_CHUNK_WINDOWS * VAD_WINDOW_SAMPLES
+    assert int(chunks[0][-1, 0]) == split_sample - 1
+    assert int(chunks[1][0, 0]) == split_sample
+    assert np.array_equal(np.concatenate(chunks), data)
+
+    # Fallback when only short pauses (< MIN_PAUSE_WINDOWS) exist: clamp PAD_SAMPLES at midpoint
+    active_short_pause = np.ones(total_windows, dtype=bool)
+    active_short_pause[600:604] = False
+    chunks_short = _split_speech(data, active_short_pause)
+    assert len(chunks_short) == 2
+    midpoint_sample = (600 + 604) * VAD_WINDOW_SAMPLES // 2
+    assert int(chunks_short[0][-1, 0]) == midpoint_sample - 1
+    assert int(chunks_short[1][0, 0]) == midpoint_sample
+
+
+def test_split_speech_discards_short_transients():
+    # Leading transient (5..10) + pause (10..25) + first speech (25..625) + pause (625..650)
+    # + intermediate transient (650..655) + pause (655..675) + second speech (675..1580)
+    # + pause (1580..1600) + trailing transient (1600..1605)
+    total_windows = 1610
+    active = np.zeros(total_windows, dtype=bool)
+    active[5:10] = True
+    active[25:625] = True
+    active[650:655] = True
+    active[675:1580] = True
+    active[1600:1605] = True
+    assert 5 < MIN_SPEECH_WINDOWS <= 600
+    data = np.arange(total_windows * VAD_WINDOW_SAMPLES, dtype=np.float32).reshape(-1, 1)
+
+    chunks = _split_speech(data, active)
+    # Leading (5..10), intermediate (650..655), and trailing (1600..1605) transients are discarded;
+    # only the two sustained speech segments (25..625 and 675..1580) are emitted.
+    assert len(chunks) == 2
+    assert int(chunks[0][0, 0]) == 25 * VAD_WINDOW_SAMPLES - PAD_SAMPLES
+    assert int(chunks[0][-1, 0]) == 625 * VAD_WINDOW_SAMPLES + PAD_SAMPLES - 1
+    assert int(chunks[1][0, 0]) == 675 * VAD_WINDOW_SAMPLES - PAD_SAMPLES
+    assert int(chunks[1][-1, 0]) == 1580 * VAD_WINDOW_SAMPLES + PAD_SAMPLES - 1
+
+    # Single-chunk recording (<= MAX_CHUNK_WINDOWS) trims both leading (5..10) and trailing (650..655) transients
+    single_active = np.zeros(660, dtype=bool)
+    single_active[5:10] = True
+    single_active[25:625] = True
+    single_active[650:655] = True
+    [single_chunk] = _split_speech(data[: 660 * VAD_WINDOW_SAMPLES], single_active)
+    assert int(single_chunk[0, 0]) == 25 * VAD_WINDOW_SAMPLES - PAD_SAMPLES
+    assert int(single_chunk[-1, 0]) == 625 * VAD_WINDOW_SAMPLES + PAD_SAMPLES - 1
+
+    # Speech 0..900 (with internal pause 500..510) + pause 900..940 + trailing transient 940..945
+    # stays a single chunk once the trailing transient is trimmed before the split loop
+    near_limit_active = np.zeros(950, dtype=bool)
+    near_limit_active[0:900] = True
+    near_limit_active[500:510] = False
+    near_limit_active[940:945] = True
+    [near_limit_chunk] = _split_speech(data[: 950 * VAD_WINDOW_SAMPLES], near_limit_active)
+    assert int(near_limit_chunk[0, 0]) == 0
+    assert int(near_limit_chunk[-1, 0]) == 900 * VAD_WINDOW_SAMPLES + PAD_SAMPLES - 1
+
+    # Intermediate transient (650..655) followed by a longer pause (655..680, 25 windows) than its
+    # preceding pause (635..650, 15 windows): split occurs at 655..680 and the transient is trimmed
+    # off the end of Chunk 1
+    trailing_mid_active = np.zeros(total_windows, dtype=bool)
+    trailing_mid_active[25:635] = True
+    trailing_mid_active[650:655] = True
+    trailing_mid_active[680:1580] = True
+    trailing_mid_chunks = _split_speech(data, trailing_mid_active)
+    assert len(trailing_mid_chunks) == 2
+    assert int(trailing_mid_chunks[0][0, 0]) == 25 * VAD_WINDOW_SAMPLES - PAD_SAMPLES
+    assert int(trailing_mid_chunks[0][-1, 0]) == 635 * VAD_WINDOW_SAMPLES + PAD_SAMPLES - 1
+    assert int(trailing_mid_chunks[1][0, 0]) == 680 * VAD_WINDOW_SAMPLES - PAD_SAMPLES
+    assert int(trailing_mid_chunks[1][-1, 0]) == 1580 * VAD_WINDOW_SAMPLES + PAD_SAMPLES - 1
+
+    # Multiple short transients summing to >= MIN_SPEECH_WINDOWS across the recording yield no chunks
+    bursts_active = np.zeros(100, dtype=bool)
+    for start in (5, 25, 45, 65):
+        bursts_active[start : start + 5] = True
+    assert int(np.count_nonzero(bursts_active)) >= MIN_SPEECH_WINDOWS
+    assert _split_speech(data[: 100 * VAD_WINDOW_SAMPLES], bursts_active) == []
+
+
+def test_recorder_reuses_analysis_across_is_silent_and_wav_chunks():
     recorder = AudioRecorder(channels=1)
     speech = _load_speech()
     recorder._chunks.append(speech[:24000])
@@ -246,8 +404,8 @@ def test_recorder_reuses_analysis_across_is_silent_and_wav_bytes():
         patch("eloquent_notes.audio.speech_window_mask", wraps=speech_window_mask) as mock_mask,
     ):
         assert recorder.is_silent is False
-        assert len(recorder.wav_bytes) > 0
-        assert len(recorder.wav_bytes) > 0
+        assert len(recorder.wav_chunks) == 1
+        assert len(recorder.wav_chunks) == 1
 
     chunk_concats = [c for c in mock_concat.call_args_list if c.args[0] is recorder._chunks]
     assert len(chunk_concats) == 1
@@ -255,7 +413,7 @@ def test_recorder_reuses_analysis_across_is_silent_and_wav_bytes():
 
     recorder._chunks.clear()
     assert recorder.is_silent is True
-    assert recorder.wav_bytes == b""
+    assert recorder.wav_chunks == []
 
 
 @patch("sounddevice.wait")

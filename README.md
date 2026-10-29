@@ -28,7 +28,7 @@ Everything runs offline on your machine.
 
 ## ✨ Features
 
-- **One-gesture capture:** left-click the tray icon or bind `eloquent-notes toggle` to a global shortcut. A floating HUD shows the remaining time while you speak.
+- **One-gesture capture:** left-click the tray icon or bind `eloquent-notes toggle` to a global shortcut. A floating HUD shows the elapsed recording time while you speak.
 - **Clean notes, not transcripts:** a three-phase pipeline (transcription → rewriting → classification) removes filler words, writes a concise title and assigns a type (`note`, `task`, `idea`, `reminder`, `question`, `decision`) and 2–5 tags.
 - **Plain Markdown files:** one file per note with YAML frontmatter, in a folder you choose. No database, no lock-in.
 - **Notes window:** a timeline grouped by day, type and tag filters, and a reader where title, type, tags and body are editable.
@@ -48,7 +48,7 @@ Everything runs offline on your machine.
    ollama pull embeddinggemma-2:latest
    ```
    > [!NOTE]
-   > Gemma 4 audio models accept clips of up to **30 seconds**, so recordings stop automatically after `audio.capture_duration` (default 30 s).
+   > Gemma 4 audio models accept clips of up to **30 seconds**, so recordings longer than 30 seconds are automatically split at natural pauses with Silero VAD.
 
 2. **PortAudio** (audio capture and beeps) and a desktop notification server:
    ```bash
@@ -89,8 +89,8 @@ eloquent-notes install-autostart    # start it automatically on login
 ```
 
 ### Record a note
-1. Start recording: left-click the tray icon or run `eloquent-notes toggle`. A beep plays, the icon turns **red**, and a floating countdown HUD appears at the top of the screen.
-2. Speak (up to 30 s). The model is preloaded in the background while you talk.
+1. Start recording: left-click the tray icon or run `eloquent-notes toggle`. A beep plays, the icon turns **red**, and a floating recording HUD appears at the top of the screen.
+2. Speak for as long as you need. The model is preloaded in the background while you talk.
 3. Stop recording the same way (or click the floating HUD). The icon turns **orange** while the note is written.
 4. A **Note Saved** notification appears and the icon returns to **gray**. Click the notification to open the notes window. Silent recordings produce a **Dictation Empty** notification and no note.
 
@@ -174,7 +174,7 @@ Open it from the tray menu (**Configuration**), the **Settings** button in the n
 - **Notes:** the notes folder.
 - **Appearance:** timeline grid columns and custom badge colors for each note type.
 - **AI Settings:** Ollama URL, audio model, output language, context length, keep-alive, retries and timeouts; **Semantic Search** group with the embedding model and minimum similarity. **Refresh** lists the audio-capable and embedding models installed in Ollama.
-- **Audio:** channels, maximum capture duration, recording HUD, beeps.
+- **Audio:** channels, recording HUD, beeps.
 - **Prompts:** edit the transcription, rewriting, classification and retry prompts.
 
 <p align="center">
@@ -225,7 +225,6 @@ search:
 
 audio:
   channels: 1
-  capture_duration: 30
   recording_hud_enabled: true
   beep_frequency: 440
   beep_duration: 0.1

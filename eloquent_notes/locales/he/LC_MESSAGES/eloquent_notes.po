@@ -70,9 +70,6 @@ msgstr "עיון..."
 msgid "Cancel"
 msgstr "ביטול"
 
-msgid "Capture Duration:"
-msgstr "משך הקלטה:"
-
 msgid "Classification - System Prompt"
 msgstr "סיווג - הנחיית מערכת"
 
@@ -142,8 +139,8 @@ msgstr "ההכתבה נוספה"
 msgid "Dictation Empty"
 msgstr "ההכתבה ריקה"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "מציג שכבת-על צפה ואלגנטית עם טיימר ספירה לאחור חי וסרגל התקדמות בזמן ההכתבה."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "מציג שכבת-על צפה ואלגנטית עם טיימר הקלטה חי בזמן ההכתבה."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (בהמתנה)"
@@ -231,9 +228,6 @@ msgstr "גודל מרבי לקובץ יומן:"
 
 msgid "Max Retries:"
 msgstr "מספר ניסיונות חוזרים מרבי:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "משך זמן מרבי בשניות להקלטת שמע לפני עיבוד אוטומטי."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "גודל מרבי של קובץ היומן לפני תחלופה."
@@ -403,7 +397,6 @@ msgstr "שכתוב - הנחיית מערכת"
 msgid "Rewriting - User Prompt"
 msgstr "שכתוב - הנחיית משתמש"
 
-
 msgid "Save"
 msgstr "שמור"
 
@@ -434,8 +427,8 @@ msgstr "חיפוש סמנטי"
 msgid "Settings"
 msgstr "הגדרות"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "הצג שכבת-על צפה של ספירה לאחור בזמן ההקלטה"
+msgid "Show floating HUD overlay during recording"
+msgstr "הצג שכבת-על צפה (HUD) בזמן ההקלטה"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "הפעל את Eloquent Notes אוטומטית בעת ההתחברות"

@@ -70,9 +70,6 @@ msgstr "مرور..."
 msgid "Cancel"
 msgstr "انصراف"
 
-msgid "Capture Duration:"
-msgstr "مدت زمان ضبط:"
-
 msgid "Classification - System Prompt"
 msgstr "دسته‌بندی - پرامپت سیستم"
 
@@ -142,8 +139,8 @@ msgstr "دیکته اضافه شد"
 msgid "Dictation Empty"
 msgstr "دیکته خالی است"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "هنگام دیکته، یک نوار شناور زیبا با شمارشگر معکوس زنده و نوار پیشرفت نمایش می‌دهد."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "هنگام دیکته، یک نوار شناور زیبا با زمان‌سنج زنده ضبط نمایش می‌دهد."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (آماده)"
@@ -231,9 +228,6 @@ msgstr "حداکثر اندازه فایل گزارش:"
 
 msgid "Max Retries:"
 msgstr "حداکثر تلاش مجدد:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "حداکثر مدت زمان ضبط صدا به ثانیه پیش از پردازش خودکار."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "حداکثر اندازه فایل گزارش پیش از چرخش."
@@ -403,7 +397,6 @@ msgstr "بازنویسی - پرامپت سیستم"
 msgid "Rewriting - User Prompt"
 msgstr "بازنویسی - پرامپت کاربر"
 
-
 msgid "Save"
 msgstr "ذخیره"
 
@@ -434,8 +427,8 @@ msgstr "جستجوی معنایی"
 msgid "Settings"
 msgstr "تنظیمات"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "نمایش شمارشگر معکوس شناور هنگام ضبط"
+msgid "Show floating HUD overlay during recording"
+msgstr "نمایش نوار شناور (HUD) هنگام ضبط"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "اجرای خودکار Eloquent Notes هنگام ورود به سیستم"

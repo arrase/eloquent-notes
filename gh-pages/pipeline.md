@@ -10,17 +10,18 @@ Rather than forcing a single small LLM call to transcribe audio, clean up prose,
 
 ```
                       ┌─────────────────────────────────┐
-                      │    In-Memory Audio (WAV bytes)  │
+                      │  In-Memory Audio (WAV chunks)   │
+                      │    (<= 30 s each via VAD)       │
                       └────────────────┬────────────────┘
                                        │
                                        ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ Phase 1: Audio Transcription (Multimodal Input)                             │
-│ - Inputs: Base64 WAV bytes + System & User Prompts                          │
-│ - Tasks: Removes stutters, repetitions, and filler words.                   │
+│ Phase 1: Audio Transcription (Multimodal Input, per <= 30 s chunk)          │
+│ - Inputs: Base64 WAV chunk + System & User Prompts                          │
+│ - Tasks: Removes stutters, repetitions, and filler words; joins chunks.     │
 │ - Output JSON: {"transcription": string, "empty": bool}                      │
 └──────────────────────────────────────┬──────────────────────────────────────┘
-                                       │ (Early exit if empty == true)
+                                       │ (Early exit if all chunks empty)
                                        ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ Phase 2: Note Rewriting & Formatting                                        │
@@ -48,7 +49,7 @@ When the dictation was started with **Add dictation** on an existing note, the p
 
 ## 1. Phase 1: Audio Transcription
 
-Phase 1 takes the raw WAV audio bytes captured during dictation, base64 encodes them, and sends them directly to the multimodal model endpoint.
+Phase 1 iterates over the `<= 30 s` WAV audio chunks (`AudioRecorder.wav_chunks`) produced during dictation, base64 encodes each chunk, and sends it to the multimodal model endpoint, joining the non-empty transcriptions with `" "` before Phase 2.
 
 ### Goals
 - Perform accurate speech-to-text conversion.
@@ -82,12 +83,17 @@ The model cannot be trusted to recognise silence or non-speech noise. Asked to l
 
 Eloquent Notes therefore decides emptiness locally via `AudioRecorder.is_silent`, which runs **Silero VAD** (`silero-vad-lite` on CPU) through `audio.speech_window_mask()`. The 16 kHz recording (`SAMPLE_RATE = 16000`) is sliced into fixed 32 ms windows (`VAD_WINDOW_SAMPLES = 512`), and each window is marked active when Silero's speech probability exceeds `0.5` (`SPEECH_PROBABILITY`). A recording must accumulate at least `0.5 s` of active speech windows (`MIN_SPEECH_S = 0.5`); otherwise `_process_audio()` emits the `empty` signal without contacting Ollama at all, so an accidental trigger, ambient noise, music or a cough cannot produce a fabricated note. Across a benchmark of 256 non-speech noise clips (ESC-50 and synthetic noise) and 200 LibriSpeech dictations (clean and noisy down to 0 dB SNR), this gate reduced noise clips saved as notes from 142/256 to **0/256** while losing **0/200** dictations. The model's own `empty` flag is retained in the schema and honoured, but treated as advisory.
 
-### Silence Trimming
+### Silence Trimming & 30-Second VAD Segmentation
 
-`AudioRecorder.wav_bytes` additionally trims leading and trailing non-speech 32 ms windows (including isolated start/stop click transients) via `audio._trim_speech()` before encoding, keeping a `0.2 s` padding margin (`SPEECH_PAD_S = 0.2`) on each side so word onsets and offsets are not clipped, and preserving interior pauses intact. This shortens the audio the model must encode, which makes it less likely to fill surrounding silence with invented speech and reduces the token cost.
+Because Gemma 4's audio encoder accepts clips of up to 30 seconds (`MAX_CHUNK_S = 30.0`), `AudioRecorder.wav_chunks` trims surrounding silence and segments longer dictations into `<= 30 s` WAV chunks via `audio._split_speech()`:
+
+- **Single-chunk trimming (`<= 30 s`):** leading and trailing non-speech 32 ms windows (including isolated start/stop click transients with `< 0.5 s` of voice) are trimmed while keeping a `0.2 s` padding margin (`SPEECH_PAD_S = 0.2`) on each side so word onsets and offsets are not clipped, preserving interior pauses intact.
+- **Natural-pause splitting (`> 30 s`):** when active speech exceeds `29.6 s` (`MAX_CHUNK_WINDOWS = 925`), `_find_split()` selects the longest real inter-word pause (`>= 256 ms`, `MIN_PAUSE_WINDOWS = 8` windows) in the second half of the window (or across the midpoint / first half if needed), avoiding intra-word consonant stop closures (`32–96 ms`). Padding between adjacent chunks is clamped to the pause midpoint so no samples are duplicated.
+- **Per-chunk voice filter:** every resulting span must contain at least `0.5 s` of active speech (`MIN_SPEECH_WINDOWS = 16`); sub-`0.5 s` noise bursts or trailing clicks are discarded before encoding.
+- **Sequential transcription & global synthesis:** `_process_audio()` transcribes each WAV chunk in Phase 1 and joins the non-empty segments with `" "` so Phase 2 and Phase 3 operate on the complete dictation at once.
 
 ### Early Exit Safeguard
-If Phase 1 returns `"empty": true` or a blank transcription string, processing terminates immediately. The application fires an `"empty"` signal, displays a desktop notification ("Dictation Empty"), resets the tray icon to gray, and saves no file to disk.
+If every chunk in Phase 1 returns `"empty": true` or a blank transcription string, processing terminates immediately. The application fires an `"empty"` signal, displays a desktop notification ("Dictation Empty"), resets the tray icon to gray, and saves no file to disk.
 
 ---
 

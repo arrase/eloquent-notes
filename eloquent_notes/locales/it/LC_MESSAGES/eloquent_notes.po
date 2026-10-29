@@ -70,9 +70,6 @@ msgstr "Sfoglia..."
 msgid "Cancel"
 msgstr "Annulla"
 
-msgid "Capture Duration:"
-msgstr "Durata acquisizione:"
-
 msgid "Classification - System Prompt"
 msgstr "Classificazione - Prompt di sistema"
 
@@ -142,8 +139,8 @@ msgstr "Dettatura aggiunta"
 msgid "Dictation Empty"
 msgstr "Dettatura vuota"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Mostra un'elegante pillola flottante con conto alla rovescia e barra di avanzamento durante la dettatura."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Mostra un'elegante pillola flottante con timer di registrazione in tempo reale durante la dettatura."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Inattivo)"
@@ -231,9 +228,6 @@ msgstr "Dimensione max file di registro:"
 
 msgid "Max Retries:"
 msgstr "Tentativi massimi:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Durata massima in secondi della registrazione audio prima dell'elaborazione automatica."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Dimensione massima del file di registro prima della rotazione."
@@ -403,7 +397,6 @@ msgstr "Riscrittura - Prompt di sistema"
 msgid "Rewriting - User Prompt"
 msgstr "Riscrittura - Prompt utente"
 
-
 msgid "Save"
 msgstr "Salva"
 
@@ -434,8 +427,8 @@ msgstr "Ricerca semantica"
 msgid "Settings"
 msgstr "Impostazioni"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Mostra overlay flottante con conto alla rovescia durante la registrazione"
+msgid "Show floating HUD overlay during recording"
+msgstr "Mostra overlay HUD flottante durante la registrazione"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Avvia automaticamente Eloquent Notes all'accesso"

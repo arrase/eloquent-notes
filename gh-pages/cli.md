@@ -61,7 +61,7 @@ Prints the installed version and exits, for example:
 
 ```bash
 $ eloquent-notes --version
-eloquent-notes 0.5.0
+eloquent-notes 0.6.0
 ```
 
 The value is read from the installed distribution metadata, so it always matches the release you actually have installed rather than a separately maintained constant.
@@ -138,7 +138,7 @@ Logs format timestamps, levels, thread names, module functions, and line numbers
 
 ```text
 2026-08-06 14:30:00 [INFO] (MainThread) eloquent_notes.app._start_recording:289 - Starting audio recording...
-2026-08-06 14:30:05 [INFO] (Thread-2) eloquent_notes.app._process_audio:465 - Phase 1: Transcribing audio...
+2026-08-06 14:30:05 [INFO] (Thread-2) eloquent_notes.app._process_audio:465 - Phase 1: Transcribing audio chunk 1/1...
 2026-08-06 14:30:08 [INFO] (Thread-2) eloquent_notes.app._process_audio:478 - Rewriting: title=Daily Standup Notes
 2026-08-06 14:30:09 [INFO] (Thread-2) eloquent_notes.app._process_audio:484 - Phase 3: Classifying note...
 2026-08-06 14:30:10 [INFO] (MainThread) eloquent_notes.app._on_processing_completed:528 - Note saved: Daily Standup Notes

@@ -269,7 +269,6 @@ def test_audio_tab_load_and_save(qapp):
     config_data = {
         "audio": {
             "channels": 2,
-            "capture_duration": 45,
             "recording_hud_enabled": False,
             "beep_enabled": False,
             "beep_frequency": 1200,
@@ -279,7 +278,6 @@ def test_audio_tab_load_and_save(qapp):
 
     tab.load_settings(config_data)
     assert tab.cmb_channels.currentIndex() == 1
-    assert tab.spn_capture_duration.value() == 45
     assert not tab.chk_recording_hud_enabled.isChecked()
     assert not tab.chk_beep_enabled.isChecked()
     assert not tab.spn_beep_freq.isEnabled()
@@ -294,7 +292,6 @@ def test_audio_tab_load_and_save(qapp):
     res = tab.save_settings(config_data)
     assert res is True
     assert config_data["audio"]["channels"] == 2
-    assert config_data["audio"]["capture_duration"] == 45
     assert config_data["audio"]["recording_hud_enabled"] is False
     assert config_data["audio"]["beep_enabled"] is True
 

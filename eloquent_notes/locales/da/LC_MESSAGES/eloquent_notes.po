@@ -70,9 +70,6 @@ msgstr "Gennemse..."
 msgid "Cancel"
 msgstr "Annuller"
 
-msgid "Capture Duration:"
-msgstr "Optagelsesvarighed:"
-
 msgid "Classification - System Prompt"
 msgstr "Klassificering - Systemprompt"
 
@@ -142,8 +139,8 @@ msgstr "Diktat tilføjet"
 msgid "Dictation Empty"
 msgstr "Diktat tomt"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Viser en elegant svævende bjælke med nedtælling og statuslinje under diktering."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Viser en elegant svævende bjælke med optagelsestimer under diktering."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Inaktiv)"
@@ -231,9 +228,6 @@ msgstr "Maks. størrelse på logfil:"
 
 msgid "Max Retries:"
 msgstr "Maks. forsøg:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Maksimal varighed i sekunder for lydoptagelse før automatisk behandling."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Maksimal størrelse på logfilen før rotation."
@@ -403,7 +397,6 @@ msgstr "Omskrivning - Systemprompt"
 msgid "Rewriting - User Prompt"
 msgstr "Omskrivning - Brugerprompt"
 
-
 msgid "Save"
 msgstr "Gem"
 
@@ -434,8 +427,8 @@ msgstr "Semantisk søgning"
 msgid "Settings"
 msgstr "Indstillinger"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Vis svævende nedtællingsbjælke under optagelse"
+msgid "Show floating HUD overlay during recording"
+msgstr "Vis svævende HUD-bjælke under optagelse"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Start Eloquent Notes automatisk ved login"

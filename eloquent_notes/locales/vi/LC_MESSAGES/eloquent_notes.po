@@ -70,9 +70,6 @@ msgstr "Duyệt..."
 msgid "Cancel"
 msgstr "Hủy"
 
-msgid "Capture Duration:"
-msgstr "Thời lượng thu âm:"
-
 msgid "Classification - System Prompt"
 msgstr "Phân loại - Lời nhắc hệ thống"
 
@@ -142,8 +139,8 @@ msgstr "Đã thêm bản đọc chính tả"
 msgid "Dictation Empty"
 msgstr "Bản đọc chính tả trống"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Hiển thị lớp phủ nổi gọn gàng với bộ đếm ngược trực tiếp và thanh tiến trình trong khi đọc chính tả."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Hiển thị lớp phủ nổi gọn gàng với bộ hẹn giờ ghi âm trực tiếp trong khi đọc chính tả."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Rảnh)"
@@ -231,9 +228,6 @@ msgstr "Kích thước tệp nhật ký tối đa:"
 
 msgid "Max Retries:"
 msgstr "Số lần thử lại tối đa:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Thời lượng tối đa tính bằng giây cho việc ghi âm trước khi tự động xử lý."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Kích thước tối đa của tệp nhật ký trước khi xoay vòng."
@@ -403,7 +397,6 @@ msgstr "Viết lại - Lời nhắc hệ thống"
 msgid "Rewriting - User Prompt"
 msgstr "Viết lại - Lời nhắc người dùng"
 
-
 msgid "Save"
 msgstr "Lưu"
 
@@ -434,8 +427,8 @@ msgstr "Tìm kiếm ngữ nghĩa"
 msgid "Settings"
 msgstr "Cài đặt"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Hiển thị lớp phủ HUD đếm ngược nổi trong khi ghi âm"
+msgid "Show floating HUD overlay during recording"
+msgstr "Hiển thị lớp phủ HUD nổi trong khi ghi âm"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Tự động khởi động Eloquent Notes khi đăng nhập"

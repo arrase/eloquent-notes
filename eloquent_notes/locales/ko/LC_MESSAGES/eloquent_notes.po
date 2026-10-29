@@ -70,9 +70,6 @@ msgstr "찾아보기..."
 msgid "Cancel"
 msgstr "취소"
 
-msgid "Capture Duration:"
-msgstr "녹음 시간:"
-
 msgid "Classification - System Prompt"
 msgstr "분류 - 시스템 프롬프트"
 
@@ -142,8 +139,8 @@ msgstr "받아쓰기 추가됨"
 msgid "Dictation Empty"
 msgstr "받아쓰기 비어 있음"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "받아쓰기 중에 실시간 카운트다운 타이머와 진행률 표시줄이 있는 깔끔한 플로팅 오버레이를 표시합니다."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "받아쓰기 중에 실시간 녹음 타이머가 있는 깔끔한 플로팅 오버레이를 표시합니다."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (대기 중)"
@@ -231,9 +228,6 @@ msgstr "최대 로그 파일 크기:"
 
 msgid "Max Retries:"
 msgstr "최대 재시도 횟수:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "자동으로 처리하기 전 오디오 녹음의 최대 시간(초)입니다."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "순환하기 전 로그 파일의 최대 크기입니다."
@@ -403,7 +397,6 @@ msgstr "재작성 - 시스템 프롬프트"
 msgid "Rewriting - User Prompt"
 msgstr "재작성 - 사용자 프롬프트"
 
-
 msgid "Save"
 msgstr "저장"
 
@@ -434,8 +427,8 @@ msgstr "시맨틱 검색"
 msgid "Settings"
 msgstr "설정"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "녹음 중 플로팅 카운트다운 HUD 오버레이 표시"
+msgid "Show floating HUD overlay during recording"
+msgstr "녹음 중 플로팅 HUD 오버레이 표시"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "로그인 시 Eloquent Notes 자동 시작"

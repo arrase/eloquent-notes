@@ -94,7 +94,6 @@ class EloquentApp(QObject):
         self._processing_thread = None
         self._config_dialog = None
         self._hud = None
-        self._capture_duration = 0.0
         self._recording_started_at = 0.0
         self._index = SemanticIndex()
 
@@ -335,7 +334,6 @@ class EloquentApp(QObject):
         self.state = RECORDING
         self._snapshot = snapshot
         self._recorder = recorder
-        self._capture_duration = float(audio_cfg["capture_duration"])
         self._recording_started_at = time.monotonic()
 
         self._update_icon("red", _("Eloquent Notes (Recording...)"))
@@ -343,8 +341,8 @@ class EloquentApp(QObject):
             if self._hud is None:
                 self._hud = recording_hud.RecordingHUD()
                 self._hud.clicked.connect(self.toggle_action)
-            self._hud.show_recording(self._capture_duration)
-        self._tick_timer.start(100)
+            self._hud.show_recording()
+            self._tick_timer.start(100)
 
         if self._preload_thread is None or not self._preload_thread.is_alive():
             ai_cfg = snapshot["ai"]
@@ -370,14 +368,9 @@ class EloquentApp(QObject):
             logger.warning("Model preload skipped: %s", e)
 
     def _on_recording_tick(self):
-        elapsed = time.monotonic() - self._recording_started_at
-        remaining = max(0.0, self._capture_duration - elapsed)
         if self._hud is not None and self._hud.isVisible():
-            self._hud.update_progress(elapsed, remaining, self._capture_duration)
-
-        if elapsed >= self._capture_duration:
-            logger.info("Maximum capture duration reached, stopping recording...")
-            self._stop_and_process()
+            elapsed = time.monotonic() - self._recording_started_at
+            self._hud.update_timer(elapsed)
 
     def _stop_and_process(self):
         self.state = PROCESSING
@@ -417,19 +410,27 @@ class EloquentApp(QObject):
         )
 
     @staticmethod
-    def _transcribe(ai_cfg, loaded, wav_bytes):
-        return llm.transcribe_audio(
-            ollama_url=ai_cfg["ollama_url"],
-            model=ai_cfg["model"],
-            system_prompt=loaded[config.TRANSCRIPTION_SYSTEM_PROMPT_PATH],
-            user_prompt=loaded[config.TRANSCRIPTION_USER_PROMPT_PATH],
-            retry_prompt=loaded[config.RETRY_PROMPT_PATH],
-            context_length=ai_cfg["context_length"],
-            audio_bytes=wav_bytes,
-            keep_alive=ai_cfg["preload_keep_alive"],
-            max_retries=ai_cfg["max_retries"],
-            timeout=ai_cfg["request_timeout"],
-        )
+    def _transcribe(ai_cfg, loaded, wav_chunks):
+        transcriptions = []
+        for index, wav_bytes in enumerate(wav_chunks, start=1):
+            logger.info("Phase 1: Transcribing audio chunk %d/%d...", index, len(wav_chunks))
+            result = llm.transcribe_audio(
+                ollama_url=ai_cfg["ollama_url"],
+                model=ai_cfg["model"],
+                system_prompt=loaded[config.TRANSCRIPTION_SYSTEM_PROMPT_PATH],
+                user_prompt=loaded[config.TRANSCRIPTION_USER_PROMPT_PATH],
+                retry_prompt=loaded[config.RETRY_PROMPT_PATH],
+                context_length=ai_cfg["context_length"],
+                audio_bytes=wav_bytes,
+                keep_alive=ai_cfg["preload_keep_alive"],
+                max_retries=ai_cfg["max_retries"],
+                timeout=ai_cfg["request_timeout"],
+            )
+            if not result["empty"]:
+                chunk_text = result["transcription"].strip()
+                if chunk_text:
+                    transcriptions.append(chunk_text)
+        return " ".join(transcriptions)
 
     @staticmethod
     def _rewrite(ai_cfg, loaded, transcription, language_instruction, keep_alive):
@@ -493,13 +494,7 @@ class EloquentApp(QObject):
             if recorder.is_silent:
                 return
 
-            wav_bytes = recorder.wav_bytes
-
-            logger.info("Phase 1: Transcribing audio...")
-            transcription_result = self._transcribe(ai_cfg, loaded, wav_bytes)
-            if transcription_result["empty"]:
-                return
-            transcription = transcription_result["transcription"].strip()
+            transcription = self._transcribe(ai_cfg, loaded, recorder.wav_chunks)
             if not transcription:
                 return
             logger.info("Transcription: %s", transcription)

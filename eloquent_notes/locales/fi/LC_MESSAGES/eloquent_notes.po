@@ -70,9 +70,6 @@ msgstr "Selaa..."
 msgid "Cancel"
 msgstr "Peruuta"
 
-msgid "Capture Duration:"
-msgstr "Tallennuksen kesto:"
-
 msgid "Classification - System Prompt"
 msgstr "Luokittelu - Järjestelmäkehote"
 
@@ -142,8 +139,8 @@ msgstr "Sanelu lisätty"
 msgid "Dictation Empty"
 msgstr "Sanelu on tyhjä"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Näyttää tyylikkään kelluvan palkin laskurilla ja edistymispalkilla sanelun aikana."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Näyttää tyylikkään kelluvan palkin reaaliaikaisella tallennusajastimella sanelun aikana."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Valmiina)"
@@ -231,9 +228,6 @@ msgstr "Lokitiedoston enimmäiskoko:"
 
 msgid "Max Retries:"
 msgstr "Uudelleenyritysten enimmäismäärä:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Äänentallennuksen enimmäiskesto sekunteina ennen automaattista käsittelyä."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Lokitiedoston enimmäiskoko ennen kiertoa."
@@ -403,7 +397,6 @@ msgstr "Uudelleenkirjoitus - Järjestelmäkehote"
 msgid "Rewriting - User Prompt"
 msgstr "Uudelleenkirjoitus - Käyttäjäkehote"
 
-
 msgid "Save"
 msgstr "Tallenna"
 
@@ -434,8 +427,8 @@ msgstr "Semanttinen haku"
 msgid "Settings"
 msgstr "Asetukset"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Näytä kelluva laskurinäkymä tallennuksen aikana"
+msgid "Show floating HUD overlay during recording"
+msgstr "Näytä kelluva HUD-näkymä tallennuksen aikana"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Käynnistä Eloquent Notes automaattisesti kirjautumisen yhteydessä"

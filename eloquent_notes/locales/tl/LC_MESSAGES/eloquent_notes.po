@@ -70,9 +70,6 @@ msgstr "Mag-browse..."
 msgid "Cancel"
 msgstr "Kanselahin"
 
-msgid "Capture Duration:"
-msgstr "Tagal ng Pag-record:"
-
 msgid "Classification - System Prompt"
 msgstr "Klasipikasyon - System Prompt"
 
@@ -142,8 +139,8 @@ msgstr "Naidagdag ang Diktasyon"
 msgid "Dictation Empty"
 msgstr "Walang Laman ang Diktasyon"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Nagpapakita ng makinis na lumulutang na pill overlay na may live countdown timer at progress bar habang nagdidikta."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Nagpapakita ng makinis na lumulutang na pill overlay na may live recording timer habang nagdidikta."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Naka-idle)"
@@ -231,9 +228,6 @@ msgstr "Max na Laki ng Log File:"
 
 msgid "Max Retries:"
 msgstr "Max na Pag-ulit:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Maximum na tagal sa segundo para sa pag-record ng audio bago awtomatikong iproseso."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Maximum na laki ng log file bago i-rotate."
@@ -403,7 +397,6 @@ msgstr "Pagsusulat Muli - System Prompt"
 msgid "Rewriting - User Prompt"
 msgstr "Pagsusulat Muli - User Prompt"
 
-
 msgid "Save"
 msgstr "I-save"
 
@@ -434,8 +427,8 @@ msgstr "Semantic na Paghahanap"
 msgid "Settings"
 msgstr "Mga Setting"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Ipakita ang lumulutang na countdown HUD overlay habang nagre-record"
+msgid "Show floating HUD overlay during recording"
+msgstr "Ipakita ang lumulutang na HUD overlay habang nagre-record"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Awtomatikong simulan ang Eloquent Notes pagka-login"

@@ -70,9 +70,6 @@ msgstr "Jelajahi..."
 msgid "Cancel"
 msgstr "Batal"
 
-msgid "Capture Duration:"
-msgstr "Durasi Perekaman:"
-
 msgid "Classification - System Prompt"
 msgstr "Klasifikasi - Prompt Sistem"
 
@@ -142,8 +139,8 @@ msgstr "Dikte Ditambahkan"
 msgid "Dictation Empty"
 msgstr "Dikte Kosong"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Menampilkan overlay kapsul mengambang dengan penghitung waktu mundur langsung dan bilah kemajuan saat mendikte."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Menampilkan overlay kapsul mengambang dengan pengatur waktu perekaman langsung saat mendikte."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Siaga)"
@@ -231,9 +228,6 @@ msgstr "Ukuran Maks File Log:"
 
 msgid "Max Retries:"
 msgstr "Percobaan Ulang Maks:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Durasi maksimum dalam detik untuk perekaman audio sebelum diproses secara otomatis."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Ukuran maksimum file log sebelum dirotasi."
@@ -403,7 +397,6 @@ msgstr "Penulisan Ulang - Prompt Sistem"
 msgid "Rewriting - User Prompt"
 msgstr "Penulisan Ulang - Prompt Pengguna"
 
-
 msgid "Save"
 msgstr "Simpan"
 
@@ -434,8 +427,8 @@ msgstr "Pencarian Semantik"
 msgid "Settings"
 msgstr "Pengaturan"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Tampilkan overlay HUD hitung mundur mengambang selama perekaman"
+msgid "Show floating HUD overlay during recording"
+msgstr "Tampilkan overlay HUD mengambang selama perekaman"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Jalankan Eloquent Notes secara otomatis saat masuk"

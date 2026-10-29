@@ -70,9 +70,6 @@ msgstr "Огляд..."
 msgid "Cancel"
 msgstr "Скасувати"
 
-msgid "Capture Duration:"
-msgstr "Тривалість запису:"
-
 msgid "Classification - System Prompt"
 msgstr "Класифікація — Системний промпт"
 
@@ -142,8 +139,8 @@ msgstr "Диктування додано"
 msgid "Dictation Empty"
 msgstr "Диктування порожнє"
 
-msgid "Displays a sleek floating pill overlay with live countdown timer and progress bar while dictating."
-msgstr "Відображає компактну плаваючу панель із таймером зворотного відліку та індикатором виконання під час диктування."
+msgid "Displays a sleek floating pill overlay with live recording timer while dictating."
+msgstr "Відображає компактну плаваючу панель із таймером запису наживо під час диктування."
 
 msgid "Eloquent Notes (Idle)"
 msgstr "Eloquent Notes (Очікування)"
@@ -231,9 +228,6 @@ msgstr "Макс. розмір файлу журналу:"
 
 msgid "Max Retries:"
 msgstr "Макс. кількість спроб:"
-
-msgid "Maximum duration in seconds for audio recording before automatically processing."
-msgstr "Максимальна тривалість запису аудіо в секундах перед автоматичною обробкою."
 
 msgid "Maximum size of the log file before rotating."
 msgstr "Максимальний розмір файлу журналу перед ротацією."
@@ -403,7 +397,6 @@ msgstr "Переписування — Системний промпт"
 msgid "Rewriting - User Prompt"
 msgstr "Переписування — Промпт користувача"
 
-
 msgid "Save"
 msgstr "Зберегти"
 
@@ -434,8 +427,8 @@ msgstr "Семантичний пошук"
 msgid "Settings"
 msgstr "Налаштування"
 
-msgid "Show floating countdown HUD overlay during recording"
-msgstr "Показувати плаваючу HUD-панель зворотного відліку під час запису"
+msgid "Show floating HUD overlay during recording"
+msgstr "Показувати плаваючу HUD-панель під час запису"
 
 msgid "Start Eloquent Notes automatically on login"
 msgstr "Автоматично запускати Eloquent Notes під час входу в систему"
