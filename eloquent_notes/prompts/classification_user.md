@@ -1,7 +1,5 @@
-Classify this note and extract metadata:
+Classify this note:
 
 <<<
-{transcription}
+{content}
 >>>
-
-{language_instruction}

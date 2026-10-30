@@ -213,7 +213,7 @@ def test_load_translations_stops_at_english_before_later_languages(monkeypatch: 
 
 def test_all_40_catalogs_cover_every_codebase_string() -> None:
     msgids, plurals = _extract_codebase_msgids()
-    assert len(msgids) == 169
+    assert len(msgids) == 171
     assert plurals == {("{count} result", "{count} results")}
 
     installed_locales = sorted(entry.name for entry in Path(i18n.LOCALES_DIR).iterdir() if entry.is_dir())

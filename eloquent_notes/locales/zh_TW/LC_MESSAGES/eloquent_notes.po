@@ -448,6 +448,12 @@ msgstr "停止聽寫"
 msgid "System is busy. Please wait."
 msgstr "系統忙碌中，請稍候。"
 
+msgid "Tagging - System Prompt"
+msgstr "標籤產生 - 系統提示詞"
+
+msgid "Tagging - User Prompt"
+msgstr "標籤產生 - 使用者提示詞"
+
 msgid "Tags, separated by commas"
 msgstr "標籤，以逗號分隔"
 

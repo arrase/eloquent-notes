@@ -10,7 +10,7 @@ repo_url: https://github.com/arrase/eloquent-notes
 nav:
   - Overview: index.md
   - Architecture & Design: architecture.md
-  - Three-Phase AI Pipeline: pipeline.md
+  - Four-Phase AI Pipeline: pipeline.md
   - Notes & Search: notes.md
   - Configuration: configuration.md
   - System Tray & Shortcuts: usage-shortcuts.md

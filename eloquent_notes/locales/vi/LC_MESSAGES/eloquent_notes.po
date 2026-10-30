@@ -448,6 +448,12 @@ msgstr "Dừng đọc chính tả"
 msgid "System is busy. Please wait."
 msgstr "Hệ thống đang bận. Vui lòng đợi."
 
+msgid "Tagging - System Prompt"
+msgstr "Gắn thẻ - Lời nhắc hệ thống"
+
+msgid "Tagging - User Prompt"
+msgstr "Gắn thẻ - Lời nhắc người dùng"
+
 msgid "Tags, separated by commas"
 msgstr "Thẻ, phân cách bằng dấu phẩy"
 

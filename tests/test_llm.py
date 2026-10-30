@@ -333,30 +333,34 @@ def test_parse_json_response_validates_field_types_and_enum() -> None:
     # Enum violation
     with pytest.raises(ValueError, match="field 'type' has invalid value 'invalid_type'"):
         llm._parse_json_response(
-            '{"type": "invalid_type", "tags": []}',
+            '{"type": "invalid_type"}',
             llm.CLASSIFICATION_SCHEMA,
         )
 
     # Array type mismatch (not a list)
     with pytest.raises(TypeError, match="field 'tags' must be a list of strings"):
         llm._parse_json_response(
-            '{"type": "note", "tags": "not-a-list"}',
-            llm.CLASSIFICATION_SCHEMA,
+            '{"tags": "not-a-list"}',
+            llm.TAGGING_SCHEMA,
         )
 
     # Array item type mismatch (list contains non-string)
     with pytest.raises(TypeError, match="field 'tags' must be a list of strings"):
         llm._parse_json_response(
-            '{"type": "note", "tags": ["ok", 42]}',
-            llm.CLASSIFICATION_SCHEMA,
+            '{"tags": ["ok", 42]}',
+            llm.TAGGING_SCHEMA,
         )
 
-    # Valid classification payload
-    parsed = llm._parse_json_response(
-        '{"type": "task", "tags": ["cache"]}',
-        llm.CLASSIFICATION_SCHEMA,
-    )
-    assert parsed == {"type": "task", "tags": ["cache"]}
+    # Missing required keys on classification and tagging schemas
+    with pytest.raises(ValueError, match=r"missing required keys: \['type'\]"):
+        llm._parse_json_response("{}", llm.CLASSIFICATION_SCHEMA)
+    with pytest.raises(ValueError, match=r"missing required keys: \['tags'\]"):
+        llm._parse_json_response("{}", llm.TAGGING_SCHEMA)
+
+    # Valid classification and tagging payloads (including empty tag list)
+    assert llm._parse_json_response('{"type": "task"}', llm.CLASSIFICATION_SCHEMA) == {"type": "task"}
+    assert llm._parse_json_response('{"tags": ["cache"]}', llm.TAGGING_SCHEMA) == {"tags": ["cache"]}
+    assert llm._parse_json_response('{"tags": []}', llm.TAGGING_SCHEMA) == {"tags": []}
 
 
 def test_execute_ollama_json_request_rejects_json_array() -> None:
@@ -518,10 +522,7 @@ def test_rewriting_schema_rejects_blank_title_or_content_and_triggers_retry() ->
 
 @patch("eloquent_notes.llm._execute_ollama_json_request")
 def test_classify_note(mock_exec: MagicMock) -> None:
-    mock_exec.return_value = {
-        "type": "idea",
-        "tags": ["tag1"],
-    }
+    mock_exec.return_value = {"type": "idea"}
 
     res = llm.classify_note(
         ollama_url="http://localhost:11434",
@@ -530,22 +531,47 @@ def test_classify_note(mock_exec: MagicMock) -> None:
         user_prompt="usr classify",
         retry_prompt="retry prompt",
         context_length=2048,
-        keep_alive="0",
+        keep_alive="5m",
         max_retries=3,
         timeout=300,
     )
 
-    assert res == {
-        "type": "idea",
-        "tags": ["tag1"],
-    }
+    assert res == {"type": "idea"}
     mock_exec.assert_called_once()
     kwargs = mock_exec.call_args.kwargs
     assert kwargs["model"] == "gemma"
     assert kwargs["messages"][0] == {"role": "system", "content": "sys classify"}
     assert kwargs["messages"][1] == {"role": "user", "content": "usr classify"}
     assert kwargs["format_schema"] is llm.CLASSIFICATION_SCHEMA
-    assert llm.CLASSIFICATION_SCHEMA["required"] == ["type", "tags"]
+    assert kwargs["task_name"] == "note classification"
+    assert llm.CLASSIFICATION_SCHEMA["required"] == ["type"]
+
+
+@patch("eloquent_notes.llm._execute_ollama_json_request")
+def test_tag_note(mock_exec: MagicMock) -> None:
+    mock_exec.return_value = {"tags": ["tag1", "tag2"]}
+
+    res = llm.tag_note(
+        ollama_url="http://localhost:11434",
+        model="gemma",
+        system_prompt="sys tag",
+        user_prompt="usr tag",
+        retry_prompt="retry prompt",
+        context_length=2048,
+        keep_alive="0",
+        max_retries=3,
+        timeout=300,
+    )
+
+    assert res == {"tags": ["tag1", "tag2"]}
+    mock_exec.assert_called_once()
+    kwargs = mock_exec.call_args.kwargs
+    assert kwargs["model"] == "gemma"
+    assert kwargs["messages"][0] == {"role": "system", "content": "sys tag"}
+    assert kwargs["messages"][1] == {"role": "user", "content": "usr tag"}
+    assert kwargs["format_schema"] is llm.TAGGING_SCHEMA
+    assert kwargs["task_name"] == "note tagging"
+    assert llm.TAGGING_SCHEMA["required"] == ["tags"]
 
 
 @patch("eloquent_notes.llm.requests.post")

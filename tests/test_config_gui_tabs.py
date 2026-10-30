@@ -9,7 +9,7 @@ from PyQt6 import sip
 from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import QApplication
 
-from eloquent_notes import ui
+from eloquent_notes import config, ui
 from eloquent_notes.config_gui.loader import OllamaModelLoader
 from eloquent_notes.config_gui.tabs import text_files
 from eloquent_notes.config_gui.tabs.ai import AITab
@@ -542,3 +542,19 @@ def test_text_files_tab_load_settings_row0_already_selected(
 
     tab.load_settings({})
     assert tab.editor.toPlainText() == "Updated Disk Text"
+
+
+def test_prompts_list_covers_every_prompt_path_in_pipeline_order() -> None:
+    paths = [path for _label, path, _default in text_files.PROMPTS]
+    assert paths == [
+        config.TRANSCRIPTION_SYSTEM_PROMPT_PATH,
+        config.TRANSCRIPTION_USER_PROMPT_PATH,
+        config.REWRITING_SYSTEM_PROMPT_PATH,
+        config.REWRITING_USER_PROMPT_PATH,
+        config.CLASSIFICATION_SYSTEM_PROMPT_PATH,
+        config.CLASSIFICATION_USER_PROMPT_PATH,
+        config.TAGGING_SYSTEM_PROMPT_PATH,
+        config.TAGGING_USER_PROMPT_PATH,
+        config.RETRY_PROMPT_PATH,
+    ]
+    assert set(paths) == set(config.PROMPT_PATHS)

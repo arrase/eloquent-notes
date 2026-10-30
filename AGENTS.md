@@ -5,7 +5,7 @@ Eloquent Notes has one focus: **voice dictations → structured, well-ordered no
 This repository contains documentation under `gh-pages/` to help AI coding agents understand the system architecture, design patterns, and module structure:
 
 - **System Blueprint**: Refer to gh-pages/architecture.md for modules, boundaries, IPC, the recording lifecycle and the threading model.
-- **Processing Pipeline**: Refer to gh-pages/pipeline.md for the three-phase Ollama pipeline, add-dictation flow and retry logic.
+- **Processing Pipeline**: Refer to gh-pages/pipeline.md for the four-phase Ollama pipeline, add-dictation flow and retry logic.
 - **Notes & Search**: Refer to gh-pages/notes.md for the note file format, the notes window and semantic search.
 - **Configuration**: Refer to gh-pages/configuration.md for settings and prompts.
 - **Usage & CLI**: Refer to gh-pages/usage-shortcuts.md and gh-pages/cli.md for tray, window and command-line behavior.

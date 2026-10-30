@@ -29,7 +29,7 @@ Everything runs offline on your machine.
 ## ✨ Features
 
 - **One-gesture capture:** left-click the tray icon or bind `eloquent-notes toggle` to a global shortcut. A floating HUD shows the elapsed recording time while you speak.
-- **Clean notes, not transcripts:** a three-phase pipeline (transcription → rewriting → classification) removes filler words, writes a concise title and assigns a type (`note`, `task`, `idea`, `reminder`, `question`, `decision`) and 2–5 tags.
+- **Clean notes, not transcripts:** a four-phase pipeline (transcription → rewriting → classification → tagging) removes filler words, writes a concise title, classifies the note type (`note`, `task`, `idea`, `reminder`, `question`, `decision`) and generates 2–5 tags.
 - **Plain Markdown files:** one file per note with YAML frontmatter, in a folder you choose. No database, no lock-in.
 - **Notes window:** a timeline grouped by day, type and tag filters, and a reader where title, type, tags and body are editable.
 - **Add dictation:** dictate more text into an existing note; it is rewritten and appended as a new paragraph.
@@ -175,7 +175,7 @@ Open it from the tray menu (**Configuration**), the **Settings** button in the n
 - **Appearance:** timeline grid columns and custom badge colors for each note type.
 - **AI Settings:** Ollama URL, audio model, output language, context length, keep-alive, retries and timeouts; **Semantic Search** group with the embedding model and minimum similarity. **Refresh** lists the audio-capable and embedding models installed in Ollama.
 - **Audio:** channels, recording HUD, beeps.
-- **Prompts:** edit the transcription, rewriting, classification and retry prompts.
+- **Prompts:** edit the transcription, rewriting, classification, tagging and retry prompts.
 
 <p align="center">
   <picture>
@@ -241,7 +241,8 @@ Prompts live in `~/.config/eloquent-notes/prompts/`:
 
 - `transcription_system.md`, `transcription_user.md` — Phase 1: audio to clean text.
 - `rewriting_system.md`, `rewriting_user.md` — Phase 2: title and note prose.
-- `classification_system.md`, `classification_user.md` — Phase 3: type and tags.
+- `classification_system.md`, `classification_user.md` — Phase 3: note type.
+- `tagging_system.md`, `tagging_user.md` — Phase 4: topic tags.
 - `retry_prompt.md` — correction sent when a response is not valid JSON.
 
 ---

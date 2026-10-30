@@ -448,6 +448,12 @@ msgstr "ডিক্টেশন বন্ধ করুন"
 msgid "System is busy. Please wait."
 msgstr "সিস্টেম ব্যস্ত। অনুগ্রহ করে অপেক্ষা করুন।"
 
+msgid "Tagging - System Prompt"
+msgstr "ট্যাগিং - সিস্টেম প্রম্পট"
+
+msgid "Tagging - User Prompt"
+msgstr "ট্যাগিং - ব্যবহারকারী প্রম্পট"
+
 msgid "Tags, separated by commas"
 msgstr "ট্যাগ, কমা দ্বারা পৃথক"
 

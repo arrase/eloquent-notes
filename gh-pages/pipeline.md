@@ -1,8 +1,8 @@
-# Three-Phase AI Pipeline
+# Four-Phase AI Pipeline
 
-Eloquent Notes utilizes a modular three-phase LLM processing pipeline powered by local models via the Ollama REST API (default model: `gemma4:e4b-it-qat`).
+Eloquent Notes utilizes a modular four-phase LLM processing pipeline powered by local models via the Ollama REST API (default model: `gemma4:e4b-it-qat`).
 
-Rather than forcing a single small LLM call to transcribe audio, clean up prose, write a title and classify the note at once, Eloquent Notes splits processing into three specialized sequential phases. The output is one structured Markdown note (see [Notes & Search](notes.md)).
+Rather than forcing a single small LLM call to transcribe audio, clean up prose, write a title, classify the note and generate tags at once, Eloquent Notes splits processing into four specialized sequential phases. The output is one structured Markdown note (see [Notes & Search](notes.md)).
 
 ---
 
@@ -34,9 +34,16 @@ Rather than forcing a single small LLM call to transcribe audio, clean up prose,
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ Phase 3: Note Classification                                                │
 │ - Inputs: Phase 2 Rewritten Content + System & User Prompts                 │
-│ - Tasks: Classifies note type and generates tags in the configured          │
-│          output_language.                                                   │
-│ - Output JSON: {"type": string, "tags": list}                               │
+│ - Tasks: Classifies the note type into one of six fixed English keys.       │
+│ - Output JSON: {"type": string}                                             │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │
+                                       ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Phase 4: Note Tagging                                                       │
+│ - Inputs: Phase 2 Rewritten Content + System & User Prompts                 │
+│ - Tasks: Generates 2 to 5 topic tags in the configured output_language.     │
+│ - Output JSON: {"tags": list}                                               │
 └──────────────────────────────────────┬──────────────────────────────────────┘
                                        │
                                        ▼
@@ -90,7 +97,7 @@ Because Gemma 4's audio encoder accepts clips of up to 30 seconds (`MAX_CHUNK_S 
 - **Single-chunk trimming (`<= 30 s`):** leading and trailing non-speech 32 ms windows (including isolated start/stop click transients with `< 0.5 s` of voice) are trimmed while keeping a `0.2 s` padding margin (`SPEECH_PAD_S = 0.2`) on each side so word onsets and offsets are not clipped, preserving interior pauses intact.
 - **Natural-pause splitting (`> 30 s`):** when active speech exceeds `29.6 s` (`MAX_CHUNK_WINDOWS = 925`), `_find_split()` selects the longest real inter-word pause (`>= 256 ms`, `MIN_PAUSE_WINDOWS = 8` windows) in the second half of the window (or across the midpoint / first half if needed), avoiding intra-word consonant stop closures (`32–96 ms`). Padding between adjacent chunks is clamped to the pause midpoint so no samples are duplicated.
 - **Per-chunk voice filter:** every resulting span must contain at least `0.5 s` of active speech (`MIN_SPEECH_WINDOWS = 16`); sub-`0.5 s` noise bursts or trailing clicks are discarded before encoding.
-- **Sequential transcription & global synthesis:** `_process_audio()` transcribes each WAV chunk in Phase 1 and joins the non-empty segments with `" "` so Phase 2 and Phase 3 operate on the complete dictation at once.
+- **Sequential transcription & global synthesis:** `_process_audio()` transcribes each WAV chunk in Phase 1 and joins the non-empty segments with `" "` so Phases 2–4 operate on the complete dictation at once.
 
 ### Early Exit Safeguard
 If every chunk in Phase 1 returns `"empty": true` or a blank transcription string, processing terminates immediately. The application fires an `"empty"` signal, displays a desktop notification ("Dictation Empty"), resets the tray icon to gray, and saves no file to disk.
@@ -128,7 +135,7 @@ Phase 2 converts the raw transcribed text from Phase 1 into clean, direct, first
 
 ## 3. Phase 3: Classification
 
-Phase 3 (`llm.classify_note()`) reads only the rewritten content from Phase 2 and returns the note's type and tags. It has no knowledge of other notes.
+Phase 3 (`llm.classify_note()`) reads the rewritten content from Phase 2 (`{content}`) and classifies the note's intent. Because `type` is always one of six fixed English enum keys, no `{language_instruction}` is sent.
 
 ### Goals
 - **Type Classification:** one of six fixed English keys:
@@ -138,7 +145,6 @@ Phase 3 (`llm.classify_note()`) reads only the rewritten content from Phase 2 an
   - `reminder` → Things to remember, deadlines.
   - `question` → Things to investigate or research.
   - `decision` → Choices made, conclusions reached.
-- **Tag Generation:** 2 to 5 lowercase, single-word or hyphenated tags in the configured `output_language` (e.g., `["redis", "caching", "performance"]`).
 
 ### JSON Format Schema
 ```json
@@ -149,14 +155,33 @@ Phase 3 (`llm.classify_note()`) reads only the rewritten content from Phase 2 an
       "type": "string",
       "enum": ["task", "idea", "note", "reminder", "question", "decision"],
       "description": "Classification of the note content."
-    },
+    }
+  },
+  "required": ["type"]
+}
+```
+
+---
+
+## 4. Phase 4: Tagging
+
+Phase 4 (`llm.tag_note()`) reads the rewritten content from Phase 2 (`{content}`) and generates topic tags in the configured `output_language`. It has no knowledge of other notes.
+
+### Goals
+- **Tag Generation:** 2 to 5 lowercase, single-word or hyphenated topic tags in the configured `output_language` (e.g., `["redis", "caching", "performance"]`), excluding generic note type names.
+
+### JSON Format Schema
+```json
+{
+  "type": "object",
+  "properties": {
     "tags": {
       "type": "array",
       "items": { "type": "string" },
       "description": "2 to 5 relevant tags, lowercase, in the requested output language."
     }
   },
-  "required": ["type", "tags"]
+  "required": ["tags"]
 }
 ```
 
@@ -164,9 +189,9 @@ Phase 3 (`llm.classify_note()`) reads only the rewritten content from Phase 2 an
 
 ## Saving the Note
 
-After Phase 3, `notes.create_note()` writes the note into `notes.folder`:
+After Phase 4, `notes.create_note()` writes the note into `notes.folder`:
 
-- **Title** and **body** come from Phase 2, **type** from Phase 3.
+- **Title** and **body** come from Phase 2, **type** from Phase 3, **tags** from Phase 4.
 - **Tags** are normalized with `notes.normalize_tags()`: lowercased, leading `#` stripped, blanks and duplicates removed.
 - `created` is the current local time with UTC offset; the file is named `YYYY-MM-DD HHMMSS Title.md` and written atomically.
 
@@ -176,13 +201,13 @@ The worker then emits `processing_completed("success", title)`; the main thread 
 
 ## Add Dictation (Phases 1-2 Only)
 
-**Add dictation** in the reader starts a recording targeted at the open note. Processing runs Phase 1 and Phase 2 only (passing `ai.keep_alive` directly to Phase 2 since Phase 3 is skipped), then emits `processing_completed("appended", content)`. On the main thread the controller saves any pending reader edits, appends the rewritten content to the note body as a new paragraph (`notes.append_to_note()`), and shows a **Dictation Added** notification. The Phase 2 title is discarded; the note keeps its title, type and tags.
+**Add dictation** in the reader starts a recording targeted at the open note. Processing runs Phase 1 and Phase 2 only (passing `ai.keep_alive` directly to Phase 2 since Phases 3 and 4 are skipped), then emits `processing_completed("appended", content)`. On the main thread the controller saves any pending reader edits, appends the rewritten content to the note body as a new paragraph (`notes.append_to_note()`), and shows a **Dictation Added** notification. The Phase 2 title is discarded; the note keeps its title, type and tags.
 
 ---
 
 ## Language Control
 
-Every text phase receives a `{language_instruction}` built from `ai.output_language`, asking the model to write the title, content and tags in that language and to translate if necessary. Phase 1 always transcribes in the spoken language. The `type` values stay fixed English keys regardless of language.
+Phase 2 (rewriting) and Phase 4 (tagging) each receive a field-specific `{language_instruction}` built from `ai.output_language`, asking the model to write `title and content` or `tags` in that language and to translate if necessary. Phase 1 always transcribes in the spoken language, and Phase 3 (classification) omits `{language_instruction}` because `type` values are fixed English keys regardless of language.
 
 ---
 
@@ -210,7 +235,7 @@ To completely eliminate this delay when recording finishes, Eloquent Notes start
 
 ### Keep-Alive Handover
 
-For a new note, Phases 1 and 2 run with `preload_keep_alive` so the model stays loaded between phases, and Phase 3 (`classify_note()`) runs with `keep_alive` (default `"0"`), so the model is unloaded right after the note is written. On **Add Dictation** (`append=True`), Phase 2 passes `ai.keep_alive` directly since Phase 3 is skipped. When processing ends before Phase 2/3 completes (silence, empty transcription or an error) and the two values differ, a final preload request re-applies `keep_alive` so the model is not left resident for `preload_keep_alive`.
+For a new note, Phases 1, 2 and 3 run with `preload_keep_alive` so the model stays loaded between phases, and Phase 4 (`tag_note()`) runs with `keep_alive` (default `"0"`), so the model is unloaded right after the note is written. On **Add Dictation** (`append=True`), Phase 2 passes `ai.keep_alive` directly since Phases 3 and 4 are skipped. When processing ends before the final phase completes (silence, empty transcription or an error) and the two values differ, a final preload request re-applies `keep_alive` so the model is not left resident for `preload_keep_alive`.
 
 ---
 
@@ -222,7 +247,7 @@ This is not a rare edge case: it is what happens whenever background noise at th
 
 Eloquent Notes therefore sends `"think": false` on every pipeline request (`llm.THINK`). This restores correct transcription of noisy audio and is also substantially faster, since no tokens are spent on reasoning that a transcription task does not benefit from.
 
-Disabling reasoning also improves the two text-only phases: it removes the thinking text that Ollama would otherwise append to the assistant turn on retries, and it leaves more of the token budget for the note itself.
+Disabling reasoning also improves the three text-only phases: it removes the thinking text that Ollama would otherwise append to the assistant turn on retries, and it leaves more of the token budget for the note itself.
 
 ## Structured JSON Validation & Retry Logic
 

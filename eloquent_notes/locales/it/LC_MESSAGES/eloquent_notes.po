@@ -448,6 +448,12 @@ msgstr "Ferma dettatura"
 msgid "System is busy. Please wait."
 msgstr "Il sistema è occupato. Attendere."
 
+msgid "Tagging - System Prompt"
+msgstr "Etichettatura - Prompt di sistema"
+
+msgid "Tagging - User Prompt"
+msgstr "Etichettatura - Prompt utente"
+
 msgid "Tags, separated by commas"
 msgstr "Tag, separati da virgole"
 

@@ -465,9 +465,11 @@ def _pipeline_snapshot() -> dict[str, Any]:
         "_loaded_files": {
             config.RETRY_PROMPT_PATH: "retry prompt",
             config.REWRITING_SYSTEM_PROMPT_PATH: "sys rewrite",
-            config.REWRITING_USER_PROMPT_PATH: ("{transcription}\n{language_instruction}"),
+            config.REWRITING_USER_PROMPT_PATH: "{transcription}\n{language_instruction}",
             config.CLASSIFICATION_SYSTEM_PROMPT_PATH: "sys class",
-            config.CLASSIFICATION_USER_PROMPT_PATH: ("{transcription}\n{language_instruction}"),
+            config.CLASSIFICATION_USER_PROMPT_PATH: "{content}",
+            config.TAGGING_SYSTEM_PROMPT_PATH: "sys tag",
+            config.TAGGING_USER_PROMPT_PATH: "{content}\n{language_instruction}",
             config.TRANSCRIPTION_SYSTEM_PROMPT_PATH: "sys trans",
             config.TRANSCRIPTION_USER_PROMPT_PATH: "usr trans",
         },
@@ -569,11 +571,15 @@ def test_process_audio_full_pipeline_success(qapp: QApplication, tmp_path: Path)
         patch(
             "eloquent_notes.app.llm.rewrite_transcription",
             return_value={"title": "Note Title", "content": "Clean note"},
-        ),
+        ) as mock_rewrite,
         patch(
             "eloquent_notes.app.llm.classify_note",
-            return_value={"type": "idea", "tags": ["#Tag1", "tag1", "two"]},
+            return_value={"type": "idea"},
         ) as mock_classify,
+        patch(
+            "eloquent_notes.app.llm.tag_note",
+            return_value={"tags": ["#Tag1", "tag1", "two"]},
+        ) as mock_tag,
         patch("eloquent_notes.app.llm.preload_model") as mock_preload,
     ):
         eloquent_app._process_audio(recorder, snapshot, append=False, preload_thread=None)
@@ -582,17 +588,101 @@ def test_process_audio_full_pipeline_success(qapp: QApplication, tmp_path: Path)
 
     # Audio bytes are forwarded to phase 1
     assert mock_transcribe.call_args.kwargs["audio_bytes"] == recorder.wav_chunks[0]
+    assert mock_rewrite.call_args.kwargs["keep_alive"] == "5m"
 
-    # Phase 3 receives the rewritten content rather than raw transcription
-    assert "Clean note" in mock_classify.call_args.kwargs["user_prompt"]
-    assert "Hello note" not in mock_classify.call_args.kwargs["user_prompt"]
+    # Phases 3 and 4 receive the rewritten content rather than raw transcription
+    assert mock_classify.call_args.kwargs["user_prompt"] == "Clean note"
+    assert mock_classify.call_args.kwargs["keep_alive"] == "5m"
+    assert "Clean note" in mock_tag.call_args.kwargs["user_prompt"]
+    assert "Hello note" not in mock_tag.call_args.kwargs["user_prompt"]
+    assert mock_tag.call_args.kwargs["keep_alive"] == "0"
 
-    # Since Phase 3 completed, preload_model is not called in finally
+    # Since Phase 4 completed, preload_model is not called in finally
     mock_preload.assert_not_called()
 
     # The note is written to the notes folder with normalized tags
     [saved] = notes.load_notes(tmp_path / "notes")
     assert (saved.title, saved.type, saved.tags, saved.body) == ("Note Title", "idea", ["tag1", "two"], "Clean note")
+
+
+def test_process_audio_classification_failure_resets_keep_alive(qapp: QApplication) -> None:
+    eloquent_app = make_app(qapp)
+    eloquent_app.processing_completed = MagicMock()
+
+    recorder = MagicMock()
+    recorder.wav_chunks = [b"RIFF" + b"\x00" * 100]
+    recorder.is_silent = False
+    snapshot = _pipeline_snapshot()
+
+    with (
+        patch(
+            "eloquent_notes.app.llm.transcribe_audio",
+            return_value={"empty": False, "transcription": "Hello"},
+        ),
+        patch(
+            "eloquent_notes.app.llm.rewrite_transcription",
+            return_value={"title": "Title", "content": "Clean"},
+        ),
+        patch(
+            "eloquent_notes.app.llm.classify_note",
+            side_effect=RuntimeError("Classification failed"),
+        ),
+        patch("eloquent_notes.app.llm.tag_note") as mock_tag,
+        patch("eloquent_notes.app.llm.preload_model") as mock_preload,
+    ):
+        eloquent_app._process_audio(recorder, snapshot, append=False, preload_thread=None)
+
+    mock_tag.assert_not_called()
+    mock_preload.assert_called_once_with(
+        ollama_url="http://localhost:11434",
+        model="gemma",
+        context_length=2048,
+        keep_alive="0",
+        timeout=10,
+    )
+    eloquent_app.processing_completed.emit.assert_called_once_with("error", "Classification failed")
+
+
+def test_process_audio_tagging_failure_resets_keep_alive(qapp: QApplication) -> None:
+    eloquent_app = make_app(qapp)
+    eloquent_app.processing_completed = MagicMock()
+
+    recorder = MagicMock()
+    recorder.wav_chunks = [b"RIFF" + b"\x00" * 100]
+    recorder.is_silent = False
+    snapshot = _pipeline_snapshot()
+
+    with (
+        patch(
+            "eloquent_notes.app.llm.transcribe_audio",
+            return_value={"empty": False, "transcription": "Hello"},
+        ),
+        patch(
+            "eloquent_notes.app.llm.rewrite_transcription",
+            return_value={"title": "Title", "content": "Clean"},
+        ),
+        patch(
+            "eloquent_notes.app.llm.classify_note",
+            return_value={"type": "task"},
+        ),
+        patch(
+            "eloquent_notes.app.llm.tag_note",
+            side_effect=RuntimeError("Tagging failed"),
+        ),
+        patch("eloquent_notes.app.notes.create_note") as mock_create,
+        patch("eloquent_notes.app.llm.preload_model") as mock_preload,
+    ):
+        eloquent_app._process_audio(recorder, snapshot, append=False, preload_thread=None)
+
+    mock_create.assert_not_called()
+    mock_preload.assert_called_once_with(
+        ollama_url="http://localhost:11434",
+        model="gemma",
+        context_length=2048,
+        keep_alive="0",
+        timeout=10,
+    )
+    eloquent_app.processing_completed.emit.assert_called_once_with("error", "Tagging failed")
 
 
 def test_process_audio_multi_chunk_transcription(qapp: QApplication, tmp_path: Path) -> None:
@@ -620,7 +710,11 @@ def test_process_audio_multi_chunk_transcription(qapp: QApplication, tmp_path: P
         ) as mock_rewrite,
         patch(
             "eloquent_notes.app.llm.classify_note",
-            return_value={"type": "note", "tags": ["long"]},
+            return_value={"type": "note"},
+        ),
+        patch(
+            "eloquent_notes.app.llm.tag_note",
+            return_value={"tags": ["long"]},
         ),
         patch("eloquent_notes.app.llm.preload_model"),
     ):
@@ -655,6 +749,7 @@ def test_process_audio_append_stops_after_rewriting(qapp: QApplication) -> None:
             return_value={"title": "Ignored", "content": "More text"},
         ) as mock_rewrite,
         patch("eloquent_notes.app.llm.classify_note") as mock_classify,
+        patch("eloquent_notes.app.llm.tag_note") as mock_tag,
         patch(
             "eloquent_notes.app.notes.create_note",
         ) as mock_create,
@@ -665,6 +760,7 @@ def test_process_audio_append_stops_after_rewriting(qapp: QApplication) -> None:
     eloquent_app.processing_completed.emit.assert_called_once_with("appended", "More text")
     assert mock_rewrite.call_args.kwargs["keep_alive"] == "0"
     mock_classify.assert_not_called()
+    mock_tag.assert_not_called()
     mock_create.assert_not_called()
     mock_preload.assert_not_called()
 
@@ -729,29 +825,70 @@ def test_user_prompts_preserve_literal_braces(qapp: QApplication) -> None:
     eloquent_app = make_app(qapp)
     snapshot = _pipeline_snapshot()
     ai_cfg = snapshot["ai"]
+    ai_cfg["output_language"] = "Spanish"
     loaded = snapshot["_loaded_files"]
     loaded[config.REWRITING_USER_PROMPT_PATH] = (
         'JSON example: {{"a": 1}} {unknown_key} {transcription} {language_instruction}'
     )
     loaded[config.CLASSIFICATION_USER_PROMPT_PATH] = (
-        "Rule {custom_brace}: {content} {transcription} {language_instruction}"
+        "Rule {custom_brace}: {transcription} {content} {language_instruction}"
+    )
+    loaded[config.TAGGING_USER_PROMPT_PATH] = (
+        "Tag rule {custom_brace}: {transcription} {content} {language_instruction}"
     )
 
-    lang_inst = EloquentApp._language_instruction("Spanish")
-    assert "translating from the transcription language if necessary" in lang_inst
+    assert "translating if necessary" in EloquentApp._language_instruction("tags", "Spanish")
 
     with patch("eloquent_notes.app.llm.rewrite_transcription") as mock_rewrite:
-        EloquentApp._rewrite(ai_cfg, loaded, "Hola", lang_inst, "5m")
+        EloquentApp._rewrite(ai_cfg, loaded, "Hola", "5m")
         prompt = mock_rewrite.call_args.kwargs["user_prompt"]
         assert "{unknown_key}" in prompt
         assert "Hola" in prompt
+        assert "write the title and content in Spanish" in prompt
 
     with patch("eloquent_notes.app.llm.classify_note") as mock_classify:
-        eloquent_app._classify(ai_cfg, loaded, "Rewritten text", lang_inst)
+        eloquent_app._classify(ai_cfg, loaded, "Rewritten text")
         prompt = mock_classify.call_args.kwargs["user_prompt"]
         assert "{custom_brace}" in prompt
-        assert "{content}" in prompt
+        assert "{transcription}" in prompt
+        assert "{language_instruction}" in prompt
+        assert "Spanish" not in prompt
         assert prompt.count("Rewritten text") == 1
+
+    with patch("eloquent_notes.app.llm.tag_note") as mock_tag:
+        eloquent_app._tag(ai_cfg, loaded, "Rewritten text")
+        prompt = mock_tag.call_args.kwargs["user_prompt"]
+        assert "{custom_brace}" in prompt
+        assert "{transcription}" in prompt
+        assert prompt.count("Rewritten text") == 1
+        assert "write the tags in Spanish" in prompt
+
+
+def test_packaged_default_prompts_render_cleanly() -> None:
+    ai_cfg = _pipeline_snapshot()["ai"]
+    ai_cfg["output_language"] = "Spanish"
+    loaded = {dst: config.load_file(src) for dst, src in config.PROMPT_DEFAULTS.items()}
+
+    with patch("eloquent_notes.app.llm.rewrite_transcription") as mock_rewrite:
+        EloquentApp._rewrite(ai_cfg, loaded, "Raw spoken text", "5m")
+        rewrite_prompt = mock_rewrite.call_args.kwargs["user_prompt"]
+        assert "Raw spoken text" in rewrite_prompt
+        assert "write the title and content in Spanish" in rewrite_prompt
+        assert "{" not in rewrite_prompt
+
+    with patch("eloquent_notes.app.llm.classify_note") as mock_classify:
+        EloquentApp._classify(ai_cfg, loaded, "Clean note body")
+        classify_prompt = mock_classify.call_args.kwargs["user_prompt"]
+        assert "Clean note body" in classify_prompt
+        assert "Spanish" not in classify_prompt
+        assert "{" not in classify_prompt
+
+    with patch("eloquent_notes.app.llm.tag_note") as mock_tag:
+        EloquentApp._tag(ai_cfg, loaded, "Clean note body")
+        tag_prompt = mock_tag.call_args.kwargs["user_prompt"]
+        assert "Clean note body" in tag_prompt
+        assert "write the tags in Spanish" in tag_prompt
+        assert "{" not in tag_prompt
 
 
 def test_on_processing_completed_branches(qapp: QApplication) -> None:

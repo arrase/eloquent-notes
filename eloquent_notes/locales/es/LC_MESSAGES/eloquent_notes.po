@@ -448,6 +448,12 @@ msgstr "Detener dictado"
 msgid "System is busy. Please wait."
 msgstr "El sistema está ocupado. Espere por favor."
 
+msgid "Tagging - System Prompt"
+msgstr "Etiquetado - Prompt de sistema"
+
+msgid "Tagging - User Prompt"
+msgstr "Etiquetado - Prompt de usuario"
+
 msgid "Tags, separated by commas"
 msgstr "Etiquetas, separadas por comas"
 

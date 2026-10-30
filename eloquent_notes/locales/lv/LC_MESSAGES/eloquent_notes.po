@@ -448,6 +448,12 @@ msgstr "Apturēt diktātu"
 msgid "System is busy. Please wait."
 msgstr "Sistēma ir aizņemta. Lūdzu, uzgaidiet."
 
+msgid "Tagging - System Prompt"
+msgstr "Birku piešķiršana – sistēmas uzvedne"
+
+msgid "Tagging - User Prompt"
+msgstr "Birku piešķiršana – lietotāja uzvedne"
+
 msgid "Tags, separated by commas"
 msgstr "Birkas, atdalītas ar komatiem"
 

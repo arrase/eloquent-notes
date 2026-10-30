@@ -448,6 +448,12 @@ msgstr "توقف دیکته"
 msgid "System is busy. Please wait."
 msgstr "سیستم مشغول است. لطفاً صبر کنید."
 
+msgid "Tagging - System Prompt"
+msgstr "برچسب‌گذاری - پرامپت سیستم"
+
+msgid "Tagging - User Prompt"
+msgstr "برچسب‌گذاری - پرامپت کاربر"
+
 msgid "Tags, separated by commas"
 msgstr "برچسب‌ها، جداشده با ویرگول"
 

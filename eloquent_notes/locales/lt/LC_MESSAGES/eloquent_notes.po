@@ -448,6 +448,12 @@ msgstr "Sustabdyti diktavimą"
 msgid "System is busy. Please wait."
 msgstr "Sistema užimta. Palaukite."
 
+msgid "Tagging - System Prompt"
+msgstr "Žymėjimas – sisteminė užklausa"
+
+msgid "Tagging - User Prompt"
+msgstr "Žymėjimas – naudotojo užklausa"
+
 msgid "Tags, separated by commas"
 msgstr "Žymos, atskirtos kableliais"
 

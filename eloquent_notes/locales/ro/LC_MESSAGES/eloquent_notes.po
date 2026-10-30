@@ -448,6 +448,12 @@ msgstr "Oprește dictarea"
 msgid "System is busy. Please wait."
 msgstr "Sistemul este ocupat. Vă rugăm să așteptați."
 
+msgid "Tagging - System Prompt"
+msgstr "Etichetare - Prompt de sistem"
+
+msgid "Tagging - User Prompt"
+msgstr "Etichetare - Prompt utilizator"
+
 msgid "Tags, separated by commas"
 msgstr "Etichete, separate prin virgulă"
 

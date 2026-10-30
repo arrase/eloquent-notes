@@ -448,6 +448,12 @@ msgstr "หยุดการป้อนด้วยเสียง"
 msgid "System is busy. Please wait."
 msgstr "ระบบกำลังทำงานอยู่ โปรดรอสักครู่"
 
+msgid "Tagging - System Prompt"
+msgstr "การติดแท็ก - พรอมต์ระบบ"
+
+msgid "Tagging - User Prompt"
+msgstr "การติดแท็ก - พรอมต์ผู้ใช้"
+
 msgid "Tags, separated by commas"
 msgstr "แท็ก คั่นด้วยเครื่องหมายจุลภาค"
 

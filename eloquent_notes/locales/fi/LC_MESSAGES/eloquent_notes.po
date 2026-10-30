@@ -448,6 +448,12 @@ msgstr "Lopeta sanelu"
 msgid "System is busy. Please wait."
 msgstr "Järjestelmä on varattu. Odota hetki."
 
+msgid "Tagging - System Prompt"
+msgstr "Tunnisteet - Järjestelmäkehote"
+
+msgid "Tagging - User Prompt"
+msgstr "Tunnisteet - Käyttäjäkehote"
+
 msgid "Tags, separated by commas"
 msgstr "Tunnisteet pilkulla erotettuna"
 

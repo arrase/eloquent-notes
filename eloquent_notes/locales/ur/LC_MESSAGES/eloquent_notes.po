@@ -448,6 +448,12 @@ msgstr "املا روکیں"
 msgid "System is busy. Please wait."
 msgstr "سسٹم مصروف ہے۔ براہ کرم انتظار کریں۔"
 
+msgid "Tagging - System Prompt"
+msgstr "ٹیگنگ - سسٹم پرامپٹ"
+
+msgid "Tagging - User Prompt"
+msgstr "ٹیگنگ - صارف پرامپٹ"
+
 msgid "Tags, separated by commas"
 msgstr "ٹیگز، کوما سے الگ کیے گئے"
 

@@ -448,6 +448,12 @@ msgstr "Заустави диктирање"
 msgid "System is busy. Please wait."
 msgstr "Систем је заузет. Молимо сачекајте."
 
+msgid "Tagging - System Prompt"
+msgstr "Означавање – Системски упит"
+
+msgid "Tagging - User Prompt"
+msgstr "Означавање – Кориснички упит"
+
 msgid "Tags, separated by commas"
 msgstr "Ознаке, одвојене зарезима"
 

@@ -448,6 +448,12 @@ msgstr "डिक्टेशन रोकें"
 msgid "System is busy. Please wait."
 msgstr "सिस्टम व्यस्त है। कृपया प्रतीक्षा करें।"
 
+msgid "Tagging - System Prompt"
+msgstr "टैगिंग - सिस्टम प्रॉम्प्ट"
+
+msgid "Tagging - User Prompt"
+msgstr "टैगिंग - उपयोगकर्ता प्रॉम्प्ट"
+
 msgid "Tags, separated by commas"
 msgstr "टैग, अल्पविराम से अलग किए गए"
 

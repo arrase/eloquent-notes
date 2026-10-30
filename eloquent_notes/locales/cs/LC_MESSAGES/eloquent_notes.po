@@ -448,6 +448,12 @@ msgstr "Zastavit diktování"
 msgid "System is busy. Please wait."
 msgstr "Systém je zaneprázdněn. Čekejte prosím."
 
+msgid "Tagging - System Prompt"
+msgstr "Štítkování – Systémový prompt"
+
+msgid "Tagging - User Prompt"
+msgstr "Štítkování – Uživatelský prompt"
+
 msgid "Tags, separated by commas"
 msgstr "Štítky oddělené čárkami"
 

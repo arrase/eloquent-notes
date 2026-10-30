@@ -11,7 +11,7 @@ Eloquent Notes is a Linux tray daemon with one job: turn voice dictations into w
 | `main.py` | CLI entry point: `install-autostart`, `toggle`, `open`, `config`; single-instance IPC client; launches the daemon. |
 | `app.py` | `EloquentApp` controller: tray icon and menu, IPC server, recording lifecycle, processing pipeline, notes window wiring, config reload. |
 | `audio.py` | In-memory 16 kHz recording (`AudioRecorder`), Silero VAD silence detection and speech segmentation into `<= 30 s` WAV chunks (`speech_window_mask`, `_split_speech`, `wav_chunks`), WAV encoding, beeps. |
-| `llm.py` | Ollama client: model preload, the three pipeline phases (`transcribe_audio`, `rewrite_note`, `classify_note`) with JSON-schema output and retries, `/api/embed`. |
+| `llm.py` | Ollama client: model preload, the four pipeline phases (`transcribe_audio`, `rewrite_transcription`, `classify_note`, `tag_note`) with JSON-schema output and retries, `/api/embed`. |
 | `notes.py` | Note storage: `Note` dataclass, load / create / save / append, frontmatter parsing, tag normalization. |
 | `search.py` | `SemanticIndex`: embedding cache and cosine-similarity ranking. |
 | `window.py` | `MainWindow`: timeline and reader pages. A pure view that reports user intent through signals. |
@@ -53,7 +53,7 @@ Eloquent Notes is a Linux tray daemon with one job: turn voice dictations into w
 └───────┬──────────────────────┬──────────────────────┬───────────┘
         ▼ (thread)             ▼ (thread)             ▼ (thread)
 ┌────────────────────┐ ┌────────────────────┐ ┌────────────────────┐
-│ Model preload      │ │ Three-phase        │ │ Semantic search    │
+│ Model preload      │ │ Four-phase         │ │ Semantic search    │
 │ (keep-alive chat)  │ │ pipeline (Ollama)  │ │ (/api/embed, cache)│
 └────────────────────┘ └─────────┬──────────┘ └────────────────────┘
                                  ▼ (main thread)
@@ -94,7 +94,7 @@ The CLI entry point (`eloquent_notes.main`) works as a lightweight client:
 | `RECORDING` | `toggle_action()` or `dictate_into(note)` while idle | Red dot |
 | `PROCESSING` | Stop request | Orange hourglass |
 
-At recording start, the configuration and all prompt files are copied into a **snapshot**, so editing settings mid-dictation cannot affect the note being processed. `dictate_into(note)` records the same way but remembers the target note; the pipeline then stops after Phase 2 and the text is appended to that note (see [Three-Phase AI Pipeline](pipeline.md)).
+At recording start, the configuration and all prompt files are copied into a **snapshot**, so editing settings mid-dictation cannot affect the note being processed. `dictate_into(note)` records the same way but remembers the target note; the pipeline then stops after Phase 2 and the text is appended to that note (see [Four-Phase AI Pipeline](pipeline.md)).
 
 While processing, further toggles only show a "System is busy" notification; the dictate button in the window is disabled.
 
@@ -187,10 +187,11 @@ flowchart TB
         T1["Phase 1: Transcription (per chunk)"]
         T3["Phase 2: Rewriting (title, content)"]
         A{"Add dictation?"}
-        T5["Phase 3: Classification (type, tags)"]
+        T5["Phase 3: Classification (type)"]
+        T6["Phase 4: Tagging (tags)"]
         S1["notes.create_note"]
         D4 --> P1 --> T1 --> T3 --> A
-        A -- No --> T5 --> S1
+        A -- No --> T5 --> T6 --> S1
     end
 
     P1 -->|"silent / empty"| D5
@@ -203,6 +204,7 @@ flowchart TB
     T1 -->|"POST /api/chat (base64 audio)"| Ollama
     T3 -->|"POST /api/chat"| Ollama
     T5 -->|"POST /api/chat"| Ollama
+    T6 -->|"POST /api/chat"| Ollama
     S1 -.->|Write file| Folder
     D7 -.->|Write file| Folder
 ```

@@ -448,6 +448,12 @@ msgstr "Hentikan dikte"
 msgid "System is busy. Please wait."
 msgstr "Sistem sedang sibuk. Harap tunggu."
 
+msgid "Tagging - System Prompt"
+msgstr "Penandaan - Prompt Sistem"
+
+msgid "Tagging - User Prompt"
+msgstr "Penandaan - Prompt Pengguna"
+
 msgid "Tags, separated by commas"
 msgstr "Tag, dipisahkan dengan koma"
 

@@ -446,6 +446,12 @@ msgstr ""
 msgid "System is busy. Please wait."
 msgstr ""
 
+msgid "Tagging - System Prompt"
+msgstr ""
+
+msgid "Tagging - User Prompt"
+msgstr ""
+
 msgid "Tags, separated by commas"
 msgstr ""
 
