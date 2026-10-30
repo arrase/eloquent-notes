@@ -186,7 +186,7 @@ class EloquentApp(QObject):
             socket = self.server.nextPendingConnection()
             try:
                 if socket.bytesAvailable() > 0 or socket.waitForReadyRead(50):
-                    message = bytes(socket.readAll()).decode("utf-8", errors="replace")  # type: ignore[arg-type]
+                    message = socket.readAll().data().decode("utf-8", errors="replace")
                     if message == "toggle":
                         self.toggle_action()
                     elif message == "open":

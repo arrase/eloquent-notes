@@ -10,6 +10,7 @@ from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 import requests
+from PyQt6.QtCore import QByteArray
 from PyQt6.QtWidgets import QApplication, QSystemTrayIcon
 
 from eloquent_notes import config, notes, ui
@@ -386,7 +387,7 @@ def test_ipc_connection_handling(qapp: QApplication) -> None:
     def make_socket(message: str) -> MagicMock:
         socket = MagicMock()
         socket.bytesAvailable.return_value = len(message.encode())
-        socket.readAll.return_value = message.encode()
+        socket.readAll.return_value = QByteArray(message.encode())
         return socket
 
     sockets = [
