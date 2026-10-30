@@ -1,5 +1,7 @@
 """Audio settings tab for configuration."""
 
+from typing import Any
+
 from PyQt6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -18,11 +20,11 @@ from eloquent_notes.i18n import _
 class AudioTab(QWidget):
     """Audio configuration tab."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._init_ui()
 
-    def _init_ui(self):
+    def _init_ui(self) -> None:
         layout = QVBoxLayout(self)
         layout.setContentsMargins(15, 15, 15, 15)
         layout.setSpacing(15)
@@ -44,7 +46,7 @@ class AudioTab(QWidget):
 
         self.chk_beep_enabled = QCheckBox(_("Play beep on recording start and stop"))
         self.chk_beep_enabled.setToolTip(_("Audible feedback beeps when starting/stopping recording."))
-        self.chk_beep_enabled.toggled.connect(self._toggle_beep_controls)
+        self.chk_beep_enabled.toggled.connect(lambda checked: self._toggle_beep_controls(checked=checked))
         form_layout.addRow(self.chk_beep_enabled)
 
         self.spn_beep_freq = QSpinBox()
@@ -62,21 +64,21 @@ class AudioTab(QWidget):
         layout.addWidget(grp_audio)
         layout.addStretch()
 
-    def _toggle_beep_controls(self, checked: bool) -> None:
+    def _toggle_beep_controls(self, *, checked: bool) -> None:
         self.spn_beep_freq.setEnabled(checked)
         self.spn_beep_duration.setEnabled(checked)
 
-    def load_settings(self, config_data: dict) -> None:
+    def load_settings(self, config_data: dict[str, Any]) -> None:
         audio_cfg = config_data["audio"]
         self.cmb_channels.setCurrentIndex(0 if audio_cfg["channels"] == 1 else 1)
         self.chk_recording_hud_enabled.setChecked(audio_cfg["recording_hud_enabled"])
         beep_enabled = audio_cfg["beep_enabled"]
         self.chk_beep_enabled.setChecked(beep_enabled)
-        self._toggle_beep_controls(beep_enabled)
+        self._toggle_beep_controls(checked=beep_enabled)
         self.spn_beep_freq.setValue(audio_cfg["beep_frequency"])
         self.spn_beep_duration.setValue(audio_cfg["beep_duration"])
 
-    def save_settings(self, config_data: dict) -> bool:
+    def save_settings(self, config_data: dict[str, Any]) -> bool:
         config_data["audio"].update(
             {
                 "channels": 1 if self.cmb_channels.currentIndex() == 0 else 2,

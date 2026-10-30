@@ -1,5 +1,6 @@
 """Unit tests for OllamaModelLoader background thread worker."""
 
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import requests
@@ -7,10 +8,10 @@ import requests
 from eloquent_notes.config_gui.loader import OllamaModelLoader
 
 
-def test_ollama_loader_success():
+def test_ollama_loader_success() -> None:
     loader = OllamaModelLoader("http://localhost:11434")
 
-    models_signal_data = []
+    models_signal_data: list[tuple[list[str], list[str]]] = []
     loader.models_fetched.connect(lambda audio, embedding: models_signal_data.append((audio, embedding)))
 
     mock_tags_response = MagicMock()
@@ -27,7 +28,8 @@ def test_ollama_loader_success():
     mock_show_embed = MagicMock()
     mock_show_embed.json.return_value = {"capabilities": ["embedding"]}
 
-    def mock_post(url, json, timeout):
+    def mock_post(url: str, json: dict[str, Any], timeout: int) -> MagicMock:
+        del url, timeout
         return {"audio-model": mock_show_audio, "embed-model": mock_show_embed}.get(json["name"], mock_show_text)
 
     with patch("requests.get", return_value=mock_tags_response), patch("requests.post", side_effect=mock_post):
@@ -36,10 +38,10 @@ def test_ollama_loader_success():
     assert models_signal_data == [(["audio-model"], ["embed-model"])]
 
 
-def test_ollama_loader_get_failure():
+def test_ollama_loader_get_failure() -> None:
     loader = OllamaModelLoader("http://localhost:11434")
 
-    error_signal_data = []
+    error_signal_data: list[str] = []
     loader.error_occurred.connect(error_signal_data.append)
 
     with patch("requests.get", side_effect=requests.RequestException("Connection refused")):
@@ -49,7 +51,7 @@ def test_ollama_loader_get_failure():
     assert "Connection refused" in error_signal_data[0]
 
 
-def test_ollama_loader_start_runs_daemon_thread():
+def test_ollama_loader_start_runs_daemon_thread() -> None:
     loader = OllamaModelLoader("http://localhost:11434")
 
     with patch("eloquent_notes.config_gui.loader.threading.Thread") as mock_thread_cls:
@@ -59,10 +61,10 @@ def test_ollama_loader_start_runs_daemon_thread():
     mock_thread_cls.return_value.start.assert_called_once()
 
 
-def test_ollama_loader_show_exception_resilience():
+def test_ollama_loader_show_exception_resilience() -> None:
     loader = OllamaModelLoader("http://localhost:11434")
 
-    models_signal_data = []
+    models_signal_data: list[tuple[list[str], list[str]]] = []
     loader.models_fetched.connect(lambda audio, embedding: models_signal_data.append((audio, embedding)))
 
     mock_tags_response = MagicMock()
@@ -71,7 +73,8 @@ def test_ollama_loader_show_exception_resilience():
     mock_show_audio = MagicMock()
     mock_show_audio.json.return_value = {"capabilities": ["audio"]}
 
-    def mock_post(url, json, timeout):
+    def mock_post(url: str, json: dict[str, Any], timeout: int) -> MagicMock:
+        del url, timeout
         if json["name"] == "failing-model":
             raise requests.RequestException("Timeout on show")
         return mock_show_audio
@@ -82,10 +85,10 @@ def test_ollama_loader_show_exception_resilience():
     assert models_signal_data == [(["audio-model"], [])]
 
 
-def test_ollama_loader_invalid_json_body_resilience():
+def test_ollama_loader_invalid_json_body_resilience() -> None:
     loader = OllamaModelLoader("http://localhost:11434")
 
-    models_signal_data = []
+    models_signal_data: list[tuple[list[str], list[str]]] = []
     loader.models_fetched.connect(lambda audio, embedding: models_signal_data.append((audio, embedding)))
 
     mock_tags_response = MagicMock()
@@ -110,7 +113,8 @@ def test_ollama_loader_invalid_json_body_resilience():
     mock_show_audio = MagicMock()
     mock_show_audio.json.return_value = {"capabilities": ["audio"]}
 
-    def mock_post(url, json, timeout):
+    def mock_post(url: str, json: dict[str, Any], timeout: int) -> MagicMock:
+        del url, timeout
         name = json["name"]
         if name == "bad-json-model":
             return mock_show_bad_json
@@ -126,7 +130,7 @@ def test_ollama_loader_invalid_json_body_resilience():
     assert models_signal_data == [(["audio-model"], [])]
 
 
-def test_ollama_loader_invalid_tags_payload_emits_error():
+def test_ollama_loader_invalid_tags_payload_emits_error() -> None:
     loader = OllamaModelLoader("http://localhost:11434/")
     assert loader.url == "http://localhost:11434"
 

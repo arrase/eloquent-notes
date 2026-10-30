@@ -1,10 +1,13 @@
 """Unit tests for configuration GUI tabs (AITab, AppearanceTab, AudioTab, GeneralTab, NotesTab, TextFilesTab)."""
 
 from pathlib import Path
+from typing import Any
 from unittest.mock import MagicMock, patch
 
+import pytest
 from PyQt6 import sip
 from PyQt6.QtGui import QColor
+from PyQt6.QtWidgets import QApplication
 
 from eloquent_notes import ui
 from eloquent_notes.config_gui.loader import OllamaModelLoader
@@ -19,11 +22,12 @@ from eloquent_notes.config_gui.tabs.text_files import TextFilesTab
 # --- AI TAB TESTS ---
 
 
-def test_ai_tab_load_and_save_valid(qapp):
+def test_ai_tab_load_and_save_valid(qapp: QApplication) -> None:
+    del qapp
     with patch.object(AITab, "_fetch_models"):
         tab = AITab()
 
-    config_data = {
+    config_data: dict[str, Any] = {
         "ai": {
             "ollama_url": "http://localhost:11434/",
             "model": "gemma",
@@ -78,11 +82,12 @@ def test_ai_tab_load_and_save_valid(qapp):
     }
 
 
-def test_ai_tab_context_default_toggle(qapp):
+def test_ai_tab_context_default_toggle(qapp: QApplication) -> None:
+    del qapp
     with patch.object(AITab, "_fetch_models"):
         tab = AITab()
 
-    config_data = {
+    config_data: dict[str, Any] = {
         "ai": {
             "ollama_url": "http://localhost:11434",
             "model": "gemma",
@@ -114,11 +119,12 @@ def test_ai_tab_context_default_toggle(qapp):
     assert tab.spn_context_length.isEnabled()
 
 
-def test_ai_tab_save_validation_failures(qapp):
+def test_ai_tab_save_validation_failures(qapp: QApplication) -> None:
+    del qapp
     with patch.object(AITab, "_fetch_models"):
         tab = AITab()
 
-    config_data = {
+    config_data: dict[str, Any] = {
         "ai": {
             "ollama_url": "http://localhost:11434",
             "model": "gemma",
@@ -186,7 +192,8 @@ def test_ai_tab_save_validation_failures(qapp):
         assert tab.save_settings(config_data) is False
 
 
-def test_ai_tab_fetch_models_and_loader_lifecycle(qapp):
+def test_ai_tab_fetch_models_and_loader_lifecycle(qapp: QApplication) -> None:
+    del qapp
     with patch.object(AITab, "_fetch_models"):
         tab = AITab()
 
@@ -243,7 +250,7 @@ def test_ai_tab_fetch_models_and_loader_lifecycle(qapp):
         assert "Connection failed: Server error 500" in tab.lbl_model_status.text()
 
 
-def test_ai_tab_loader_signal_after_widget_deleted(qapp):
+def test_ai_tab_loader_signal_after_widget_deleted(qapp: QApplication) -> None:
     with patch.object(AITab, "_fetch_models"):
         tab = AITab()
 
@@ -254,6 +261,8 @@ def test_ai_tab_loader_signal_after_widget_deleted(qapp):
         tab._fetch_models()
         loader2 = tab._model_loader
 
+    assert loader1 is not None
+    assert loader2 is not None
     assert loader1 is not loader2
     sip.delete(tab)
     loader1.models_fetched.emit(["model_a"], ["embed_a"])
@@ -264,9 +273,10 @@ def test_ai_tab_loader_signal_after_widget_deleted(qapp):
 # --- AUDIO TAB TESTS ---
 
 
-def test_audio_tab_load_and_save(qapp):
+def test_audio_tab_load_and_save(qapp: QApplication) -> None:
+    del qapp
     tab = AudioTab()
-    config_data = {
+    config_data: dict[str, Any] = {
         "audio": {
             "channels": 2,
             "recording_hud_enabled": False,
@@ -299,9 +309,10 @@ def test_audio_tab_load_and_save(qapp):
 # --- GENERAL TAB TESTS ---
 
 
-def test_general_tab_load_and_save(qapp):
+def test_general_tab_load_and_save(qapp: QApplication) -> None:
+    del qapp
     tab = GeneralTab()
-    config_data = {"logging": {"level": "WARNING", "max_mb": 15, "backup_count": 3}}
+    config_data: dict[str, Any] = {"logging": {"level": "WARNING", "max_mb": 15, "backup_count": 3}}
 
     with patch("pathlib.Path.exists", return_value=False):
         tab.load_settings(config_data)
@@ -318,9 +329,10 @@ def test_general_tab_load_and_save(qapp):
         assert config_data["logging"]["level"] == "WARNING"
 
 
-def test_general_tab_autostart_removal(qapp):
+def test_general_tab_autostart_removal(qapp: QApplication) -> None:
+    del qapp
     tab = GeneralTab()
-    config_data = {"logging": {"level": "INFO", "max_mb": 5, "backup_count": 3}}
+    config_data: dict[str, Any] = {"logging": {"level": "INFO", "max_mb": 5, "backup_count": 3}}
 
     with patch("pathlib.Path.exists", return_value=True):
         tab.load_settings(config_data)
@@ -333,7 +345,8 @@ def test_general_tab_autostart_removal(qapp):
         mock_remove.assert_called_once()
 
 
-def test_general_tab_view_log_file(qapp, tmp_path):
+def test_general_tab_view_log_file(qapp: QApplication, tmp_path: Path) -> None:
+    del qapp
     tab = GeneralTab()
     log_dir = tmp_path / "logs"
     log_file = str(log_dir / "app.log")
@@ -358,9 +371,10 @@ def test_general_tab_view_log_file(qapp, tmp_path):
         mock_open.assert_called_once()
 
 
-def test_general_tab_lowercase_log_level(qapp):
+def test_general_tab_lowercase_log_level(qapp: QApplication) -> None:
+    del qapp
     tab = GeneralTab()
-    config_data = {"logging": {"level": "debug", "max_mb": 5, "backup_count": 3}}
+    config_data: dict[str, Any] = {"logging": {"level": "debug", "max_mb": 5, "backup_count": 3}}
     tab.load_settings(config_data)
     assert tab.cmb_log_level.currentText() == "DEBUG"
 
@@ -368,9 +382,10 @@ def test_general_tab_lowercase_log_level(qapp):
 # --- NOTES TAB TESTS ---
 
 
-def test_notes_tab_load_and_save(qapp):
+def test_notes_tab_load_and_save(qapp: QApplication) -> None:
+    del qapp
     tab = NotesTab()
-    config_data = {"notes": {"folder": "~/Notes"}}
+    config_data: dict[str, Any] = {"notes": {"folder": "~/Notes"}}
 
     tab.load_settings(config_data)
     assert tab.txt_folder.text() == "~/Notes"
@@ -380,9 +395,10 @@ def test_notes_tab_load_and_save(qapp):
     assert config_data["notes"]["folder"] == "~/Voice Notes"
 
 
-def test_notes_tab_rejects_empty_folder(qapp):
+def test_notes_tab_rejects_empty_folder(qapp: QApplication) -> None:
+    del qapp
     tab = NotesTab()
-    config_data = {"notes": {"folder": "~/Notes"}}
+    config_data: dict[str, Any] = {"notes": {"folder": "~/Notes"}}
     tab.txt_folder.setText("  ")
 
     with patch("PyQt6.QtWidgets.QMessageBox.warning") as mock_warn:
@@ -391,7 +407,8 @@ def test_notes_tab_rejects_empty_folder(qapp):
     assert config_data["notes"]["folder"] == "~/Notes"
 
 
-def test_notes_tab_browse_folder(qapp, tmp_path):
+def test_notes_tab_browse_folder(qapp: QApplication, tmp_path: Path) -> None:
+    del qapp
     tab = NotesTab()
     tab.txt_folder.setText(str(tmp_path))
 
@@ -410,9 +427,10 @@ def test_notes_tab_browse_folder(qapp, tmp_path):
 # --- APPEARANCE TAB TESTS ---
 
 
-def test_appearance_tab_load_and_save(qapp):
+def test_appearance_tab_load_and_save(qapp: QApplication) -> None:
+    del qapp
     tab = AppearanceTab()
-    config_data = {
+    config_data: dict[str, Any] = {
         "notes": {
             "columns": 2,
             "type_colors": dict(ui.DEFAULT_TYPE_COLORS),
@@ -434,9 +452,10 @@ def test_appearance_tab_load_and_save(qapp):
     assert config_data["notes"]["type_colors"]["note"] == ui.DEFAULT_TYPE_COLORS["note"]
 
 
-def test_appearance_tab_pick_color_cancelled(qapp):
+def test_appearance_tab_pick_color_cancelled(qapp: QApplication) -> None:
+    del qapp
     tab = AppearanceTab()
-    config_data = {
+    config_data: dict[str, Any] = {
         "notes": {
             "columns": 2,
             "type_colors": dict(ui.DEFAULT_TYPE_COLORS),
@@ -452,7 +471,8 @@ def test_appearance_tab_pick_color_cancelled(qapp):
 # --- TEXT FILES TAB TESTS ---
 
 
-def test_text_files_tab_flow(qapp, tmp_path, monkeypatch):
+def test_text_files_tab_flow(qapp: QApplication, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    del qapp
     f1 = str(tmp_path / "prompt1.md")
     f2 = str(tmp_path / "prompt2.md")
     def1 = str(tmp_path / "def1.md")
@@ -466,7 +486,7 @@ def test_text_files_tab_flow(qapp, tmp_path, monkeypatch):
     monkeypatch.setattr(text_files, "PROMPTS", items)
     tab = TextFilesTab()
 
-    config_data = {}
+    config_data: dict[str, Any] = {}
     tab.load_settings(config_data)
 
     assert tab.lst_items.count() == 2
@@ -499,7 +519,12 @@ def test_text_files_tab_flow(qapp, tmp_path, monkeypatch):
     assert tab.loaded_contents[f2] == "Default Prompt 2"
 
 
-def test_text_files_tab_load_settings_row0_already_selected(qapp, tmp_path, monkeypatch):
+def test_text_files_tab_load_settings_row0_already_selected(
+    qapp: QApplication,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    del qapp
     f1 = str(tmp_path / "prompt1.md")
     Path(f1).write_text("Initial Text", encoding="utf-8")
 

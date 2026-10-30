@@ -1,6 +1,7 @@
 """General tab for application configuration."""
 
 from pathlib import Path
+from typing import Any
 
 from PyQt6.QtCore import Qt, QUrl
 from PyQt6.QtGui import QDesktopServices
@@ -29,11 +30,11 @@ from eloquent_notes.logging_utils import LOG_LEVELS, get_log_file_path
 class GeneralTab(QWidget):
     """General settings and logs tab."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._init_ui()
 
-    def _init_ui(self):
+    def _init_ui(self) -> None:
         layout = QVBoxLayout(self)
         layout.setContentsMargins(15, 15, 15, 15)
         layout.setSpacing(15)
@@ -74,7 +75,7 @@ class GeneralTab(QWidget):
 
         layout.addStretch()
 
-    def _view_log_file(self):
+    def _view_log_file(self) -> None:
         log_file_path = get_log_file_path()
         if not Path(log_file_path).exists():
             QMessageBox.information(
@@ -86,7 +87,7 @@ class GeneralTab(QWidget):
 
         QDesktopServices.openUrl(QUrl.fromLocalFile(log_file_path))
 
-    def load_settings(self, config_data: dict) -> None:
+    def load_settings(self, config_data: dict[str, Any]) -> None:
         self.chk_autostart.setChecked(is_autostart_enabled())
 
         log_cfg = config_data["logging"]
@@ -94,7 +95,7 @@ class GeneralTab(QWidget):
         self.spn_log_max_mb.setValue(log_cfg["max_mb"])
         self.spn_log_backups.setValue(log_cfg["backup_count"])
 
-    def save_settings(self, config_data: dict) -> bool:
+    def save_settings(self, config_data: dict[str, Any]) -> bool:
         config_data["logging"].update(
             {
                 "level": self.cmb_log_level.currentText(),

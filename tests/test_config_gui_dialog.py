@@ -1,11 +1,12 @@
 """Unit tests for ConfigurationDialog."""
 
+from collections.abc import Iterator
 from unittest.mock import patch
 
 import pytest
 import yaml
 from PyQt6.QtCore import QEvent
-from PyQt6.QtWidgets import QMessageBox
+from PyQt6.QtWidgets import QApplication, QMessageBox
 
 from eloquent_notes import config, ui
 from eloquent_notes.config_gui.dialog import ConfigurationDialog
@@ -13,13 +14,14 @@ from eloquent_notes.config_gui.tabs.ai import AITab
 
 
 @pytest.fixture(autouse=True)
-def mock_fetch_models():
+def mock_fetch_models() -> Iterator[None]:
     """Autouse fixture to prevent network requests during dialog tests."""
     with patch.object(AITab, "_fetch_models"):
         yield
 
 
-def test_dialog_init(qapp):
+def test_dialog_init(qapp: QApplication) -> None:
+    del qapp
     dummy_config = config.load_default_config()
 
     with patch("eloquent_notes.config.load_config", return_value=dummy_config):
@@ -39,7 +41,8 @@ def test_dialog_init(qapp):
     assert not dialog.windowIcon().isNull()
 
 
-def test_dialog_palette_change_updates_stylesheet(qapp):
+def test_dialog_palette_change_updates_stylesheet(qapp: QApplication) -> None:
+    del qapp
     dummy_config = config.load_default_config()
 
     with (
@@ -56,7 +59,8 @@ def test_dialog_palette_change_updates_stylesheet(qapp):
     assert dialog.styleSheet() == ui.dialog_stylesheet(ui.DARK_THEME)
 
 
-def test_dialog_init_falls_back_to_default_on_corrupt_config(qapp):
+def test_dialog_init_falls_back_to_default_on_corrupt_config(qapp: QApplication) -> None:
+    del qapp
     default_config = config.load_default_config()
 
     with (
@@ -76,7 +80,8 @@ def test_dialog_init_falls_back_to_default_on_corrupt_config(qapp):
     assert dialog.config_data == default_config
 
 
-def test_dialog_load_settings(qapp):
+def test_dialog_load_settings(qapp: QApplication) -> None:
+    del qapp
     dummy_config = config.load_default_config()
     dummy_config["ai"].update(
         {
@@ -121,7 +126,8 @@ def test_dialog_load_settings(qapp):
     assert dialog.ai_tab.spn_min_similarity.value() == 0.5
 
 
-def test_dialog_restore_defaults(qapp):
+def test_dialog_restore_defaults(qapp: QApplication) -> None:
+    del qapp
     dummy_config = config.load_default_config()
     with patch("eloquent_notes.config.load_config", return_value=dummy_config):
         dialog = ConfigurationDialog()
@@ -155,7 +161,8 @@ def test_dialog_restore_defaults(qapp):
     assert dialog.general_tab.chk_autostart.isChecked() is False
 
 
-def test_dialog_save_settings(qapp):
+def test_dialog_save_settings(qapp: QApplication) -> None:
+    del qapp
     dummy_config = config.load_default_config()
 
     with (
@@ -189,7 +196,8 @@ def test_dialog_save_settings(qapp):
         mock_crit.assert_called_once()
 
 
-def test_dialog_save_validation_failure_does_not_mutate_disk(qapp):
+def test_dialog_save_validation_failure_does_not_mutate_disk(qapp: QApplication) -> None:
+    del qapp
     dummy_config = config.load_default_config()
 
     with (
@@ -221,7 +229,8 @@ def test_dialog_save_validation_failure_does_not_mutate_disk(qapp):
         mock_write.assert_not_called()
 
 
-def test_dialog_accept(qapp):
+def test_dialog_accept(qapp: QApplication) -> None:
+    del qapp
     dummy_config = config.load_default_config()
 
     with patch("eloquent_notes.config.load_config", return_value=dummy_config):

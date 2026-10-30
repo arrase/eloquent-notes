@@ -7,6 +7,7 @@ installation, and launching the daemon or configuration window.
 import argparse
 import os
 import sys
+from collections.abc import Callable, Sequence
 
 from PyQt6.QtCore import QCoreApplication
 from PyQt6.QtNetwork import QLocalSocket
@@ -18,7 +19,7 @@ from eloquent_notes.config_gui import ConfigurationDialog
 from eloquent_notes.i18n import _
 
 
-def parse_args(cli_args=None):
+def parse_args(cli_args: Sequence[str] | None = None) -> argparse.Namespace:
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
         prog="eloquent-notes",
@@ -50,7 +51,7 @@ def parse_args(cli_args=None):
     return parser.parse_args(cli_args)
 
 
-def send_ipc_command(command, timeout_ms=500):
+def send_ipc_command(command: str, timeout_ms: int = 500) -> bool:
     """Send a command string to the running daemon via local socket IPC.
 
     Returns:
@@ -68,7 +69,10 @@ def send_ipc_command(command, timeout_ms=500):
     return False
 
 
-def run_cli(cli_args=None, launcher=os.execv):
+def run_cli(
+    cli_args: Sequence[str] | None = None,
+    launcher: Callable[[str, list[str]], object] = os.execv,
+) -> None:
     """Execute CLI logic based on provided arguments."""
     args = parse_args(cli_args)
     wants_toggle = args.command == "toggle" or args.toggle
@@ -102,7 +106,7 @@ def run_cli(cli_args=None, launcher=os.execv):
     launcher(sys.executable, daemon_args)
 
 
-def main():
+def main() -> None:
     """Main entry point for the CLI application."""
     run_cli()
 

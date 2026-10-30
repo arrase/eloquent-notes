@@ -117,7 +117,8 @@ def embed(
         timeout=timeout,
     )
     response.raise_for_status()
-    return response.json()["embeddings"]
+    embeddings: list[list[float]] = response.json()["embeddings"]
+    return embeddings
 
 
 def preload_model(
@@ -149,7 +150,7 @@ def preload_model(
     response.raise_for_status()
 
 
-def _validate_property(key: str, val: Any, prop_schema: dict[str, Any]) -> None:
+def _validate_property(key: str, val: object, prop_schema: dict[str, Any]) -> None:
     prop_type = prop_schema["type"]
     if prop_type == "string":
         if not isinstance(val, str):
@@ -186,6 +187,7 @@ def _parse_json_response(content: str, format_schema: dict[str, Any]) -> dict[st
 
 
 def _execute_ollama_json_request(
+    *,
     ollama_url: str,
     model: str,
     messages: list[dict[str, Any]],
@@ -268,6 +270,7 @@ def _execute_ollama_json_request(
 
 
 def transcribe_audio(
+    *,
     ollama_url: str,
     model: str,
     system_prompt: str,
@@ -305,6 +308,7 @@ def transcribe_audio(
 def _run_text_phase(
     format_schema: dict[str, Any],
     task_name: str,
+    *,
     ollama_url: str,
     model: str,
     system_prompt: str,

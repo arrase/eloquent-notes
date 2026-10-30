@@ -30,41 +30,41 @@ APP_ICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" wi
 """
 
 
-def get_icon_path():
+def get_icon_path() -> str:
     """Return the path of the Eloquent Notes application SVG icon."""
     return str(Path(get_data_home(), "icons", "hicolor", "scalable", "apps", "eloquent-notes.svg"))
 
 
-def get_desktop_entry_path():
+def get_desktop_entry_path() -> str:
     """Return the path of the Eloquent Notes application launcher desktop entry."""
     return str(Path(get_data_home(), "applications", "eloquent-notes.desktop"))
 
 
-def get_autostart_path():
+def get_autostart_path() -> str:
     """Return the path of the Eloquent Notes autostart desktop entry."""
     return str(Path(get_config_home(), "autostart", "eloquent-notes.desktop"))
 
 
-def is_autostart_enabled():
+def is_autostart_enabled() -> bool:
     """Return True if autostart desktop entry exists."""
     return Path(get_autostart_path()).exists()
 
 
-def remove_autostart():
+def remove_autostart() -> None:
     """Remove the autostart desktop entry if it exists."""
     path = Path(get_autostart_path())
     if path.exists():
         path.unlink()
 
 
-def install_app_icon():
+def install_app_icon() -> str:
     """Install the Eloquent Notes SVG icon into the user hicolor icon theme."""
     icon_path = get_icon_path()
     atomic_write(icon_path, APP_ICON_SVG)
     return icon_path
 
 
-def _resolve_launcher():
+def _resolve_launcher() -> tuple[str, str]:
     icon_path = install_app_icon()
     exec_path = str(Path(sys.executable).with_name("eloquent-notes"))
     if " " in exec_path:
@@ -72,7 +72,7 @@ def _resolve_launcher():
     return icon_path, exec_path
 
 
-def _write_desktop_entry(path, exec_cmd, icon_path, *extra_lines):
+def _write_desktop_entry(path: str, exec_cmd: str, icon_path: str, *extra_lines: str) -> str:
     comment = _("Voice dictations turned into organized notes")
     lines = [
         "[Desktop Entry]",
@@ -92,7 +92,7 @@ def _write_desktop_entry(path, exec_cmd, icon_path, *extra_lines):
     return path
 
 
-def install_desktop_entry():
+def install_desktop_entry() -> str:
     """Install the application launcher desktop entry for Eloquent Notes.
 
     Returns:
@@ -102,7 +102,7 @@ def install_desktop_entry():
     return _write_desktop_entry(get_desktop_entry_path(), f"{exec_path} open", icon_path)
 
 
-def install_autostart():
+def install_autostart() -> str:
     """Install the autostart desktop entry for Eloquent Notes.
 
     Returns:

@@ -107,7 +107,7 @@ class NoteCard(QFrame):
     opened = pyqtSignal(object)
     tag_clicked = pyqtSignal(str)
 
-    def __init__(self, note: Note, show_date: bool, type_color: str) -> None:
+    def __init__(self, note: Note, *, show_date: bool, type_color: str) -> None:
         super().__init__()
         self.note = note
         self.setObjectName("card")
@@ -294,13 +294,13 @@ class TimelinePage(QWidget):
 
     def _refresh_tag_filter(self) -> None:
         current = self.tag_filter.currentData()
-        self.tag_filter.blockSignals(True)
+        self.tag_filter.blockSignals(True)  # noqa: FBT003
         self.tag_filter.clear()
         self.tag_filter.addItem(_("All tags"), "")
         for tag in sorted({tag for note in self._notes for tag in note.tags}):
             self.tag_filter.addItem(f"#{tag}", tag)
         self.tag_filter.setCurrentIndex(max(0, self.tag_filter.findData(current)))
-        self.tag_filter.blockSignals(False)
+        self.tag_filter.blockSignals(False)  # noqa: FBT003
 
     def _matches(self, note: Note) -> bool:
         tag = self.tag_filter.currentData()
@@ -315,11 +315,18 @@ class TimelinePage(QWidget):
         label.setContentsMargins(0, 32, 0, 32)
         return label
 
-    def _card(self, note: Note, show_date: bool) -> NoteCard:
-        card = NoteCard(note, show_date, self._type_colors[note.type])
+    def _card(self, note: Note, *, show_date: bool) -> NoteCard:
+        card = NoteCard(note, show_date=show_date, type_color=self._type_colors[note.type])
         card.opened.connect(self.note_opened)
         card.tag_clicked.connect(self.select_tag)
         return card
+
+    def _empty_message(self) -> QLabel:
+        if self._query:
+            return self._message(_("No matching notes."))
+        if self._notes:
+            return self._message(_("No notes match these filters."))
+        return self._message(_("No notes yet. Click the tray icon to record your first one."))
 
     def _list_widgets(self) -> list[QWidget]:
         if not self._query:
@@ -333,11 +340,7 @@ class TimelinePage(QWidget):
 
         notes = [note for note in source if self._matches(note)]
         if not notes:
-            if self._query:
-                return [self._message(_("No matching notes."))]
-            if self._notes:
-                return [self._message(_("No notes match these filters."))]
-            return [self._message(_("No notes yet. Click the tray icon to record your first one."))]
+            return [self._empty_message()]
 
         if self._query:
             count = len(notes)
@@ -348,7 +351,7 @@ class TimelinePage(QWidget):
             return [header, *(self._card(note, show_date=True) for note in notes)]
 
         widgets: list[QWidget] = []
-        today = date.today()
+        today = datetime.now().astimezone().date()
         current_day = None
         for note in notes:
             day = note.created.date()
@@ -360,6 +363,9 @@ class TimelinePage(QWidget):
 
     def _render(self) -> None:
         self._show(self._list_widgets())
+
+    def refresh_theme(self) -> None:
+        self._render()
 
     def _show(self, widgets: list[QWidget]) -> None:
         """Swap in a freshly built grid; setWidget makes the scroll area re-measure it."""
@@ -390,11 +396,11 @@ class TimelinePage(QWidget):
         content.column.addLayout(self._grid)
         content.column.addStretch(1)
         scrollbar = self._scroll.verticalScrollBar()
-        scroll_value = scrollbar.value()  # type: ignore[union-attr]
+        scroll_value = scrollbar.value()
         # Deferred: a card's own signal may have triggered this render.
-        self._scroll.takeWidget().deleteLater()  # type: ignore[union-attr]
+        self._scroll.takeWidget().deleteLater()
         self._scroll.setWidget(content)
-        scrollbar.setValue(scroll_value)  # type: ignore[union-attr]
+        scrollbar.setValue(scroll_value)
 
 
 class ReaderPage(QWidget):
@@ -419,6 +425,12 @@ class ReaderPage(QWidget):
         layout.setContentsMargins(PAGE_MARGIN, 16, PAGE_MARGIN, PAGE_MARGIN)
         layout.setSpacing(12)
 
+        layout.addLayout(self._build_toolbar())
+        layout.addWidget(self._build_card(), stretch=1)
+
+        QShortcut(QKeySequence(Qt.Key.Key_Escape), self).activated.connect(self.back_clicked)
+
+    def _build_toolbar(self) -> QHBoxLayout:
         toolbar = QHBoxLayout()
         toolbar.setSpacing(8)
         btn_back = QPushButton(_("← Back"))
@@ -439,8 +451,9 @@ class ReaderPage(QWidget):
         self.btn_delete.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_delete.clicked.connect(self.delete_clicked)
         toolbar.addWidget(self.btn_delete)
-        layout.addLayout(toolbar)
+        return toolbar
 
+    def _build_card(self) -> QFrame:
         card = QFrame()
         card.setObjectName("readerCard")
         sheet = QVBoxLayout(card)
@@ -477,12 +490,9 @@ class ReaderPage(QWidget):
 
         self.body_edit = QPlainTextEdit()
         self.body_edit.setObjectName("bodyEdit")
-        self.body_edit.document().setDocumentMargin(0)  # type: ignore[union-attr]
+        self.body_edit.document().setDocumentMargin(0)
         sheet.addWidget(self.body_edit, stretch=1)
-
-        layout.addWidget(card, stretch=1)
-
-        QShortcut(QKeySequence(Qt.Key.Key_Escape), self).activated.connect(self.back_clicked)
+        return card
 
     def show_note(self, note: Note) -> None:
         self.note = note
@@ -492,6 +502,13 @@ class ReaderPage(QWidget):
         self.title_edit.setText(note.title)
         self.tags_edit.setText(", ".join(note.tags))
         self.body_edit.setPlainText(note.body)
+
+    def refresh_if_clean(self, note: Note) -> None:
+        if not self.has_unsaved_edits():
+            if (note.title, note.type, note.tags, note.body) != self._saved:
+                self.show_note(note)
+            else:
+                self.note = note
 
     def has_unsaved_edits(self) -> bool:
         return (
@@ -571,7 +588,7 @@ class MainWindow(QMainWindow):
             if dark != self._dark:
                 self._dark = dark
                 self.setStyleSheet(ui.window_stylesheet(ui.current_theme()))
-                self.timeline._render()
+                self.timeline.refresh_theme()
         super().changeEvent(event)
 
     def set_columns(self, columns: int) -> None:
@@ -585,11 +602,7 @@ class MainWindow(QMainWindow):
         if self.stack.currentWidget() is self.reader:
             for note in notes:
                 if note.path == self.reader.note.path:
-                    if not self.reader.has_unsaved_edits():
-                        if (note.title, note.type, note.tags, note.body) != self.reader._saved:
-                            self.reader.show_note(note)
-                        else:
-                            self.reader.note = note
+                    self.reader.refresh_if_clean(note)
                     return
             self.stack.setCurrentWidget(self.timeline)
 
@@ -622,7 +635,7 @@ class MainWindow(QMainWindow):
 
     def _on_copy(self) -> None:
         self.save_open_note()
-        QGuiApplication.clipboard().setText(self.reader.note.markdown)  # type: ignore[union-attr]
+        QGuiApplication.clipboard().setText(self.reader.note.markdown)
 
     def _on_delete(self) -> None:
         self.save_open_note()

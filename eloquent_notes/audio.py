@@ -173,9 +173,9 @@ class AudioRecorder:
     def _on_audio(
         self,
         indata: np.ndarray,
-        frames: int,
-        time_info: dict,
-        status: sd.CallbackFlags,
+        _frames: int,
+        _time_info: object,
+        _status: sd.CallbackFlags,
     ) -> None:
         """sounddevice callback — enqueue an immutable copy of each chunk."""
         self._chunks.append(indata.copy())
@@ -235,6 +235,7 @@ class AudioRecorder:
 def play_beep(
     frequency: float,
     duration: float,
+    *,
     wait: bool,
 ) -> None:
     """Play a short sine-wave beep for audible feedback.

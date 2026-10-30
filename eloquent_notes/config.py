@@ -9,6 +9,7 @@ import os
 import re
 import shutil
 from pathlib import Path
+from typing import Any
 from urllib.parse import urlparse
 
 import yaml
@@ -20,17 +21,17 @@ _HEX_COLOR_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
 KEEP_ALIVE_RE = re.compile(r"^-?\d+(ns|us|µs|ms|s|m|h)?$")
 
 
-def get_config_home():
+def get_config_home() -> str:
     """Return the XDG base directory for user configuration files."""
     return os.environ.get("XDG_CONFIG_HOME") or str(Path("~/.config").expanduser())
 
 
-def get_cache_home():
+def get_cache_home() -> str:
     """Return the XDG base directory for user cache files."""
     return os.environ.get("XDG_CACHE_HOME") or str(Path("~/.cache").expanduser())
 
 
-def get_data_home():
+def get_data_home() -> str:
     """Return the XDG base directory for user data files."""
     return os.environ.get("XDG_DATA_HOME") or str(Path("~/.local/share").expanduser())
 
@@ -71,7 +72,7 @@ _FILES_TO_COPY = (
 )
 
 
-def init_config_dir():
+def init_config_dir() -> None:
     """Create config directories and copy default files if they don't exist."""
     Path(CONFIG_DIR).mkdir(parents=True, exist_ok=True)
     Path(PROMPTS_DIR).mkdir(parents=True, exist_ok=True)
@@ -104,7 +105,7 @@ def _is_valid_number(key: str, value: int | float) -> bool:
     return 0 < value < float("inf")
 
 
-def _validate_override(key: str, value, default_val) -> None:
+def _validate_override(key: str, value: object, default_val: object) -> None:
     if key == "context_length" and value is None:
         return
     expected = (int, float) if type(default_val) is float else (type(default_val),)
@@ -112,16 +113,16 @@ def _validate_override(key: str, value, default_val) -> None:
         raise TypeError(_("Invalid configuration value for '{key}'").format(key=key))
 
     valid = True
-    if isinstance(value, str):
+    if isinstance(value, str) and isinstance(default_val, str):
         valid = _is_valid_str(key, value, default_val)
-    elif type(value) in (int, float):
+    elif type(value) in (int, float) and isinstance(value, (int, float)):
         valid = _is_valid_number(key, value)
 
     if not valid:
         raise ValueError(_("Invalid configuration value for '{key}'").format(key=key))
 
 
-def _merge_configs(base: dict, overrides: dict) -> dict:
+def _merge_configs(base: dict[str, Any], overrides: dict[str, Any]) -> dict[str, Any]:
     """Recursively merge overrides into base config dict."""
     result = copy.deepcopy(base)
     for k, v in overrides.items():
@@ -142,9 +143,9 @@ def _merge_configs(base: dict, overrides: dict) -> dict:
     return result
 
 
-def diff_configs(default: dict, current: dict) -> dict:
+def diff_configs(default: dict[str, Any], current: dict[str, Any]) -> dict[str, Any]:
     """Recursively diff current config against defaults, returning only overrides."""
-    overrides = {}
+    overrides: dict[str, Any] = {}
     for k, default_val in default.items():
         v = current[k]
         if isinstance(default_val, dict) and isinstance(v, dict):
@@ -156,13 +157,14 @@ def diff_configs(default: dict, current: dict) -> dict:
     return overrides
 
 
-def load_default_config():
+def load_default_config() -> dict[str, Any]:
     """Load and return the packaged default configuration dictionary."""
     with Path(DEFAULT_CONFIG_SRC).open(encoding="utf-8") as f:
-        return yaml.safe_load(f)
+        data: dict[str, Any] = yaml.safe_load(f)
+        return data
 
 
-def load_config():
+def load_config() -> dict[str, Any]:
     """Load and merge default config with user overrides."""
     init_config_dir()
 
@@ -179,7 +181,7 @@ def load_config():
     return _merge_configs(default_config, user_config)
 
 
-def load_file(path):
+def load_file(path: str) -> str:
     """Load and return the text content of a file."""
     return Path(path).read_text(encoding="utf-8")
 
@@ -196,7 +198,7 @@ def atomic_write(path: str, content: str | bytes) -> None:
     tmp_path.replace(target)
 
 
-def save_config(config_data):
+def save_config(config_data: dict[str, Any]) -> None:
     """Save configuration data to user config file."""
     content = yaml.safe_dump(config_data, default_flow_style=False, sort_keys=False)
     atomic_write(CONFIG_PATH, content)

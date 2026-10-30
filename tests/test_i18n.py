@@ -3,12 +3,14 @@
 import ast
 import gettext
 import re
+from collections.abc import Iterator
 from datetime import date, datetime
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 from PyQt6.QtCore import QLocale
+from PyQt6.QtWidgets import QApplication
 
 from eloquent_notes import i18n
 from eloquent_notes.config_gui.dialog import RESTORE_DEFAULTS_TITLE, ConfigurationDialog
@@ -71,11 +73,24 @@ PLACEHOLDER_RE = re.compile(r"\{[a-zA-Z0-9_]+\}")
 
 
 @pytest.fixture(autouse=True)
-def restore_english_locale():
+def restore_english_locale() -> Iterator[None]:
     """Ensure every test starts and ends with the default English locale active."""
     i18n.load_translations(["en"])
     yield
     i18n.load_translations(["en"])
+
+
+def _collect_call_msgids(node: ast.AST, strings: set[str], plurals: set[tuple[str, str]]) -> None:
+    if not (isinstance(node, ast.Call) and isinstance(node.func, ast.Name)):
+        return
+    if node.func.id == "_" and node.args:
+        arg = node.args[0]
+        if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
+            strings.add(arg.value)
+    elif node.func.id == "ngettext" and len(node.args) >= 2:
+        a0, a1 = node.args[0], node.args[1]
+        if isinstance(a0, ast.Constant) and isinstance(a1, ast.Constant):
+            plurals.add((str(a0.value), str(a1.value)))
 
 
 def _extract_codebase_msgids() -> tuple[set[str], set[tuple[str, str]]]:
@@ -86,31 +101,19 @@ def _extract_codebase_msgids() -> tuple[set[str], set[tuple[str, str]]]:
     for path in sorted(pkg_dir.rglob("*.py")):
         tree = ast.parse(path.read_text(encoding="utf-8"), str(path))
         for node in ast.walk(tree):
-            if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
-                if node.func.id == "_" and node.args:
-                    arg = node.args[0]
-                    if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
-                        strings.add(arg.value)
-                elif node.func.id == "ngettext" and len(node.args) >= 2:
-                    a0, a1 = node.args[0], node.args[1]
-                    if isinstance(a0, ast.Constant) and isinstance(a1, ast.Constant):
-                        plurals.add((str(a0.value), str(a1.value)))
+            _collect_call_msgids(node, strings, plurals)
 
-    for _color, label in DICTATE_STATES.values():
-        strings.add(label)
-    for label in TYPE_LABELS.values():
-        strings.add(label)
-    for _note_type, label in _TYPE_FILTER_LABELS:
-        strings.add(label)
+    strings.update(label for _color, label in DICTATE_STATES.values())
+    strings.update(TYPE_LABELS.values())
+    strings.update(label for _note_type, label in _TYPE_FILTER_LABELS)
     strings.add(RESTORE_DEFAULTS_TITLE)
     strings.add(VALIDATION_ERROR_TITLE)
-    for label, _path, _default in text_files.PROMPTS:
-        strings.add(label)
+    strings.update(label for label, _path, _default in text_files.PROMPTS)
 
     return strings, plurals
 
 
-def test_detect_system_languages_posix_c(monkeypatch):
+def test_detect_system_languages_posix_c(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("LC_ALL", "C")
     monkeypatch.setenv("LANGUAGE", "es:fr")
     assert i18n.detect_system_languages() == ["en"]
@@ -124,7 +127,7 @@ def test_detect_system_languages_posix_c(monkeypatch):
     assert i18n.detect_system_languages() == ["en"]
 
 
-def test_detect_system_languages_env_and_aliases(monkeypatch):
+def test_detect_system_languages_env_and_aliases(monkeypatch: pytest.MonkeyPatch) -> None:
     for var in ("LANGUAGE", "LC_ALL", "LC_MESSAGES", "LANG"):
         monkeypatch.delenv(var, raising=False)
 
@@ -140,7 +143,7 @@ def test_detect_system_languages_env_and_aliases(monkeypatch):
     assert "he" in langs
 
 
-def test_detect_system_languages_falls_back_to_qlocale(monkeypatch):
+def test_detect_system_languages_falls_back_to_qlocale(monkeypatch: pytest.MonkeyPatch) -> None:
     for var in ("LANGUAGE", "LC_ALL", "LC_MESSAGES", "LANG"):
         monkeypatch.delenv(var, raising=False)
 
@@ -153,7 +156,7 @@ def test_detect_system_languages_falls_back_to_qlocale(monkeypatch):
         assert i18n.detect_system_languages() == ["en"]
 
 
-def test_detect_system_languages_posix_precedence(monkeypatch):
+def test_detect_system_languages_posix_precedence(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("LANGUAGE", raising=False)
     monkeypatch.setenv("LC_ALL", "en_US.UTF-8")
     monkeypatch.setenv("LC_MESSAGES", "fr_FR.UTF-8")
@@ -164,7 +167,7 @@ def test_detect_system_languages_posix_precedence(monkeypatch):
     assert i18n.detect_system_languages() == ["fr_FR", "fr"]
 
 
-def test_load_translations_defaults_to_system_detection(monkeypatch):
+def test_load_translations_defaults_to_system_detection(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("LC_ALL", raising=False)
     monkeypatch.delenv("LC_MESSAGES", raising=False)
     monkeypatch.delenv("LANGUAGE", raising=False)
@@ -177,7 +180,7 @@ def test_load_translations_defaults_to_system_detection(monkeypatch):
     assert i18n.ui_locale().language() == QLocale.Language.Spanish
 
 
-def test_load_translations_stops_at_english_before_later_languages(monkeypatch):
+def test_load_translations_stops_at_english_before_later_languages(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("LANGUAGE", raising=False)
     monkeypatch.setenv("LC_ALL", "en_US.UTF-8")
     monkeypatch.setenv("LANG", "es_ES.UTF-8")
@@ -208,7 +211,7 @@ def test_load_translations_stops_at_english_before_later_languages(monkeypatch):
     assert tr.info().get("language") == "es"
 
 
-def test_all_40_catalogs_cover_every_codebase_string():
+def test_all_40_catalogs_cover_every_codebase_string() -> None:
     msgids, plurals = _extract_codebase_msgids()
     assert len(msgids) == 169
     assert plurals == {("{count} result", "{count} results")}
@@ -235,7 +238,8 @@ def test_all_40_catalogs_cover_every_codebase_string():
             assert str(count) in rendered
 
 
-def test_ui_components_render_translated_strings(qapp):
+def test_ui_components_render_translated_strings(qapp: QApplication) -> None:
+    del qapp
     i18n.load_translations(["ru"])
 
     hud = RecordingHUD()
@@ -252,7 +256,7 @@ def test_ui_components_render_translated_strings(qapp):
     today = date(2026, 10, 22)
     assert day_label(today, today) == i18n._("Today")
     assert day_label(date(2026, 10, 21), today) == i18n._("Yesterday")
-    moment = datetime(2026, 10, 22, 21, 5).astimezone()
+    moment = datetime.fromisoformat("2026-10-22T21:05:00").astimezone()
     assert format_time(moment, "HH:mm") == "21:05"
 
     with patch.object(AITab, "_fetch_models"):

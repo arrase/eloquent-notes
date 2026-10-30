@@ -4,12 +4,12 @@ import sys
 from unittest.mock import MagicMock
 
 import pytest
-from PyQt6.QtWidgets import QDialog
+from PyQt6.QtWidgets import QApplication, QDialog
 
 from eloquent_notes import main
 
 
-def test_version_flag_prints_installed_version(capsys):
+def test_version_flag_prints_installed_version(capsys: pytest.CaptureFixture[str]) -> None:
     """The --version flag reports the installed distribution version."""
     with pytest.raises(SystemExit) as exc_info:
         main.parse_args(["--version"])
@@ -18,7 +18,7 @@ def test_version_flag_prints_installed_version(capsys):
     assert main.__version__ in capsys.readouterr().out
 
 
-def test_parse_args():
+def test_parse_args() -> None:
     """Test argument parsing for various CLI command combinations."""
     args = main.parse_args([])
     assert args.command is None
@@ -41,7 +41,7 @@ def test_parse_args():
     assert args.command == "config"
 
 
-def test_send_ipc_command_success(monkeypatch):
+def test_send_ipc_command_success(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test send_ipc_command returns True when connection succeeds."""
     mock_socket = MagicMock()
     mock_socket.waitForConnected.return_value = True
@@ -56,7 +56,7 @@ def test_send_ipc_command_success(monkeypatch):
     mock_socket.disconnectFromServer.assert_called_once()
 
 
-def test_send_ipc_command_failure(monkeypatch):
+def test_send_ipc_command_failure(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test send_ipc_command returns False when connection fails."""
     mock_socket = MagicMock()
     mock_socket.waitForConnected.return_value = False
@@ -68,7 +68,7 @@ def test_send_ipc_command_failure(monkeypatch):
     mock_socket.write.assert_not_called()
 
 
-def test_send_ipc_command_exception(monkeypatch):
+def test_send_ipc_command_exception(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test send_ipc_command ensures disconnect is called if write raises exception."""
     mock_socket = MagicMock()
     mock_socket.waitForConnected.return_value = True
@@ -82,7 +82,7 @@ def test_send_ipc_command_exception(monkeypatch):
     mock_socket.disconnectFromServer.assert_called_once()
 
 
-def test_run_cli_install_autostart(monkeypatch):
+def test_run_cli_install_autostart(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test run_cli with install-autostart command."""
     mock_autostart = MagicMock()
 
@@ -93,8 +93,9 @@ def test_run_cli_install_autostart(monkeypatch):
     mock_autostart.assert_called_once()
 
 
-def test_run_cli_config_accepted(monkeypatch, qapp):
+def test_run_cli_config_accepted(monkeypatch: pytest.MonkeyPatch, qapp: QApplication) -> None:
     """Test run_cli with config command when configuration dialog is accepted."""
+    del qapp
     mock_dialog = MagicMock()
     mock_dialog.exec.return_value = QDialog.DialogCode.Accepted
     mock_send_ipc = MagicMock()
@@ -108,8 +109,9 @@ def test_run_cli_config_accepted(monkeypatch, qapp):
     mock_send_ipc.assert_called_once_with("reload", timeout_ms=200)
 
 
-def test_run_cli_config_rejected(monkeypatch, qapp):
+def test_run_cli_config_rejected(monkeypatch: pytest.MonkeyPatch, qapp: QApplication) -> None:
     """Test run_cli with config command when configuration dialog is rejected."""
+    del qapp
     mock_dialog = MagicMock()
     mock_dialog.exec.return_value = QDialog.DialogCode.Rejected
     mock_send_ipc = MagicMock()
@@ -123,11 +125,11 @@ def test_run_cli_config_rejected(monkeypatch, qapp):
     mock_send_ipc.assert_not_called()
 
 
-def test_run_cli_daemon_already_running(monkeypatch):
+def test_run_cli_daemon_already_running(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test run_cli notifies running daemon via IPC if daemon is already active."""
     created_apps = []
 
-    def fake_core_app(argv):
+    def fake_core_app(_argv: list[str]) -> MagicMock:
         app = MagicMock()
         created_apps.append(app)
         return app
@@ -135,7 +137,7 @@ def test_run_cli_daemon_already_running(monkeypatch):
     mock_core_app_cls = MagicMock(side_effect=fake_core_app)
     mock_core_app_cls.instance.return_value = None
 
-    def check_app_alive(cmd):
+    def check_app_alive(_cmd: str) -> bool:
         assert len(created_apps) == 1
         assert sys.getrefcount(created_apps[0]) > 2
         return True
@@ -152,7 +154,7 @@ def test_run_cli_daemon_already_running(monkeypatch):
     mock_launcher.assert_not_called()
 
 
-def test_run_cli_default_no_args_already_running(monkeypatch):
+def test_run_cli_default_no_args_already_running(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test run_cli asks the running daemon to open the notes window when launched with no args."""
     mock_send_ipc = MagicMock(return_value=True)
     mock_launcher = MagicMock()
@@ -165,7 +167,7 @@ def test_run_cli_default_no_args_already_running(monkeypatch):
     mock_launcher.assert_not_called()
 
 
-def test_run_cli_launch_daemon(monkeypatch):
+def test_run_cli_launch_daemon(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test run_cli launches daemon process when no instance is running."""
     mock_send_ipc = MagicMock(return_value=False)
     mock_launcher = MagicMock()
@@ -178,7 +180,7 @@ def test_run_cli_launch_daemon(monkeypatch):
     mock_launcher.assert_called_once_with(sys.executable, [sys.executable, "-m", "eloquent_notes.app", "toggle"])
 
 
-def test_run_cli_launch_daemon_default_no_args(monkeypatch):
+def test_run_cli_launch_daemon_default_no_args(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test run_cli launches daemon process without toggle arg when started with no args."""
     mock_send_ipc = MagicMock(return_value=False)
     mock_launcher = MagicMock()
@@ -191,7 +193,7 @@ def test_run_cli_launch_daemon_default_no_args(monkeypatch):
     mock_launcher.assert_called_once_with(sys.executable, [sys.executable, "-m", "eloquent_notes.app"])
 
 
-def test_main_function(monkeypatch):
+def test_main_function(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test main entry point calls run_cli."""
     mock_run_cli = MagicMock()
     monkeypatch.setattr("eloquent_notes.main.run_cli", mock_run_cli)
@@ -200,7 +202,7 @@ def test_main_function(monkeypatch):
     mock_run_cli.assert_called_once()
 
 
-def test_run_cli_open_launches_daemon_with_window(monkeypatch):
+def test_run_cli_open_launches_daemon_with_window(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test 'open' starts the daemon with the notes window when no instance is running."""
     mock_send_ipc = MagicMock(return_value=False)
     mock_launcher = MagicMock()
