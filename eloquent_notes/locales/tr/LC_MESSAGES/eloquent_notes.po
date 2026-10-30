@@ -448,6 +448,12 @@ msgstr "Dikteyi durdur"
 msgid "System is busy. Please wait."
 msgstr "Sistem meşgul. Lütfen bekleyin."
 
+msgid "Tagging - System Prompt"
+msgstr "Etiketleme - Sistem İstemi"
+
+msgid "Tagging - User Prompt"
+msgstr "Etiketleme - Kullanıcı İstemi"
+
 msgid "Tags, separated by commas"
 msgstr "Virgülle ayrılmış etiketler"
 

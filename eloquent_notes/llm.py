@@ -1,8 +1,9 @@
-"""Ollama API client for the three-phase dictation pipeline and search.
+"""Ollama API client for the four-phase dictation pipeline and search.
 
 Phase 1 (transcription): multimodal audio -> text.
 Phase 2 (rewriting): transcription -> clean note prose and title.
-Phase 3 (classification): rewritten note -> type and tags.
+Phase 3 (classification): rewritten note -> type.
+Phase 4 (tagging): rewritten note -> tags.
 Embeddings (/api/embed) power semantic search over saved notes.
 
 Every phase requests structured output through Ollama's ``format`` JSON
@@ -89,13 +90,20 @@ CLASSIFICATION_SCHEMA: dict[str, Any] = {
             "enum": list(NOTE_TYPES),
             "description": "Classification of the note content.",
         },
+    },
+    "required": ["type"],
+}
+
+TAGGING_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
         "tags": {
             "type": "array",
             "items": {"type": "string"},
             "description": "2 to 5 relevant tags, lowercase, in the requested output language.",
         },
     },
-    "required": ["type", "tags"],
+    "required": ["tags"],
 }
 
 
@@ -343,3 +351,4 @@ def _run_text_phase(
 
 rewrite_transcription = partial(_run_text_phase, REWRITING_SCHEMA, "note rewriting")
 classify_note = partial(_run_text_phase, CLASSIFICATION_SCHEMA, "note classification")
+tag_note = partial(_run_text_phase, TAGGING_SCHEMA, "note tagging")

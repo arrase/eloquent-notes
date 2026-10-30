@@ -14,6 +14,8 @@ All configuration lives under `~/.config/eloquent-notes/` (or `$XDG_CONFIG_HOME/
     ├── rewriting_user.md
     ├── classification_system.md
     ├── classification_user.md
+    ├── tagging_system.md
+    ├── tagging_user.md
     └── retry_prompt.md
 ```
 
@@ -58,7 +60,7 @@ The dialog has six tabs plus **Restore Defaults**, **Cancel** and **Save** butto
 #### 4. AI Settings
 **Ollama & AI Pipeline Settings**
 * **Ollama URL**: endpoint of the Ollama server (default `http://localhost:11434`).
-* **AI Model (Audio)**: multimodal model used for all three pipeline phases (default `gemma4:e4b-it-qat`). **Refresh** queries Ollama and lists the installed models that report the `audio` capability.
+* **AI Model (Audio)**: multimodal model used for all four pipeline phases (default `gemma4:e4b-it-qat`). **Refresh** queries Ollama and lists the installed models that report the `audio` capability.
 * **Context Length**: `num_ctx` for requests (default `8192`). **Use default context length** stores `null` so Ollama uses the model's maximum.
 * **Keep Alive Time**: how long the model stays loaded after a note is generated (default `"0"`, unload immediately).
 * **Preload Keep Alive**: how long the model stays loaded while recording and between phases (default `"5m"`).
@@ -143,8 +145,10 @@ Prompts reside in `~/.config/eloquent-notes/prompts/`:
 | `transcription_user.md` | User prompt sent with the audio. | — |
 | `rewriting_system.md` | System instructions for Phase 2 (title and note prose). | — |
 | `rewriting_user.md` | User prompt for Phase 2. | `{transcription}`, `{language_instruction}` |
-| `classification_system.md` | System instructions for Phase 3 (type and tags). | — |
-| `classification_user.md` | User prompt for Phase 3. | `{transcription}` (the rewritten content), `{language_instruction}` |
+| `classification_system.md` | System instructions for Phase 3 (note type). | — |
+| `classification_user.md` | User prompt for Phase 3. | `{content}` |
+| `tagging_system.md` | System instructions for Phase 4 (topic tags). | — |
+| `tagging_user.md` | User prompt for Phase 4. | `{content}`, `{language_instruction}` |
 | `retry_prompt.md` | Correction sent when a response is not valid JSON. | — |
 
-Unknown placeholders are left untouched. The JSON output shapes are fixed by the schemas in `llm.py` (see [Three-Phase AI Pipeline](pipeline.md)); prompts change the model's behavior, not the fields it returns.
+Unknown placeholders are left untouched. The JSON output shapes are fixed by the schemas in `llm.py` (see [Four-Phase AI Pipeline](pipeline.md)); prompts change the model's behavior, not the fields it returns.

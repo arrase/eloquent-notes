@@ -448,6 +448,12 @@ msgstr "Зупинити диктування"
 msgid "System is busy. Please wait."
 msgstr "Система зайнята. Зачекайте, будь ласка."
 
+msgid "Tagging - System Prompt"
+msgstr "Тегування — Системний промпт"
+
+msgid "Tagging - User Prompt"
+msgstr "Тегування — Промпт користувача"
+
 msgid "Tags, separated by commas"
 msgstr "Теги, розділені комами"
 

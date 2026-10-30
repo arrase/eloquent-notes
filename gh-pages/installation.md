@@ -49,7 +49,7 @@ Install PortAudio and DBus notification utilities using your distribution packag
 
 ## Local Ollama Setup & Model Download
 
-Eloquent Notes relies on **Ollama** to run two models locally: the multimodal Gemma 4 model for transcription, rewriting and classification, and an EmbeddingGemma model for semantic search.
+Eloquent Notes relies on **Ollama** to run two models locally: the multimodal Gemma 4 model for transcription, rewriting, classification and tagging, and an EmbeddingGemma model for semantic search.
 
 ### 1. Install Ollama
 

@@ -27,6 +27,8 @@ PROMPTS = [
         ("Rewriting - User Prompt", config.REWRITING_USER_PROMPT_PATH),
         ("Classification - System Prompt", config.CLASSIFICATION_SYSTEM_PROMPT_PATH),
         ("Classification - User Prompt", config.CLASSIFICATION_USER_PROMPT_PATH),
+        ("Tagging - System Prompt", config.TAGGING_SYSTEM_PROMPT_PATH),
+        ("Tagging - User Prompt", config.TAGGING_USER_PROMPT_PATH),
         ("Retry Prompt", config.RETRY_PROMPT_PATH),
     )
 ]

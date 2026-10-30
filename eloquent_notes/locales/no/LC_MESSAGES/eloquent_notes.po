@@ -448,6 +448,12 @@ msgstr "Stopp diktering"
 msgid "System is busy. Please wait."
 msgstr "Systemet er opptatt. Vennligst vent."
 
+msgid "Tagging - System Prompt"
+msgstr "Emneknagging – Systeminstruks"
+
+msgid "Tagging - User Prompt"
+msgstr "Emneknagging – Brukerinstruks"
+
 msgid "Tags, separated by commas"
 msgstr "Emneknagger, atskilt med komma"
 

@@ -8,7 +8,7 @@ hide:
     <i class="fa-solid fa-microphone-lines" aria-hidden="true"></i><span>Voice Dictations to Structured Notes</span>
   </div>
   <h1>Eloquent Notes</h1>
-  <p class="hero-subtitle">A Linux system tray app that turns voice dictations into well-structured, well-ordered Markdown notes with a local three-phase Gemma 4 pipeline via Ollama, and lets you browse, edit and search them by meaning.</p>
+  <p class="hero-subtitle">A Linux system tray app that turns voice dictations into well-structured, well-ordered Markdown notes with a local four-phase Gemma 4 pipeline via Ollama, and lets you browse, edit and search them by meaning.</p>
   <div class="hero-badges">
     <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.11%2B-blue.svg" alt="Python 3.11+"></a>
     <a href="#"><img src="https://img.shields.io/badge/platform-Linux%20POSIX-important.svg" alt="Platform"></a>
@@ -47,7 +47,7 @@ hide:
   <div class="feature-card">
     <i class="fa-solid fa-wand-magic-sparkles feature-icon" aria-hidden="true"></i>
     <h3>Clean, Structured Notes</h3>
-    <p>A three-phase Gemma 4 pipeline transcribes, rewrites the dictation as clean prose with a title, and assigns a type and 2&ndash;5 tags.</p>
+    <p>A four-phase Gemma 4 pipeline transcribes, rewrites the dictation as clean prose with a title, classifies the note type, and generates 2&ndash;5 tags.</p>
   </div>
 
   <div class="feature-card">
@@ -77,7 +77,7 @@ hide:
   <div class="feature-card">
     <i class="fa-solid fa-shield-halved feature-icon" aria-hidden="true"></i>
     <h3>Offline &amp; Private</h3>
-    <p>Audio never touches the disk, and transcription, rewriting, classification and search all run locally through Ollama.</p>
+    <p>Audio never touches the disk, and transcription, rewriting, classification, tagging and search all run locally through Ollama.</p>
   </div>
 
   <div class="feature-card">
@@ -155,8 +155,8 @@ Eloquent Notes includes a PyQt6 dialog for editing the notes folder, timeline la
       <i class="fa-solid fa-brain feature-icon" aria-hidden="true"></i>
       <span class="card-badge">Read →</span>
     </div>
-    <h3>Three-Phase AI Pipeline</h3>
-    <p>Deep dive into Phase 1 (Transcription), Phase 2 (Rewriting), Phase 3 (Classification), model preloading, and JSON retry validation.</p>
+    <h3>Four-Phase AI Pipeline</h3>
+    <p>Deep dive into Phase 1 (Transcription), Phase 2 (Rewriting), Phase 3 (Classification), Phase 4 (Tagging), model preloading, and JSON retry validation.</p>
   </a>
 
   <a href="notes/" class="feature-card">

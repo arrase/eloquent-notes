@@ -448,6 +448,12 @@ msgstr "إيقاف الإملاء"
 msgid "System is busy. Please wait."
 msgstr "النظام مشغول. يرجى الانتظار."
 
+msgid "Tagging - System Prompt"
+msgstr "الوسم - موجه النظام"
+
+msgid "Tagging - User Prompt"
+msgstr "الوسم - موجه المستخدم"
+
 msgid "Tags, separated by commas"
 msgstr "الوسوم، مفصولة بفواصل"
 

@@ -448,6 +448,12 @@ msgstr "Διακοπή υπαγόρευσης"
 msgid "System is busy. Please wait."
 msgstr "Το σύστημα είναι απασχολημένο. Παρακαλώ περιμένετε."
 
+msgid "Tagging - System Prompt"
+msgstr "Ετικετοποίηση - Προτροπή συστήματος"
+
+msgid "Tagging - User Prompt"
+msgstr "Ετικετοποίηση - Προτροπή χρήστη"
+
 msgid "Tags, separated by commas"
 msgstr "Ετικέτες, διαχωρισμένες με κόμμα"
 

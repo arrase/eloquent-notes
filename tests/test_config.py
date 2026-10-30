@@ -316,6 +316,7 @@ def test_prompt_paths_cover_every_copied_prompt() -> None:
     assert all(path.startswith(config.PROMPTS_DIR) for path in config.PROMPT_PATHS)
     assert tuple(config.PROMPT_DEFAULTS) == config.PROMPT_PATHS
     assert all(Path(src).is_file() for src in config.PROMPT_DEFAULTS.values())
+    assert {Path(src) for src in config.PROMPT_DEFAULTS.values()} == set(Path(config.DEFAULT_PROMPTS_DIR).glob("*.md"))
 
 
 def test_cache_dir_follows_xdg_cache_home() -> None:

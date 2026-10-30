@@ -448,6 +448,12 @@ msgstr "Stoppa diktering"
 msgid "System is busy. Please wait."
 msgstr "Systemet är upptaget. Vänta."
 
+msgid "Tagging - System Prompt"
+msgstr "Taggning - Systemprompt"
+
+msgid "Tagging - User Prompt"
+msgstr "Taggning - Användarprompt"
+
 msgid "Tags, separated by commas"
 msgstr "Taggar, separerade med kommatecken"
 

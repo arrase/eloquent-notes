@@ -448,6 +448,12 @@ msgstr "Diktat stoppen"
 msgid "System is busy. Please wait."
 msgstr "System ist beschäftigt. Bitte warten."
 
+msgid "Tagging - System Prompt"
+msgstr "Tagging - System-Prompt"
+
+msgid "Tagging - User Prompt"
+msgstr "Tagging - Benutzer-Prompt"
+
 msgid "Tags, separated by commas"
 msgstr "Tags, durch Kommas getrennt"
 

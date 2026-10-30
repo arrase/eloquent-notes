@@ -1,9 +1,9 @@
 """Eloquent Notes daemon — system tray application and notes window.
 
 Owns the recording lifecycle (IDLE → RECORDING → PROCESSING → IDLE),
-the single-instance IPC server, the three-phase Ollama pipeline
-(transcription → rewriting → classification) that turns dictations into
-Markdown notes, and the notes window.
+the single-instance IPC server, the four-phase Ollama pipeline
+(transcription → rewriting → classification → tagging) that turns dictations
+into Markdown notes, and the notes window.
 
 All state changes happen on the Qt main thread; only model preloading,
 audio processing and semantic search run on background threads and report
@@ -16,6 +16,7 @@ import logging
 import sys
 import threading
 import time
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -413,11 +414,8 @@ class EloquentApp(QObject):
     # --- Processing pipeline (background thread) ---------------------------
 
     @staticmethod
-    def _language_instruction(target_language: str) -> str:
-        return (
-            f"IMPORTANT: You MUST write the title, content, and tags "
-            f"in {target_language}, translating from the transcription language if necessary."
-        )
+    def _language_instruction(fields: str, target_language: str) -> str:
+        return f"IMPORTANT: You MUST write the {fields} in {target_language}, translating if necessary."
 
     @staticmethod
     def _transcribe(ai_cfg: dict[str, Any], loaded: dict[str, str], wav_chunks: list[bytes]) -> str:
@@ -443,23 +441,21 @@ class EloquentApp(QObject):
         return " ".join(transcriptions)
 
     @staticmethod
-    def _rewrite(
+    def _call_text_phase(
+        phase_fn: Callable[..., dict[str, Any]],
         ai_cfg: dict[str, Any],
         loaded: dict[str, str],
-        transcription: str,
-        language_instruction: str,
+        *,
+        system_path: str,
+        user_path: str,
+        placeholders: dict[str, str],
         keep_alive: str,
     ) -> dict[str, Any]:
-        user_prompt = loaded[config.REWRITING_USER_PROMPT_PATH].format_map(
-            SafeDict(
-                transcription=transcription,
-                language_instruction=language_instruction,
-            )
-        )
-        return llm.rewrite_transcription(
+        user_prompt = loaded[user_path].format_map(SafeDict(placeholders))
+        return phase_fn(
             ollama_url=ai_cfg["ollama_url"],
             model=ai_cfg["model"],
-            system_prompt=loaded[config.REWRITING_SYSTEM_PROMPT_PATH],
+            system_prompt=loaded[system_path],
             user_prompt=user_prompt,
             retry_prompt=loaded[config.RETRY_PROMPT_PATH],
             context_length=ai_cfg["context_length"],
@@ -468,29 +464,62 @@ class EloquentApp(QObject):
             timeout=ai_cfg["request_timeout"],
         )
 
-    @staticmethod
+    @classmethod
+    def _rewrite(
+        cls,
+        ai_cfg: dict[str, Any],
+        loaded: dict[str, str],
+        transcription: str,
+        keep_alive: str,
+    ) -> dict[str, Any]:
+        return cls._call_text_phase(
+            llm.rewrite_transcription,
+            ai_cfg,
+            loaded,
+            system_path=config.REWRITING_SYSTEM_PROMPT_PATH,
+            user_path=config.REWRITING_USER_PROMPT_PATH,
+            placeholders={
+                "transcription": transcription,
+                "language_instruction": cls._language_instruction("title and content", ai_cfg["output_language"]),
+            },
+            keep_alive=keep_alive,
+        )
+
+    @classmethod
     def _classify(
+        cls,
         ai_cfg: dict[str, Any],
         loaded: dict[str, str],
         content: str,
-        language_instruction: str,
     ) -> dict[str, Any]:
-        user_prompt = loaded[config.CLASSIFICATION_USER_PROMPT_PATH].format_map(
-            SafeDict(
-                transcription=content,
-                language_instruction=language_instruction,
-            )
+        return cls._call_text_phase(
+            llm.classify_note,
+            ai_cfg,
+            loaded,
+            system_path=config.CLASSIFICATION_SYSTEM_PROMPT_PATH,
+            user_path=config.CLASSIFICATION_USER_PROMPT_PATH,
+            placeholders={"content": content},
+            keep_alive=ai_cfg["preload_keep_alive"],
         )
-        return llm.classify_note(
-            ollama_url=ai_cfg["ollama_url"],
-            model=ai_cfg["model"],
-            system_prompt=loaded[config.CLASSIFICATION_SYSTEM_PROMPT_PATH],
-            user_prompt=user_prompt,
-            retry_prompt=loaded[config.RETRY_PROMPT_PATH],
-            context_length=ai_cfg["context_length"],
+
+    @classmethod
+    def _tag(
+        cls,
+        ai_cfg: dict[str, Any],
+        loaded: dict[str, str],
+        content: str,
+    ) -> dict[str, Any]:
+        return cls._call_text_phase(
+            llm.tag_note,
+            ai_cfg,
+            loaded,
+            system_path=config.TAGGING_SYSTEM_PROMPT_PATH,
+            user_path=config.TAGGING_USER_PROMPT_PATH,
+            placeholders={
+                "content": content,
+                "language_instruction": cls._language_instruction("tags", ai_cfg["output_language"]),
+            },
             keep_alive=ai_cfg["keep_alive"],
-            max_retries=ai_cfg["max_retries"],
-            timeout=ai_cfg["request_timeout"],
         )
 
     def _reset_keep_alive(self, ai_cfg: dict[str, Any], preload_thread: threading.Thread | None) -> None:
@@ -534,14 +563,11 @@ class EloquentApp(QObject):
                 return
             logger.info("Transcription: %s", transcription)
 
-            language_instruction = self._language_instruction(ai_cfg["output_language"])
-
             logger.info("Phase 2: Rewriting transcription...")
             rewrite = self._rewrite(
                 ai_cfg,
                 loaded,
                 transcription,
-                language_instruction,
                 ai_cfg["keep_alive"] if append else ai_cfg["preload_keep_alive"],
             )
             completed_final_phase = append
@@ -553,19 +579,19 @@ class EloquentApp(QObject):
                 return
 
             logger.info("Phase 3: Classifying note...")
-            classification = self._classify(ai_cfg, loaded, content, language_instruction)
+            classification = self._classify(ai_cfg, loaded, content)
+            logger.info("Classification: type=%s", classification["type"])
+
+            logger.info("Phase 4: Tagging note...")
+            tagging = self._tag(ai_cfg, loaded, content)
             completed_final_phase = True
-            logger.info(
-                "Classification: type=%s, tags=%s",
-                classification["type"],
-                classification["tags"],
-            )
+            logger.info("Tagging: tags=%s", tagging["tags"])
 
             note = notes.create_note(
                 folder=Path(snapshot["notes"]["folder"]).expanduser(),
                 title=title,
                 note_type=classification["type"],
-                tags=notes.normalize_tags(classification["tags"]),
+                tags=notes.normalize_tags(tagging["tags"]),
                 body=content,
             )
             status, detail = "success", note.title

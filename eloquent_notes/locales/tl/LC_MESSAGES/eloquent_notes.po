@@ -448,6 +448,12 @@ msgstr "Ihinto ang diktasyon"
 msgid "System is busy. Please wait."
 msgstr "Abala ang system. Mangyaring maghintay."
 
+msgid "Tagging - System Prompt"
+msgstr "Paglalagay ng Tag - System Prompt"
+
+msgid "Tagging - User Prompt"
+msgstr "Paglalagay ng Tag - User Prompt"
+
 msgid "Tags, separated by commas"
 msgstr "Mga tag, pinaghihiwalay ng mga kuwit"
 

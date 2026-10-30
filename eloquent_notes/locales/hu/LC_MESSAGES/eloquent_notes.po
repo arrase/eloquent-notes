@@ -448,6 +448,12 @@ msgstr "Diktálás leállítása"
 msgid "System is busy. Please wait."
 msgstr "A rendszer foglalt. Kérjük, várjon."
 
+msgid "Tagging - System Prompt"
+msgstr "Címkézés - Rendszerprompt"
+
+msgid "Tagging - User Prompt"
+msgstr "Címkézés - Felhasználói prompt"
+
 msgid "Tags, separated by commas"
 msgstr "Címkék, vesszővel elválasztva"
 

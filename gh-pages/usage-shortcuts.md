@@ -56,7 +56,7 @@ The tray icon changes color and symbol to indicate the active state:
 | :--- | :--- | :--- | :--- |
 | **Idle** | Gray Circle + White Microphone | `Eloquent Notes (Idle)` | Waiting for input. No audio input is active. |
 | **Recording** | Red Circle + White Recording Dot | `Eloquent Notes (Recording...)` | Microphone audio is recorded into memory; the model is preloaded in the background. |
-| **Processing** | Orange Circle + White Hourglass | `Eloquent Notes (Processing...)` | The Ollama pipeline is writing the note (transcription, rewriting, classification). |
+| **Processing** | Orange Circle + White Hourglass | `Eloquent Notes (Processing...)` | The Ollama pipeline is writing the note (transcription, rewriting, classification, tagging). |
 
 The same icons appear on the **Add dictation** button in the notes window.
 

@@ -448,6 +448,12 @@ msgstr "Спри диктовката"
 msgid "System is busy. Please wait."
 msgstr "Системата е заета. Моля, изчакайте."
 
+msgid "Tagging - System Prompt"
+msgstr "Етикетиране – Системен промпт"
+
+msgid "Tagging - User Prompt"
+msgstr "Етикетиране – Потребителски промпт"
+
 msgid "Tags, separated by commas"
 msgstr "Етикети, разделени със запетая"
 

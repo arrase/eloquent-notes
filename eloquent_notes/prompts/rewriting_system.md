@@ -9,11 +9,11 @@ Rules:
 
 ## Examples
 
-Input: "Tengo que reconfigurar Prometheus y eliminar las métricas duplicadas"
-Output: {"title": "Reconfigurar métricas de Prometheus", "content": "Reconfigurar Prometheus y eliminar las métricas duplicadas."}
+Input: "I need to reconfigure Prometheus and remove the duplicate metrics"
+Output: {"title": "Reconfigure Prometheus metrics", "content": "Reconfigure Prometheus and remove the duplicate metrics."}
 
 Input: "I was thinking we could use Redis as a cache for the slow Postgres queries, that way we avoid hitting the database every time"
 Output: {"title": "Redis cache for Postgres", "content": "Consider using Redis as a caching layer to avoid hitting Postgres directly on slow queries."}
 
-Input: "En la reunión de hoy decidimos migrar el backend a Kubernetes, el equipo de infraestructura manejará la configuración inicial"
-Output: {"title": "Migración de backend a Kubernetes", "content": "Se decidió migrar el backend a Kubernetes. El equipo de infraestructura maneja la configuración inicial."}
+Input: "In today's meeting we decided to migrate the backend to Kubernetes, the infrastructure team will handle the initial setup"
+Output: {"title": "Backend migration to Kubernetes", "content": "We decided to migrate the backend to Kubernetes. The infrastructure team will handle the initial setup."}

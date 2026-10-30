@@ -448,6 +448,12 @@ msgstr "Peata dikteerimine"
 msgid "System is busy. Please wait."
 msgstr "Süsteem on hõivatud. Palun oodake."
 
+msgid "Tagging - System Prompt"
+msgstr "Sildistamine – süsteemiviip"
+
+msgid "Tagging - User Prompt"
+msgstr "Sildistamine – kasutajaviip"
+
 msgid "Tags, separated by commas"
 msgstr "Sildid, komadega eraldatud"
 

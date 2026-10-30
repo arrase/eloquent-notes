@@ -448,6 +448,12 @@ msgstr "音声入力を停止"
 msgid "System is busy. Please wait."
 msgstr "システムがビジー状態です。しばらくお待ちください。"
 
+msgid "Tagging - System Prompt"
+msgstr "タグ付け - システムプロンプト"
+
+msgid "Tagging - User Prompt"
+msgstr "タグ付け - ユーザープロンプト"
+
 msgid "Tags, separated by commas"
 msgstr "タグ（カンマ区切り）"
 

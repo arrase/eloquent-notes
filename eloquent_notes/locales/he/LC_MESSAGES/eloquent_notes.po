@@ -448,6 +448,12 @@ msgstr "עצור הכתבה"
 msgid "System is busy. Please wait."
 msgstr "המערכת עמוסה. נא להמתין."
 
+msgid "Tagging - System Prompt"
+msgstr "תיוג - הנחיית מערכת"
+
+msgid "Tagging - User Prompt"
+msgstr "תיוג - הנחיית משתמש"
+
 msgid "Tags, separated by commas"
 msgstr "תגיות, מופרדות בפסיקים"
 
