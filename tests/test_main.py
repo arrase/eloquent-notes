@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 import pytest
 from PyQt6.QtWidgets import QApplication, QDialog
 
-from eloquent_notes import main
+from eloquent_notes import __version__, main
 
 
 def test_version_flag_prints_installed_version(capsys: pytest.CaptureFixture[str]) -> None:
@@ -15,7 +15,7 @@ def test_version_flag_prints_installed_version(capsys: pytest.CaptureFixture[str
         main.parse_args(["--version"])
 
     assert exc_info.value.code == 0
-    assert main.__version__ in capsys.readouterr().out
+    assert __version__ in capsys.readouterr().out
 
 
 def test_parse_args() -> None:

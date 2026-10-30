@@ -55,7 +55,7 @@ def test_start_and_stop(mock_input_stream: MagicMock) -> None:
         callback=recorder._on_audio,
     )
     stream_instance.start.assert_called_once()
-    assert recorder._stream is stream_instance
+    assert vars(recorder)["_stream"] is stream_instance
 
     recorder.stop()
     stream_instance.stop.assert_called_once()
@@ -147,7 +147,7 @@ def test_is_silent_rejects_non_speech() -> None:
 
     silence = np.zeros(num_samples, dtype=np.float32)
     white_noise = rng.standard_normal(num_samples).astype(np.float32) * 0.2
-    hum_50hz = (sum(np.sin(2.0 * np.pi * 50.0 * k * t) / k for k in range(1, 12)) * 0.2).astype(np.float32)
+    hum_50hz = (np.sum([np.sin(2.0 * np.pi * 50.0 * k * t) / k for k in range(1, 12)], axis=0) * 0.2).astype(np.float32)
     low_thump = (np.sin(2.0 * np.pi * 40.0 * t) * 0.4).astype(np.float32)
     high_tone = (np.sin(2.0 * np.pi * 5000.0 * t) * 0.4).astype(np.float32)
 
@@ -403,7 +403,7 @@ def test_recorder_reuses_analysis_across_is_silent_and_wav_chunks() -> None:
         patch("eloquent_notes.audio.np.concatenate", wraps=np.concatenate) as mock_concat,
         patch("eloquent_notes.audio.speech_window_mask", wraps=speech_window_mask) as mock_mask,
     ):
-        assert recorder.is_silent is False
+        assert bool(recorder.is_silent) is False
         assert len(recorder.wav_chunks) == 1
         assert len(recorder.wav_chunks) == 1
 
@@ -412,7 +412,7 @@ def test_recorder_reuses_analysis_across_is_silent_and_wav_chunks() -> None:
     assert mock_mask.call_count == 1
 
     recorder._chunks.clear()
-    assert recorder.is_silent is True
+    assert bool(recorder.is_silent) is True
     assert recorder.wav_chunks == []
 
 

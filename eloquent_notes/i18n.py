@@ -87,16 +87,19 @@ def _expand_tag(raw: str) -> list[str]:
     return candidates
 
 
-def detect_system_languages() -> list[str]:
-    """Return ordered gettext language codes detected from the system environment."""
-    locale_val = ""
+def _env_locale() -> str:
     for var in ("LC_ALL", "LC_MESSAGES", "LANG"):
         val = os.environ.get(var, "").strip()
         if val:
-            if val.split(".", maxsplit=1)[0].upper() in ("C", "POSIX"):
-                return ["en"]
-            locale_val = val
-            break
+            return val
+    return ""
+
+
+def detect_system_languages() -> list[str]:
+    """Return ordered gettext language codes detected from the system environment."""
+    locale_val = _env_locale()
+    if locale_val.split(".", maxsplit=1)[0].upper() in ("C", "POSIX"):
+        return ["en"]
 
     raw_tags: list[str] = []
     language_env = os.environ.get("LANGUAGE", "").strip()

@@ -281,11 +281,12 @@ def test_toggle_from_recording_stops_and_processes(qapp: QApplication) -> None:
 
 def test_stop_recording_failure_resets_to_idle(qapp: QApplication) -> None:
     eloquent_app = make_app(qapp)
-    recorder = MagicMock()
+    recorder: Any = MagicMock()
     recorder.stop.side_effect = RuntimeError("PortAudio stop error")
+    snapshot: Any = {"audio": {"beep_enabled": False}}
     eloquent_app.state = "RECORDING"
     eloquent_app._recorder = recorder
-    eloquent_app._snapshot = {"audio": {"beep_enabled": False}}
+    eloquent_app._snapshot = snapshot
 
     with patch("eloquent_notes.app.threading.Thread") as mock_thread_cls:
         eloquent_app.toggle_action()
@@ -332,7 +333,7 @@ def test_start_recording_creates_hud_lazily(qapp: QApplication) -> None:
     eloquent_app = EloquentApp(qapp)
     eloquent_app._notify = MagicMock()  # type: ignore[method-assign]
     eloquent_app._update_icon = MagicMock()  # type: ignore[method-assign]
-    assert eloquent_app._hud is None
+    assert vars(eloquent_app)["_hud"] is None
 
     with (
         patch(
@@ -425,7 +426,7 @@ def test_update_icon_and_notify(qapp: QApplication) -> None:
 
 def test_process_audio_empty_wav(qapp: QApplication) -> None:
     eloquent_app = make_app(qapp)
-    eloquent_app.processing_completed = MagicMock()  # type: ignore[method-assign]
+    eloquent_app.processing_completed = MagicMock()
 
     recorder = MagicMock()
     recorder.wav_chunks = []
@@ -435,7 +436,7 @@ def test_process_audio_empty_wav(qapp: QApplication) -> None:
     with patch("eloquent_notes.app.llm.preload_model") as mock_preload:
         eloquent_app._process_audio(recorder, snapshot, append=False, preload_thread=None)
 
-    eloquent_app.processing_completed.emit.assert_called_once_with("empty", "")  # type: ignore[attr-defined]
+    eloquent_app.processing_completed.emit.assert_called_once_with("empty", "")
     mock_preload.assert_called_once_with(
         ollama_url="http://localhost:11434",
         model="gemma",
@@ -475,7 +476,7 @@ def _pipeline_snapshot() -> dict[str, Any]:
 
 def test_process_audio_empty_transcription(qapp: QApplication) -> None:
     eloquent_app = make_app(qapp)
-    eloquent_app.processing_completed = MagicMock()  # type: ignore[method-assign]
+    eloquent_app.processing_completed = MagicMock()
     preload_thread = MagicMock()
     preload_thread.is_alive.return_value = True
     newer_preload_thread = MagicMock()
@@ -497,7 +498,7 @@ def test_process_audio_empty_transcription(qapp: QApplication) -> None:
 
     preload_thread.join.assert_called_once_with(timeout=10)
     newer_preload_thread.join.assert_not_called()
-    eloquent_app.processing_completed.emit.assert_called_once_with("empty", "")  # type: ignore[attr-defined]
+    eloquent_app.processing_completed.emit.assert_called_once_with("empty", "")
     mock_transcribe.assert_called_once()
     mock_preload.assert_called_once_with(
         ollama_url="http://localhost:11434",
@@ -508,7 +509,7 @@ def test_process_audio_empty_transcription(qapp: QApplication) -> None:
     )
 
     # Also verify empty=True returns before stripping transcription
-    eloquent_app.processing_completed.reset_mock()  # type: ignore[attr-defined]
+    eloquent_app.processing_completed.reset_mock()
     preload_thread.is_alive.return_value = False
     with (
         patch(
@@ -518,13 +519,13 @@ def test_process_audio_empty_transcription(qapp: QApplication) -> None:
         patch("eloquent_notes.app.llm.preload_model"),
     ):
         eloquent_app._process_audio(recorder, snapshot, append=False, preload_thread=preload_thread)
-    eloquent_app.processing_completed.emit.assert_called_once_with("empty", "")  # type: ignore[attr-defined]
+    eloquent_app.processing_completed.emit.assert_called_once_with("empty", "")
 
 
 def test_process_audio_local_silence_never_reaches_model(qapp: QApplication) -> None:
     """A quiet trigger is rejected locally, without encoding WAV or calling the model."""
     eloquent_app = make_app(qapp)
-    eloquent_app.processing_completed = MagicMock()  # type: ignore[method-assign]
+    eloquent_app.processing_completed = MagicMock()
 
     recorder = MagicMock()
     wav_prop = PropertyMock(return_value=[b"RIFF" + b"\x00" * 100])
@@ -539,7 +540,7 @@ def test_process_audio_local_silence_never_reaches_model(qapp: QApplication) -> 
         eloquent_app._process_audio(recorder, snapshot, append=False, preload_thread=None)
 
     wav_prop.assert_not_called()
-    eloquent_app.processing_completed.emit.assert_called_once_with("empty", "")  # type: ignore[attr-defined]
+    eloquent_app.processing_completed.emit.assert_called_once_with("empty", "")
     mock_transcribe.assert_not_called()
     mock_preload.assert_called_once_with(
         ollama_url="http://localhost:11434",
@@ -552,7 +553,7 @@ def test_process_audio_local_silence_never_reaches_model(qapp: QApplication) -> 
 
 def test_process_audio_full_pipeline_success(qapp: QApplication, tmp_path: Path) -> None:
     eloquent_app = make_app(qapp)
-    eloquent_app.processing_completed = MagicMock()  # type: ignore[method-assign]
+    eloquent_app.processing_completed = MagicMock()
 
     recorder = MagicMock()
     recorder.wav_chunks = [b"RIFF" + b"\x00" * 100]
@@ -577,7 +578,7 @@ def test_process_audio_full_pipeline_success(qapp: QApplication, tmp_path: Path)
     ):
         eloquent_app._process_audio(recorder, snapshot, append=False, preload_thread=None)
 
-    eloquent_app.processing_completed.emit.assert_called_once_with("success", "Note Title")  # type: ignore[attr-defined]
+    eloquent_app.processing_completed.emit.assert_called_once_with("success", "Note Title")
 
     # Audio bytes are forwarded to phase 1
     assert mock_transcribe.call_args.kwargs["audio_bytes"] == recorder.wav_chunks[0]
@@ -596,7 +597,7 @@ def test_process_audio_full_pipeline_success(qapp: QApplication, tmp_path: Path)
 
 def test_process_audio_multi_chunk_transcription(qapp: QApplication, tmp_path: Path) -> None:
     eloquent_app = make_app(qapp)
-    eloquent_app.processing_completed = MagicMock()  # type: ignore[method-assign]
+    eloquent_app.processing_completed = MagicMock()
 
     recorder = MagicMock()
     recorder.wav_chunks = [b"chunk1", b"chunk2", b"chunk3"]
@@ -632,12 +633,12 @@ def test_process_audio_multi_chunk_transcription(qapp: QApplication, tmp_path: P
         b"chunk3",
     ]
     assert "First part. Second part." in mock_rewrite.call_args.kwargs["user_prompt"]
-    eloquent_app.processing_completed.emit.assert_called_once_with("success", "Multi-chunk Note")  # type: ignore[attr-defined]
+    eloquent_app.processing_completed.emit.assert_called_once_with("success", "Multi-chunk Note")
 
 
 def test_process_audio_append_stops_after_rewriting(qapp: QApplication) -> None:
     eloquent_app = make_app(qapp)
-    eloquent_app.processing_completed = MagicMock()  # type: ignore[method-assign]
+    eloquent_app.processing_completed = MagicMock()
 
     recorder = MagicMock()
     recorder.wav_chunks = [b"RIFF" + b"\x00" * 100]
@@ -661,7 +662,7 @@ def test_process_audio_append_stops_after_rewriting(qapp: QApplication) -> None:
     ):
         eloquent_app._process_audio(recorder, snapshot, append=True, preload_thread=None)
 
-    eloquent_app.processing_completed.emit.assert_called_once_with("appended", "More text")  # type: ignore[attr-defined]
+    eloquent_app.processing_completed.emit.assert_called_once_with("appended", "More text")
     assert mock_rewrite.call_args.kwargs["keep_alive"] == "0"
     mock_classify.assert_not_called()
     mock_create.assert_not_called()
@@ -670,7 +671,7 @@ def test_process_audio_append_stops_after_rewriting(qapp: QApplication) -> None:
 
 def test_process_audio_rejects_empty_rewrite(qapp: QApplication) -> None:
     eloquent_app = make_app(qapp)
-    eloquent_app.processing_completed = MagicMock()  # type: ignore[method-assign]
+    eloquent_app.processing_completed = MagicMock()
 
     recorder = MagicMock()
     recorder.wav_chunks = [b"RIFF" + b"\x00" * 100]
@@ -690,7 +691,7 @@ def test_process_audio_rejects_empty_rewrite(qapp: QApplication) -> None:
     ):
         eloquent_app._process_audio(recorder, snapshot, append=False, preload_thread=None)
 
-    eloquent_app.processing_completed.emit.assert_called_once_with(  # type: ignore[attr-defined]
+    eloquent_app.processing_completed.emit.assert_called_once_with(
         "error",
         "Model returned empty note content",
     )
@@ -698,7 +699,7 @@ def test_process_audio_rejects_empty_rewrite(qapp: QApplication) -> None:
 
 def test_process_audio_exception_emits_error(qapp: QApplication) -> None:
     eloquent_app = make_app(qapp)
-    eloquent_app.processing_completed = MagicMock()  # type: ignore[method-assign]
+    eloquent_app.processing_completed = MagicMock()
 
     recorder = MagicMock()
     recorder.wav_chunks = [b"RIFF" + b"\x00" * 100]
@@ -717,7 +718,7 @@ def test_process_audio_exception_emits_error(qapp: QApplication) -> None:
     ):
         eloquent_app._process_audio(recorder, snapshot, append=False, preload_thread=None)
 
-    eloquent_app.processing_completed.emit.assert_called_once_with(  # type: ignore[attr-defined]
+    eloquent_app.processing_completed.emit.assert_called_once_with(
         "error",
         "Ollama failed",
     )
@@ -868,7 +869,7 @@ def test_reload_config_success_and_failure(qapp: QApplication, mock_config: dict
 
 def test_show_config_dialog(qapp: QApplication) -> None:
     eloquent_app = make_app(qapp)
-    assert eloquent_app._config_dialog is None
+    assert vars(eloquent_app)["_config_dialog"] is None
 
     with patch("eloquent_notes.app.config_gui.ConfigurationDialog") as mock_dialog_cls:
         mock_dialog_instance = MagicMock()
@@ -876,7 +877,7 @@ def test_show_config_dialog(qapp: QApplication) -> None:
 
         # First call creates dialog
         eloquent_app.show_config_dialog()
-        assert eloquent_app._config_dialog is mock_dialog_instance
+        assert vars(eloquent_app)["_config_dialog"] is mock_dialog_instance
         mock_dialog_instance.show.assert_called_once()
 
         # Second call raises existing dialog
@@ -944,11 +945,11 @@ def test_exit_app_cleanup(qapp: QApplication) -> None:
         eloquent_app.exit_app()
 
     mock_recorder.stop.assert_called_once()
-    eloquent_app.window.close.assert_called_once()  # type: ignore[attr-defined]
-    eloquent_app._config_dialog.close.assert_called_once()  # type: ignore[attr-defined]
-    eloquent_app.server.close.assert_called_once()  # type: ignore[attr-defined]
-    eloquent_app.tray.hide.assert_called_once()  # type: ignore[attr-defined]
-    eloquent_app.app.quit.assert_called_once()  # type: ignore[attr-defined]
+    eloquent_app.window.close.assert_called_once()
+    eloquent_app._config_dialog.close.assert_called_once()
+    eloquent_app.server.close.assert_called_once()
+    eloquent_app.tray.hide.assert_called_once()
+    eloquent_app.app.quit.assert_called_once()
 
 
 def test_exit_app_waits_for_processing_thread(qapp: QApplication, tmp_path: Path) -> None:
@@ -970,7 +971,7 @@ def test_exit_app_waits_for_processing_thread(qapp: QApplication, tmp_path: Path
         eloquent_app.exit_app()
 
     spy_join.assert_called_once_with(timeout=5.0)
-    eloquent_app.app.processEvents.assert_called_once()  # type: ignore[attr-defined]
+    eloquent_app.app.processEvents.assert_called_once()
     assert notes.load_notes(tmp_path / "notes")[0].body == "Buy milk.\n\nSaved on exit."
 
 
@@ -1144,7 +1145,7 @@ def test_toggle_action_clears_append_target(qapp: QApplication, tmp_path: Path) 
 
 
 def test_appended_dictation_keeps_reader_edits(qapp: QApplication, tmp_path: Path) -> None:
-    note = _write_note(tmp_path / "notes")
+    note: Any = _write_note(tmp_path / "notes")
     eloquent_app = make_app(qapp)
     eloquent_app.show_window()
     window = eloquent_app.window
@@ -1203,7 +1204,7 @@ def test_appended_dictation_without_window(qapp: QApplication, tmp_path: Path) -
 
 
 def test_appended_dictation_does_not_resurrect_deleted_note(qapp: QApplication, tmp_path: Path) -> None:
-    note = _write_note(tmp_path / "notes")
+    note: Any = _write_note(tmp_path / "notes")
     eloquent_app = make_app(qapp)
     eloquent_app._append_target = note
 
@@ -1235,7 +1236,7 @@ def test_search_runs_in_background_and_reports_results(qapp: QApplication, tmp_p
     eloquent_app.show_window()
     assert eloquent_app.window is not None
     eloquent_app._index = MagicMock()
-    eloquent_app._index.search.return_value = [note]  # type: ignore[attr-defined]
+    eloquent_app._index.search.return_value = [note]
     eloquent_app.window.show_search_results = MagicMock()  # type: ignore[method-assign]
 
     with patch("eloquent_notes.app.threading.Thread") as mock_thread_cls:
@@ -1243,7 +1244,7 @@ def test_search_runs_in_background_and_reports_results(qapp: QApplication, tmp_p
     query, folder, cfg = mock_thread_cls.call_args.kwargs["args"]
     eloquent_app._run_search(query, folder, cfg)
 
-    assert [n.title for n in eloquent_app._index.search.call_args.args[0]] == ["Groceries"]  # type: ignore[attr-defined]
+    assert [n.title for n in eloquent_app._index.search.call_args.args[0]] == ["Groceries"]
     eloquent_app.window.show_search_results.assert_called_once_with("milk", [note])
     eloquent_app.window.close()
 
@@ -1253,7 +1254,7 @@ def test_search_failure_reaches_window(qapp: QApplication, tmp_path: Path) -> No
     eloquent_app.show_window()
     assert eloquent_app.window is not None
     eloquent_app._index = MagicMock()
-    eloquent_app._index.search.side_effect = requests.ConnectionError("Ollama down")  # type: ignore[attr-defined]
+    eloquent_app._index.search.side_effect = requests.ConnectionError("Ollama down")
     eloquent_app.window.show_search_error = MagicMock()  # type: ignore[method-assign]
 
     eloquent_app._run_search("milk", tmp_path / "notes", {})

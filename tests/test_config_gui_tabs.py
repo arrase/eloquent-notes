@@ -204,7 +204,7 @@ def test_ai_tab_fetch_models_and_loader_lifecycle(qapp: QApplication) -> None:
     tab.txt_ollama_url.setText("   ")
     tab._fetch_models()
     assert tab.lbl_model_status.text() == "Ollama URL is empty."
-    assert tab._model_loader is None
+    assert vars(tab)["_model_loader"] is None
     assert tab.btn_refresh_models.isEnabled()
 
     with patch.object(tab, "sender", return_value=in_flight):
@@ -217,7 +217,7 @@ def test_ai_tab_fetch_models_and_loader_lifecycle(qapp: QApplication) -> None:
     with patch("eloquent_notes.config_gui.tabs.ai.OllamaModelLoader", return_value=new_loader):
         tab._fetch_models()
 
-    assert tab._model_loader is new_loader
+    assert vars(tab)["_model_loader"] is new_loader
     assert not tab.btn_refresh_models.isEnabled()
     new_loader.start.assert_called_once()
 
@@ -230,7 +230,7 @@ def test_ai_tab_fetch_models_and_loader_lifecycle(qapp: QApplication) -> None:
     # Active loader callback updates UI, clears _model_loader, and re-enables refresh button
     with patch.object(tab, "sender", return_value=new_loader):
         tab._on_models_fetched(["model_a", "model_b"], ["embed_a"])
-        assert tab._model_loader is None
+        assert vars(tab)["_model_loader"] is None
         assert tab.btn_refresh_models.isEnabled()
         assert tab.cmb_model.count() == 2
         assert tab.cmb_embedding_model.count() == 1
@@ -245,7 +245,7 @@ def test_ai_tab_fetch_models_and_loader_lifecycle(qapp: QApplication) -> None:
 
         tab._model_loader = new_loader
         tab._on_models_fetch_failed("Server error 500")
-        assert tab._model_loader is None
+        assert vars(tab)["_model_loader"] is None
         assert tab.btn_refresh_models.isEnabled()
         assert "Connection failed: Server error 500" in tab.lbl_model_status.text()
 

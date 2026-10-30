@@ -31,6 +31,6 @@ def qapp() -> QApplication:
     """Fixture to ensure a QApplication instance exists for Qt widget testing."""
     os.environ["QT_QPA_PLATFORM"] = "offscreen"
     app = QApplication.instance()
-    if app is None:
+    if not isinstance(app, QApplication):
         app = QApplication(sys.argv)
-    return app  # type: ignore[return-value]
+    return app

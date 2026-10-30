@@ -227,7 +227,7 @@ def test_all_40_catalogs_cover_every_codebase_string() -> None:
         for msgid in msgids:
             translated = i18n._(msgid)
             assert translated, f"Empty translation in {lang} for {msgid!r}"
-            assert msgid in tr._catalog, f"Missing msgid in {lang} catalog: {msgid!r}"
+            assert msgid in tr._catalog, f"Missing msgid in {lang} catalog: {msgid!r}"  # type: ignore[attr-defined]
             assert PLACEHOLDER_RE.findall(translated) or not PLACEHOLDER_RE.findall(msgid)
             assert set(PLACEHOLDER_RE.findall(translated)) == set(PLACEHOLDER_RE.findall(msgid)), (
                 f"Placeholder mismatch in {lang} for {msgid!r}: {translated!r}"

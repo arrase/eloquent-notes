@@ -8,7 +8,7 @@ from unittest.mock import patch
 import numpy as np
 import pytest
 
-from eloquent_notes import notes
+from eloquent_notes import config, notes
 from eloquent_notes.search import DOCUMENT_PROMPT, QUERY_PROMPT, SemanticIndex
 
 CFG: dict[str, Any] = {
@@ -90,7 +90,7 @@ def test_search_reuses_cache_across_instances(tmp_path: Path, note_list: list[no
     cache_path = str(tmp_path / "cache" / "embeddings.npz")
     with (
         patch("eloquent_notes.search.llm.embed", side_effect=fake_embed),
-        patch("eloquent_notes.search.config.atomic_write", wraps=notes.atomic_write) as mock_atomic,
+        patch("eloquent_notes.search.config.atomic_write", wraps=config.atomic_write) as mock_atomic,
     ):
         SemanticIndex(cache_path).search(note_list, "food", CFG)
 

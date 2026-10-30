@@ -11,7 +11,7 @@ from PyQt6.QtGui import QGuiApplication, QMouseEvent
 from PyQt6.QtWidgets import QAbstractButton, QApplication, QLabel, QMessageBox, QPushButton, QWidget
 
 from eloquent_notes import notes, ui
-from eloquent_notes.window import PAGE_MARGIN, MainWindow, NoteCard, day_label, format_time
+from eloquent_notes.window import PAGE_MARGIN, MainWindow, NoteCard, _ScrollContent, day_label, format_time
 
 
 @pytest.fixture
@@ -470,14 +470,16 @@ def test_copy_and_dictate_preserve_cursor_selection_and_undo(
     cursor.setPosition(4, cursor.MoveMode.KeepAnchor)
     body_edit.setTextCursor(cursor)
 
-    assert body_edit.document().isUndoAvailable()
+    doc = body_edit.document()
+    assert doc is not None
+    assert doc.isUndoAvailable()
 
     with patch.object(body_edit, "setPlainText", wraps=body_edit.setPlainText) as spy_set_plain:
         window.reader.copy_clicked.emit()
         window.reader.btn_dictate.click()
 
     spy_set_plain.assert_not_called()
-    assert body_edit.document().isUndoAvailable()
+    assert doc.isUndoAvailable()
     assert body_edit.textCursor().selectionStart() == 0
     assert body_edit.textCursor().selectionEnd() == 4
     assert window.reader.tags_edit.text() == "work, "
@@ -491,13 +493,15 @@ def test_show_note_resets_body_edit_when_switching_notes(
     cursor = window.reader.body_edit.textCursor()
     cursor.select(cursor.SelectionType.Document)
     cursor.insertText("   ")
-    assert window.reader.body_edit.document().isUndoAvailable()
+    doc = window.reader.body_edit.document()
+    assert doc is not None
+    assert doc.isUndoAvailable()
     window.show_timeline()
 
     # sample_notes[3] also has body == ""; opening it must reset text and undo stack.
     window.show_note(sample_notes[3])
     assert window.reader.body_edit.toPlainText() == ""
-    assert not window.reader.body_edit.document().isUndoAvailable()
+    assert not doc.isUndoAvailable()
 
 
 def test_back_saves_edits(window: MainWindow, sample_notes: list[notes.Note]) -> None:
@@ -602,12 +606,12 @@ def test_window_palette_change_updates_theme(qapp: QApplication, sample_notes: l
 def test_scroll_content_aligns_right_margin_with_scrollbar(window: MainWindow) -> None:
     scroll = window.timeline._scroll
     content = scroll.widget()
-    assert content is not None
+    assert isinstance(content, _ScrollContent)
     scroll.resize(960, 600)
     content.resize(952, 600)
     content.resizeEvent(None)
 
-    margins = content.column.contentsMargins()  # type: ignore[attr-defined]
+    margins = content.column.contentsMargins()
     assert margins.left() == PAGE_MARGIN
     assert margins.right() == PAGE_MARGIN - 8
 
@@ -617,6 +621,7 @@ def test_timeline_preserves_vertical_scroll_position_on_rerender(
     sample_notes: list[notes.Note],
 ) -> None:
     scrollbar = window.timeline._scroll.verticalScrollBar()
+    assert scrollbar is not None
     target_scroll = min(80, scrollbar.maximum())
     assert target_scroll > 0
     scrollbar.setValue(target_scroll)

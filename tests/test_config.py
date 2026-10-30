@@ -64,13 +64,13 @@ def test_init_config_dir(tmp_config_dir: dict[str, Any], monkeypatch: pytest.Mon
 
 def test_merge_configs() -> None:
     """Test recursive merging and type validation of base config and overrides."""
-    base = {
+    base: dict[str, Any] = {
         "audio": {"channels": 1, "beep_enabled": True, "beep_frequency": 440},
         "ai": {"model": "gemma", "context_length": 8192},
         "search": {"min_similarity": 0.6},
         "notes": {"type_colors": {"idea": "#C27821", "note": "#64748B"}},
     }
-    overrides = {
+    overrides: dict[str, Any] = {
         "audio": {"channels": 2, "beep_frequency": 880},
         "ai": {"model": "gemma4:e4b", "context_length": None},
         "search": {"min_similarity": 1},

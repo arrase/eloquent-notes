@@ -134,7 +134,7 @@ def test_ollama_loader_invalid_tags_payload_emits_error() -> None:
     loader = OllamaModelLoader("http://localhost:11434/")
     assert loader.url == "http://localhost:11434"
 
-    errors = []
+    errors: list[str] = []
     loader.error_occurred.connect(errors.append)
 
     for bad_payload in (["not", "dict"], {"models": "not-list"}, {"models": ["not-dict"]}, {}):
