@@ -1,5 +1,7 @@
 """AI settings tab for configuration."""
 
+from typing import Any
+
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QCheckBox,
@@ -34,24 +36,21 @@ def _form_label(text: str) -> QLabel:
 class AITab(QWidget):
     """AI and Ollama configuration tab."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self._model_loader = None
+        self._model_loader: OllamaModelLoader | None = None
         self._init_ui()
 
-    def _init_ui(self):
+    def _init_ui(self) -> None:
         layout = QVBoxLayout(self)
         layout.setContentsMargins(15, 15, 15, 15)
         layout.setSpacing(15)
 
-        grp_ai = QGroupBox(_("Ollama && AI Pipeline Settings"))
-        form_layout = QFormLayout(grp_ai)
-        form_layout.setSpacing(10)
+        layout.addWidget(self._build_ai_group())
+        layout.addWidget(self._build_search_group())
+        layout.addStretch()
 
-        self.txt_ollama_url = QLineEdit()
-        self.txt_ollama_url.setToolTip(_("URL of your local or remote Ollama server."))
-        form_layout.addRow(_form_label(_("Ollama URL:")), self.txt_ollama_url)
-
+    def _build_model_row(self, form_layout: QFormLayout) -> None:
         model_widget = QWidget()
         model_layout = QVBoxLayout(model_widget)
         model_layout.setContentsMargins(0, 0, 0, 0)
@@ -83,6 +82,7 @@ class AITab(QWidget):
         lbl_ai_model.setContentsMargins(0, 6, 0, 0)
         form_layout.addRow(lbl_ai_model, model_widget)
 
+    def _build_context_row(self, form_layout: QFormLayout) -> None:
         context_widget = QWidget()
         context_layout = QHBoxLayout(context_widget)
         context_layout.setContentsMargins(0, 0, 0, 0)
@@ -102,11 +102,23 @@ class AITab(QWidget):
                 "instructing Ollama to use the model's default maximum context length."
             )
         )
-        self.chk_context_default.toggled.connect(self._toggle_context_default)
+        self.chk_context_default.toggled.connect(lambda checked: self._toggle_context_default(checked=checked))
 
         context_layout.addWidget(self.spn_context_length, 1)
         context_layout.addWidget(self.chk_context_default)
         form_layout.addRow(_form_label(_("Context Length:")), context_widget)
+
+    def _build_ai_group(self) -> QGroupBox:
+        grp_ai = QGroupBox(_("Ollama && AI Pipeline Settings"))
+        form_layout = QFormLayout(grp_ai)
+        form_layout.setSpacing(10)
+
+        self.txt_ollama_url = QLineEdit()
+        self.txt_ollama_url.setToolTip(_("URL of your local or remote Ollama server."))
+        form_layout.addRow(_form_label(_("Ollama URL:")), self.txt_ollama_url)
+
+        self._build_model_row(form_layout)
+        self._build_context_row(form_layout)
 
         self.txt_keep_alive = QLineEdit()
         self.txt_keep_alive.setToolTip(
@@ -143,8 +155,9 @@ class AITab(QWidget):
         )
         form_layout.addRow(_form_label(_("Output Language:")), self.cmb_language)
 
-        layout.addWidget(grp_ai)
+        return grp_ai
 
+    def _build_search_group(self) -> QGroupBox:
         grp_search = QGroupBox(_("Semantic Search"))
         search_layout = QFormLayout(grp_search)
         search_layout.setSpacing(10)
@@ -168,13 +181,12 @@ class AITab(QWidget):
         self.spn_min_similarity.setToolTip(_("Search results below this cosine similarity are hidden."))
         search_layout.addRow(_form_label(_("Minimum Similarity:")), self.spn_min_similarity)
 
-        layout.addWidget(grp_search)
-        layout.addStretch()
+        return grp_search
 
-    def _toggle_context_default(self, checked):
+    def _toggle_context_default(self, *, checked: bool) -> None:
         self.spn_context_length.setEnabled(not checked)
 
-    def _fetch_models(self):
+    def _fetch_models(self) -> None:
         url = self.txt_ollama_url.text().strip()
         if not url:
             self._model_loader = None
@@ -198,7 +210,7 @@ class AITab(QWidget):
         combo.setCurrentText(value)
 
     @staticmethod
-    def _fill_models(combo, models):
+    def _fill_models(combo: QComboBox, models: list[str]) -> None:
         """Replace combo items with models, keeping the current selection."""
         current_text = combo.currentText()
         combo.clear()
@@ -206,7 +218,7 @@ class AITab(QWidget):
         if current_text:
             AITab._set_combo_value(combo, current_text)
 
-    def _on_models_fetched(self, audio_models, embedding_models):
+    def _on_models_fetched(self, audio_models: list[str], embedding_models: list[str]) -> None:
         if self._model_loader is None or self.sender() is not self._model_loader:
             return
         self._model_loader = None
@@ -220,14 +232,14 @@ class AITab(QWidget):
         else:
             self.lbl_model_status.setText(_("Models loaded successfully."))
 
-    def _on_models_fetch_failed(self, error_msg):
+    def _on_models_fetch_failed(self, error_msg: str) -> None:
         if self._model_loader is None or self.sender() is not self._model_loader:
             return
         self._model_loader = None
         self.btn_refresh_models.setEnabled(True)
         self.lbl_model_status.setText(_("Connection failed: {error}").format(error=error_msg))
 
-    def load_settings(self, config_data: dict) -> None:
+    def load_settings(self, config_data: dict[str, Any]) -> None:
         ai_cfg = config_data["ai"]
         self.txt_ollama_url.setText(ai_cfg["ollama_url"])
         self._set_combo_value(self.cmb_model, ai_cfg["model"])
@@ -254,34 +266,30 @@ class AITab(QWidget):
 
         self._fetch_models()
 
-    def save_settings(self, config_data: dict) -> bool:
+    def _validate_inputs(self, url: str, model: str, embedding_model: str, output_lang: str) -> str | None:
+        if not url:
+            return _("Ollama URL cannot be empty.")
+        if not url.startswith(("http://", "https://")):
+            return _("Ollama URL must start with http:// or https://.")
+        if not model:
+            return _("AI Model cannot be empty.")
+        if not embedding_model:
+            return _("Embedding Model cannot be empty.")
+        if not output_lang:
+            return _("Output Language cannot be empty.")
+        return None
+
+    def save_settings(self, config_data: dict[str, Any]) -> bool:
         url = self.txt_ollama_url.text().strip().rstrip("/")
         self.txt_ollama_url.setText(url)
 
-        if not url:
-            QMessageBox.warning(self, _(VALIDATION_ERROR_TITLE), _("Ollama URL cannot be empty."))
-            return False
-        if not url.startswith(("http://", "https://")):
-            QMessageBox.warning(
-                self,
-                _(VALIDATION_ERROR_TITLE),
-                _("Ollama URL must start with http:// or https://."),
-            )
-            return False
-
         model = self.cmb_model.currentText().strip()
-        if not model:
-            QMessageBox.warning(self, _(VALIDATION_ERROR_TITLE), _("AI Model cannot be empty."))
-            return False
-
         embedding_model = self.cmb_embedding_model.currentText().strip()
-        if not embedding_model:
-            QMessageBox.warning(self, _(VALIDATION_ERROR_TITLE), _("Embedding Model cannot be empty."))
-            return False
-
         output_lang = self.cmb_language.currentText().strip()
-        if not output_lang:
-            QMessageBox.warning(self, _(VALIDATION_ERROR_TITLE), _("Output Language cannot be empty."))
+
+        error = self._validate_inputs(url, model, embedding_model, output_lang)
+        if error is not None:
+            QMessageBox.warning(self, _(VALIDATION_ERROR_TITLE), error)
             return False
 
         keep_alive = self.txt_keep_alive.text().strip()

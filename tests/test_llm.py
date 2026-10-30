@@ -18,7 +18,7 @@ SIMPLE_SCHEMA = {
 
 
 @patch("eloquent_notes.llm.requests.post")
-def test_preload_model(mock_post):
+def test_preload_model(mock_post: MagicMock) -> None:
     mock_response = MagicMock()
     mock_response.raise_for_status.return_value = None
     mock_post.return_value = mock_response
@@ -38,7 +38,7 @@ def test_preload_model(mock_post):
 
 
 @patch("eloquent_notes.llm.requests.post")
-def test_preload_model_without_context_length(mock_post):
+def test_preload_model_without_context_length(mock_post: MagicMock) -> None:
     mock_response = MagicMock()
     mock_response.raise_for_status.return_value = None
     mock_post.return_value = mock_response
@@ -58,7 +58,7 @@ def test_preload_model_without_context_length(mock_post):
 
 
 @patch("eloquent_notes.llm.requests.post")
-def test_execute_ollama_json_request_success_first_try(mock_post):
+def test_execute_ollama_json_request_success_first_try(mock_post: MagicMock) -> None:
     mock_response = MagicMock()
     mock_response.raise_for_status.return_value = None
     mock_response.json.return_value = {"message": {"content": '{"result": "ok"}'}}
@@ -83,7 +83,7 @@ def test_execute_ollama_json_request_success_first_try(mock_post):
 
 
 @patch("eloquent_notes.llm.requests.post")
-def test_execute_ollama_json_request_without_context_length(mock_post):
+def test_execute_ollama_json_request_without_context_length(mock_post: MagicMock) -> None:
     mock_response = MagicMock()
     mock_response.raise_for_status.return_value = None
     mock_response.json.return_value = {"message": {"content": '{"result": "ok"}'}}
@@ -108,7 +108,7 @@ def test_execute_ollama_json_request_without_context_length(mock_post):
 
 
 @patch("eloquent_notes.llm.requests.post")
-def test_execute_ollama_json_request_retry_and_immutability(mock_post):
+def test_execute_ollama_json_request_retry_and_immutability(mock_post: MagicMock) -> None:
     # First response invalid JSON, second valid JSON
     resp1 = MagicMock()
     resp1.raise_for_status.return_value = None
@@ -143,7 +143,7 @@ def test_execute_ollama_json_request_retry_and_immutability(mock_post):
 
 
 @patch("eloquent_notes.llm.requests.post")
-def test_execute_ollama_json_request_http_error(mock_post):
+def test_execute_ollama_json_request_http_error(mock_post: MagicMock) -> None:
     mock_resp = MagicMock()
     mock_resp.status_code = 500
     mock_resp.text = "Internal Server Error"
@@ -166,7 +166,7 @@ def test_execute_ollama_json_request_http_error(mock_post):
 
 
 @patch("eloquent_notes.llm.requests.post")
-def test_execute_ollama_json_request_missing_required_key(mock_post):
+def test_execute_ollama_json_request_missing_required_key(mock_post: MagicMock) -> None:
     mock_resp = MagicMock()
     mock_resp.raise_for_status.return_value = None
     mock_resp.json.return_value = {"message": {"content": '{"wrong_key": "val"}'}}
@@ -194,7 +194,7 @@ def test_execute_ollama_json_request_missing_required_key(mock_post):
 
 
 @patch("eloquent_notes.llm.requests.post")
-def test_execute_ollama_json_request_malformed_response_structure(mock_post):
+def test_execute_ollama_json_request_malformed_response_structure(mock_post: MagicMock) -> None:
     mock_resp1 = MagicMock()
     mock_resp1.raise_for_status.return_value = None
     mock_resp1.json.return_value = {"error": "unexpected format"}
@@ -224,7 +224,7 @@ def test_execute_ollama_json_request_malformed_response_structure(mock_post):
 
 
 @patch("eloquent_notes.llm.requests.post")
-def test_execute_ollama_json_request_non_string_content_uses_response_text_on_retry(mock_post):
+def test_execute_ollama_json_request_non_string_content_uses_response_text_on_retry(mock_post: MagicMock) -> None:
     mock_resp1 = MagicMock()
     mock_resp1.raise_for_status.return_value = None
     mock_resp1.json.return_value = {"message": {"content": 123}}
@@ -258,7 +258,7 @@ def test_execute_ollama_json_request_non_string_content_uses_response_text_on_re
 
 
 @patch("eloquent_notes.llm._execute_ollama_json_request")
-def test_transcribe_audio(mock_exec):
+def test_transcribe_audio(mock_exec: MagicMock) -> None:
     mock_exec.return_value = {"empty": False, "transcription": "Test speech"}
     audio_bytes = b"fake wav data"
 
@@ -285,7 +285,7 @@ def test_transcribe_audio(mock_exec):
     assert kwargs["format_schema"] is llm.TRANSCRIPTION_SCHEMA
 
 
-def test_transcription_schema_orders_transcription_before_empty():
+def test_transcription_schema_orders_transcription_before_empty() -> None:
     """Constrained decoding follows property order; transcript must win.
 
     With "empty" first the model commits to that flag before transcribing and
@@ -296,13 +296,13 @@ def test_transcription_schema_orders_transcription_before_empty():
     assert llm.TRANSCRIPTION_SCHEMA["required"] == ["transcription", "empty"]
 
 
-def test_parse_json_response_rejects_non_object_json():
+def test_parse_json_response_rejects_non_object_json() -> None:
     """A bare JSON array/scalar is not a valid phase response."""
     with pytest.raises(TypeError, match="expected a JSON object"):
         llm._parse_json_response("[1, 2, 3]", SIMPLE_SCHEMA)
 
 
-def test_parse_json_response_reports_missing_keys():
+def test_parse_json_response_reports_missing_keys() -> None:
     schema = {
         "type": "object",
         "properties": {
@@ -315,7 +315,7 @@ def test_parse_json_response_reports_missing_keys():
         llm._parse_json_response('{"result": "ok"}', schema)
 
 
-def test_parse_json_response_validates_field_types_and_enum():
+def test_parse_json_response_validates_field_types_and_enum() -> None:
     # String type mismatch
     with pytest.raises(TypeError, match="field 'transcription' must be a string"):
         llm._parse_json_response(
@@ -359,7 +359,7 @@ def test_parse_json_response_validates_field_types_and_enum():
     assert parsed == {"type": "task", "tags": ["cache"]}
 
 
-def test_execute_ollama_json_request_rejects_json_array():
+def test_execute_ollama_json_request_rejects_json_array() -> None:
     resp1 = MagicMock()
     resp1.raise_for_status.return_value = None
     resp1.json.return_value = {"message": {"content": "[1, 2, 3]"}}
@@ -385,7 +385,7 @@ def test_execute_ollama_json_request_rejects_json_array():
     assert res == {"result": "ok"}
 
 
-def test_execute_ollama_json_request_rejects_non_dict_and_raises():
+def test_execute_ollama_json_request_rejects_non_dict_and_raises() -> None:
     resp = MagicMock()
     resp.raise_for_status.return_value = None
     resp.json.return_value = {"message": {"content": '"just a string"'}}
@@ -405,7 +405,7 @@ def test_execute_ollama_json_request_rejects_non_dict_and_raises():
         )
 
 
-def test_execute_ollama_json_request_negative_retries_raises():
+def test_execute_ollama_json_request_negative_retries_raises() -> None:
     with (
         patch("eloquent_notes.llm.requests.post") as mock_post,
         pytest.raises(
@@ -429,7 +429,7 @@ def test_execute_ollama_json_request_negative_retries_raises():
 
 
 @patch("eloquent_notes.llm.requests.post")
-def test_execute_ollama_json_request_disables_thinking(mock_post):
+def test_execute_ollama_json_request_disables_thinking(mock_post: MagicMock) -> None:
     """Gemma 4 thinks by default and starves num_predict (issue #16583)."""
     mock_resp = MagicMock()
     mock_resp.raise_for_status.return_value = None
@@ -454,7 +454,7 @@ def test_execute_ollama_json_request_disables_thinking(mock_post):
 
 
 @patch("eloquent_notes.llm._execute_ollama_json_request")
-def test_rewrite_transcription(mock_exec):
+def test_rewrite_transcription(mock_exec: MagicMock) -> None:
     mock_exec.return_value = {"title": "Title", "content": "Content"}
 
     res = llm.rewrite_transcription(
@@ -478,7 +478,7 @@ def test_rewrite_transcription(mock_exec):
     assert kwargs["format_schema"] is llm.REWRITING_SCHEMA
 
 
-def test_rewriting_schema_rejects_blank_title_or_content_and_triggers_retry():
+def test_rewriting_schema_rejects_blank_title_or_content_and_triggers_retry() -> None:
     with pytest.raises(ValueError, match="field 'title' must not be empty"):
         llm._parse_json_response('{"title": "   ", "content": "ok"}', llm.REWRITING_SCHEMA)
 
@@ -517,7 +517,7 @@ def test_rewriting_schema_rejects_blank_title_or_content_and_triggers_retry():
 
 
 @patch("eloquent_notes.llm._execute_ollama_json_request")
-def test_classify_note(mock_exec):
+def test_classify_note(mock_exec: MagicMock) -> None:
     mock_exec.return_value = {
         "type": "idea",
         "tags": ["tag1"],
@@ -549,7 +549,7 @@ def test_classify_note(mock_exec):
 
 
 @patch("eloquent_notes.llm.requests.post")
-def test_embed(mock_post):
+def test_embed(mock_post: MagicMock) -> None:
     mock_post.return_value.json.return_value = {"embeddings": [[0.1, 0.2], [0.3, 0.4]]}
 
     vectors = llm.embed(

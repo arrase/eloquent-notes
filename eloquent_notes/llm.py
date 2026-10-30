@@ -117,7 +117,8 @@ def embed(
         timeout=timeout,
     )
     response.raise_for_status()
-    return response.json()["embeddings"]
+    embeddings: list[list[float]] = response.json()["embeddings"]
+    return embeddings
 
 
 def preload_model(
@@ -149,21 +150,24 @@ def preload_model(
     response.raise_for_status()
 
 
-def _validate_property(key: str, val: Any, prop_schema: dict[str, Any]) -> None:
+def _validate_string_property(key: str, val: object, prop_schema: dict[str, Any]) -> None:
+    if not isinstance(val, str):
+        raise TypeError(f"field {key!r} must be a string, got {type(val).__name__}")
+    if "minLength" in prop_schema and len(val.strip()) < prop_schema["minLength"]:
+        raise ValueError(f"field {key!r} must not be empty")
+    if "enum" in prop_schema and val not in prop_schema["enum"]:
+        raise ValueError(f"field {key!r} has invalid value {val!r}, expected one of {prop_schema['enum']}")
+
+
+def _validate_property(key: str, val: object, prop_schema: dict[str, Any]) -> None:
     prop_type = prop_schema["type"]
     if prop_type == "string":
-        if not isinstance(val, str):
-            raise TypeError(f"field {key!r} must be a string, got {type(val).__name__}")
-        if "minLength" in prop_schema and len(val.strip()) < prop_schema["minLength"]:
-            raise ValueError(f"field {key!r} must not be empty")
-        if "enum" in prop_schema and val not in prop_schema["enum"]:
-            raise ValueError(f"field {key!r} has invalid value {val!r}, expected one of {prop_schema['enum']}")
+        _validate_string_property(key, val, prop_schema)
     elif prop_type == "boolean":
         if not isinstance(val, bool):
             raise TypeError(f"field {key!r} must be a boolean, got {type(val).__name__}")
-    elif prop_type == "array":
-        if not isinstance(val, list) or not all(isinstance(item, str) for item in val):
-            raise TypeError(f"field {key!r} must be a list of strings")
+    elif prop_type == "array" and (not isinstance(val, list) or not all(isinstance(item, str) for item in val)):
+        raise TypeError(f"field {key!r} must be a list of strings")
 
 
 def _parse_json_response(content: str, format_schema: dict[str, Any]) -> dict[str, Any]:
@@ -186,6 +190,7 @@ def _parse_json_response(content: str, format_schema: dict[str, Any]) -> dict[st
 
 
 def _execute_ollama_json_request(
+    *,
     ollama_url: str,
     model: str,
     messages: list[dict[str, Any]],
@@ -268,6 +273,7 @@ def _execute_ollama_json_request(
 
 
 def transcribe_audio(
+    *,
     ollama_url: str,
     model: str,
     system_prompt: str,
@@ -305,6 +311,7 @@ def transcribe_audio(
 def _run_text_phase(
     format_schema: dict[str, Any],
     task_name: str,
+    *,
     ollama_url: str,
     model: str,
     system_prompt: str,

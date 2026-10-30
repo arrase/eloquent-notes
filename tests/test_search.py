@@ -1,15 +1,17 @@
 """Unit tests for eloquent_notes.search (semantic search with cached embeddings)."""
 
 from datetime import UTC, datetime
+from pathlib import Path
+from typing import Any
 from unittest.mock import patch
 
 import numpy as np
 import pytest
 
-from eloquent_notes import notes
+from eloquent_notes import config, notes
 from eloquent_notes.search import DOCUMENT_PROMPT, QUERY_PROMPT, SemanticIndex
 
-CFG = {
+CFG: dict[str, Any] = {
     "ai": {"ollama_url": "http://localhost:11434", "request_timeout": 30},
     "search": {"embedding_model": "embed", "keep_alive": "5m", "min_similarity": 0.5},
 }
@@ -28,7 +30,14 @@ QUERIES = {
 }
 
 
-def fake_embed(ollama_url, model, texts, keep_alive, timeout):
+def fake_embed(
+    ollama_url: str,
+    model: str,
+    texts: list[str],
+    keep_alive: str,
+    timeout: int,
+) -> list[list[float]]:
+    del ollama_url, model, keep_alive, timeout
     vectors = []
     for text in texts:
         if text.startswith("task: search result | query: "):
@@ -40,7 +49,7 @@ def fake_embed(ollama_url, model, texts, keep_alive, timeout):
 
 
 @pytest.fixture
-def note_list(tmp_path):
+def note_list(tmp_path: Path) -> list[notes.Note]:
     created = datetime(2026, 10, 22, 10, 0, tzinfo=UTC)
     result = []
     for title in VECTORS:
@@ -50,7 +59,7 @@ def note_list(tmp_path):
     return result
 
 
-def test_search_ranks_by_similarity_and_applies_threshold(tmp_path, note_list):
+def test_search_ranks_by_similarity_and_applies_threshold(tmp_path: Path, note_list: list[notes.Note]) -> None:
     index = SemanticIndex(str(tmp_path / "cache.npz"))
 
     with patch("eloquent_notes.search.llm.embed", side_effect=fake_embed) as mock_embed:
@@ -65,7 +74,7 @@ def test_search_ranks_by_similarity_and_applies_threshold(tmp_path, note_list):
     assert mock_embed.call_args_list[1].kwargs["texts"] == [QUERY_PROMPT.format("copias de seguridad")]
 
 
-def test_results_must_be_close_to_the_best_match(tmp_path, note_list):
+def test_results_must_be_close_to_the_best_match(tmp_path: Path, note_list: list[notes.Note]) -> None:
     index = SemanticIndex(str(tmp_path / "cache.npz"))
 
     with patch("eloquent_notes.search.llm.embed", side_effect=fake_embed):
@@ -77,11 +86,11 @@ def test_results_must_be_close_to_the_best_match(tmp_path, note_list):
     assert [note.title for note in leaning] == ["Backups"]
 
 
-def test_search_reuses_cache_across_instances(tmp_path, note_list):
+def test_search_reuses_cache_across_instances(tmp_path: Path, note_list: list[notes.Note]) -> None:
     cache_path = str(tmp_path / "cache" / "embeddings.npz")
     with (
         patch("eloquent_notes.search.llm.embed", side_effect=fake_embed),
-        patch("eloquent_notes.search.config.atomic_write", wraps=notes.atomic_write) as mock_atomic,
+        patch("eloquent_notes.search.config.atomic_write", wraps=config.atomic_write) as mock_atomic,
     ):
         SemanticIndex(cache_path).search(note_list, "food", CFG)
 
@@ -97,7 +106,7 @@ def test_search_reuses_cache_across_instances(tmp_path, note_list):
     assert mock_embed.call_count == 1
 
 
-def test_search_reembeds_only_changed_notes(tmp_path, note_list):
+def test_search_reembeds_only_changed_notes(tmp_path: Path, note_list: list[notes.Note]) -> None:
     index = SemanticIndex(str(tmp_path / "cache.npz"))
     with patch("eloquent_notes.search.llm.embed", side_effect=fake_embed):
         index.search(note_list, "food", CFG)
@@ -109,19 +118,19 @@ def test_search_reembeds_only_changed_notes(tmp_path, note_list):
     assert mock_embed.call_args_list[0].kwargs["texts"] == [DOCUMENT_PROMPT.format("Groceries", "Changed body")]
 
 
-def test_changing_embedding_model_reembeds_everything(tmp_path, note_list):
+def test_changing_embedding_model_reembeds_everything(tmp_path: Path, note_list: list[notes.Note]) -> None:
     index = SemanticIndex(str(tmp_path / "cache.npz"))
     with patch("eloquent_notes.search.llm.embed", side_effect=fake_embed):
         index.search(note_list, "food", CFG)
 
-    other_cfg = {**CFG, "search": {**CFG["search"], "embedding_model": "other"}}
+    other_cfg: dict[str, Any] = {**CFG, "search": {**CFG["search"], "embedding_model": "other"}}
     with patch("eloquent_notes.search.llm.embed", side_effect=fake_embed) as mock_embed:
         index.search(note_list, "food", other_cfg)
 
     assert len(mock_embed.call_args_list[0].kwargs["texts"]) == 3
 
 
-def test_deleted_notes_are_dropped_from_cache(tmp_path, note_list):
+def test_deleted_notes_are_dropped_from_cache(tmp_path: Path, note_list: list[notes.Note]) -> None:
     cache_path = tmp_path / "cache.npz"
     index = SemanticIndex(str(cache_path))
     with patch("eloquent_notes.search.llm.embed", side_effect=fake_embed):
@@ -136,13 +145,13 @@ def test_deleted_notes_are_dropped_from_cache(tmp_path, note_list):
     assert not cache_path.exists()
 
 
-def test_search_without_notes_skips_ollama(tmp_path):
+def test_search_without_notes_skips_ollama(tmp_path: Path) -> None:
     with patch("eloquent_notes.search.llm.embed") as mock_embed:
         assert SemanticIndex(str(tmp_path / "cache.npz")).search([], "anything", CFG) == []
     mock_embed.assert_not_called()
 
 
-def test_search_propagates_ollama_errors(tmp_path, note_list):
+def test_search_propagates_ollama_errors(tmp_path: Path, note_list: list[notes.Note]) -> None:
     index = SemanticIndex(str(tmp_path / "cache.npz"))
 
     with patch("eloquent_notes.search.llm.embed", side_effect=ConnectionError("down")), pytest.raises(ConnectionError):

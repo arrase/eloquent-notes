@@ -48,8 +48,8 @@ class RecordingHUD(QWidget):
             | Qt.WindowType.WindowStaysOnTopHint
             | Qt.WindowType.WindowDoesNotAcceptFocus
         )
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
-        self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating, True)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, on=True)
+        self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating, on=True)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setToolTip(_("Recording in progress — click to stop and process note"))
         self.setFixedSize(260, 40)
@@ -61,22 +61,22 @@ class RecordingHUD(QWidget):
 
         self.lbl_dot = QLabel("●")
         self.lbl_dot.setStyleSheet("color: #EF4444; font-size: 14px; font-weight: bold;")
-        self.lbl_dot.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
+        self.lbl_dot.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, on=True)
         layout.addWidget(self.lbl_dot)
 
         self.lbl_status = QLabel(_("Recording Note..."))
         self.lbl_status.setStyleSheet("color: #F3F4F6; font-size: 12px; font-weight: 600;")
-        self.lbl_status.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
+        self.lbl_status.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, on=True)
         layout.addWidget(self.lbl_status)
 
         layout.addStretch()
 
         self.lbl_timer = QLabel("00:00")
         self.lbl_timer.setStyleSheet(_TIMER_LABEL_QSS)
-        self.lbl_timer.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
+        self.lbl_timer.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, on=True)
         layout.addWidget(self.lbl_timer)
 
-    def paintEvent(self, event: QPaintEvent | None) -> None:
+    def paintEvent(self, _event: QPaintEvent | None) -> None:
         """Render antialiased dark rounded pill background and subtle border."""
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)

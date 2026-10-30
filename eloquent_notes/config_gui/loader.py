@@ -16,7 +16,7 @@ class OllamaModelLoader(QObject):
     models_fetched = pyqtSignal(list, list)
     error_occurred = pyqtSignal(str)
 
-    def __init__(self, url: str):
+    def __init__(self, url: str) -> None:
         super().__init__()
         self.url = url.rstrip("/")
 

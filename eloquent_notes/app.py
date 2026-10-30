@@ -17,6 +17,7 @@ import sys
 import threading
 import time
 from pathlib import Path
+from typing import Any
 
 import requests
 from PyQt6.QtCore import QFile, QObject, QTimer, pyqtSignal
@@ -48,7 +49,7 @@ logger = logging.getLogger("eloquent_notes.app")
 APP_NAME = "Eloquent Notes"
 
 
-def _configure_logging(cfg):
+def _configure_logging(cfg: dict[str, Any]) -> None:
     log_cfg = cfg["logging"]
     setup_logging(
         log_level_str=log_cfg["level"],
@@ -57,10 +58,10 @@ def _configure_logging(cfg):
     )
 
 
-class SafeDict(dict):
+class SafeDict(dict[str, str]):
     """Dict that leaves unknown prompt placeholders untouched (e.g. {unknown} stays {unknown})."""
 
-    def __missing__(self, key):
+    def __missing__(self, key: str) -> str:
         return f"{{{key}}}"
 
 
@@ -71,7 +72,14 @@ class EloquentApp(QObject):
     search_completed = pyqtSignal(str, list)
     search_failed = pyqtSignal(str, str)
 
-    def __init__(self, qapp, start_recording_immediately=False, open_window_immediately=False, app_config=None):
+    def __init__(
+        self,
+        qapp: QApplication,
+        *,
+        start_recording_immediately: bool = False,
+        open_window_immediately: bool = False,
+        app_config: dict[str, Any] | None = None,
+    ) -> None:
         super().__init__()
         self.app = qapp
         self.app.setApplicationName("eloquent-notes")
@@ -79,21 +87,21 @@ class EloquentApp(QObject):
         self.app.setDesktopFileName("eloquent-notes")
         self.app.setWindowIcon(ui.get_app_icon())
         self.state = IDLE
-        self.config = app_config if app_config is not None else config.load_config()
-        self.tray = None
-        self.menu = None
-        self.server = None
-        self.window = None
+        self.config: dict[str, Any] = app_config if app_config is not None else config.load_config()
+        self.tray: QSystemTrayIcon | None = None
+        self.menu: QMenu | None = None
+        self.server: QLocalServer | None = None
+        self.window: MainWindow | None = None
 
         self._start_recording_immediately = start_recording_immediately
         self._open_window_immediately = open_window_immediately
-        self._snapshot = None  # config + prompt files frozen at recording start
-        self._recorder = None
-        self._append_target = None  # note that receives the current dictation, if any
-        self._preload_thread = None
-        self._processing_thread = None
-        self._config_dialog = None
-        self._hud = None
+        self._snapshot: dict[str, Any] | None = None  # config + prompt files frozen at recording start
+        self._recorder: audio.AudioRecorder | None = None
+        self._append_target: notes.Note | None = None  # note that receives the current dictation, if any
+        self._preload_thread: threading.Thread | None = None
+        self._processing_thread: threading.Thread | None = None
+        self._config_dialog: config_gui.ConfigurationDialog | None = None
+        self._hud: recording_hud.RecordingHUD | None = None
         self._recording_started_at = 0.0
         self._index = SemanticIndex()
 
@@ -106,7 +114,7 @@ class EloquentApp(QObject):
 
     # --- UI setup ---------------------------------------------------------
 
-    def run(self):
+    def run(self) -> None:
         """Set up the system tray, IPC server, and enter the event loop."""
         self.tray = QSystemTrayIcon()
         self._init_ipc_server()
@@ -117,7 +125,7 @@ class EloquentApp(QObject):
             QTimer.singleShot(100, self.show_window)
         sys.exit(self.app.exec())
 
-    def _init_ipc_server(self):
+    def _init_ipc_server(self) -> None:
         self.server = QLocalServer(self)
         QLocalServer.removeServer(IPC_SERVER_NAME)
         if not self.server.listen(IPC_SERVER_NAME):
@@ -126,7 +134,7 @@ class EloquentApp(QObject):
             raise RuntimeError(error_msg)
         self.server.newConnection.connect(self._handle_ipc_connection)
 
-    def _init_tray_ui(self):
+    def _init_tray_ui(self) -> None:
         self.menu = self._create_tray_menu()
         self.tray.setContextMenu(self.menu)
         self.tray.activated.connect(self._on_tray_activated)
@@ -134,7 +142,7 @@ class EloquentApp(QObject):
         self._update_icon("gray", _("Eloquent Notes (Idle)"))
         self.tray.show()
 
-    def _create_tray_menu(self):
+    def _create_tray_menu(self) -> QMenu:
         menu = QMenu()
 
         toggle_action = QAction(_("Start/Stop Recording"), menu)
@@ -164,7 +172,7 @@ class EloquentApp(QObject):
 
         return menu
 
-    def _on_tray_activated(self, reason):
+    def _on_tray_activated(self, reason: QSystemTrayIcon.ActivationReason) -> None:
         if reason == QSystemTrayIcon.ActivationReason.Trigger:
             self.toggle_action()
         elif reason == QSystemTrayIcon.ActivationReason.MiddleClick:
@@ -173,12 +181,12 @@ class EloquentApp(QObject):
             else:
                 self.show_window()
 
-    def _handle_ipc_connection(self):
+    def _handle_ipc_connection(self) -> None:
         while self.server.hasPendingConnections():
             socket = self.server.nextPendingConnection()
             try:
                 if socket.bytesAvailable() > 0 or socket.waitForReadyRead(50):
-                    message = bytes(socket.readAll()).decode("utf-8", errors="replace")
+                    message = socket.readAll().data().decode("utf-8", errors="replace")
                     if message == "toggle":
                         self.toggle_action()
                     elif message == "open":
@@ -189,14 +197,14 @@ class EloquentApp(QObject):
                 socket.disconnectFromServer()
                 socket.deleteLater()
 
-    def _update_icon(self, color, tooltip):
+    def _update_icon(self, color: str, tooltip: str) -> None:
         if self.tray is not None:
             self.tray.setIcon(ui.get_qicon(color))
             self.tray.setToolTip(tooltip)
         if self.window is not None:
             self.window.set_state(self.state)
 
-    def _notify(self, title, message):
+    def _notify(self, title: str, message: str) -> None:
         if self.tray is not None:
             self.tray.showMessage(
                 title,
@@ -206,7 +214,7 @@ class EloquentApp(QObject):
             )
 
     @staticmethod
-    def _play_beep(audio_cfg, wait):
+    def _play_beep(audio_cfg: dict[str, Any], *, wait: bool) -> None:
         if not audio_cfg["beep_enabled"]:
             return
         try:
@@ -215,15 +223,16 @@ class EloquentApp(QObject):
                 duration=audio_cfg["beep_duration"],
                 wait=wait,
             )
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — PortAudio/sounddevice raises backend-specific exceptions when audio output fails
             logger.warning("Audio feedback beep failed: %s", e)
 
     # --- Notes window (main thread) ----------------------------------------
 
-    def _notes_folder(self):
-        return Path(self.config["notes"]["folder"]).expanduser()
+    def _notes_folder(self) -> Path:
+        folder: str = self.config["notes"]["folder"]
+        return Path(folder).expanduser()
 
-    def show_window(self):
+    def show_window(self) -> None:
         """Show the notes window, creating it on first use."""
         if self.window is None:
             self.window = MainWindow(
@@ -243,7 +252,7 @@ class EloquentApp(QObject):
         self.window.raise_()
         self.window.activateWindow()
 
-    def _save_open_note(self):
+    def _save_open_note(self) -> None:
         if self.window is not None:
             self.window.note_edited.disconnect(self._on_note_edited)
             self.window.note_edited.connect(notes.save_note)
@@ -253,32 +262,33 @@ class EloquentApp(QObject):
                 self.window.note_edited.disconnect(notes.save_note)
                 self.window.note_edited.connect(self._on_note_edited)
 
-    def _refresh_window(self):
+    def _refresh_window(self) -> None:
         if self.window is not None:
             self.window.set_columns(self.config["notes"]["columns"])
             self.window.set_type_colors(self.config["notes"]["type_colors"])
             self.window.set_notes(notes.load_notes(self._notes_folder()))
 
-    def _on_note_edited(self, note):
+    def _on_note_edited(self, note: notes.Note) -> None:
         notes.save_note(note)
         self._refresh_window()
 
-    def _on_delete_requested(self, note):
-        if not QFile.moveToTrash(str(note.path)):
+    def _on_delete_requested(self, note: notes.Note) -> None:
+        moved: bool = QFile.moveToTrash(str(note.path))[0]
+        if not moved:
             self._notify(
                 _("Delete Failed"),
                 _("Could not move {name} to the trash.").format(name=note.path.name),
             )
         self._refresh_window()
 
-    def _start_search(self, query):
+    def _start_search(self, query: str) -> None:
         threading.Thread(
             target=self._run_search,
             args=(query, self._notes_folder(), copy.deepcopy(self.config)),
             daemon=True,
         ).start()
 
-    def _run_search(self, query, folder, cfg):
+    def _run_search(self, query: str, folder: Path, cfg: dict[str, Any]) -> None:
         try:
             results = self._index.search(notes.load_notes(folder), query, cfg)
         except Exception as e:
@@ -287,17 +297,17 @@ class EloquentApp(QObject):
             return
         self.search_completed.emit(query, results)
 
-    def _on_search_completed(self, query, results):
+    def _on_search_completed(self, query: str, results: list[notes.Note]) -> None:
         if self.window is not None:
             self.window.show_search_results(query, results)
 
-    def _on_search_failed(self, query, message):
+    def _on_search_failed(self, query: str, message: str) -> None:
         if self.window is not None:
             self.window.show_search_error(query, message)
 
     # --- Recording lifecycle (main thread) ---------------------------------
 
-    def toggle_action(self):
+    def toggle_action(self) -> None:
         """Start recording a new note, stop and process, or notify that we are busy."""
         if self.state == IDLE:
             self._append_target = None
@@ -307,7 +317,7 @@ class EloquentApp(QObject):
         else:
             self._notify(APP_NAME, _("System is busy. Please wait."))
 
-    def dictate_into(self, note):
+    def dictate_into(self, note: notes.Note) -> None:
         """Start recording a dictation that will be appended to note, or stop the current one."""
         if self.state == IDLE:
             self._append_target = note
@@ -315,7 +325,7 @@ class EloquentApp(QObject):
         else:
             self.toggle_action()
 
-    def _start_recording(self):
+    def _start_recording(self) -> None:
         logger.info("Starting audio recording...")
         try:
             snapshot = copy.deepcopy(self.config)
@@ -354,7 +364,7 @@ class EloquentApp(QObject):
             self._preload_thread.start()
 
     @staticmethod
-    def _preload_model(ai_cfg, keep_alive):
+    def _preload_model(ai_cfg: dict[str, Any], keep_alive: str) -> None:
         """Warm or unload the model weights in Ollama (best effort)."""
         try:
             llm.preload_model(
@@ -367,12 +377,12 @@ class EloquentApp(QObject):
         except (requests.RequestException, ValueError) as e:
             logger.warning("Model preload skipped: %s", e)
 
-    def _on_recording_tick(self):
+    def _on_recording_tick(self) -> None:
         if self._hud is not None and self._hud.isVisible():
             elapsed = time.monotonic() - self._recording_started_at
             self._hud.update_timer(elapsed)
 
-    def _stop_and_process(self):
+    def _stop_and_process(self) -> None:
         self.state = PROCESSING
         self._tick_timer.stop()
         if self._hud is not None:
@@ -390,7 +400,7 @@ class EloquentApp(QObject):
             self.processing_completed.emit("error", _("Could not stop recording: {error}").format(error=e))
             return
 
-        self._play_beep(snapshot["audio"], wait=False)
+        self._play_beep(snapshot["audio"], wait=False)  # type: ignore[index]
         self._update_icon("orange", _("Eloquent Notes (Processing...)"))
 
         self._processing_thread = threading.Thread(
@@ -403,14 +413,14 @@ class EloquentApp(QObject):
     # --- Processing pipeline (background thread) ---------------------------
 
     @staticmethod
-    def _language_instruction(target_language):
+    def _language_instruction(target_language: str) -> str:
         return (
             f"IMPORTANT: You MUST write the title, content, and tags "
             f"in {target_language}, translating from the transcription language if necessary."
         )
 
     @staticmethod
-    def _transcribe(ai_cfg, loaded, wav_chunks):
+    def _transcribe(ai_cfg: dict[str, Any], loaded: dict[str, str], wav_chunks: list[bytes]) -> str:
         transcriptions = []
         for index, wav_bytes in enumerate(wav_chunks, start=1):
             logger.info("Phase 1: Transcribing audio chunk %d/%d...", index, len(wav_chunks))
@@ -433,7 +443,13 @@ class EloquentApp(QObject):
         return " ".join(transcriptions)
 
     @staticmethod
-    def _rewrite(ai_cfg, loaded, transcription, language_instruction, keep_alive):
+    def _rewrite(
+        ai_cfg: dict[str, Any],
+        loaded: dict[str, str],
+        transcription: str,
+        language_instruction: str,
+        keep_alive: str,
+    ) -> dict[str, Any]:
         user_prompt = loaded[config.REWRITING_USER_PROMPT_PATH].format_map(
             SafeDict(
                 transcription=transcription,
@@ -453,7 +469,12 @@ class EloquentApp(QObject):
         )
 
     @staticmethod
-    def _classify(ai_cfg, loaded, content, language_instruction):
+    def _classify(
+        ai_cfg: dict[str, Any],
+        loaded: dict[str, str],
+        content: str,
+        language_instruction: str,
+    ) -> dict[str, Any]:
         user_prompt = loaded[config.CLASSIFICATION_USER_PROMPT_PATH].format_map(
             SafeDict(
                 transcription=content,
@@ -472,12 +493,26 @@ class EloquentApp(QObject):
             timeout=ai_cfg["request_timeout"],
         )
 
-    def _reset_keep_alive(self, ai_cfg, preload_thread):
+    def _reset_keep_alive(self, ai_cfg: dict[str, Any], preload_thread: threading.Thread | None) -> None:
         if preload_thread is not None and preload_thread.is_alive():
             preload_thread.join(timeout=ai_cfg["preload_timeout"])
         self._preload_model(ai_cfg, ai_cfg["keep_alive"])
 
-    def _process_audio(self, recorder, snapshot, append, preload_thread):
+    @staticmethod
+    def _validate_rewrite(rewrite: dict[str, Any], *, append: bool) -> tuple[str, str]:
+        title: str = rewrite["title"].strip()
+        content: str = rewrite["content"].strip()
+        if not content or (not append and not title):
+            raise ValueError(_("Model returned empty note content"))
+        return title, content
+
+    def _process_audio(
+        self,
+        recorder: audio.AudioRecorder,
+        snapshot: dict[str, Any],
+        append: bool,  # noqa: FBT001
+        preload_thread: threading.Thread | None,
+    ) -> None:
         """Run the pipeline over the recorded audio.
 
         Executes on a background thread with the state frozen at recording
@@ -510,10 +545,7 @@ class EloquentApp(QObject):
                 ai_cfg["keep_alive"] if append else ai_cfg["preload_keep_alive"],
             )
             completed_final_phase = append
-            title = rewrite["title"].strip()
-            content = rewrite["content"].strip()
-            if not content or (not append and not title):
-                raise ValueError(_("Model returned empty note content"))
+            title, content = self._validate_rewrite(rewrite, append=append)
             logger.info("Rewriting: title=%s", title)
 
             if append:
@@ -547,7 +579,7 @@ class EloquentApp(QObject):
 
     # --- Completion, reload and shutdown -----------------------------------
 
-    def _on_processing_completed(self, status, detail):
+    def _on_processing_completed(self, status: str, detail: str) -> None:
         self.state = IDLE
         self._update_icon("gray", _("Eloquent Notes (Idle)"))
         target, self._append_target = self._append_target, None
@@ -571,10 +603,10 @@ class EloquentApp(QObject):
                 _("Error processing dictation: {detail}").format(detail=detail),
             )
 
-    def _append_dictation(self, target, text):
+    def _append_dictation(self, target: notes.Note | None, text: str) -> None:
         """Append dictated text to target, keeping any edits pending in the reader."""
         self._save_open_note()
-        note = notes._parse(target.path) if target is not None else None
+        note = notes.parse_note(target.path) if target is not None else None
         if note is None:
             target_name = target.path.name if target is not None else "<none>"
             logger.error("Cannot append dictation; target note unavailable: %s", target_name)
@@ -589,7 +621,7 @@ class EloquentApp(QObject):
         self._notify(_("Dictation Added"), note.title)
         self._refresh_window()
 
-    def reload_config(self):
+    def reload_config(self) -> None:
         """Reload configuration from disk."""
         try:
             new_config = config.load_config()
@@ -608,7 +640,7 @@ class EloquentApp(QObject):
                 _("Failed to reload configuration: {error}").format(error=e),
             )
 
-    def show_config_dialog(self):
+    def show_config_dialog(self) -> None:
         """Show the configuration dialog, creating it if necessary."""
         if self._config_dialog is not None:
             self._config_dialog.raise_()
@@ -620,13 +652,13 @@ class EloquentApp(QObject):
         self._config_dialog.finished.connect(self._on_config_dialog_closed)
         self._config_dialog.show()
 
-    def _on_config_dialog_closed(self, _result):
+    def _on_config_dialog_closed(self, _result: int) -> None:
         if self._config_dialog is not None:
             dialog = self._config_dialog
             self._config_dialog = None
             dialog.deleteLater()
 
-    def exit_app(self):
+    def exit_app(self) -> None:
         """Clean up and exit the application."""
         logger.info("Exiting application...")
         self._tick_timer.stop()
@@ -655,7 +687,7 @@ class EloquentApp(QObject):
         sys.exit(0)
 
 
-def main():
+def main() -> None:
     """Daemon entry point — configure logging and launch the tray app."""
     parser = argparse.ArgumentParser(description=_("Eloquent Notes Daemon"))
     parser.add_argument(

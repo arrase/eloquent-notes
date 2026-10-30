@@ -27,18 +27,20 @@ from eloquent_notes.i18n import _
 
 RESTORE_DEFAULTS_TITLE = "Restore Defaults"
 
+SettingsTabWidget = GeneralTab | NotesTab | AppearanceTab | AITab | AudioTab | TextFilesTab
+
 
 class ConfigurationDialog(QDialog):
     """Dialogue window for full application settings management."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle(_("Eloquent Notes Configuration"))
         self.setWindowIcon(ui.get_app_icon())
         self.setMinimumSize(850, 700)
         self._dark = ui.is_dark_theme()
         self.setStyleSheet(ui.dialog_stylesheet(ui.current_theme()))
-        self._tabs = []
+        self._tabs: list[tuple[SettingsTabWidget, str]] = []
         self._init_ui()
 
         try:
@@ -53,16 +55,16 @@ class ConfigurationDialog(QDialog):
             self.config_data = config.load_default_config()
             self.load_settings_to_ui()
 
-    def changeEvent(self, event):
+    def changeEvent(self, event: QEvent | None) -> None:
         """Update theme stylesheet when the system palette changes."""
-        if event.type() == QEvent.Type.PaletteChange:
+        if event is not None and event.type() == QEvent.Type.PaletteChange:
             dark = ui.is_dark_theme()
             if dark != self._dark:
                 self._dark = dark
                 self.setStyleSheet(ui.dialog_stylesheet(ui.current_theme()))
         super().changeEvent(event)
 
-    def _init_ui(self):
+    def _init_ui(self) -> None:
         """Build the GUI widgets."""
         layout = QVBoxLayout(self)
         layout.setContentsMargins(15, 15, 15, 15)
@@ -109,12 +111,12 @@ class ConfigurationDialog(QDialog):
 
         layout.addLayout(btn_layout)
 
-    def load_settings_to_ui(self):
+    def load_settings_to_ui(self) -> None:
         """Populate widget states from loaded configuration dict."""
         for tab_widget, _title in self._tabs:
             tab_widget.load_settings(self.config_data)
 
-    def restore_defaults(self):
+    def restore_defaults(self) -> None:
         """Overwrite current edits with factory defaults after confirmation."""
         confirm = QMessageBox.question(
             self,
@@ -140,9 +142,9 @@ class ConfigurationDialog(QDialog):
             _("Defaults restored. Click 'Save' to apply changes to disk."),
         )
 
-    def save_settings_from_ui(self):
+    def save_settings_from_ui(self) -> bool:
         """Gather settings from widgets and persist them to files on disk."""
-        save_order = (
+        save_order: tuple[SettingsTabWidget, ...] = (
             self.notes_tab,
             self.appearance_tab,
             self.ai_tab,
@@ -167,7 +169,7 @@ class ConfigurationDialog(QDialog):
             self.config_data = new_config
             return True
 
-    def accept(self):
+    def accept(self) -> None:
         """Save settings and close the dialog with Accepted code."""
         if self.save_settings_from_ui():
             super().accept()

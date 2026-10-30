@@ -4,13 +4,15 @@ from unittest.mock import patch
 
 import pytest
 from PyQt6.QtGui import QColor, QIcon, QPalette
+from PyQt6.QtWidgets import QApplication
 
 from eloquent_notes import ui
 
 
 @pytest.mark.parametrize("color", ["red", "orange", "gray"])
-def test_create_icon_pixmap(qapp, color):
+def test_create_icon_pixmap(qapp: QApplication, color: str) -> None:
     """Test create_icon_pixmap renders a valid opaque 64x64 icon."""
+    del qapp
     pixmap = ui.create_icon_pixmap(color)
     assert not pixmap.isNull()
     assert pixmap.width() == 64
@@ -20,29 +22,33 @@ def test_create_icon_pixmap(qapp, color):
     assert center.alpha() == 255
 
 
-def test_create_icon_pixmap_unknown_raises(qapp):
+def test_create_icon_pixmap_unknown_raises(qapp: QApplication) -> None:
     """Test that create_icon_pixmap fails fast on invalid color."""
+    del qapp
     with pytest.raises(ValueError, match="Unknown icon status color"):
         ui.create_icon_pixmap("unknown")
 
 
 @pytest.mark.parametrize("color", ["red", "orange", "gray"])
-def test_get_qicon(qapp, color):
+def test_get_qicon(qapp: QApplication, color: str) -> None:
     """Test get_qicon returns a valid Qt QIcon for each state color."""
+    del qapp
     qicon = ui.get_qicon(color)
     assert isinstance(qicon, QIcon)
     assert not qicon.isNull()
 
 
-def test_get_qicon_cached(qapp):
+def test_get_qicon_cached(qapp: QApplication) -> None:
     """Test that repeated calls return the cached QIcon instance."""
+    del qapp
     icon1 = ui.get_qicon("red")
     icon2 = ui.get_qicon("red")
     assert icon1 is icon2
 
 
-def test_app_icon_pixmap_and_cached_qicon(qapp):
+def test_app_icon_pixmap_and_cached_qicon(qapp: QApplication) -> None:
     """Test create_app_icon_pixmap and get_app_icon return a valid cached 64x64 icon."""
+    del qapp
     pixmap = ui.create_app_icon_pixmap()
     assert not pixmap.isNull()
     assert pixmap.width() == 64
@@ -56,8 +62,9 @@ def test_app_icon_pixmap_and_cached_qicon(qapp):
     assert ui.get_app_icon() is icon
 
 
-def test_theme_selection_and_stylesheets(qapp):
+def test_theme_selection_and_stylesheets(qapp: QApplication) -> None:
     """Test light and dark theme detection and stylesheet builders."""
+    del qapp
     light_palette = QPalette()
     light_palette.setColor(QPalette.ColorRole.Window, QColor("#F3F5F8"))
     with patch("eloquent_notes.ui.QGuiApplication.palette", return_value=light_palette):

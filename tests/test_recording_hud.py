@@ -4,12 +4,14 @@ from unittest.mock import MagicMock
 
 from PyQt6.QtCore import QPointF, Qt
 from PyQt6.QtGui import QMouseEvent
+from PyQt6.QtWidgets import QApplication
 
 from eloquent_notes.recording_hud import RecordingHUD
 
 
-def test_recording_hud_initialization(qapp):
+def test_recording_hud_initialization(qapp: QApplication) -> None:
     """Test that RecordingHUD initializes with proper flags, layout, and defaults."""
+    del qapp
     hud = RecordingHUD()
     assert hud.lbl_status.text() == "Recording Note..."
     assert hud.lbl_timer.text() == "00:00"
@@ -17,7 +19,7 @@ def test_recording_hud_initialization(qapp):
     assert hud.testAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
 
 
-def test_recording_hud_show_recording(qapp):
+def test_recording_hud_show_recording(qapp: QApplication) -> None:
     """Test show_recording resets timer and shows the widget."""
     hud = RecordingHUD()
     hud.update_timer(45.0)
@@ -33,8 +35,9 @@ def test_recording_hud_show_recording(qapp):
     assert not hud.isVisible()
 
 
-def test_recording_hud_update_timer(qapp):
+def test_recording_hud_update_timer(qapp: QApplication) -> None:
     """Test update_timer formats elapsed seconds and keeps styling intact."""
+    del qapp
     hud = RecordingHUD()
     hud.show_recording()
 
@@ -52,8 +55,9 @@ def test_recording_hud_update_timer(qapp):
     hud.hide()
 
 
-def test_recording_hud_mouse_click_emits_signal(qapp):
+def test_recording_hud_mouse_click_emits_signal(qapp: QApplication) -> None:
     """Test that left clicking the HUD widget emits the clicked signal."""
+    del qapp
     hud = RecordingHUD()
     mock_slot = MagicMock()
     hud.clicked.connect(mock_slot)

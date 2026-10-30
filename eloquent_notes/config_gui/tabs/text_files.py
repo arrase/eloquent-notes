@@ -1,6 +1,7 @@
 """Configuration tab for editing a list of text files."""
 
 from pathlib import Path
+from typing import Any
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
@@ -34,12 +35,12 @@ PROMPTS = [
 class TextFilesTab(QWidget):
     """Tab for editing prompt files."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self.loaded_contents = {}
+        self.loaded_contents: dict[str, str] = {}
         self._init_ui()
 
-    def _init_ui(self):
+    def _init_ui(self) -> None:
         layout = QVBoxLayout(self)
         layout.setContentsMargins(15, 15, 15, 15)
         layout.setSpacing(10)
@@ -85,19 +86,19 @@ class TextFilesTab(QWidget):
         path = self.lst_items.currentItem().data(Qt.ItemDataRole.UserRole)
         self.editor.setPlainText(self.loaded_contents[path])
 
-    def _on_item_changed(self, current, previous):
+    def _on_item_changed(self, _current: QListWidgetItem | None, previous: QListWidgetItem | None) -> None:
         if previous:
             prev_path = previous.data(Qt.ItemDataRole.UserRole)
             self.loaded_contents[prev_path] = self.editor.toPlainText()
         self._load_current_into_editor()
 
-    def commit_active_editor(self):
+    def commit_active_editor(self) -> None:
         """Commit current editor contents to memory cache."""
         path = self.lst_items.currentItem().data(Qt.ItemDataRole.UserRole)
         self.loaded_contents[path] = self.editor.toPlainText()
 
-    def load_settings(self, config_data: dict) -> None:
-        self.lst_items.blockSignals(True)
+    def load_settings(self, _config_data: dict[str, Any]) -> None:
+        self.lst_items.blockSignals(True)  # noqa: FBT003
         self.loaded_contents.clear()
 
         for _label, path, default_path in PROMPTS:
@@ -106,7 +107,7 @@ class TextFilesTab(QWidget):
 
         self.lst_items.setCurrentRow(0)
         self._load_current_into_editor()
-        self.lst_items.blockSignals(False)
+        self.lst_items.blockSignals(False)  # noqa: FBT003
 
     def restore_defaults(self) -> None:
         self.loaded_contents.clear()
@@ -114,7 +115,7 @@ class TextFilesTab(QWidget):
             self.loaded_contents[path] = config.load_file(default_path)
         self._load_current_into_editor()
 
-    def save_settings(self, config_data: dict) -> bool:
+    def save_settings(self, _config_data: dict[str, Any]) -> bool:
         self.commit_active_editor()
         for _label, path, _default in PROMPTS:
             content = self.loaded_contents[path]

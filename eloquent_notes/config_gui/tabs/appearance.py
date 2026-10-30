@@ -1,5 +1,7 @@
 """Appearance tab for timeline layout and note type colors."""
 
+from typing import Any
+
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor, QIcon, QPixmap
 from PyQt6.QtWidgets import (
@@ -75,14 +77,14 @@ class AppearanceTab(QWidget):
         if color.isValid():
             self._set_color(note_type, color.name())
 
-    def load_settings(self, config_data: dict) -> None:
+    def load_settings(self, config_data: dict[str, Any]) -> None:
         notes_cfg = config_data["notes"]
         self.spn_columns.setValue(notes_cfg["columns"])
         type_colors = notes_cfg["type_colors"]
         for note_type in NOTE_TYPES:
             self._set_color(note_type, type_colors[note_type])
 
-    def save_settings(self, config_data: dict) -> bool:
+    def save_settings(self, config_data: dict[str, Any]) -> bool:
         config_data["notes"]["columns"] = self.spn_columns.value()
         config_data["notes"]["type_colors"] = dict(self._colors)
         return True

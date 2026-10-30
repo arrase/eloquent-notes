@@ -74,11 +74,16 @@ def _render(note: Note) -> str:
     return f"---\n{frontmatter}---\n{note.body}\n"
 
 
-def _parse(path: Path) -> Note | None:
-    try:
-        text = path.read_text(encoding="utf-8")
-    except (OSError, UnicodeDecodeError):
-        return None
+def _parse_created(raw_created: object) -> datetime | None:
+    if isinstance(raw_created, str):
+        try:
+            raw_created = datetime.fromisoformat(raw_created)
+        except ValueError:
+            return None
+    return raw_created.astimezone() if isinstance(raw_created, datetime) else None
+
+
+def _parse_frontmatter(text: str) -> tuple[dict[str, object], str] | None:
     match = _FRONTMATTER_RE.match(text)
     if not match:
         return None
@@ -88,30 +93,38 @@ def _parse(path: Path) -> Note | None:
         return None
     if not isinstance(meta, dict) or not {"title", "created", "type"} <= meta.keys():
         return None
+    return meta, match.group(2).strip()
+
+
+def parse_note(path: Path) -> Note | None:
+    """Parse a Markdown note file with YAML frontmatter, or return None if invalid."""
+    try:
+        text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return None
+    parsed = _parse_frontmatter(text)
+    if parsed is None:
+        return None
+    meta, body = parsed
     title = meta["title"]
-    if not isinstance(title, str) or not title.strip():
-        return None
     note_type = str(meta["type"]).lower()
-    if note_type not in NOTE_TYPES:
-        return None
-    created = meta["created"]
-    if isinstance(created, str):
-        try:
-            created = datetime.fromisoformat(created)
-        except ValueError:
-            return None
-    if not isinstance(created, datetime):
-        return None
+    created = _parse_created(meta["created"])
     raw_tags = meta.get("tags")
-    if raw_tags is not None and not isinstance(raw_tags, list):
+    if (
+        not isinstance(title, str)
+        or not title.strip()
+        or note_type not in NOTE_TYPES
+        or created is None
+        or (raw_tags is not None and not isinstance(raw_tags, list))
+    ):
         return None
     return Note(
         path=path,
         title=title.strip(),
-        created=created.astimezone(),
+        created=created,
         type=note_type,
         tags=normalize_tags([str(tag) for tag in raw_tags or []]),
-        body=match.group(2).strip(),
+        body=body,
     )
 
 
@@ -119,7 +132,7 @@ def load_notes(folder: Path) -> list[Note]:
     """Return every note in folder, newest first."""
     notes = []
     for path in folder.glob("*.md"):
-        note = _parse(path)
+        note = parse_note(path)
         if note is None:
             logger.warning("Ignoring %s: missing or invalid Eloquent Notes frontmatter", path)
             continue

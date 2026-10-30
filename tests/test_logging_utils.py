@@ -1,25 +1,26 @@
 import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
+from typing import Any
 
 import pytest
 
 from eloquent_notes import logging_utils
 
 
-def test_parse_log_level_valid():
+def test_parse_log_level_valid() -> None:
     assert set(logging_utils.LOG_LEVELS) == {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
     assert logging_utils.parse_log_level("debug") == logging.DEBUG
     assert logging_utils.parse_log_level("INFO") == logging.INFO
     assert logging_utils.parse_log_level("Warning") == logging.WARNING
 
 
-def test_parse_log_level_invalid_fails_fast():
+def test_parse_log_level_invalid_fails_fast() -> None:
     with pytest.raises(ValueError, match="Invalid log level"):
         logging_utils.parse_log_level("NOT_A_LEVEL")
 
 
-def test_get_log_dir_custom_env(tmp_path, monkeypatch):
+def test_get_log_dir_custom_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Test get_log_dir when XDG_STATE_HOME environment variable is set."""
     custom_state = str(tmp_path / "custom_state")
     monkeypatch.setenv("XDG_STATE_HOME", custom_state)
@@ -28,7 +29,7 @@ def test_get_log_dir_custom_env(tmp_path, monkeypatch):
     assert log_dir == str(Path(custom_state, "eloquent-notes"))
 
 
-def test_get_log_dir_default(monkeypatch):
+def test_get_log_dir_default(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test get_log_dir when XDG_STATE_HOME environment variable is unset."""
     monkeypatch.delenv("XDG_STATE_HOME", raising=False)
 
@@ -37,7 +38,7 @@ def test_get_log_dir_default(monkeypatch):
     assert log_dir == expected
 
 
-def test_setup_logging(tmp_path, monkeypatch):
+def test_setup_logging(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Test setup_logging configures console and file handlers correctly."""
     monkeypatch.setenv("XDG_STATE_HOME", str(tmp_path))
 
@@ -70,13 +71,13 @@ def test_setup_logging(tmp_path, monkeypatch):
     assert file_handler.backupCount == 5
 
 
-def test_setup_logging_file_error(tmp_path, monkeypatch):
+def test_setup_logging_file_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Test setup_logging fails fast and leaves handlers empty when file logging fails."""
     monkeypatch.setenv("XDG_STATE_HOME", str(tmp_path))
     logger = logging.getLogger("eloquent_notes")
     logger.handlers.clear()
 
-    def fail_file_handler(*args, **kwargs):
+    def fail_file_handler(*_args: Any, **_kwargs: Any) -> RotatingFileHandler:
         raise PermissionError("Access denied")
 
     monkeypatch.setattr(logging_utils, "RotatingFileHandler", fail_file_handler)
@@ -87,7 +88,7 @@ def test_setup_logging_file_error(tmp_path, monkeypatch):
     assert logger.handlers == []
 
 
-def test_get_log_file_path():
+def test_get_log_file_path() -> None:
     """Test get_log_file_path returns app.log under the log directory."""
     path = logging_utils.get_log_file_path()
     assert path.endswith("app.log")

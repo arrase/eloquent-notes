@@ -34,14 +34,14 @@ def _load_speech() -> np.ndarray:
     return (pcm.astype(np.float32) / PCM16_MAX).reshape(-1, 1)
 
 
-def test_recorder_init():
+def test_recorder_init() -> None:
     recorder = AudioRecorder(channels=2)
     assert recorder.channels == 2
     assert recorder._stream is None
 
 
 @patch("sounddevice.InputStream")
-def test_start_and_stop(mock_input_stream):
+def test_start_and_stop(mock_input_stream: MagicMock) -> None:
     stream_instance = MagicMock()
     mock_input_stream.return_value = stream_instance
 
@@ -55,7 +55,7 @@ def test_start_and_stop(mock_input_stream):
         callback=recorder._on_audio,
     )
     stream_instance.start.assert_called_once()
-    assert recorder._stream is stream_instance
+    assert vars(recorder)["_stream"] is stream_instance
 
     recorder.stop()
     stream_instance.stop.assert_called_once()
@@ -68,7 +68,7 @@ def test_start_and_stop(mock_input_stream):
 
 
 @patch("sounddevice.InputStream")
-def test_start_failure_closes_stream_and_raises(mock_input_stream):
+def test_start_failure_closes_stream_and_raises(mock_input_stream: MagicMock) -> None:
     stream_instance = MagicMock()
     stream_instance.start.side_effect = RuntimeError("Device unavailable")
     mock_input_stream.return_value = stream_instance
@@ -81,20 +81,20 @@ def test_start_failure_closes_stream_and_raises(mock_input_stream):
     assert recorder._stream is None
 
 
-def test_stop_exception_safety():
+def test_stop_exception_safety() -> None:
     recorder = AudioRecorder(channels=1)
     stream_instance = MagicMock()
-    stream_instance.stop.side_effect = Exception("PortAudio error")
+    stream_instance.stop.side_effect = RuntimeError("PortAudio error")
     recorder._stream = stream_instance
 
-    with pytest.raises(Exception, match="PortAudio error"):
+    with pytest.raises(RuntimeError, match="PortAudio error"):
         recorder.stop()
 
     assert stream_instance.close.called
     assert recorder._stream is None
 
 
-def test_callback_enqueues_copy():
+def test_callback_enqueues_copy() -> None:
     recorder = AudioRecorder(channels=1)
     chunk = np.zeros((100, 1), dtype=np.float32)
     recorder._on_audio(chunk, 100, None, None)
@@ -104,13 +104,13 @@ def test_callback_enqueues_copy():
     assert queued_chunk is not chunk
 
 
-def test_wav_chunks_without_data_is_empty():
+def test_wav_chunks_without_data_is_empty() -> None:
     recorder = AudioRecorder(channels=1)
     assert recorder.wav_chunks == []
     assert encode_wav_bytes(np.empty(0, dtype=np.float32), SAMPLE_RATE, 1) == b""
 
 
-def test_wav_chunks_encodes_captured_chunks():
+def test_wav_chunks_encodes_captured_chunks() -> None:
     recorder = AudioRecorder(channels=1)
     speech = _load_speech()
     recorder._chunks.append(speech[:24000])
@@ -126,7 +126,7 @@ def test_wav_chunks_encodes_captured_chunks():
         assert wf.getnframes() == len(speech)
 
 
-def test_speech_window_mask_short_and_stereo():
+def test_speech_window_mask_short_and_stereo() -> None:
     assert speech_window_mask(np.empty(0, dtype=np.float32)).size == 0
     assert speech_window_mask(np.ones(VAD_WINDOW_SAMPLES - 1, dtype=np.float32)).size == 0
 
@@ -138,7 +138,7 @@ def test_speech_window_mask_short_and_stereo():
     assert np.array_equal(stereo_mask, mono_mask)
 
 
-def test_is_silent_rejects_non_speech():
+def test_is_silent_rejects_non_speech() -> None:
     assert AudioRecorder(channels=1).is_silent is True
 
     rng = np.random.default_rng(0)
@@ -147,7 +147,7 @@ def test_is_silent_rejects_non_speech():
 
     silence = np.zeros(num_samples, dtype=np.float32)
     white_noise = rng.standard_normal(num_samples).astype(np.float32) * 0.2
-    hum_50hz = (sum(np.sin(2.0 * np.pi * 50.0 * k * t) / k for k in range(1, 12)) * 0.2).astype(np.float32)
+    hum_50hz = (np.sum([np.sin(2.0 * np.pi * 50.0 * k * t) / k for k in range(1, 12)], axis=0) * 0.2).astype(np.float32)
     low_thump = (np.sin(2.0 * np.pi * 40.0 * t) * 0.4).astype(np.float32)
     high_tone = (np.sin(2.0 * np.pi * 5000.0 * t) * 0.4).astype(np.float32)
 
@@ -167,7 +167,7 @@ def test_is_silent_rejects_non_speech():
         assert recorder.is_silent is True
 
 
-def test_is_silent_accepts_real_speech():
+def test_is_silent_accepts_real_speech() -> None:
     rng = np.random.default_rng(0)
     speech = _load_speech()
 
@@ -184,7 +184,7 @@ def test_is_silent_accepts_real_speech():
     assert noisy_recorder.is_silent is False
 
 
-def test_short_burst_is_silent():
+def test_short_burst_is_silent() -> None:
     speech = _load_speech()
     silence = np.zeros((SAMPLE_RATE, 1), dtype=np.float32)
     burst = speech[: int(SAMPLE_RATE * 0.3)]
@@ -202,7 +202,7 @@ def test_short_burst_is_silent():
     assert multi_recorder.is_silent is True
 
 
-def test_trim_keeps_speech_with_padding():
+def test_trim_keeps_speech_with_padding() -> None:
     speech = _load_speech()
     silence = np.zeros((SAMPLE_RATE, 1), dtype=np.float32)
     click = np.zeros((SAMPLE_RATE, 1), dtype=np.float32)
@@ -234,7 +234,7 @@ def test_trim_keeps_speech_with_padding():
         assert wf.getnframes() == len(trimmed)
 
 
-def test_trim_keeps_interior_pauses():
+def test_trim_keeps_interior_pauses() -> None:
     speech = _load_speech()
     pause = np.zeros((SAMPLE_RATE, 1), dtype=np.float32)
     data = np.concatenate([speech[:24000], pause, speech[24000:]])
@@ -245,14 +245,14 @@ def test_trim_keeps_interior_pauses():
     assert np.array_equal(trimmed, data)
 
 
-def test_split_speech_returns_empty_for_silent_audio():
+def test_split_speech_returns_empty_for_silent_audio() -> None:
     quiet = np.zeros((SAMPLE_RATE, 1), dtype=np.float32)
     active = speech_window_mask(quiet)
     assert not np.any(active)
     assert _split_speech(quiet, active) == []
 
 
-def test_split_speech_splits_long_audio_at_real_pauses():
+def test_split_speech_splits_long_audio_at_real_pauses() -> None:
     total_windows = 1300
     active = np.ones(total_windows, dtype=bool)
     # Place a 20-window (640 ms > 2 * SPEECH_PAD_S) pause in the second half of the first 30 s window
@@ -281,7 +281,7 @@ def test_split_speech_splits_long_audio_at_real_pauses():
     assert int(crossing_chunks[0][-1, 0]) == 312 * VAD_WINDOW_SAMPLES + PAD_SAMPLES - 1
 
 
-def test_split_speech_prioritizes_first_half_real_pause_over_second_half_micro_pause():
+def test_split_speech_prioritizes_first_half_real_pause_over_second_half_micro_pause() -> None:
     total_windows = 1200
     active = np.ones(total_windows, dtype=bool)
     # Real inter-word pause (>= MIN_PAUSE_WINDOWS) in the first half
@@ -303,7 +303,7 @@ def test_split_speech_prioritizes_first_half_real_pause_over_second_half_micro_p
     assert int(chunks[1][0, 0]) == midpoint_sample
 
 
-def test_split_speech_continuous_speech_no_pauses_and_short_pause_clamping():
+def test_split_speech_continuous_speech_no_pauses_and_short_pause_clamping() -> None:
     # Continuous speech > 30 s with zero silent windows splits cleanly at MAX_CHUNK_WINDOWS
     total_windows = 1100
     active = np.ones(total_windows, dtype=bool)
@@ -329,7 +329,7 @@ def test_split_speech_continuous_speech_no_pauses_and_short_pause_clamping():
     assert int(chunks_short[1][0, 0]) == midpoint_sample
 
 
-def test_split_speech_discards_short_transients():
+def test_split_speech_discards_short_transients() -> None:
     # Leading transient (5..10) + pause (10..25) + first speech (25..625) + pause (625..650)
     # + intermediate transient (650..655) + pause (655..675) + second speech (675..1580)
     # + pause (1580..1600) + trailing transient (1600..1605)
@@ -393,7 +393,7 @@ def test_split_speech_discards_short_transients():
     assert _split_speech(data[: 100 * VAD_WINDOW_SAMPLES], bursts_active) == []
 
 
-def test_recorder_reuses_analysis_across_is_silent_and_wav_chunks():
+def test_recorder_reuses_analysis_across_is_silent_and_wav_chunks() -> None:
     recorder = AudioRecorder(channels=1)
     speech = _load_speech()
     recorder._chunks.append(speech[:24000])
@@ -403,7 +403,7 @@ def test_recorder_reuses_analysis_across_is_silent_and_wav_chunks():
         patch("eloquent_notes.audio.np.concatenate", wraps=np.concatenate) as mock_concat,
         patch("eloquent_notes.audio.speech_window_mask", wraps=speech_window_mask) as mock_mask,
     ):
-        assert recorder.is_silent is False
+        assert bool(recorder.is_silent) is False
         assert len(recorder.wav_chunks) == 1
         assert len(recorder.wav_chunks) == 1
 
@@ -412,13 +412,13 @@ def test_recorder_reuses_analysis_across_is_silent_and_wav_chunks():
     assert mock_mask.call_count == 1
 
     recorder._chunks.clear()
-    assert recorder.is_silent is True
+    assert bool(recorder.is_silent) is True
     assert recorder.wav_chunks == []
 
 
 @patch("sounddevice.wait")
 @patch("sounddevice.play")
-def test_play_beep_blocks_when_wait_true(mock_play, mock_wait):
+def test_play_beep_blocks_when_wait_true(mock_play: MagicMock, mock_wait: MagicMock) -> None:
     play_beep(frequency=440, duration=0.1, wait=True)
 
     assert mock_play.called
@@ -432,7 +432,7 @@ def test_play_beep_blocks_when_wait_true(mock_play, mock_wait):
 
 @patch("sounddevice.wait")
 @patch("sounddevice.play")
-def test_play_beep_non_blocking(mock_play, mock_wait):
+def test_play_beep_non_blocking(mock_play: MagicMock, mock_wait: MagicMock) -> None:
     play_beep(frequency=440, duration=0.1, wait=False)
 
     assert mock_play.called
@@ -441,7 +441,7 @@ def test_play_beep_non_blocking(mock_play, mock_wait):
 
 @patch("sounddevice.wait")
 @patch("sounddevice.play")
-def test_play_beep_zero_duration(mock_play, mock_wait):
+def test_play_beep_zero_duration(mock_play: MagicMock, mock_wait: MagicMock) -> None:
     play_beep(frequency=440, duration=0.0, wait=True)
 
     assert not mock_play.called

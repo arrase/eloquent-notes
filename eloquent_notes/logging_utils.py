@@ -11,7 +11,7 @@ from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 
-def get_log_dir():
+def get_log_dir() -> str:
     """Return the log directory path following XDG conventions."""
     xdg_state = os.environ.get("XDG_STATE_HOME") or str(Path("~/.local/state").expanduser())
     return str(Path(xdg_state, "eloquent-notes"))
@@ -29,12 +29,12 @@ LOG_LEVELS = {
 LOG_FILE_NAME = "app.log"
 
 
-def get_log_file_path():
+def get_log_file_path() -> str:
     """Return the absolute path to the application log file."""
     return str(Path(get_log_dir(), LOG_FILE_NAME))
 
 
-def parse_log_level(name):
+def parse_log_level(name: str) -> int:
     """Translate a configuration log-level name into a logging constant."""
     try:
         return LOG_LEVELS[str(name).upper()]
@@ -43,7 +43,7 @@ def parse_log_level(name):
         raise ValueError(f"Invalid log level {name!r}. Expected one of: {valid}") from None
 
 
-def setup_logging(log_level_str, max_mb, backup_count):
+def setup_logging(log_level_str: str, max_mb: int, backup_count: int) -> logging.Logger:
     """Configure the eloquent_notes logger with console and file handlers."""
     level = parse_log_level(log_level_str)
 

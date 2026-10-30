@@ -126,9 +126,13 @@ DARK_THEME = Theme(
 )
 
 
+_DARK_LIGHTNESS_THRESHOLD = 128
+
+
 def is_dark_theme() -> bool:
     """Return True when the application palette has a dark window background."""
-    return QGuiApplication.palette().color(QPalette.ColorRole.Window).lightness() < 128
+    lightness: int = QGuiApplication.palette().color(QPalette.ColorRole.Window).lightness()
+    return lightness < _DARK_LIGHTNESS_THRESHOLD
 
 
 def current_theme() -> Theme:

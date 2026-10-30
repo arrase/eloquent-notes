@@ -1,6 +1,7 @@
 """Notes storage tab for configuration."""
 
 from pathlib import Path
+from typing import Any
 
 from PyQt6.QtWidgets import (
     QFileDialog,
@@ -21,11 +22,11 @@ from eloquent_notes.i18n import _
 class NotesTab(QWidget):
     """Notes folder configuration tab."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self._init_ui()
 
-    def _init_ui(self):
+    def _init_ui(self) -> None:
         layout = QVBoxLayout(self)
         layout.setContentsMargins(15, 15, 15, 15)
         layout.setSpacing(15)
@@ -56,7 +57,7 @@ class NotesTab(QWidget):
         layout.addWidget(grp_notes)
         layout.addStretch()
 
-    def _browse_folder(self):
+    def _browse_folder(self) -> None:
         initial_dir = Path(self.txt_folder.text()).expanduser()
         if not initial_dir.exists():
             initial_dir = Path("~/").expanduser()
@@ -65,10 +66,10 @@ class NotesTab(QWidget):
         if dir_path:
             self.txt_folder.setText(dir_path)
 
-    def load_settings(self, config_data: dict) -> None:
+    def load_settings(self, config_data: dict[str, Any]) -> None:
         self.txt_folder.setText(config_data["notes"]["folder"])
 
-    def save_settings(self, config_data: dict) -> bool:
+    def save_settings(self, config_data: dict[str, Any]) -> bool:
         folder = self.txt_folder.text().strip()
         if not folder:
             QMessageBox.warning(self, _("Validation Error"), _("Notes Folder cannot be empty."))
