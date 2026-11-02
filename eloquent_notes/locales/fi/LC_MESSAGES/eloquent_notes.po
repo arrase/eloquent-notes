@@ -55,6 +55,9 @@ msgstr "Äänentallennusasetukset"
 msgid "Audio Channels:"
 msgstr "Äänikanavat:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "Lisää muistiinpanoeditorissa korjatut sanat automaattisesti mukautettuun sanastoon."
+
 msgid "Backup Count:"
 msgstr "Varmuuskopioiden määrä:"
 
@@ -66,6 +69,9 @@ msgstr "Äänimerkin taajuus:"
 
 msgid "Browse..."
 msgstr "Selaa..."
+
+msgid "Bullet list"
+msgstr "Luettelomerkit"
 
 msgid "Cancel"
 msgstr "Peruuta"
@@ -114,6 +120,9 @@ msgstr "Tallennusta ei voitu lopettaa: {error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "Luo automaattisen käynnistyksen merkinnän XDG autostart -hakemistoon"
+
+msgid "Custom Vocabulary"
+msgstr "Mukautettu sanasto"
 
 msgid "Decision"
 msgstr "Päätös"
@@ -211,6 +220,9 @@ msgstr "Virheellinen asetusarvo kohteelle '{key}'"
 msgid "Keep Alive Time:"
 msgstr "Keep Alive -aika:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "Opi mukautettua sanastoa manuaalisista muistiinpanomuokkauksista"
+
 msgid "Log File"
 msgstr "Lokitiedosto"
 
@@ -222,6 +234,15 @@ msgstr "Lokitaso:"
 
 msgid "Logging Settings"
 msgstr "Lokiasetukset"
+
+msgid "Make casual"
+msgstr "Tee rento"
+
+msgid "Make concise"
+msgstr "Tiivistä"
+
+msgid "Make formal"
+msgstr "Tee muodollinen"
 
 msgid "Max Log File Size:"
 msgstr "Lokitiedoston enimmäiskoko:"
@@ -270,6 +291,9 @@ msgstr "Muistiinpano"
 
 msgid "Note Saved"
 msgstr "Muistiinpano tallennettu"
+
+msgid "Note Transformed"
+msgstr "Muistiinpano muunnettu"
 
 msgid "Note Type Colors"
 msgstr "Muistiinpanotyyppien värit"
@@ -351,6 +375,9 @@ msgstr "Kehotteet"
 
 msgid "Prompts:"
 msgstr "Kehotteet:"
+
+msgid "Proofread"
+msgstr "Oikolue"
 
 msgid "Question"
 msgstr "Kysymys"
@@ -445,6 +472,9 @@ msgstr "Stereo (2 kanavaa)"
 msgid "Stop dictation"
 msgstr "Lopeta sanelu"
 
+msgid "Stop voice edit"
+msgstr "Pysäytä äänimuokkaus"
+
 msgid "System is busy. Please wait."
 msgstr "Järjestelmä on varattu. Odota hetki."
 
@@ -493,6 +523,18 @@ msgstr "Litterointi - Järjestelmäkehote"
 msgid "Transcription - User Prompt"
 msgstr "Litterointi - Käyttäjäkehote"
 
+msgid "Transform"
+msgstr "Muunna"
+
+msgid "Transformation - System Prompt"
+msgstr "Muunnos - Järjestelmäkehote"
+
+msgid "Transformation - User Prompt"
+msgstr "Muunnos - Käyttäjäkehote"
+
+msgid "Translate to output language"
+msgstr "Käännä tulostuskielelle"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "Paikallisen tai etä-Ollama-palvelimen URL-osoite."
 
@@ -513,6 +555,9 @@ msgstr "Näytä lokitiedosto"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "Äänisanelut muunnettuna jäsennellyiksi muistiinpanoiksi"
+
+msgid "Voice edit"
+msgstr "Äänimuokkaus"
 
 msgid "Yesterday"
 msgstr "Eilen"

@@ -37,7 +37,21 @@ def _load_speech() -> np.ndarray:
 def test_recorder_init() -> None:
     recorder = AudioRecorder(channels=2)
     assert recorder.channels == 2
+    assert recorder.rms == 0.0
     assert recorder._stream is None
+
+
+def test_callback_updates_rms() -> None:
+    recorder = AudioRecorder(channels=1)
+    assert recorder.rms == 0.0
+
+    chunk = np.array([[0.3], [-0.3], [0.4], [-0.4]], dtype=np.float32)
+    recorder._on_audio(chunk, 4, None, None)
+    expected_rms = float(np.sqrt(np.mean(chunk * chunk)))
+    assert recorder.rms == pytest.approx(expected_rms)
+
+    recorder._on_audio(np.empty((0, 1), dtype=np.float32), 0, None, None)
+    assert recorder.rms == 0.0
 
 
 @patch("sounddevice.InputStream")

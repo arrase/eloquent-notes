@@ -55,6 +55,9 @@ msgstr "Налаштування захоплення аудіо"
 msgid "Audio Channels:"
 msgstr "Аудіоканали:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "Автоматично додавати слова, виправлені в редакторі нотаток, до власного словника."
+
 msgid "Backup Count:"
 msgstr "Кількість резервних копій:"
 
@@ -66,6 +69,9 @@ msgstr "Частота сигналу:"
 
 msgid "Browse..."
 msgstr "Огляд..."
+
+msgid "Bullet list"
+msgstr "Маркований список"
 
 msgid "Cancel"
 msgstr "Скасувати"
@@ -114,6 +120,9 @@ msgstr "Не вдалося зупинити запис: {error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "Створює запис автозапуску в каталозі автозапуску XDG"
+
+msgid "Custom Vocabulary"
+msgstr "Власний словник"
 
 msgid "Decision"
 msgstr "Рішення"
@@ -211,6 +220,9 @@ msgstr "Неправильне значення конфігурації для 
 msgid "Keep Alive Time:"
 msgstr "Час Keep Alive:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "Вивчати власний словник із ручних редагувань нотаток"
+
 msgid "Log File"
 msgstr "Файл журналу"
 
@@ -222,6 +234,15 @@ msgstr "Рівень логування:"
 
 msgid "Logging Settings"
 msgstr "Налаштування логування"
+
+msgid "Make casual"
+msgstr "Зробити невимушеним"
+
+msgid "Make concise"
+msgstr "Зробити стислим"
+
+msgid "Make formal"
+msgstr "Зробити офіційним"
 
 msgid "Max Log File Size:"
 msgstr "Макс. розмір файлу журналу:"
@@ -270,6 +291,9 @@ msgstr "Нотатка"
 
 msgid "Note Saved"
 msgstr "Нотатку збережено"
+
+msgid "Note Transformed"
+msgstr "Нотатку перетворено"
 
 msgid "Note Type Colors"
 msgstr "Кольори типів нотаток"
@@ -351,6 +375,9 @@ msgstr "Промпти"
 
 msgid "Prompts:"
 msgstr "Промпти:"
+
+msgid "Proofread"
+msgstr "Вичитати текст"
 
 msgid "Question"
 msgstr "Питання"
@@ -445,6 +472,9 @@ msgstr "Стерео (2 канали)"
 msgid "Stop dictation"
 msgstr "Зупинити диктування"
 
+msgid "Stop voice edit"
+msgstr "Зупинити голосове редагування"
+
 msgid "System is busy. Please wait."
 msgstr "Система зайнята. Зачекайте, будь ласка."
 
@@ -493,6 +523,18 @@ msgstr "Транскрипція — Системний промпт"
 msgid "Transcription - User Prompt"
 msgstr "Транскрипція — Промпт користувача"
 
+msgid "Transform"
+msgstr "Перетворити"
+
+msgid "Transformation - System Prompt"
+msgstr "Перетворення - Системний промпт"
+
+msgid "Transformation - User Prompt"
+msgstr "Перетворення - Користувацький промпт"
+
+msgid "Translate to output language"
+msgstr "Перекласти мовою виводу"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "URL вашого локального або віддаленого сервера Ollama."
 
@@ -513,6 +555,9 @@ msgstr "Переглянути файл журналу"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "Голосові диктування, перетворені на впорядковані нотатки"
+
+msgid "Voice edit"
+msgstr "Голосове редагування"
 
 msgid "Yesterday"
 msgstr "Учора"

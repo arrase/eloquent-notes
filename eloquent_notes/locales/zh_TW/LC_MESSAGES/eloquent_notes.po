@@ -55,6 +55,9 @@ msgstr "音訊擷取設定"
 msgid "Audio Channels:"
 msgstr "音訊聲道："
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "自動將在筆記編輯器中更正的詞語新增至自訂詞彙表。"
+
 msgid "Backup Count:"
 msgstr "備份數量："
 
@@ -66,6 +69,9 @@ msgstr "提示音頻率："
 
 msgid "Browse..."
 msgstr "瀏覽..."
+
+msgid "Bullet list"
+msgstr "項目符號清單"
 
 msgid "Cancel"
 msgstr "取消"
@@ -114,6 +120,9 @@ msgstr "無法停止錄音：{error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "在 XDG 自動啟動目錄中建立桌面自動啟動項目"
+
+msgid "Custom Vocabulary"
+msgstr "自訂詞彙表"
 
 msgid "Decision"
 msgstr "決定"
@@ -211,6 +220,9 @@ msgstr "'{key}' 的設定值無效"
 msgid "Keep Alive Time:"
 msgstr "保持活動時間："
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "從手動筆記編輯中學習自訂詞彙"
+
 msgid "Log File"
 msgstr "日誌檔案"
 
@@ -222,6 +234,15 @@ msgstr "日誌等級："
 
 msgid "Logging Settings"
 msgstr "日誌設定"
+
+msgid "Make casual"
+msgstr "轉為口語化"
+
+msgid "Make concise"
+msgstr "精簡內容"
+
+msgid "Make formal"
+msgstr "轉為正式語氣"
 
 msgid "Max Log File Size:"
 msgstr "最大日誌檔案大小："
@@ -270,6 +291,9 @@ msgstr "筆記"
 
 msgid "Note Saved"
 msgstr "筆記已儲存"
+
+msgid "Note Transformed"
+msgstr "筆記已轉換"
 
 msgid "Note Type Colors"
 msgstr "筆記類型顏色"
@@ -351,6 +375,9 @@ msgstr "提示詞"
 
 msgid "Prompts:"
 msgstr "提示詞："
+
+msgid "Proofread"
+msgstr "校對潤飾"
 
 msgid "Question"
 msgstr "問題"
@@ -445,6 +472,9 @@ msgstr "立體聲（2 聲道）"
 msgid "Stop dictation"
 msgstr "停止聽寫"
 
+msgid "Stop voice edit"
+msgstr "停止語音編輯"
+
 msgid "System is busy. Please wait."
 msgstr "系統忙碌中，請稍候。"
 
@@ -493,6 +523,18 @@ msgstr "轉錄 - 系統提示詞"
 msgid "Transcription - User Prompt"
 msgstr "轉錄 - 使用者提示詞"
 
+msgid "Transform"
+msgstr "轉換"
+
+msgid "Transformation - System Prompt"
+msgstr "轉換 - 系統提示詞"
+
+msgid "Transformation - User Prompt"
+msgstr "轉換 - 使用者提示詞"
+
+msgid "Translate to output language"
+msgstr "翻譯為輸出語言"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "本機或遠端 Ollama 伺服器的 URL。"
 
@@ -513,6 +555,9 @@ msgstr "檢視日誌檔案"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "將語音聽寫轉化為井然有序的筆記"
+
+msgid "Voice edit"
+msgstr "語音編輯"
 
 msgid "Yesterday"
 msgstr "昨天"

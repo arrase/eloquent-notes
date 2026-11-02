@@ -55,6 +55,9 @@ msgstr "ऑडियो कैप्चर सेटिंग्स"
 msgid "Audio Channels:"
 msgstr "ऑडियो चैनल:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "नोट संपादक में सुधारे गए शब्दों को स्वचालित रूप से कस्टम शब्दावली में जोड़ें।"
+
 msgid "Backup Count:"
 msgstr "बैकअप संख्या:"
 
@@ -66,6 +69,9 @@ msgstr "बीप आवृत्ति:"
 
 msgid "Browse..."
 msgstr "ब्राउज़ करें..."
+
+msgid "Bullet list"
+msgstr "बुलेट सूची"
 
 msgid "Cancel"
 msgstr "रद्द करें"
@@ -114,6 +120,9 @@ msgstr "रिकॉर्डिंग बंद नहीं हो सकी: 
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "XDG ऑटोस्टार्ट निर्देशिका में डेस्कटॉप ऑटोस्टार्ट प्रविष्टि बनाता है"
+
+msgid "Custom Vocabulary"
+msgstr "कस्टम शब्दावली"
 
 msgid "Decision"
 msgstr "निर्णय"
@@ -211,6 +220,9 @@ msgstr "'{key}' के लिए अमान्य कॉन्फ़िगर�
 msgid "Keep Alive Time:"
 msgstr "Keep Alive समय:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "मैनुअल नोट संपादनों से कस्टम शब्दावली सीखें"
+
 msgid "Log File"
 msgstr "लॉग फ़ाइल"
 
@@ -222,6 +234,15 @@ msgstr "लॉगिंग स्तर:"
 
 msgid "Logging Settings"
 msgstr "लॉगिंग सेटिंग्स"
+
+msgid "Make casual"
+msgstr "अनौपचारिक बनाएं"
+
+msgid "Make concise"
+msgstr "संक्षिप्त बनाएं"
+
+msgid "Make formal"
+msgstr "औपचारिक बनाएं"
 
 msgid "Max Log File Size:"
 msgstr "अधिकतम लॉग फ़ाइल आकार:"
@@ -270,6 +291,9 @@ msgstr "नोट"
 
 msgid "Note Saved"
 msgstr "नोट सहेजा गया"
+
+msgid "Note Transformed"
+msgstr "नोट रूपांतरित किया गया"
 
 msgid "Note Type Colors"
 msgstr "नोट प्रकार के रंग"
@@ -351,6 +375,9 @@ msgstr "प्रॉम्प्ट्स"
 
 msgid "Prompts:"
 msgstr "प्रॉम्प्ट्स:"
+
+msgid "Proofread"
+msgstr "प्रूफ़रीड करें"
 
 msgid "Question"
 msgstr "प्रश्न"
@@ -445,6 +472,9 @@ msgstr "स्टीरियो (2 चैनल)"
 msgid "Stop dictation"
 msgstr "डिक्टेशन रोकें"
 
+msgid "Stop voice edit"
+msgstr "वॉइस संपादन रोकें"
+
 msgid "System is busy. Please wait."
 msgstr "सिस्टम व्यस्त है। कृपया प्रतीक्षा करें।"
 
@@ -493,6 +523,18 @@ msgstr "ट्रांसक्रिप्शन - सिस्टम प्�
 msgid "Transcription - User Prompt"
 msgstr "ट्रांसक्रिप्शन - उपयोगकर्ता प्रॉम्प्ट"
 
+msgid "Transform"
+msgstr "रूपांतरित करें"
+
+msgid "Transformation - System Prompt"
+msgstr "रूपांतरण - सिस्टम प्रॉम्प्ट"
+
+msgid "Transformation - User Prompt"
+msgstr "रूपांतरण - उपयोगकर्ता प्रॉम्प्ट"
+
+msgid "Translate to output language"
+msgstr "आउटपुट भाषा में अनुवाद करें"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "आपके स्थानीय या दूरस्थ Ollama सर्वर का URL।"
 
@@ -513,6 +555,9 @@ msgstr "लॉग फ़ाइल देखें"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "वॉयस डिक्टेशन को व्यवस्थित नोट्स में बदला गया"
+
+msgid "Voice edit"
+msgstr "वॉइस संपादन"
 
 msgid "Yesterday"
 msgstr "कल"

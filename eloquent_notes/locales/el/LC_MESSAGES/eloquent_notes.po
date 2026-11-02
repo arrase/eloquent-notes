@@ -55,6 +55,9 @@ msgstr "Ρυθμίσεις λήψης ήχου"
 msgid "Audio Channels:"
 msgstr "Κανάλια ήχου:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "Αυτόματη προσθήκη λέξεων που διορθώθηκαν στον επεξεργαστή σημειώσεων στο προσαρμοσμένο λεξιλόγιο."
+
 msgid "Backup Count:"
 msgstr "Αριθμός αντιγράφων:"
 
@@ -66,6 +69,9 @@ msgstr "Συχνότητα ηχητικού σήματος:"
 
 msgid "Browse..."
 msgstr "Αναζήτηση..."
+
+msgid "Bullet list"
+msgstr "Λίστα με κουκκίδες"
 
 msgid "Cancel"
 msgstr "Ακύρωση"
@@ -114,6 +120,9 @@ msgstr "Δεν ήταν δυνατή η διακοπή εγγραφής: {error}
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "Δημιουργεί μια καταχώριση αυτόματης εκκίνησης στον κατάλογο XDG autostart"
+
+msgid "Custom Vocabulary"
+msgstr "Προσαρμοσμένο λεξιλόγιο"
 
 msgid "Decision"
 msgstr "Απόφαση"
@@ -211,6 +220,9 @@ msgstr "Μη έγκυρη τιμή ρύθμισης για το '{key}'"
 msgid "Keep Alive Time:"
 msgstr "Χρόνος Keep Alive:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "Εκμάθηση προσαρμοσμένου λεξιλογίου από χειροκίνητες επεξεργασίες σημειώσεων"
+
 msgid "Log File"
 msgstr "Αρχείο καταγραφής"
 
@@ -222,6 +234,15 @@ msgstr "Επίπεδο καταγραφής:"
 
 msgid "Logging Settings"
 msgstr "Ρυθμίσεις καταγραφής"
+
+msgid "Make casual"
+msgstr "Ανεπίσημο ύφος"
+
+msgid "Make concise"
+msgstr "Πιο συνοπτικό"
+
+msgid "Make formal"
+msgstr "Επίσημο ύφος"
 
 msgid "Max Log File Size:"
 msgstr "Μέγ. μέγεθος αρχείου καταγραφής:"
@@ -270,6 +291,9 @@ msgstr "Σημείωση"
 
 msgid "Note Saved"
 msgstr "Η σημείωση αποθηκεύτηκε"
+
+msgid "Note Transformed"
+msgstr "Η σημείωση μετασχηματίστηκε"
 
 msgid "Note Type Colors"
 msgstr "Χρώματα τύπων σημειώσεων"
@@ -351,6 +375,9 @@ msgstr "Προτροπές"
 
 msgid "Prompts:"
 msgstr "Προτροπές:"
+
+msgid "Proofread"
+msgstr "Διόρθωση κειμένου"
 
 msgid "Question"
 msgstr "Ερώτηση"
@@ -445,6 +472,9 @@ msgstr "Στερεοφωνικό (2 κανάλια)"
 msgid "Stop dictation"
 msgstr "Διακοπή υπαγόρευσης"
 
+msgid "Stop voice edit"
+msgstr "Διακοπή φωνητικής επεξεργασίας"
+
 msgid "System is busy. Please wait."
 msgstr "Το σύστημα είναι απασχολημένο. Παρακαλώ περιμένετε."
 
@@ -493,6 +523,18 @@ msgstr "Μεταγραφή - Προτροπή συστήματος"
 msgid "Transcription - User Prompt"
 msgstr "Μεταγραφή - Προτροπή χρήστη"
 
+msgid "Transform"
+msgstr "Μετασχηματισμός"
+
+msgid "Transformation - System Prompt"
+msgstr "Μετασχηματισμός - Προτροπή συστήματος"
+
+msgid "Transformation - User Prompt"
+msgstr "Μετασχηματισμός - Προτροπή χρήστη"
+
+msgid "Translate to output language"
+msgstr "Μετάφραση στη γλώσσα εξόδου"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "URL του τοπικού ή απομακρυσμένου διακομιστή Ollama."
 
@@ -513,6 +555,9 @@ msgstr "Προβολή αρχείου καταγραφής"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "Φωνητικές υπαγορεύσεις που μετατρέπονται σε οργανωμένες σημειώσεις"
+
+msgid "Voice edit"
+msgstr "Φωνητική επεξεργασία"
 
 msgid "Yesterday"
 msgstr "Χθες"

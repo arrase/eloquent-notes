@@ -55,6 +55,9 @@ msgstr "오디오 캡처 설정"
 msgid "Audio Channels:"
 msgstr "오디오 채널:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "노트 편집기에서 수정된 단어를 사용자 지정 어휘에 자동으로 추가합니다."
+
 msgid "Backup Count:"
 msgstr "백업 개수:"
 
@@ -66,6 +69,9 @@ msgstr "알림음 주파수:"
 
 msgid "Browse..."
 msgstr "찾아보기..."
+
+msgid "Bullet list"
+msgstr "글머리 기호 목록"
 
 msgid "Cancel"
 msgstr "취소"
@@ -114,6 +120,9 @@ msgstr "녹음을 중지할 수 없습니다: {error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "XDG 자동 시작 디렉터리에 데스크톱 자동 시작 항목을 생성합니다"
+
+msgid "Custom Vocabulary"
+msgstr "사용자 지정 어휘"
 
 msgid "Decision"
 msgstr "결정"
@@ -211,6 +220,9 @@ msgstr "'{key}'에 대한 잘못된 구성 값"
 msgid "Keep Alive Time:"
 msgstr "Keep Alive 시간:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "수동 노트 편집에서 사용자 지정 어휘 학습"
+
 msgid "Log File"
 msgstr "로그 파일"
 
@@ -222,6 +234,15 @@ msgstr "로깅 수준:"
 
 msgid "Logging Settings"
 msgstr "로깅 설정"
+
+msgid "Make casual"
+msgstr "자연스럽게 작성"
+
+msgid "Make concise"
+msgstr "간결하게 작성"
+
+msgid "Make formal"
+msgstr "격식 있게 작성"
 
 msgid "Max Log File Size:"
 msgstr "최대 로그 파일 크기:"
@@ -270,6 +291,9 @@ msgstr "노트"
 
 msgid "Note Saved"
 msgstr "노트 저장됨"
+
+msgid "Note Transformed"
+msgstr "노트 변환됨"
 
 msgid "Note Type Colors"
 msgstr "노트 유형 색상"
@@ -351,6 +375,9 @@ msgstr "프롬프트"
 
 msgid "Prompts:"
 msgstr "프롬프트:"
+
+msgid "Proofread"
+msgstr "맞춤법 및 문장 교정"
 
 msgid "Question"
 msgstr "질문"
@@ -445,6 +472,9 @@ msgstr "스테레오 (2채널)"
 msgid "Stop dictation"
 msgstr "받아쓰기 중지"
 
+msgid "Stop voice edit"
+msgstr "음성 편집 중지"
+
 msgid "System is busy. Please wait."
 msgstr "시스템이 사용 중입니다. 잠시만 기다려 주세요."
 
@@ -493,6 +523,18 @@ msgstr "전사 - 시스템 프롬프트"
 msgid "Transcription - User Prompt"
 msgstr "전사 - 사용자 프롬프트"
 
+msgid "Transform"
+msgstr "변환"
+
+msgid "Transformation - System Prompt"
+msgstr "변환 - 시스템 프롬프트"
+
+msgid "Transformation - User Prompt"
+msgstr "변환 - 사용자 프롬프트"
+
+msgid "Translate to output language"
+msgstr "출력 언어로 번역"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "로컬 또는 원격 Ollama 서버의 URL입니다."
 
@@ -513,6 +555,9 @@ msgstr "로그 파일 보기"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "음성 받아쓰기를 체계적인 노트로 변환"
+
+msgid "Voice edit"
+msgstr "음성 편집"
 
 msgid "Yesterday"
 msgstr "어제"

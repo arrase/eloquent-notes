@@ -55,6 +55,9 @@ msgstr "تنظیمات ضبط صدا"
 msgid "Audio Channels:"
 msgstr "کانال‌های صوتی:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "افزودن خودکار واژه‌های اصلاح‌شده در ویرایشگر یادداشت به واژگان سفارشی."
+
 msgid "Backup Count:"
 msgstr "تعداد نسخه‌های پشتیبان:"
 
@@ -66,6 +69,9 @@ msgstr "فرکانس بوق:"
 
 msgid "Browse..."
 msgstr "مرور..."
+
+msgid "Bullet list"
+msgstr "فهرست گلوله‌ای"
 
 msgid "Cancel"
 msgstr "انصراف"
@@ -114,6 +120,9 @@ msgstr "توقف ضبط امکان‌پذیر نبود: {error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "یک ورودی راه‌اندازی خودکار دسکتاپ در پوشه راه‌اندازی خودکار XDG ایجاد می‌کند"
+
+msgid "Custom Vocabulary"
+msgstr "واژگان سفارشی"
 
 msgid "Decision"
 msgstr "تصمیم"
@@ -211,6 +220,9 @@ msgstr "مقدار پیکربندی نامعتبر برای '{key}'"
 msgid "Keep Alive Time:"
 msgstr "زمان نگه‌داری در حافظه:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "یادگیری واژگان سفارشی از ویرایش‌های دستی یادداشت‌ها"
+
 msgid "Log File"
 msgstr "فایل گزارش"
 
@@ -222,6 +234,15 @@ msgstr "سطح گزارش‌گیری:"
 
 msgid "Logging Settings"
 msgstr "تنظیمات گزارش‌گیری"
+
+msgid "Make casual"
+msgstr "لحن صمیمی"
+
+msgid "Make concise"
+msgstr "مختصر کردن"
+
+msgid "Make formal"
+msgstr "لحن رسمی"
 
 msgid "Max Log File Size:"
 msgstr "حداکثر اندازه فایل گزارش:"
@@ -270,6 +291,9 @@ msgstr "یادداشت"
 
 msgid "Note Saved"
 msgstr "یادداشت ذخیره شد"
+
+msgid "Note Transformed"
+msgstr "یادداشت تبدیل شد"
 
 msgid "Note Type Colors"
 msgstr "رنگ‌های نوع یادداشت"
@@ -351,6 +375,9 @@ msgstr "پرامپت‌ها"
 
 msgid "Prompts:"
 msgstr "پرامپت‌ها:"
+
+msgid "Proofread"
+msgstr "ویرایش و بازخوانی"
 
 msgid "Question"
 msgstr "پرسش"
@@ -445,6 +472,9 @@ msgstr "استریو (۲ کانال)"
 msgid "Stop dictation"
 msgstr "توقف دیکته"
 
+msgid "Stop voice edit"
+msgstr "توقف ویرایش صوتی"
+
 msgid "System is busy. Please wait."
 msgstr "سیستم مشغول است. لطفاً صبر کنید."
 
@@ -493,6 +523,18 @@ msgstr "رونویسی - پرامپت سیستم"
 msgid "Transcription - User Prompt"
 msgstr "رونویسی - پرامپت کاربر"
 
+msgid "Transform"
+msgstr "تبدیل"
+
+msgid "Transformation - System Prompt"
+msgstr "تبدیل - اعلان سیستم"
+
+msgid "Transformation - User Prompt"
+msgstr "تبدیل - اعلان کاربر"
+
+msgid "Translate to output language"
+msgstr "ترجمه به زبان خروجی"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "نشانی سرور محلی یا راه‌دور Ollama شما."
 
@@ -513,6 +555,9 @@ msgstr "مشاهده فایل گزارش"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "دیکته‌های صوتی تبدیل‌شده به یادداشت‌های منظم"
+
+msgid "Voice edit"
+msgstr "ویرایش صوتی"
 
 msgid "Yesterday"
 msgstr "دیروز"

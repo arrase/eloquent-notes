@@ -55,6 +55,9 @@ msgstr "Настройки за запис на аудио"
 msgid "Audio Channels:"
 msgstr "Аудио канали:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "Автоматично добавяне на коригираните в редактора на бележки думи към потребителския речник."
+
 msgid "Backup Count:"
 msgstr "Брой резервни копия:"
 
@@ -66,6 +69,9 @@ msgstr "Честота на сигнала:"
 
 msgid "Browse..."
 msgstr "Преглед..."
+
+msgid "Bullet list"
+msgstr "Списък с водещи символи"
 
 msgid "Cancel"
 msgstr "Отказ"
@@ -114,6 +120,9 @@ msgstr "Неуспешно спиране на записа: {error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "Създава запис за автоматично стартиране в директорията XDG autostart"
+
+msgid "Custom Vocabulary"
+msgstr "Потребителски речник"
 
 msgid "Decision"
 msgstr "Решение"
@@ -211,6 +220,9 @@ msgstr "Невалидна конфигурационна стойност за 
 msgid "Keep Alive Time:"
 msgstr "Време за Keep Alive:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "Заучаване на потребителски речник от ръчни редакции на бележки"
+
 msgid "Log File"
 msgstr "Лог файл"
 
@@ -222,6 +234,15 @@ msgstr "Ниво на логване:"
 
 msgid "Logging Settings"
 msgstr "Настройки за логване"
+
+msgid "Make casual"
+msgstr "Направи разговорен"
+
+msgid "Make concise"
+msgstr "Направи кратък"
+
+msgid "Make formal"
+msgstr "Направи официален"
 
 msgid "Max Log File Size:"
 msgstr "Макс. размер на лог файла:"
@@ -270,6 +291,9 @@ msgstr "Бележка"
 
 msgid "Note Saved"
 msgstr "Бележката е запазена"
+
+msgid "Note Transformed"
+msgstr "Бележката е трансформирана"
 
 msgid "Note Type Colors"
 msgstr "Цветове на типовете бележки"
@@ -351,6 +375,9 @@ msgstr "Промптове"
 
 msgid "Prompts:"
 msgstr "Промптове:"
+
+msgid "Proofread"
+msgstr "Корекция"
 
 msgid "Question"
 msgstr "Въпрос"
@@ -445,6 +472,9 @@ msgstr "Стерео (2 канала)"
 msgid "Stop dictation"
 msgstr "Спри диктовката"
 
+msgid "Stop voice edit"
+msgstr "Спри гласовата редакция"
+
 msgid "System is busy. Please wait."
 msgstr "Системата е заета. Моля, изчакайте."
 
@@ -493,6 +523,18 @@ msgstr "Транскрипция – Системен промпт"
 msgid "Transcription - User Prompt"
 msgstr "Транскрипция – Потребителски промпт"
 
+msgid "Transform"
+msgstr "Трансформиране"
+
+msgid "Transformation - System Prompt"
+msgstr "Трансформиране - Системен промпт"
+
+msgid "Transformation - User Prompt"
+msgstr "Трансформиране - Потребителски промпт"
+
+msgid "Translate to output language"
+msgstr "Превод на изходния език"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "URL адрес на вашия локален или отдалечен Ollama сървър."
 
@@ -513,6 +555,9 @@ msgstr "Преглед на лог файла"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "Гласови диктовки, превърнати в организирани бележки"
+
+msgid "Voice edit"
+msgstr "Гласова редакция"
 
 msgid "Yesterday"
 msgstr "Вчера"

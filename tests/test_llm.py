@@ -105,6 +105,8 @@ def test_execute_ollama_json_request_without_context_length(mock_post: MagicMock
     options = mock_post.call_args.kwargs["json"]["options"]
     assert "num_ctx" not in options
     assert options["temperature"] == 0.0
+    assert options["num_predict"] == 4096
+    assert llm.DEFAULT_NUM_PREDICT == 4096
 
 
 @patch("eloquent_notes.llm.requests.post")
@@ -574,6 +576,36 @@ def test_tag_note(mock_exec: MagicMock) -> None:
     assert llm.TAGGING_SCHEMA["required"] == ["tags"]
 
 
+@patch("eloquent_notes.llm._execute_ollama_json_request")
+def test_transform_text(mock_exec: MagicMock) -> None:
+    mock_exec.return_value = {"content": "Transformed text"}
+
+    res = llm.transform_text(
+        ollama_url="http://localhost:11434",
+        model="gemma",
+        system_prompt="sys transform",
+        user_prompt="usr transform",
+        retry_prompt="retry prompt",
+        context_length=2048,
+        keep_alive="0",
+        max_retries=3,
+        timeout=300,
+    )
+
+    assert res == {"content": "Transformed text"}
+    mock_exec.assert_called_once()
+    kwargs = mock_exec.call_args.kwargs
+    assert kwargs["model"] == "gemma"
+    assert kwargs["messages"][0] == {"role": "system", "content": "sys transform"}
+    assert kwargs["messages"][1] == {"role": "user", "content": "usr transform"}
+    assert kwargs["format_schema"] is llm.TRANSFORM_SCHEMA
+    assert kwargs["task_name"] == "text transformation"
+    assert llm.TRANSFORM_SCHEMA["required"] == ["content"]
+
+    with pytest.raises(ValueError, match="field 'content' must not be empty"):
+        llm._parse_json_response('{"content": "   "}', llm.TRANSFORM_SCHEMA)
+
+
 @patch("eloquent_notes.llm.requests.post")
 def test_embed(mock_post: MagicMock) -> None:
     mock_post.return_value.json.return_value = {"embeddings": [[0.1, 0.2], [0.3, 0.4]]}
@@ -593,3 +625,87 @@ def test_embed(mock_post: MagicMock) -> None:
         timeout=30,
     )
     mock_post.return_value.raise_for_status.assert_called_once()
+
+
+def test_has_repeating_loop() -> None:
+    assert llm.has_repeating_loop("") is False
+    assert llm.has_repeating_loop("Normal note text with some repeated words like test and test.") is False
+    assert llm.has_repeating_loop("hola " * 5) is True
+    assert llm.has_repeating_loop("Intro text. " + "This phrase repeats over and over. " * 6) is True
+
+
+def test_repeating_loop_rejected_and_triggers_retry() -> None:
+    looping_json = '{"transcription": "' + "palabra " * 6 + '", "empty": false}'
+    with pytest.raises(ValueError, match="field 'transcription' contains a runaway repeating loop"):
+        llm._parse_json_response(looping_json, llm.TRANSCRIPTION_SCHEMA)
+
+    resp1 = MagicMock()
+    resp1.raise_for_status.return_value = None
+    resp1.json.return_value = {"message": {"content": looping_json}}
+
+    resp2 = MagicMock()
+    resp2.raise_for_status.return_value = None
+    resp2.json.return_value = {"message": {"content": '{"transcription": "Clean text", "empty": false}'}}
+
+    with patch("eloquent_notes.llm.requests.post", side_effect=[resp1, resp2]) as mock_post:
+        res = llm._execute_ollama_json_request(
+            ollama_url="http://localhost:11434",
+            model="gemma",
+            messages=[{"role": "user", "content": "hi"}],
+            format_schema=llm.TRANSCRIPTION_SCHEMA,
+            retry_prompt="retry",
+            context_length=4096,
+            keep_alive="5m",
+            max_retries=1,
+            timeout=30,
+            task_name="loop test",
+        )
+
+    assert res == {"transcription": "Clean text", "empty": False}
+    assert mock_post.call_count == 2
+
+
+def test_split_overlapping_windows_short_text() -> None:
+    assert llm.CHUNK_THRESHOLD == 3000
+    assert llm.CHUNK_WINDOW_SIZE == 3500
+    assert llm.CHUNK_OVERLAP == 500
+
+    short_text = "Short note text."
+    assert llm.split_overlapping_windows(short_text) == [("", short_text)]
+
+    boundary_text = "a" * llm.CHUNK_THRESHOLD
+    assert llm.split_overlapping_windows(boundary_text) == [("", boundary_text)]
+
+
+def test_split_overlapping_windows_long_text_word_boundaries_and_overlap() -> None:
+    words = [f"word{i:04d}" for i in range(600)]
+    long_text = " ".join(words)
+    assert len(long_text) > llm.CHUNK_THRESHOLD
+
+    windows = llm.split_overlapping_windows(long_text)
+    assert len(windows) == 2
+
+    first_overlap, first_chunk = windows[0]
+    second_overlap, second_chunk = windows[1]
+
+    assert first_overlap == ""
+    assert len(first_chunk) <= llm.CHUNK_THRESHOLD
+    assert first_chunk.endswith(" ")
+    assert not second_chunk.startswith(" ")
+
+    # Concatenating chunk_text parts reconstructs the full text without loss or duplication
+    assert "".join(chunk for _, chunk in windows) == long_text
+
+    # Second window receives tail of first chunk aligned to word boundary
+    assert 0 < len(second_overlap) <= llm.CHUNK_OVERLAP
+    assert first_chunk.strip().endswith(second_overlap)
+    assert second_overlap.startswith("word")
+
+
+def test_split_overlapping_windows_small_chunk_overlap() -> None:
+    text = "alpha beta gamma delta epsilon zeta"
+    windows = llm.split_overlapping_windows(text, threshold=15, window=50, overlap=25)
+    assert len(windows) >= 2
+    assert windows[0][0] == ""
+    assert windows[1][0] == windows[0][1].strip()
+    assert "".join(chunk for _, chunk in windows) == text

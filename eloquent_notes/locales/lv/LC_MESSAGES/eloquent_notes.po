@@ -55,6 +55,9 @@ msgstr "Audio tveršanas iestatījumi"
 msgid "Audio Channels:"
 msgstr "Audio kanāli:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "Automātiski pievienot piezīmju redaktorā izlabotos vārdus pielāgotajai vārdnīcai."
+
 msgid "Backup Count:"
 msgstr "Dublējumu skaits:"
 
@@ -66,6 +69,9 @@ msgstr "Signāla frekvence:"
 
 msgid "Browse..."
 msgstr "Pārlūkot..."
+
+msgid "Bullet list"
+msgstr "Aizzīmēts saraksts"
 
 msgid "Cancel"
 msgstr "Atcelt"
@@ -114,6 +120,9 @@ msgstr "Nevarēja apturēt ierakstīšanu: {error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "Izveido darbvirsmas automātiskās palaišanas ierakstu XDG automātiskās palaišanas direktorijā"
+
+msgid "Custom Vocabulary"
+msgstr "Pielāgota vārdnīca"
 
 msgid "Decision"
 msgstr "Lēmums"
@@ -211,6 +220,9 @@ msgstr "Nederīga konfigurācijas vērtība atslēgai '{key}'"
 msgid "Keep Alive Time:"
 msgstr "Uzturēšanas laiks atmiņā:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "Apgūt pielāgotu vārdnīcu no manuāliem piezīmju labojumiem"
+
 msgid "Log File"
 msgstr "Žurnāla fails"
 
@@ -222,6 +234,15 @@ msgstr "Reģistrēšanas līmenis:"
 
 msgid "Logging Settings"
 msgstr "Reģistrēšanas iestatījumi"
+
+msgid "Make casual"
+msgstr "Padarīt neformālu"
+
+msgid "Make concise"
+msgstr "Padarīt kodolīgu"
+
+msgid "Make formal"
+msgstr "Padarīt formālu"
 
 msgid "Max Log File Size:"
 msgstr "Maks. žurnāla faila izmērs:"
@@ -270,6 +291,9 @@ msgstr "Piezīme"
 
 msgid "Note Saved"
 msgstr "Piezīme saglabāta"
+
+msgid "Note Transformed"
+msgstr "Piezīme pārveidota"
 
 msgid "Note Type Colors"
 msgstr "Piezīmju veidu krāsas"
@@ -351,6 +375,9 @@ msgstr "Uzvednes"
 
 msgid "Prompts:"
 msgstr "Uzvednes:"
+
+msgid "Proofread"
+msgstr "Koriģēt"
 
 msgid "Question"
 msgstr "Jautājums"
@@ -445,6 +472,9 @@ msgstr "Stereo (2 kanāli)"
 msgid "Stop dictation"
 msgstr "Apturēt diktātu"
 
+msgid "Stop voice edit"
+msgstr "Apturēt balss rediģēšanu"
+
 msgid "System is busy. Please wait."
 msgstr "Sistēma ir aizņemta. Lūdzu, uzgaidiet."
 
@@ -493,6 +523,18 @@ msgstr "Transkripcija – sistēmas uzvedne"
 msgid "Transcription - User Prompt"
 msgstr "Transkripcija – lietotāja uzvedne"
 
+msgid "Transform"
+msgstr "Pārveidot"
+
+msgid "Transformation - System Prompt"
+msgstr "Pārveidošana - Sistēmas uzvedne"
+
+msgid "Transformation - User Prompt"
+msgstr "Pārveidošana - Lietotāja uzvedne"
+
+msgid "Translate to output language"
+msgstr "Tulkot izvades valodā"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "Vietējā vai attālā Ollama servera URL."
 
@@ -513,6 +555,9 @@ msgstr "Skatīt žurnāla failu"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "Balss diktāti, kas pārvērsti sakārtotās piezīmēs"
+
+msgid "Voice edit"
+msgstr "Balss rediģēšana"
 
 msgid "Yesterday"
 msgstr "Vakar"

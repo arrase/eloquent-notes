@@ -55,6 +55,9 @@ msgstr "音声キャプチャ設定"
 msgid "Audio Channels:"
 msgstr "音声チャンネル:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "ノートエディタで修正された単語をカスタム語彙に自動的に追加します。"
+
 msgid "Backup Count:"
 msgstr "バックアップ数:"
 
@@ -66,6 +69,9 @@ msgstr "ビープ音の周波数:"
 
 msgid "Browse..."
 msgstr "参照..."
+
+msgid "Bullet list"
+msgstr "箇条書きリスト"
 
 msgid "Cancel"
 msgstr "キャンセル"
@@ -114,6 +120,9 @@ msgstr "録音を停止できませんでした: {error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "XDG自動起動ディレクトリにデスクトップ自動起動エントリを作成します"
+
+msgid "Custom Vocabulary"
+msgstr "カスタム語彙"
 
 msgid "Decision"
 msgstr "決定事項"
@@ -211,6 +220,9 @@ msgstr "'{key}' の設定値が無効です"
 msgid "Keep Alive Time:"
 msgstr "Keep Alive時間:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "ノートのハンド編集からカスタム語彙を学習する"
+
 msgid "Log File"
 msgstr "ログファイル"
 
@@ -222,6 +234,15 @@ msgstr "ログレベル:"
 
 msgid "Logging Settings"
 msgstr "ログ設定"
+
+msgid "Make casual"
+msgstr "カジュアルにする"
+
+msgid "Make concise"
+msgstr "簡潔にする"
+
+msgid "Make formal"
+msgstr "フォーマルにする"
 
 msgid "Max Log File Size:"
 msgstr "最大ログファイルサイズ:"
@@ -270,6 +291,9 @@ msgstr "ノート"
 
 msgid "Note Saved"
 msgstr "ノートを保存しました"
+
+msgid "Note Transformed"
+msgstr "ノートを変換しました"
 
 msgid "Note Type Colors"
 msgstr "ノート種別の色"
@@ -351,6 +375,9 @@ msgstr "プロンプト"
 
 msgid "Prompts:"
 msgstr "プロンプト:"
+
+msgid "Proofread"
+msgstr "校正する"
 
 msgid "Question"
 msgstr "質問"
@@ -445,6 +472,9 @@ msgstr "ステレオ (2チャンネル)"
 msgid "Stop dictation"
 msgstr "音声入力を停止"
 
+msgid "Stop voice edit"
+msgstr "音声編集を停止"
+
 msgid "System is busy. Please wait."
 msgstr "システムがビジー状態です。しばらくお待ちください。"
 
@@ -493,6 +523,18 @@ msgstr "文字起こし - システムプロンプト"
 msgid "Transcription - User Prompt"
 msgstr "文字起こし - ユーザープロンプト"
 
+msgid "Transform"
+msgstr "変換"
+
+msgid "Transformation - System Prompt"
+msgstr "変換 - システムプロンプト"
+
+msgid "Transformation - User Prompt"
+msgstr "変換 - ユーザープロンプト"
+
+msgid "Translate to output language"
+msgstr "出力言語に翻訳"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "ローカルまたはリモートのOllamaサーバーのURL。"
 
@@ -513,6 +555,9 @@ msgstr "ログファイルを表示"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "音声入力を整理されたノートに変換"
+
+msgid "Voice edit"
+msgstr "音声編集"
 
 msgid "Yesterday"
 msgstr "昨日"

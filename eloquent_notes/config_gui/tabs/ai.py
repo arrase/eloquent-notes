@@ -155,6 +155,12 @@ class AITab(QWidget):
         )
         form_layout.addRow(_form_label(_("Output Language:")), self.cmb_language)
 
+        self.chk_learn_from_edits = QCheckBox(_("Learn custom vocabulary from manual note edits"))
+        self.chk_learn_from_edits.setToolTip(
+            _("Automatically add words corrected in the note editor to the custom vocabulary.")
+        )
+        form_layout.addRow(_form_label(""), self.chk_learn_from_edits)
+
         return grp_ai
 
     def _build_search_group(self) -> QGroupBox:
@@ -263,6 +269,7 @@ class AITab(QWidget):
         self.spn_min_similarity.setValue(search_cfg["min_similarity"])
 
         self._set_combo_value(self.cmb_language, ai_cfg["output_language"])
+        self.chk_learn_from_edits.setChecked(ai_cfg["learn_from_edits"])
 
         self._fetch_models()
 
@@ -337,6 +344,7 @@ class AITab(QWidget):
                 "max_retries": self.spn_max_retries.value(),
                 "preload_timeout": self.spn_preload_timeout.value(),
                 "request_timeout": self.spn_request_timeout.value(),
+                "learn_from_edits": self.chk_learn_from_edits.isChecked(),
             }
         )
         config_data["search"].update(

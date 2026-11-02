@@ -29,7 +29,10 @@ PROMPTS = [
         ("Classification - User Prompt", config.CLASSIFICATION_USER_PROMPT_PATH),
         ("Tagging - System Prompt", config.TAGGING_SYSTEM_PROMPT_PATH),
         ("Tagging - User Prompt", config.TAGGING_USER_PROMPT_PATH),
+        ("Transformation - System Prompt", config.TRANSFORM_SYSTEM_PROMPT_PATH),
+        ("Transformation - User Prompt", config.TRANSFORM_USER_PROMPT_PATH),
         ("Retry Prompt", config.RETRY_PROMPT_PATH),
+        ("Custom Vocabulary", config.VOCABULARY_PATH),
     )
 ]
 

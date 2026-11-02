@@ -176,3 +176,25 @@ def test_parse_and_normalize_tags() -> None:
     assert notes.parse_tags(" #Work, home ,, work,  #  ") == ["work", "home"]
     assert notes.parse_tags("") == []
     assert notes.normalize_tags(["#Rust", "rust", " CLI "]) == ["rust", "cli"]
+
+
+def test_parse_vocabulary() -> None:
+    raw = "  PyQt6, Kubernetes \n\nkubernetes\n  Ollama , , gemma4  "
+    assert notes.parse_vocabulary(raw) == ["PyQt6", "Kubernetes", "Ollama", "gemma4"]
+    assert notes.parse_vocabulary("   \n , ") == []
+
+
+def test_extract_learned_words_learns_1_to_1_corrections() -> None:
+    old = "We deployed Cubernetis and used pyqt6 with Olama for 123 items."
+    new = "We deployed Kubernetes and used PyQt6 with Ollama for 456 items."
+    assert notes.extract_learned_words(old, new) == ["Kubernetes", "PyQt6", "Ollama"]
+
+
+def test_extract_learned_words_ignores_rewrites_and_unrelated_words() -> None:
+    old = "The cat sat on the mat and ate food."
+    new = "A completely different sentence with new structure and apple."
+    assert notes.extract_learned_words(old, new) == []
+    assert notes.extract_learned_words("To go", "To do") == []
+    assert notes.extract_learned_words("Deploy Cubernetis and cubernetis", "Deploy Kubernetes and kubernetes") == [
+        "Kubernetes"
+    ]

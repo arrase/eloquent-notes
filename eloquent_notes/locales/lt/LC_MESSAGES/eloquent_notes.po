@@ -55,6 +55,9 @@ msgstr "Garso įrašymo nustatymai"
 msgid "Audio Channels:"
 msgstr "Garso kanalai:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "Automatiškai įtraukti užrašų redaktoriuje ištaisytus žodžius į tinkintą žodyną."
+
 msgid "Backup Count:"
 msgstr "Atsarginių kopijų skaičius:"
 
@@ -66,6 +69,9 @@ msgstr "Pyptelėjimo dažnis:"
 
 msgid "Browse..."
 msgstr "Naršyti..."
+
+msgid "Bullet list"
+msgstr "Suženklintas sąrašas"
 
 msgid "Cancel"
 msgstr "Atšaukti"
@@ -114,6 +120,9 @@ msgstr "Nepavyko sustabdyti įrašymo: {error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "Sukuria darbalaukio automatinio paleidimo įrašą XDG automatinio paleidimo kataloge"
+
+msgid "Custom Vocabulary"
+msgstr "Tinkintas žodynas"
 
 msgid "Decision"
 msgstr "Sprendimas"
@@ -211,6 +220,9 @@ msgstr "Netinkama konfigūracijos reikšmė raktui '{key}'"
 msgid "Keep Alive Time:"
 msgstr "Palaikymo atmintyje laikas:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "Mokytis tinkinto žodyno iš rankinių užrašų taisymų"
+
 msgid "Log File"
 msgstr "Žurnalo failas"
 
@@ -222,6 +234,15 @@ msgstr "Registravimo lygis:"
 
 msgid "Logging Settings"
 msgstr "Registravimo nustatymai"
+
+msgid "Make casual"
+msgstr "Padaryti neformalų"
+
+msgid "Make concise"
+msgstr "Padaryti glaustą"
+
+msgid "Make formal"
+msgstr "Padaryti oficialų"
 
 msgid "Max Log File Size:"
 msgstr "Maks. žurnalo failo dydis:"
@@ -270,6 +291,9 @@ msgstr "Užrašas"
 
 msgid "Note Saved"
 msgstr "Užrašas išsaugotas"
+
+msgid "Note Transformed"
+msgstr "Užrašas transformuotas"
 
 msgid "Note Type Colors"
 msgstr "Užrašų tipų spalvos"
@@ -351,6 +375,9 @@ msgstr "Užklausos"
 
 msgid "Prompts:"
 msgstr "Užklausos:"
+
+msgid "Proofread"
+msgstr "Redaguoti tekstą"
 
 msgid "Question"
 msgstr "Klausimas"
@@ -445,6 +472,9 @@ msgstr "Stereo (2 kanalai)"
 msgid "Stop dictation"
 msgstr "Sustabdyti diktavimą"
 
+msgid "Stop voice edit"
+msgstr "Sustabdyti redagavimą balsu"
+
 msgid "System is busy. Please wait."
 msgstr "Sistema užimta. Palaukite."
 
@@ -493,6 +523,18 @@ msgstr "Transkripcija – sisteminė užklausa"
 msgid "Transcription - User Prompt"
 msgstr "Transkripcija – naudotojo užklausa"
 
+msgid "Transform"
+msgstr "Transformuoti"
+
+msgid "Transformation - System Prompt"
+msgstr "Transformavimas - Sistemos raginimas"
+
+msgid "Transformation - User Prompt"
+msgstr "Transformavimas - Naudotojo raginimas"
+
+msgid "Translate to output language"
+msgstr "Išversti į išvesties kalbą"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "Vietinio arba nuotolinio „Ollama“ serverio URL."
 
@@ -513,6 +555,9 @@ msgstr "Peržiūrėti žurnalo failą"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "Balso diktavimai, paversti tvarkingais užrašais"
+
+msgid "Voice edit"
+msgstr "Redagavimas balsu"
 
 msgid "Yesterday"
 msgstr "Vakar"

@@ -55,6 +55,9 @@ msgstr "অডিও ক্যাপচার সেটিংস"
 msgid "Audio Channels:"
 msgstr "অডিও চ্যানেল:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "নোট এডিটরে সংশোধিত শব্দগুলি স্বয়ংক্রিয়ভাবে কাস্টম শব্দভাণ্ডারে যোগ করুন।"
+
 msgid "Backup Count:"
 msgstr "ব্যাকআপ সংখ্যা:"
 
@@ -66,6 +69,9 @@ msgstr "বিপ ফ্রিকোয়েন্সি:"
 
 msgid "Browse..."
 msgstr "ব্রাউজ করুন..."
+
+msgid "Bullet list"
+msgstr "বুলেট তালিকা"
 
 msgid "Cancel"
 msgstr "বাতিল"
@@ -114,6 +120,9 @@ msgstr "রেকর্ডিং বন্ধ করা যায়নি: {err
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "XDG অটোস্টার্ট ডিরেক্টরিতে একটি ডেস্কটপ অটোস্টার্ট এন্ট্রি তৈরি করে"
+
+msgid "Custom Vocabulary"
+msgstr "কাস্টম শব্দভাণ্ডার"
 
 msgid "Decision"
 msgstr "সিদ্ধান্ত"
@@ -211,6 +220,9 @@ msgstr "'{key}'-এর জন্য অবৈধ কনফিগারেশন 
 msgid "Keep Alive Time:"
 msgstr "Keep Alive সময়:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "ম্যানুয়াল নোট সম্পাদনা থেকে কাস্টম শব্দভাণ্ডার শিখুন"
+
 msgid "Log File"
 msgstr "লগ ফাইল"
 
@@ -222,6 +234,15 @@ msgstr "লগিং স্তর:"
 
 msgid "Logging Settings"
 msgstr "লগিং সেটিংস"
+
+msgid "Make casual"
+msgstr "ঘরোয়া করুন"
+
+msgid "Make concise"
+msgstr "সংক্ষিপ্ত করুন"
+
+msgid "Make formal"
+msgstr "আনুষ্ঠানিক করুন"
 
 msgid "Max Log File Size:"
 msgstr "সর্বোচ্চ লগ ফাইল আকার:"
@@ -270,6 +291,9 @@ msgstr "নোট"
 
 msgid "Note Saved"
 msgstr "নোট সংরক্ষিত হয়েছে"
+
+msgid "Note Transformed"
+msgstr "নোট রূপান্তরিত হয়েছে"
 
 msgid "Note Type Colors"
 msgstr "নোটের ধরনের রঙ"
@@ -351,6 +375,9 @@ msgstr "প্রম্পটসমূহ"
 
 msgid "Prompts:"
 msgstr "প্রম্পটসমূহ:"
+
+msgid "Proofread"
+msgstr "প্রুফরিড"
 
 msgid "Question"
 msgstr "প্রশ্ন"
@@ -445,6 +472,9 @@ msgstr "স্টেরিও (২ চ্যানেল)"
 msgid "Stop dictation"
 msgstr "ডিক্টেশন বন্ধ করুন"
 
+msgid "Stop voice edit"
+msgstr "ভয়েস সম্পাদনা থামান"
+
 msgid "System is busy. Please wait."
 msgstr "সিস্টেম ব্যস্ত। অনুগ্রহ করে অপেক্ষা করুন।"
 
@@ -493,6 +523,18 @@ msgstr "ট্রান্সক্রিপশন - সিস্টেম প�
 msgid "Transcription - User Prompt"
 msgstr "ট্রান্সক্রিপশন - ব্যবহারকারী প্রম্পট"
 
+msgid "Transform"
+msgstr "রূপান্তর"
+
+msgid "Transformation - System Prompt"
+msgstr "রূপান্তর - সিস্টেম প্রম্পট"
+
+msgid "Transformation - User Prompt"
+msgstr "রূপান্তর - ব্যবহারকারী প্রম্পট"
+
+msgid "Translate to output language"
+msgstr "আউটপুট ভাষায় অনুবাদ করুন"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "আপনার লোকাল বা রিমোট Ollama সার্ভারের URL।"
 
@@ -513,6 +555,9 @@ msgstr "লগ ফাইল দেখুন"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "ভয়েস ডিক্টেশন সুসংগঠিত নোটে পরিণত হয়েছে"
+
+msgid "Voice edit"
+msgstr "ভয়েস সম্পাদনা"
 
 msgid "Yesterday"
 msgstr "গতকাল"

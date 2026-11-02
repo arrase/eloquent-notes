@@ -11,7 +11,15 @@ from PyQt6.QtGui import QGuiApplication, QMouseEvent
 from PyQt6.QtWidgets import QAbstractButton, QApplication, QLabel, QMessageBox, QPushButton, QWidget
 
 from eloquent_notes import notes, ui
-from eloquent_notes.window import PAGE_MARGIN, MainWindow, NoteCard, _ScrollContent, day_label, format_time
+from eloquent_notes.window import (
+    PAGE_MARGIN,
+    TRANSFORM_PRESETS,
+    MainWindow,
+    NoteCard,
+    _ScrollContent,
+    day_label,
+    format_time,
+)
 
 
 @pytest.fixture
@@ -240,16 +248,25 @@ def test_set_state_updates_dictate_and_delete_buttons(window: MainWindow) -> Non
     window.set_state("RECORDING")
     assert window.reader.btn_dictate.text() == "Stop dictation"
     assert window.reader.btn_dictate.isEnabled()
+    assert window.reader.btn_voice_edit.text() == "Stop voice edit"
+    assert window.reader.btn_voice_edit.isEnabled()
+    assert not window.reader.btn_transform.isEnabled()
     assert not window.reader.btn_delete.isEnabled()
 
     window.set_state("PROCESSING")
     assert window.reader.btn_dictate.text() == "Processing…"
     assert not window.reader.btn_dictate.isEnabled()
+    assert window.reader.btn_voice_edit.text() == "Processing…"
+    assert not window.reader.btn_voice_edit.isEnabled()
+    assert not window.reader.btn_transform.isEnabled()
     assert not window.reader.btn_delete.isEnabled()
 
     window.set_state("IDLE")
     assert window.reader.btn_dictate.text() == "Add dictation"
     assert window.reader.btn_dictate.isEnabled()
+    assert window.reader.btn_voice_edit.text() == "Voice edit"
+    assert window.reader.btn_voice_edit.isEnabled()
+    assert window.reader.btn_transform.isEnabled()
     assert window.reader.btn_delete.isEnabled()
 
 
@@ -554,6 +571,105 @@ def test_dictate_saves_then_emits_note(window: MainWindow, sample_notes: list[no
     window.reader.btn_dictate.click()
 
     assert events == [("edited", "Edited"), ("dictate", "Edited")]
+
+
+def test_voice_edit_saves_then_emits_full_or_partial_selection(
+    window: MainWindow,
+    sample_notes: list[notes.Note],
+) -> None:
+    events: list[tuple[str, object]] = []
+    window.note_edited.connect(lambda note: events.append(("edited", note.title)))
+    window.voice_edit_clicked.connect(
+        lambda note, sel, start, end: events.append(("voice_edit", (note.title, sel, start, end)))
+    )
+    window.show_note(sample_notes[0])
+    window.reader.title_edit.setText("Edited before voice edit")
+
+    # Full-note voice edit when nothing is selected
+    window.reader.btn_voice_edit.click()
+    assert events == [
+        ("edited", "Edited before voice edit"),
+        ("voice_edit", ("Edited before voice edit", "", 0, len("Ship on Friday."))),
+    ]
+
+    # Partial-selection voice edit when an excerpt is selected
+    events.clear()
+    cursor = window.reader.body_edit.textCursor()
+    cursor.setPosition(8)
+    cursor.setPosition(14, cursor.MoveMode.KeepAnchor)
+    window.reader.body_edit.setTextCursor(cursor)
+
+    window.reader.btn_voice_edit.click()
+    assert events == [
+        ("voice_edit", ("Edited before voice edit", "Friday", 8, 14)),
+    ]
+
+
+def test_transform_menu_requests_full_or_partial_selection(
+    window: MainWindow,
+    sample_notes: list[notes.Note],
+) -> None:
+    events: list[tuple[str, object]] = []
+    window.note_edited.connect(lambda note: events.append(("edited", note.title)))
+    window.transform_requested.connect(
+        lambda note, key, sel, start, end: events.append(("transform", (note.title, key, sel, start, end)))
+    )
+    window.show_note(sample_notes[0])
+    window.reader.title_edit.setText("Edited before transform")
+
+    menu = window.reader.btn_transform.menu()
+    assert menu is not None
+    actions = menu.actions()
+    assert [a.text() for a in actions] == [label for _k, label, _inst in TRANSFORM_PRESETS]
+
+    # Full-note transform when nothing is selected
+    actions[0].trigger()
+    assert events == [
+        ("edited", "Edited before transform"),
+        ("transform", ("Edited before transform", "concise", "", 0, len("Ship on Friday."))),
+    ]
+
+    # Partial-selection transform when an excerpt is selected
+    events.clear()
+    cursor = window.reader.body_edit.textCursor()
+    cursor.setPosition(8)
+    cursor.setPosition(14, cursor.MoveMode.KeepAnchor)
+    window.reader.body_edit.setTextCursor(cursor)
+
+    actions[1].trigger()
+    assert events == [
+        ("transform", ("Edited before transform", "formal", "Friday", 8, 14)),
+    ]
+
+
+def test_apply_note_replacement_preserves_undo_stack(
+    window: MainWindow,
+    sample_notes: list[notes.Note],
+) -> None:
+    edited = MagicMock()
+    window.note_edited.connect(edited)
+
+    # Returns False when timeline is active
+    assert not window.apply_note_replacement(sample_notes[0].path, "Ignored", 0, 4)
+
+    window.show_note(sample_notes[0])
+    # Returns False when a different note is open in reader
+    assert not window.apply_note_replacement(sample_notes[1].path, "Ignored", 0, 4)
+
+    # Partial replacement on the open note updates body_edit via QTextCursor and saves
+    doc = window.reader.body_edit.document()
+    assert doc is not None
+    assert not doc.isUndoAvailable()
+
+    assert window.apply_note_replacement(sample_notes[0].path, "Monday", 8, 14)
+    assert window.reader.body_edit.toPlainText() == "Ship on Monday."
+    assert sample_notes[0].body == "Ship on Monday."
+    edited.assert_called_once_with(sample_notes[0])
+    assert doc.isUndoAvailable()
+
+    # Ctrl+Z (undo) restores original text
+    window.reader.body_edit.undo()
+    assert window.reader.body_edit.toPlainText() == "Ship on Friday."
 
 
 def test_copy_puts_markdown_on_clipboard(window: MainWindow, sample_notes: list[notes.Note]) -> None:

@@ -10,12 +10,12 @@ Eloquent Notes is a Linux tray daemon with one job: turn voice dictations into w
 | :--- | :--- |
 | `main.py` | CLI entry point: `install-autostart`, `toggle`, `open`, `config`; single-instance IPC client; launches the daemon. |
 | `app.py` | `EloquentApp` controller: tray icon and menu, IPC server, recording lifecycle, processing pipeline, notes window wiring, config reload. |
-| `audio.py` | In-memory 16 kHz recording (`AudioRecorder`), Silero VAD silence detection and speech segmentation into `<= 30 s` WAV chunks (`speech_window_mask`, `_split_speech`, `wav_chunks`), WAV encoding, beeps. |
-| `llm.py` | Ollama client: model preload, the four pipeline phases (`transcribe_audio`, `rewrite_transcription`, `classify_note`, `tag_note`) with JSON-schema output and retries, `/api/embed`. |
-| `notes.py` | Note storage: `Note` dataclass, load / create / save / append, frontmatter parsing, tag normalization. |
+| `audio.py` | In-memory 16 kHz recording (`AudioRecorder`), live RMS level (`rms`), Silero VAD silence detection and speech segmentation into `<= 30 s` WAV chunks (`speech_window_mask`, `_split_speech`, `wav_chunks`), WAV encoding, beeps. |
+| `llm.py` | Ollama client: model preload, the four pipeline phases (`transcribe_audio`, `rewrite_transcription`, `classify_note`, `tag_note`) and text transformation (`transform_text`) with JSON-schema output, anti-loop validation (`has_repeating_loop`), sliding-window splitting (`split_overlapping_windows`) and retries, `/api/embed`. |
+| `notes.py` | Note storage: `Note` dataclass, load / create / save / append, frontmatter parsing, tag normalization, custom vocabulary parsing and edit-based vocabulary extraction (`parse_vocabulary`, `extract_learned_words`). |
 | `search.py` | `SemanticIndex`: embedding cache and cosine-similarity ranking. |
 | `window.py` | `MainWindow`: timeline and reader pages. A pure view that reports user intent through signals. |
-| `recording_hud.py` | Floating elapsed-time overlay shown while recording (click to stop). |
+| `recording_hud.py` | Floating overlay shown while recording: live audio level meter, elapsed timer, click to stop, and `×` button or right-click to cancel. |
 | `ui.py` | Application, tray and dictation state icons drawn with `QPainter`, plus explicit light/dark `Theme` palettes (`window_stylesheet`, `dialog_stylesheet`). |
 | `i18n.py` | System locale detection and `gettext` translation loader (`_`, `ngettext`, `ui_locale`, `OUTPUT_LANGUAGES`) with 40 packaged `.po`/`.mo` catalogs under `locales/`. |
 | `config.py` | XDG paths, default file installation, config loading/merging, diffing (`diff_configs`), atomic writes. |
@@ -24,7 +24,7 @@ Eloquent Notes is a Linux tray daemon with one job: turn voice dictations into w
 
 ### Boundaries
 
-- `window.py` never touches files, audio or models. It renders the `Note` objects it is given and emits signals (`dictate_clicked`, `note_edited`, `delete_requested`, `search_requested`, `settings_clicked`).
+- `window.py` never touches files, audio or models. It renders the `Note` objects it is given and emits signals (`dictate_clicked`, `voice_edit_clicked`, `transform_requested`, `note_edited`, `delete_requested`, `search_requested`, `settings_clicked`).
 - `notes.py` and `search.py` have no Qt dependency; `llm.py` and `audio.py` neither.
 - `EloquentApp` is the only place where these pieces meet and where application state changes.
 
@@ -90,11 +90,11 @@ The CLI entry point (`eloquent_notes.main`) works as a lightweight client:
 
 | State | Entered by | Tray icon |
 | :--- | :--- | :--- |
-| `IDLE` | Startup, processing finished | Gray microphone |
-| `RECORDING` | `toggle_action()` or `dictate_into(note)` while idle | Red dot |
-| `PROCESSING` | Stop request | Orange hourglass |
+| `IDLE` | Startup, processing finished, or `cancel_recording()` | Gray microphone |
+| `RECORDING` | `toggle_action()`, `dictate_into(note)` or `voice_edit_into(note, ...)` while idle | Red dot |
+| `PROCESSING` | Stop request or `transform_note(...)` | Orange hourglass |
 
-At recording start, the configuration and all prompt files are copied into a **snapshot**, so editing settings mid-dictation cannot affect the note being processed. `dictate_into(note)` records the same way but remembers the target note; the pipeline then stops after Phase 2 and the text is appended to that note (see [Four-Phase AI Pipeline](pipeline.md)).
+At recording start, the configuration and all prompt files are copied into a **snapshot**, so editing settings mid-dictation cannot affect the note being processed. `dictate_into(note)` records the same way but remembers the target note; the pipeline then stops after Phase 2 and the text is appended to that note. `voice_edit_into(note, selected_text, sel_start, sel_end)` records a spoken instruction, runs Phase 1 followed by text transformation, and replaces the note body or selected excerpt in-place. `cancel_recording()` (triggered from the HUD's `×` button or right-click) aborts the active recording and discards captured audio without running the pipeline (see [Four-Phase AI Pipeline](pipeline.md)).
 
 While processing, further toggles only show a "System is busy" notification; the dictate button in the window is disabled.
 
@@ -139,7 +139,7 @@ The application window icon (`ui.get_app_icon()`) and state icons (`ui.get_qicon
 All application and UI state changes happen on the Qt main thread. Only three kinds of work run on background `threading.Thread`s, and they report back exclusively through Qt signals:
 
 1. **Model preloading** — started when recording begins; warms the Gemma 4 weights while the user speaks (best effort, errors are only logged).
-2. **Audio processing** — `_process_audio()` runs the pipeline on the frozen snapshot and emits `processing_completed(status, detail)` with `success`, `appended`, `empty` or `error`. Note files for new notes are written on this thread by `notes.create_note`; appended text is written on the main thread when the signal arrives.
+2. **Audio processing & note transformations** — `_process_audio()` and `_process_transform()` run on the frozen snapshot and emit `processing_completed(status, detail)` with `success`, `appended`, `transformed`, `empty` or `error`. Note files for new notes are written on this thread by `notes.create_note`; appended and transformed text is applied on the main thread when the signal arrives.
 3. **Semantic search** — `_run_search()` calls `SemanticIndex.search()` (which serializes access to its cache with a lock) and emits `search_completed(query, results)` or `search_failed(query, message)`. The window ignores results for a query that is no longer current.
 
 ---

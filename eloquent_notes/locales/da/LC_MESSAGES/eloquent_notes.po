@@ -55,6 +55,9 @@ msgstr "Indstillinger for lydoptagelse"
 msgid "Audio Channels:"
 msgstr "Lydkanaler:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "Tilføj automatisk ord rettet i noteeditoren til det brugerdefinerede ordforråd."
+
 msgid "Backup Count:"
 msgstr "Antal sikkerhedskopier:"
 
@@ -66,6 +69,9 @@ msgstr "Bip-frekvens:"
 
 msgid "Browse..."
 msgstr "Gennemse..."
+
+msgid "Bullet list"
+msgstr "Punktopstilling"
 
 msgid "Cancel"
 msgstr "Annuller"
@@ -114,6 +120,9 @@ msgstr "Kunne ikke stoppe optagelse: {error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "Opretter en autostart-post i XDG autostart-mappen"
+
+msgid "Custom Vocabulary"
+msgstr "Brugerdefineret ordforråd"
 
 msgid "Decision"
 msgstr "Beslutning"
@@ -211,6 +220,9 @@ msgstr "Ugyldig konfigurationsværdi for '{key}'"
 msgid "Keep Alive Time:"
 msgstr "Keep Alive-tid:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "Lær brugerdefineret ordforråd fra manuelle noteredigeringer"
+
 msgid "Log File"
 msgstr "Logfil"
 
@@ -222,6 +234,15 @@ msgstr "Logniveau:"
 
 msgid "Logging Settings"
 msgstr "Logindstillinger"
+
+msgid "Make casual"
+msgstr "Gør uformel"
+
+msgid "Make concise"
+msgstr "Gør kortfattet"
+
+msgid "Make formal"
+msgstr "Gør formel"
 
 msgid "Max Log File Size:"
 msgstr "Maks. størrelse på logfil:"
@@ -270,6 +291,9 @@ msgstr "Note"
 
 msgid "Note Saved"
 msgstr "Note gemt"
+
+msgid "Note Transformed"
+msgstr "Note transformeret"
 
 msgid "Note Type Colors"
 msgstr "Farver for notetyper"
@@ -351,6 +375,9 @@ msgstr "Prompter"
 
 msgid "Prompts:"
 msgstr "Prompter:"
+
+msgid "Proofread"
+msgstr "Korrekturlæs"
 
 msgid "Question"
 msgstr "Spørgsmål"
@@ -445,6 +472,9 @@ msgstr "Stereo (2 kanaler)"
 msgid "Stop dictation"
 msgstr "Stop diktat"
 
+msgid "Stop voice edit"
+msgstr "Stop stemmeredigering"
+
 msgid "System is busy. Please wait."
 msgstr "Systemet er optaget. Vent venligst."
 
@@ -493,6 +523,18 @@ msgstr "Transskription - Systemprompt"
 msgid "Transcription - User Prompt"
 msgstr "Transskription - Brugerprompt"
 
+msgid "Transform"
+msgstr "Transformér"
+
+msgid "Transformation - System Prompt"
+msgstr "Transformering - Systemprompt"
+
+msgid "Transformation - User Prompt"
+msgstr "Transformering - Brugerprompt"
+
+msgid "Translate to output language"
+msgstr "Oversæt til outputsprog"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "URL til din lokale eller eksterne Ollama-server."
 
@@ -513,6 +555,9 @@ msgstr "Vis logfil"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "Stemmediktater omdannet til organiserede noter"
+
+msgid "Voice edit"
+msgstr "Stemmeredigering"
 
 msgid "Yesterday"
 msgstr "I går"

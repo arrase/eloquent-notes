@@ -55,6 +55,9 @@ msgstr "Nastavení záznamu zvuku"
 msgid "Audio Channels:"
 msgstr "Zvukové kanály:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "Automaticky přidávat slova opravená v editoru poznámek do vlastního slovníku."
+
 msgid "Backup Count:"
 msgstr "Počet záloh:"
 
@@ -66,6 +69,9 @@ msgstr "Frekvence pípnutí:"
 
 msgid "Browse..."
 msgstr "Procházet..."
+
+msgid "Bullet list"
+msgstr "Odrážkový seznam"
 
 msgid "Cancel"
 msgstr "Zrušit"
@@ -114,6 +120,9 @@ msgstr "Nelze zastavit nahrávání: {error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "Vytvoří položku automatického spuštění v adresáři XDG autostart"
+
+msgid "Custom Vocabulary"
+msgstr "Vlastní slovník"
 
 msgid "Decision"
 msgstr "Rozhodnutí"
@@ -211,6 +220,9 @@ msgstr "Neplatná hodnota konfigurace pro '{key}'"
 msgid "Keep Alive Time:"
 msgstr "Doba Keep Alive:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "Učit se vlastní slovník z ručních úprav poznámek"
+
 msgid "Log File"
 msgstr "Soubor protokolu"
 
@@ -222,6 +234,15 @@ msgstr "Úroveň protokolování:"
 
 msgid "Logging Settings"
 msgstr "Nastavení protokolování"
+
+msgid "Make casual"
+msgstr "Zneformálnit"
+
+msgid "Make concise"
+msgstr "Zkrátit a zpřesnit"
+
+msgid "Make formal"
+msgstr "Formální styl"
 
 msgid "Max Log File Size:"
 msgstr "Max. velikost souboru protokolu:"
@@ -270,6 +291,9 @@ msgstr "Poznámka"
 
 msgid "Note Saved"
 msgstr "Poznámka uložena"
+
+msgid "Note Transformed"
+msgstr "Poznámka transformována"
 
 msgid "Note Type Colors"
 msgstr "Barvy typů poznámek"
@@ -351,6 +375,9 @@ msgstr "Prompty"
 
 msgid "Prompts:"
 msgstr "Prompty:"
+
+msgid "Proofread"
+msgstr "Jazyková korektura"
 
 msgid "Question"
 msgstr "Otázka"
@@ -445,6 +472,9 @@ msgstr "Stereo (2 kanály)"
 msgid "Stop dictation"
 msgstr "Zastavit diktování"
 
+msgid "Stop voice edit"
+msgstr "Zastavit hlasovou úpravu"
+
 msgid "System is busy. Please wait."
 msgstr "Systém je zaneprázdněn. Čekejte prosím."
 
@@ -493,6 +523,18 @@ msgstr "Přepis – Systémový prompt"
 msgid "Transcription - User Prompt"
 msgstr "Přepis – Uživatelský prompt"
 
+msgid "Transform"
+msgstr "Transformovat"
+
+msgid "Transformation - System Prompt"
+msgstr "Transformace - Systémový prompt"
+
+msgid "Transformation - User Prompt"
+msgstr "Transformace - Uživatelský prompt"
+
+msgid "Translate to output language"
+msgstr "Přeložit do výstupního jazyka"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "URL vašeho místního nebo vzdáleného serveru Ollama."
 
@@ -513,6 +555,9 @@ msgstr "Zobrazit soubor protokolu"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "Hlasové diktáty přeměněné na přehledné poznámky"
+
+msgid "Voice edit"
+msgstr "Hlasová úprava"
 
 msgid "Yesterday"
 msgstr "Včera"

@@ -55,6 +55,9 @@ msgstr "Hangrögzítési beállítások"
 msgid "Audio Channels:"
 msgstr "Hangcsatornák:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "A jegyzetszerkesztőben javított szavak automatikus hozzáadása az egyéni szótárhoz."
+
 msgid "Backup Count:"
 msgstr "Biztonsági mentések száma:"
 
@@ -66,6 +69,9 @@ msgstr "Hangjelzés frekvenciája:"
 
 msgid "Browse..."
 msgstr "Tallózás..."
+
+msgid "Bullet list"
+msgstr "Felsorolás"
 
 msgid "Cancel"
 msgstr "Mégse"
@@ -114,6 +120,9 @@ msgstr "Nem sikerült leállítani a felvételt: {error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "Automatikus indítási bejegyzést hoz létre az XDG autostart könyvtárban"
+
+msgid "Custom Vocabulary"
+msgstr "Egyéni szótár"
 
 msgid "Decision"
 msgstr "Döntés"
@@ -211,6 +220,9 @@ msgstr "Érvénytelen konfigurációs érték ehhez: '{key}'"
 msgid "Keep Alive Time:"
 msgstr "Keep Alive idő:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "Egyéni szótár tanulása a jegyzetek kézi szerkesztéséből"
+
 msgid "Log File"
 msgstr "Naplófájl"
 
@@ -222,6 +234,15 @@ msgstr "Naplózási szint:"
 
 msgid "Logging Settings"
 msgstr "Naplózási beállítások"
+
+msgid "Make casual"
+msgstr "Legyen közvetlen"
+
+msgid "Make concise"
+msgstr "Legyen tömör"
+
+msgid "Make formal"
+msgstr "Legyen hivatalos"
 
 msgid "Max Log File Size:"
 msgstr "Max. naplófájlméret:"
@@ -270,6 +291,9 @@ msgstr "Jegyzet"
 
 msgid "Note Saved"
 msgstr "Jegyzet mentve"
+
+msgid "Note Transformed"
+msgstr "Jegyzet átalakítva"
 
 msgid "Note Type Colors"
 msgstr "Jegyzettípusok színei"
@@ -351,6 +375,9 @@ msgstr "Promptok"
 
 msgid "Prompts:"
 msgstr "Promptok:"
+
+msgid "Proofread"
+msgstr "Korrektúra"
 
 msgid "Question"
 msgstr "Kérdés"
@@ -445,6 +472,9 @@ msgstr "Sztereó (2 csatorna)"
 msgid "Stop dictation"
 msgstr "Diktálás leállítása"
 
+msgid "Stop voice edit"
+msgstr "Hangalapú szerkesztés leállítása"
+
 msgid "System is busy. Please wait."
 msgstr "A rendszer foglalt. Kérjük, várjon."
 
@@ -493,6 +523,18 @@ msgstr "Átirat - Rendszerprompt"
 msgid "Transcription - User Prompt"
 msgstr "Átirat - Felhasználói prompt"
 
+msgid "Transform"
+msgstr "Átalakítás"
+
+msgid "Transformation - System Prompt"
+msgstr "Átalakítás - Rendszerprompt"
+
+msgid "Transformation - User Prompt"
+msgstr "Átalakítás - Felhasználói prompt"
+
+msgid "Translate to output language"
+msgstr "Fordítás a kimeneti nyelvre"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "A helyi vagy távoli Ollama-kiszolgáló URL-címe."
 
@@ -513,6 +555,9 @@ msgstr "Naplófájl megtekintése"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "Hangdiktálások rendszerezett jegyzetekké alakítva"
+
+msgid "Voice edit"
+msgstr "Hangalapú szerkesztés"
 
 msgid "Yesterday"
 msgstr "Tegnap"

@@ -55,6 +55,9 @@ msgstr "Helisalvestuse seaded"
 msgid "Audio Channels:"
 msgstr "Helikanalid:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "Lisa märkmeredaktoris parandatud sõnad automaatselt kohandatud sõnavarasse."
+
 msgid "Backup Count:"
 msgstr "Varukoopiate arv:"
 
@@ -66,6 +69,9 @@ msgstr "Helisignaali sagedus:"
 
 msgid "Browse..."
 msgstr "Sirvi..."
+
+msgid "Bullet list"
+msgstr "Täpploend"
 
 msgid "Cancel"
 msgstr "Tühista"
@@ -114,6 +120,9 @@ msgstr "Salvestamist ei õnnestunud peatada: {error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "Loob töölaua automaatkäivituse kirje XDG automaatkäivituse kataloogi"
+
+msgid "Custom Vocabulary"
+msgstr "Kohandatud sõnavara"
 
 msgid "Decision"
 msgstr "Otsus"
@@ -211,6 +220,9 @@ msgstr "Vigane seadistusväärtus võtmele '{key}'"
 msgid "Keep Alive Time:"
 msgstr "Mälus hoidmise aeg:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "Õpi kohandatud sõnavara märkmete käsitsi muutmisest"
+
 msgid "Log File"
 msgstr "Logifail"
 
@@ -222,6 +234,15 @@ msgstr "Logimise tase:"
 
 msgid "Logging Settings"
 msgstr "Logimise seaded"
+
+msgid "Make casual"
+msgstr "Muuda vabamaks"
+
+msgid "Make concise"
+msgstr "Muuda kokkuvõtlikuks"
+
+msgid "Make formal"
+msgstr "Muuda ametlikuks"
 
 msgid "Max Log File Size:"
 msgstr "Logifaili max suurus:"
@@ -270,6 +291,9 @@ msgstr "Märge"
 
 msgid "Note Saved"
 msgstr "Märge salvestatud"
+
+msgid "Note Transformed"
+msgstr "Märge teisendatud"
 
 msgid "Note Type Colors"
 msgstr "Märkmetüüpide värvid"
@@ -351,6 +375,9 @@ msgstr "Viibad"
 
 msgid "Prompts:"
 msgstr "Viibad:"
+
+msgid "Proofread"
+msgstr "Keeletoimetus"
 
 msgid "Question"
 msgstr "Küsimus"
@@ -445,6 +472,9 @@ msgstr "Stereo (2 kanalit)"
 msgid "Stop dictation"
 msgstr "Peata dikteerimine"
 
+msgid "Stop voice edit"
+msgstr "Peata häälmuutmine"
+
 msgid "System is busy. Please wait."
 msgstr "Süsteem on hõivatud. Palun oodake."
 
@@ -493,6 +523,18 @@ msgstr "Transkriptsioon – süsteemiviip"
 msgid "Transcription - User Prompt"
 msgstr "Transkriptsioon – kasutajaviip"
 
+msgid "Transform"
+msgstr "Teisenda"
+
+msgid "Transformation - System Prompt"
+msgstr "Teisendamine - Süsteemiviip"
+
+msgid "Transformation - User Prompt"
+msgstr "Teisendamine - Kasutajaviip"
+
+msgid "Translate to output language"
+msgstr "Tõlgi väljundkeelde"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "Kohaliku või kaug-Ollama serveri URL."
 
@@ -513,6 +555,9 @@ msgstr "Vaata logifaili"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "Hääldikteeringud muudetud korrastatud märkmeteks"
+
+msgid "Voice edit"
+msgstr "Häälmuutmine"
 
 msgid "Yesterday"
 msgstr "Eile"
