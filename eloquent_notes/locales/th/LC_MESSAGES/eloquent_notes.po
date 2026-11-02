@@ -55,6 +55,9 @@ msgstr "การตั้งค่าการบันทึกเสียง
 msgid "Audio Channels:"
 msgstr "ช่องสัญญาณเสียง:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "เพิ่มคำที่แก้ไขในตัวแก้ไขบันทึกไปยังคำศัพท์กำหนดเองโดยอัตโนมัติ"
+
 msgid "Backup Count:"
 msgstr "จำนวนไฟล์สำรอง:"
 
@@ -66,6 +69,9 @@ msgstr "ความถี่เสียงบี๊บ:"
 
 msgid "Browse..."
 msgstr "เรียกดู..."
+
+msgid "Bullet list"
+msgstr "รายการหัวข้อย่อย"
 
 msgid "Cancel"
 msgstr "ยกเลิก"
@@ -114,6 +120,9 @@ msgstr "ไม่สามารถหยุดการบันทึกเส
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "สร้างรายการเริ่มทำงานอัตโนมัติของเดสก์ท็อปในไดเรกทอรี XDG autostart"
+
+msgid "Custom Vocabulary"
+msgstr "คำศัพท์กำหนดเอง"
 
 msgid "Decision"
 msgstr "การตัดสินใจ"
@@ -211,6 +220,9 @@ msgstr "ค่าการกำหนดค่าไม่ถูกต้อง
 msgid "Keep Alive Time:"
 msgstr "เวลา Keep Alive:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "เรียนรู้คำศัพท์กำหนดเองจากการแก้ไขบันทึกด้วยตนเอง"
+
 msgid "Log File"
 msgstr "ไฟล์บันทึก (Log)"
 
@@ -222,6 +234,15 @@ msgstr "ระดับการบันทึก:"
 
 msgid "Logging Settings"
 msgstr "การตั้งค่าการบันทึก"
+
+msgid "Make casual"
+msgstr "ทำให้เป็นกันเอง"
+
+msgid "Make concise"
+msgstr "ทำให้กระชับ"
+
+msgid "Make formal"
+msgstr "ทำให้เป็นทางการ"
 
 msgid "Max Log File Size:"
 msgstr "ขนาดไฟล์บันทึกสูงสุด:"
@@ -270,6 +291,9 @@ msgstr "โน้ต"
 
 msgid "Note Saved"
 msgstr "บันทึกโน้ตแล้ว"
+
+msgid "Note Transformed"
+msgstr "แปลงบันทึกแล้ว"
 
 msgid "Note Type Colors"
 msgstr "สีประเภทโน้ต"
@@ -351,6 +375,9 @@ msgstr "พรอมต์"
 
 msgid "Prompts:"
 msgstr "พรอมต์:"
+
+msgid "Proofread"
+msgstr "ตรวจทานคำผิด"
 
 msgid "Question"
 msgstr "คำถาม"
@@ -445,6 +472,9 @@ msgstr "สเตอริโอ (2 ช่องสัญญาณ)"
 msgid "Stop dictation"
 msgstr "หยุดการป้อนด้วยเสียง"
 
+msgid "Stop voice edit"
+msgstr "หยุดการแก้ไขด้วยเสียง"
+
 msgid "System is busy. Please wait."
 msgstr "ระบบกำลังทำงานอยู่ โปรดรอสักครู่"
 
@@ -493,6 +523,18 @@ msgstr "การถอดความ - พรอมต์ระบบ"
 msgid "Transcription - User Prompt"
 msgstr "การถอดความ - พรอมต์ผู้ใช้"
 
+msgid "Transform"
+msgstr "แปลงข้อความ"
+
+msgid "Transformation - System Prompt"
+msgstr "การแปลงข้อความ - พรอมต์ระบบ"
+
+msgid "Transformation - User Prompt"
+msgstr "การแปลงข้อความ - พรอมต์ผู้ใช้"
+
+msgid "Translate to output language"
+msgstr "แปลเป็นภาษาผลลัพธ์"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "URL ของเซิร์ฟเวอร์ Ollama ในเครื่องหรือระยะไกลของคุณ"
 
@@ -513,6 +555,9 @@ msgstr "ดูไฟล์บันทึก"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "เปลี่ยนการป้อนด้วยเสียงให้เป็นโน้ตที่เป็นระเบียบ"
+
+msgid "Voice edit"
+msgstr "แก้ไขด้วยเสียง"
 
 msgid "Yesterday"
 msgstr "เมื่อวาน"

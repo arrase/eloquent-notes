@@ -55,6 +55,9 @@ msgstr "Ses Yakalama Ayarları"
 msgid "Audio Channels:"
 msgstr "Ses Kanalları:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "Not düzenleyicide düzeltilen kelimeleri özel sözlüğe otomatik olarak ekle."
+
 msgid "Backup Count:"
 msgstr "Yedek Sayısı:"
 
@@ -66,6 +69,9 @@ msgstr "Sinyal Frekansı:"
 
 msgid "Browse..."
 msgstr "Gözat..."
+
+msgid "Bullet list"
+msgstr "Madde işaretli liste"
 
 msgid "Cancel"
 msgstr "İptal"
@@ -114,6 +120,9 @@ msgstr "Kayıt durdurulamadı: {error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "XDG otomatik başlatma dizininde bir masaüstü otomatik başlatma girdisi oluşturur"
+
+msgid "Custom Vocabulary"
+msgstr "Özel Sözlük"
 
 msgid "Decision"
 msgstr "Karar"
@@ -211,6 +220,9 @@ msgstr "'{key}' için geçersiz yapılandırma değeri"
 msgid "Keep Alive Time:"
 msgstr "Bellekte Tutma Süresi:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "Manuel not düzenlemelerinden özel sözlük öğren"
+
 msgid "Log File"
 msgstr "Günlük Dosyası"
 
@@ -222,6 +234,15 @@ msgstr "Günlükleme Düzeyi:"
 
 msgid "Logging Settings"
 msgstr "Günlükleme Ayarları"
+
+msgid "Make casual"
+msgstr "Günlük dile çevir"
+
+msgid "Make concise"
+msgstr "Özetle ve kısalt"
+
+msgid "Make formal"
+msgstr "Resmi dile çevir"
 
 msgid "Max Log File Size:"
 msgstr "Maks. Günlük Dosyası Boyutu:"
@@ -270,6 +291,9 @@ msgstr "Not"
 
 msgid "Note Saved"
 msgstr "Not Kaydedildi"
+
+msgid "Note Transformed"
+msgstr "Not Dönüştürüldü"
 
 msgid "Note Type Colors"
 msgstr "Not Türü Renkleri"
@@ -351,6 +375,9 @@ msgstr "İstemler"
 
 msgid "Prompts:"
 msgstr "İstemler:"
+
+msgid "Proofread"
+msgstr "Yazım denetimi yap"
 
 msgid "Question"
 msgstr "Soru"
@@ -445,6 +472,9 @@ msgstr "Stereo (2 kanal)"
 msgid "Stop dictation"
 msgstr "Dikteyi durdur"
 
+msgid "Stop voice edit"
+msgstr "Sesli düzenlemeyi durdur"
+
 msgid "System is busy. Please wait."
 msgstr "Sistem meşgul. Lütfen bekleyin."
 
@@ -493,6 +523,18 @@ msgstr "Deşifre - Sistem İstemi"
 msgid "Transcription - User Prompt"
 msgstr "Deşifre - Kullanıcı İstemi"
 
+msgid "Transform"
+msgstr "Dönüştür"
+
+msgid "Transformation - System Prompt"
+msgstr "Dönüştürme - Sistem İstemi"
+
+msgid "Transformation - User Prompt"
+msgstr "Dönüştürme - Kullanıcı İstemi"
+
+msgid "Translate to output language"
+msgstr "Çıktı diline çevir"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "Yerel veya uzak Ollama sunucunuzun URL'si."
 
@@ -513,6 +555,9 @@ msgstr "Günlük Dosyasını Görüntüle"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "Düzenli notlara dönüştürülen sesli dikteler"
+
+msgid "Voice edit"
+msgstr "Sesli düzenleme"
 
 msgid "Yesterday"
 msgstr "Dün"

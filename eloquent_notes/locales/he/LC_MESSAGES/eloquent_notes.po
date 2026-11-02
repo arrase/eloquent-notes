@@ -55,6 +55,9 @@ msgstr "הגדרות לכידת שמע"
 msgid "Audio Channels:"
 msgstr "ערוצי שמע:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "הוסף אוטומטית מילים שתוקנו בעורך ההערות לאוצר המילים המותאם אישית."
+
 msgid "Backup Count:"
 msgstr "מספר גיבויים:"
 
@@ -66,6 +69,9 @@ msgstr "תדר צפצוף:"
 
 msgid "Browse..."
 msgstr "עיון..."
+
+msgid "Bullet list"
+msgstr "רשימת תבליטים"
 
 msgid "Cancel"
 msgstr "ביטול"
@@ -114,6 +120,9 @@ msgstr "לא ניתן לעצור הקלטה: {error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "יוצר רשומת הפעלה אוטומטית של שולחן העבודה בספריית ההפעלה האוטומטית של XDG"
+
+msgid "Custom Vocabulary"
+msgstr "אוצר מילים מותאם אישית"
 
 msgid "Decision"
 msgstr "החלטה"
@@ -211,6 +220,9 @@ msgstr "ערך תצורה לא חוקי עבור '{key}'"
 msgid "Keep Alive Time:"
 msgstr "זמן החזקה בזיכרון:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "למד אוצר מילים מותאם אישית מעריכות ידניות של הערות"
+
 msgid "Log File"
 msgstr "קובץ יומן"
 
@@ -222,6 +234,15 @@ msgstr "רמת רישום:"
 
 msgid "Logging Settings"
 msgstr "הגדרות יומן"
+
+msgid "Make casual"
+msgstr "הפוך ליומיומי"
+
+msgid "Make concise"
+msgstr "הפוך לתמציתי"
+
+msgid "Make formal"
+msgstr "הפוך לרשמי"
 
 msgid "Max Log File Size:"
 msgstr "גודל מרבי לקובץ יומן:"
@@ -270,6 +291,9 @@ msgstr "הערה"
 
 msgid "Note Saved"
 msgstr "ההערה נשמרה"
+
+msgid "Note Transformed"
+msgstr "הפתק הומר"
 
 msgid "Note Type Colors"
 msgstr "צבעי סוגי הערות"
@@ -351,6 +375,9 @@ msgstr "הנחיות"
 
 msgid "Prompts:"
 msgstr "הנחיות:"
+
+msgid "Proofread"
+msgstr "הגהה"
 
 msgid "Question"
 msgstr "שאלה"
@@ -445,6 +472,9 @@ msgstr "סטריאו (2 ערוצים)"
 msgid "Stop dictation"
 msgstr "עצור הכתבה"
 
+msgid "Stop voice edit"
+msgstr "עצור עריכה קולית"
+
 msgid "System is busy. Please wait."
 msgstr "המערכת עמוסה. נא להמתין."
 
@@ -493,6 +523,18 @@ msgstr "תמלול - הנחיית מערכת"
 msgid "Transcription - User Prompt"
 msgstr "תמלול - הנחיית משתמש"
 
+msgid "Transform"
+msgstr "המר"
+
+msgid "Transformation - System Prompt"
+msgstr "המרה - הנחיית מערכת"
+
+msgid "Transformation - User Prompt"
+msgstr "המרה - הנחיית משתמש"
+
+msgid "Translate to output language"
+msgstr "תרגם לשפת הפלט"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "כתובת ה-URL של שרת ה-Ollama המקומי או המרוחק שלך."
 
@@ -513,6 +555,9 @@ msgstr "הצג קובץ יומן"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "הכתבות קוליות שהפכו להערות מאורגנות"
+
+msgid "Voice edit"
+msgstr "עריכה קולית"
 
 msgid "Yesterday"
 msgstr "אתמול"

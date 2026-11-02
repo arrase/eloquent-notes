@@ -6,6 +6,7 @@ never renames its file. Files without the expected frontmatter are ignored,
 which lets the folder live inside an Obsidian vault.
 """
 
+import difflib
 import logging
 import re
 from dataclasses import dataclass
@@ -22,7 +23,10 @@ NOTE_TYPES = ("note", "task", "idea", "reminder", "question", "decision")
 
 _FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n?(.*)$", re.DOTALL)
 _UNSAFE_FILENAME_CHARS_RE = re.compile(r'[\\/:*?"<>|#^\[\]]')
+_WORD_TOKEN_RE = re.compile(r"\b\w+\b")
 _MAX_FILENAME_TITLE = 80
+_MIN_LEARNED_WORD_LEN = 3
+_MIN_LEARNED_SIMILARITY = 0.6
 
 
 @dataclass
@@ -53,6 +57,42 @@ def normalize_tags(raw_tags: list[str]) -> list[str]:
 def parse_tags(text: str) -> list[str]:
     """Split and normalize comma-separated tags."""
     return normalize_tags(text.split(","))
+
+
+def parse_vocabulary(raw: str) -> list[str]:
+    """Split vocabulary text by newlines and commas, deduplicating case-insensitively."""
+    words: list[str] = []
+    seen: set[str] = set()
+    for part in re.split(r"[\n,]", raw):
+        word = part.strip()
+        lowered = word.lower()
+        if word and lowered not in seen:
+            seen.add(lowered)
+            words.append(word)
+    return words
+
+
+def extract_learned_words(old_text: str, new_text: str) -> list[str]:
+    """Return single-word typo, phonetic, or casing corrections between old_text and new_text."""
+    old_words = _WORD_TOKEN_RE.findall(old_text)
+    new_words = _WORD_TOKEN_RE.findall(new_text)
+    learned: list[str] = []
+    seen: set[str] = set()
+    for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(None, old_words, new_words).get_opcodes():
+        if tag != "replace" or i2 - i1 != 1 or j2 - j1 != 1:
+            continue
+        old_w, new_w = old_words[i1], new_words[j1]
+        lowered = new_w.lower()
+        if (
+            old_w != new_w
+            and len(new_w) >= _MIN_LEARNED_WORD_LEN
+            and not new_w.isdigit()
+            and lowered not in seen
+            and difflib.SequenceMatcher(None, old_w.lower(), lowered).ratio() >= _MIN_LEARNED_SIMILARITY
+        ):
+            seen.add(lowered)
+            learned.append(new_w)
+    return learned
 
 
 def _filename(created: datetime, title: str) -> str:

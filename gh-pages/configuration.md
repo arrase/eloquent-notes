@@ -16,7 +16,10 @@ All configuration lives under `~/.config/eloquent-notes/` (or `$XDG_CONFIG_HOME/
     ├── classification_user.md
     ├── tagging_system.md
     ├── tagging_user.md
-    └── retry_prompt.md
+    ├── transform_system.md
+    ├── transform_user.md
+    ├── retry_prompt.md
+    └── vocabulary.md
 ```
 
 User values in `config.yaml` are merged over the packaged defaults, so missing keys fall back to the defaults. A section that is not a mapping is rejected with an error notification.
@@ -67,6 +70,7 @@ The dialog has six tabs plus **Restore Defaults**, **Cancel** and **Save** butto
 * **Max Retries**: retries when a response fails JSON validation (default `3`).
 * **Preload Timeout** / **Request Timeout**: seconds allowed for model loading (default `180`) and for each pipeline request (default `300`).
 * **Output Language**: language for titles, rewritten prose and tags (default `English`; editable).
+* **Learn custom vocabulary from manual note edits**: automatically adds words corrected in the note reader to `vocabulary.md` (`ai.learn_from_edits`, default `true`).
 
 **Semantic Search**
 * **Embedding Model**: Ollama embedding model used for search (default `embeddinggemma-2:latest`). **Refresh** also lists installed models that report the `embedding` capability.
@@ -75,11 +79,11 @@ The dialog has six tabs plus **Restore Defaults**, **Cancel** and **Save** butto
 
 #### 5. Audio
 * **Audio Channels**: `1` (mono) or `2` (stereo). Audio is always captured at 16 kHz.
-* **Show floating HUD**: overlay with the elapsed recording time while dictating; clicking it stops the recording.
+* **Show floating HUD**: overlay showing a live audio level meter and elapsed recording time while dictating; left-clicking stops and processes the recording, while clicking `×` or right-clicking cancels and discards it.
 * **Play beep on recording start and stop**: audio cues, with **Beep Frequency** (default `440` Hz) and **Beep Duration** (default `0.1` s).
 
 #### 6. Prompts
-Editor for the Markdown prompts of each pipeline phase and the retry prompt (see below).
+Editor for the Markdown prompts of each pipeline phase, text transformations, the retry prompt, and the **Custom Vocabulary** list (`vocabulary.md`, see below).
 
 ![Prompts Editor (Dark)](screenshots/configuration-prompts-dark.png#only-dark)
 ![Prompts Editor (Light)](screenshots/configuration-prompts-light.png#only-light)
@@ -112,6 +116,7 @@ ai:
   max_retries: 3        # Number of times to retry LLM execution if the output is not valid JSON.
   preload_timeout: 180  # Timeout in seconds for preloading the model weights.
   request_timeout: 300  # Timeout in seconds for note generation requests.
+  learn_from_edits: true # Automatically add words corrected in the note editor to vocabulary.md.
 
 search:
   embedding_model: "embeddinggemma-2:latest"
@@ -149,6 +154,9 @@ Prompts reside in `~/.config/eloquent-notes/prompts/`:
 | `classification_user.md` | User prompt for Phase 3. | `{content}` |
 | `tagging_system.md` | System instructions for Phase 4 (topic tags). | — |
 | `tagging_user.md` | User prompt for Phase 4. | `{content}`, `{language_instruction}` |
+| `transform_system.md` | System instructions for Voice Edit and style transformations. | — |
+| `transform_user.md` | User prompt for Voice Edit and style transformations. | `{instruction}`, `{content}`, `{language_instruction}` |
 | `retry_prompt.md` | Correction sent when a response is not valid JSON. | — |
+| `vocabulary.md` | Custom vocabulary terms (one per line or comma-separated) injected into transcription, rewriting, and transformation prompts. | — |
 
 Unknown placeholders are left untouched. The JSON output shapes are fixed by the schemas in `llm.py` (see [Four-Phase AI Pipeline](pipeline.md)); prompts change the model's behavior, not the fields it returns.

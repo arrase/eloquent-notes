@@ -19,6 +19,7 @@ ai:
   max_retries: 3        # Number of times to retry LLM execution if the output is not valid JSON.
   preload_timeout: 180  # Timeout in seconds for preloading the model weights.
   request_timeout: 300  # Timeout in seconds for note generation requests.
+  learn_from_edits: true # Automatically add words corrected in the note editor to the custom vocabulary.
 
 search:
   embedding_model: "embeddinggemma-2:latest"

@@ -55,6 +55,9 @@ msgstr "Tetapan Rakaman Audio"
 msgid "Audio Channels:"
 msgstr "Saluran Audio:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "Tambah perkataan yang dibetulkan dalam editor nota secara automatik ke dalam kosa kata tersuai."
+
 msgid "Backup Count:"
 msgstr "Bilangan Sandaran:"
 
@@ -66,6 +69,9 @@ msgstr "Frekuensi Bip:"
 
 msgid "Browse..."
 msgstr "Semak imbas..."
+
+msgid "Bullet list"
+msgstr "Senarai titik"
 
 msgid "Cancel"
 msgstr "Batal"
@@ -114,6 +120,9 @@ msgstr "Tidak dapat menghentikan rakaman: {error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "Mencipta entri mula automatik desktop dalam direktori mula automatik XDG"
+
+msgid "Custom Vocabulary"
+msgstr "Kosa Kata Tersuai"
 
 msgid "Decision"
 msgstr "Keputusan"
@@ -211,6 +220,9 @@ msgstr "Nilai konfigurasi tidak sah untuk '{key}'"
 msgid "Keep Alive Time:"
 msgstr "Masa Keep Alive:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "Pelajari kosa kata tersuai daripada suntingan nota manual"
+
 msgid "Log File"
 msgstr "Fail Log"
 
@@ -222,6 +234,15 @@ msgstr "Tahap Log:"
 
 msgid "Logging Settings"
 msgstr "Tetapan Log"
+
+msgid "Make casual"
+msgstr "Jadikan santai"
+
+msgid "Make concise"
+msgstr "Jadikan ringkas"
+
+msgid "Make formal"
+msgstr "Jadikan formal"
 
 msgid "Max Log File Size:"
 msgstr "Saiz Fail Log Maks:"
@@ -270,6 +291,9 @@ msgstr "Nota"
 
 msgid "Note Saved"
 msgstr "Nota Disimpan"
+
+msgid "Note Transformed"
+msgstr "Nota Ditransformasikan"
 
 msgid "Note Type Colors"
 msgstr "Warna Jenis Nota"
@@ -351,6 +375,9 @@ msgstr "Prompt"
 
 msgid "Prompts:"
 msgstr "Prompt:"
+
+msgid "Proofread"
+msgstr "Semak pruf"
 
 msgid "Question"
 msgstr "Soalan"
@@ -445,6 +472,9 @@ msgstr "Stereo (2 saluran)"
 msgid "Stop dictation"
 msgstr "Hentikan imlak"
 
+msgid "Stop voice edit"
+msgstr "Hentikan suntingan suara"
+
 msgid "System is busy. Please wait."
 msgstr "Sistem sedang sibuk. Sila tunggu."
 
@@ -493,6 +523,18 @@ msgstr "Transkripsi - Prompt Sistem"
 msgid "Transcription - User Prompt"
 msgstr "Transkripsi - Prompt Pengguna"
 
+msgid "Transform"
+msgstr "Transformasi"
+
+msgid "Transformation - System Prompt"
+msgstr "Transformasi - Prompt Sistem"
+
+msgid "Transformation - User Prompt"
+msgstr "Transformasi - Prompt Pengguna"
+
+msgid "Translate to output language"
+msgstr "Terjemah ke bahasa output"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "URL pelayan Ollama tempatan atau jauh anda."
 
@@ -513,6 +555,9 @@ msgstr "Lihat Fail Log"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "Imlak suara ditukar menjadi nota yang tersusun"
+
+msgid "Voice edit"
+msgstr "Suntingan suara"
 
 msgid "Yesterday"
 msgstr "Semalam"

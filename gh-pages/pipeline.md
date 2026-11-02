@@ -97,7 +97,7 @@ Because Gemma 4's audio encoder accepts clips of up to 30 seconds (`MAX_CHUNK_S 
 - **Single-chunk trimming (`<= 30 s`):** leading and trailing non-speech 32 ms windows (including isolated start/stop click transients with `< 0.5 s` of voice) are trimmed while keeping a `0.2 s` padding margin (`SPEECH_PAD_S = 0.2`) on each side so word onsets and offsets are not clipped, preserving interior pauses intact.
 - **Natural-pause splitting (`> 30 s`):** when active speech exceeds `29.6 s` (`MAX_CHUNK_WINDOWS = 925`), `_find_split()` selects the longest real inter-word pause (`>= 256 ms`, `MIN_PAUSE_WINDOWS = 8` windows) in the second half of the window (or across the midpoint / first half if needed), avoiding intra-word consonant stop closures (`32–96 ms`). Padding between adjacent chunks is clamped to the pause midpoint so no samples are duplicated.
 - **Per-chunk voice filter:** every resulting span must contain at least `0.5 s` of active speech (`MIN_SPEECH_WINDOWS = 16`); sub-`0.5 s` noise bursts or trailing clicks are discarded before encoding.
-- **Sequential transcription & global synthesis:** `_process_audio()` transcribes each WAV chunk in Phase 1 and joins the non-empty segments with `" "` so Phases 2–4 operate on the complete dictation at once.
+- **Sequential transcription, inter-chunk continuity & custom vocabulary:** `_process_audio()` transcribes each WAV chunk in Phase 1, passing the last 200 characters of the previous chunk (`Previous segment ending (for context only, do NOT repeat)`) and any entries from `vocabulary.md` so domain-specific terms and proper nouns are spelled consistently across chunks, then joins the non-empty segments with `" "` so Phases 2–4 operate on the complete dictation at once.
 
 ### Early Exit Safeguard
 If every chunk in Phase 1 returns `"empty": true` or a blank transcription string, processing terminates immediately. The application fires an `"empty"` signal, displays a desktop notification ("Dictation Empty"), resets the tray icon to gray, and saves no file to disk.
@@ -106,7 +106,7 @@ If every chunk in Phase 1 returns `"empty": true` or a blank transcription strin
 
 ## 2. Phase 2: Note Rewriting
 
-Phase 2 converts the raw transcribed text from Phase 1 into clean, direct, first-person prose and a title.
+Phase 2 converts the raw transcribed text from Phase 1 into clean, direct, first-person prose and a title, injecting any custom vocabulary from `vocabulary.md`. For long transcriptions (`> 3000` characters, `CHUNK_THRESHOLD`), `llm.split_overlapping_windows()` splits the text at word boundaries into windows (`CHUNK_WINDOW_SIZE = 3500`) with a 500-character preceding context (`CHUNK_OVERLAP = 500`), keeping the title from the first window and joining the rewritten paragraphs with `"\n\n"`.
 
 ### Goals
 - Rephrase awkward oral phrasing into polished written prose (bullet and numbered lists allowed; no headers, bold or other decoration).
@@ -120,10 +120,12 @@ Phase 2 converts the raw transcribed text from Phase 1 into clean, direct, first
   "properties": {
     "title": {
       "type": "string",
+      "minLength": 1,
       "description": "Concise title (max 8 words) in the requested output language."
     },
     "content": {
       "type": "string",
+      "minLength": 1,
       "description": "Clean, direct note prose in the requested output language."
     }
   },
@@ -202,6 +204,17 @@ The worker then emits `processing_completed("success", title)`; the main thread 
 ## Add Dictation (Phases 1-2 Only)
 
 **Add dictation** in the reader starts a recording targeted at the open note. Processing runs Phase 1 and Phase 2 only (passing `ai.keep_alive` directly to Phase 2 since Phases 3 and 4 are skipped), then emits `processing_completed("appended", content)`. On the main thread the controller saves any pending reader edits, appends the rewritten content to the note body as a new paragraph (`notes.append_to_note()`), and shows a **Dictation Added** notification. The Phase 2 title is discarded; the note keeps its title, type and tags.
+
+---
+
+## Voice Edit & Style Transformations
+
+The reader also supports in-place AI transformations on either a selected excerpt or the full note body via `llm.transform_text()` (`TRANSFORM_SCHEMA`: `{"content": string}` with `minLength: 1`):
+
+- **Transform menu presets:** **Make concise**, **Make formal**, **Make casual**, **Bullet list**, **Proofread**, and **Translate to output language** run `_process_transform()` in the background using `transform_system.md` and `transform_user.md`.
+- **Voice edit:** **Voice edit** records a spoken instruction for the open note (or selected excerpt), runs Phase 1 (`_transcribe`) to transcribe the instruction, and then runs `_transform()` (`llm.transform_text`) to apply that instruction to the target text.
+- When a text selection is active, the full note body is included as reference context (`Full note context (for reference only)`) while instructing the model to return only the replacement for the selected excerpt.
+- When `processing_completed("transformed", content)` arrives on the main thread, `MainWindow.apply_note_replacement()` replaces the target range through `QTextCursor.insertText()` so the change can be undone with <kbd>Ctrl</kbd>+<kbd>Z</kbd>, saves the note, and shows a **Note Transformed** notification.
 
 ---
 
@@ -319,7 +332,7 @@ def _execute_ollama_json_request(
 ```
 
 ### Retry Mechanism Details
-1. **Schema-Constrained Output:** Requests include a `format` JSON schema so Ollama constrains sampling to the expected structure.
-2. **Schema Verification:** `_parse_json_response()` verifies that the output is a JSON object containing all required keys with matching types and enum values.
+1. **Schema-Constrained Output:** Requests include a `format` JSON schema and `DEFAULT_NUM_PREDICT = 4096` so Ollama constrains sampling to the expected structure without prematurely truncating longer notes.
+2. **Schema & Anti-Loop Verification:** `_parse_json_response()` verifies that the output is a JSON object containing all required keys with matching types, `minLength` constraints, and enum values, and rejects any string property containing a runaway repetition loop (`has_repeating_loop()`, 5+ consecutive repetitions of a 4–80 character pattern).
 3. **Chat Context Appending:** If validation fails, the erroneous assistant message is appended to the message history followed by the contents of `~/.config/eloquent-notes/prompts/retry_prompt.md`.
 4. **Retry Loop:** Retries execution up to `max_retries` times (default: 3) before raising an exception.

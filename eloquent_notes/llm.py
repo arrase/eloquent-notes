@@ -28,6 +28,7 @@ silence, the model frequently answers false and invents text instead, so
 import base64
 import json
 import logging
+import re
 from functools import partial
 from typing import Any
 
@@ -37,10 +38,16 @@ from eloquent_notes.notes import NOTE_TYPES
 
 logger = logging.getLogger("eloquent_notes.llm")
 
-DEFAULT_NUM_PREDICT = 2048
+DEFAULT_NUM_PREDICT = 4096
+
+CHUNK_THRESHOLD = 3000
+CHUNK_WINDOW_SIZE = 3500
+CHUNK_OVERLAP = 500
 
 # Gemma 4 enables reasoning by default; see the module docstring.
 THINK = False
+
+_REPEATING_LOOP_RE = re.compile(r"(.{4,80}?)\1{4,}", re.DOTALL)
 
 # Field order matters: Ollama emits properties in schema order under
 # constrained decoding, so "transcription" must come first for the model to
@@ -106,6 +113,18 @@ TAGGING_SCHEMA: dict[str, Any] = {
     "required": ["tags"],
 }
 
+TRANSFORM_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "content": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Transformed note text in the requested output language.",
+        },
+    },
+    "required": ["content"],
+}
+
 
 def _chat_url(ollama_url: str) -> str:
     return f"{ollama_url.rstrip('/')}/api/chat"
@@ -158,6 +177,53 @@ def preload_model(
     response.raise_for_status()
 
 
+def has_repeating_loop(text: str) -> bool:
+    return bool(_REPEATING_LOOP_RE.search(text))
+
+
+def _extract_overlap(prev_chunk: str, overlap: int) -> str:
+    if len(prev_chunk) <= overlap:
+        return prev_chunk.strip()
+    tail = prev_chunk[-overlap:]
+    if not prev_chunk[-overlap - 1].isspace():
+        space_idx = tail.find(" ", 0, overlap // 2)
+        if space_idx != -1:
+            tail = tail[space_idx + 1 :]
+    return tail.strip()
+
+
+def split_overlapping_windows(
+    text: str,
+    threshold: int = CHUNK_THRESHOLD,
+    window: int = CHUNK_WINDOW_SIZE,
+    overlap: int = CHUNK_OVERLAP,
+) -> list[tuple[str, str]]:
+    """Split long transcriptions into (overlap_context, chunk_text) windows."""
+    if len(text) <= threshold:
+        return [("", text)]
+
+    max_chunk = min(threshold, window - overlap)
+    windows: list[tuple[str, str]] = []
+    pos = 0
+    n = len(text)
+
+    while pos < n:
+        if n - pos <= max_chunk:
+            end = n
+        else:
+            end = pos + max_chunk
+            split_at = text.rfind(" ", pos + max_chunk // 2, end)
+            if split_at != -1:
+                end = split_at + 1
+
+        chunk = text[pos:end]
+        overlap_ctx = _extract_overlap(windows[-1][1], overlap) if windows else ""
+        windows.append((overlap_ctx, chunk))
+        pos = end
+
+    return windows
+
+
 def _validate_string_property(key: str, val: object, prop_schema: dict[str, Any]) -> None:
     if not isinstance(val, str):
         raise TypeError(f"field {key!r} must be a string, got {type(val).__name__}")
@@ -165,6 +231,8 @@ def _validate_string_property(key: str, val: object, prop_schema: dict[str, Any]
         raise ValueError(f"field {key!r} must not be empty")
     if "enum" in prop_schema and val not in prop_schema["enum"]:
         raise ValueError(f"field {key!r} has invalid value {val!r}, expected one of {prop_schema['enum']}")
+    if has_repeating_loop(val):
+        raise ValueError(f"field {key!r} contains a runaway repeating loop")
 
 
 def _validate_property(key: str, val: object, prop_schema: dict[str, Any]) -> None:
@@ -352,3 +420,4 @@ def _run_text_phase(
 rewrite_transcription = partial(_run_text_phase, REWRITING_SCHEMA, "note rewriting")
 classify_note = partial(_run_text_phase, CLASSIFICATION_SCHEMA, "note classification")
 tag_note = partial(_run_text_phase, TAGGING_SCHEMA, "note tagging")
+transform_text = partial(_run_text_phase, TRANSFORM_SCHEMA, "text transformation")

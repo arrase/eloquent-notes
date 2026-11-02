@@ -43,11 +43,12 @@ from eloquent_notes import (
 from eloquent_notes.i18n import _
 from eloquent_notes.logging_utils import setup_logging
 from eloquent_notes.search import SemanticIndex
-from eloquent_notes.window import MainWindow
+from eloquent_notes.window import TRANSFORM_PRESETS, MainWindow
 
 logger = logging.getLogger("eloquent_notes.app")
 
 APP_NAME = "Eloquent Notes"
+TRAY_IDLE_TOOLTIP = "Eloquent Notes (Idle)"
 
 
 def _configure_logging(cfg: dict[str, Any]) -> None:
@@ -99,6 +100,8 @@ class EloquentApp(QObject):
         self._snapshot: dict[str, Any] | None = None  # config + prompt files frozen at recording start
         self._recorder: audio.AudioRecorder | None = None
         self._append_target: notes.Note | None = None  # note that receives the current dictation, if any
+        self._replace_target: tuple[notes.Note, int, int] | None = None
+        self._voice_edit_context: tuple[str, str] | None = None
         self._preload_thread: threading.Thread | None = None
         self._processing_thread: threading.Thread | None = None
         self._config_dialog: config_gui.ConfigurationDialog | None = None
@@ -140,7 +143,7 @@ class EloquentApp(QObject):
         self.tray.setContextMenu(self.menu)
         self.tray.activated.connect(self._on_tray_activated)
         self.tray.messageClicked.connect(self.show_window)
-        self._update_icon("gray", _("Eloquent Notes (Idle)"))
+        self._update_icon("gray", _(TRAY_IDLE_TOOLTIP))
         self.tray.show()
 
     def _create_tray_menu(self) -> QMenu:
@@ -241,6 +244,8 @@ class EloquentApp(QObject):
                 type_colors=self.config["notes"]["type_colors"],
             )
             self.window.dictate_clicked.connect(self.dictate_into)
+            self.window.voice_edit_clicked.connect(self.voice_edit_into)
+            self.window.transform_requested.connect(self.transform_note)
             self.window.note_edited.connect(self._on_note_edited)
             self.window.delete_requested.connect(self._on_delete_requested)
             self.window.search_requested.connect(self._start_search)
@@ -270,6 +275,18 @@ class EloquentApp(QObject):
             self.window.set_notes(notes.load_notes(self._notes_folder()))
 
     def _on_note_edited(self, note: notes.Note) -> None:
+        if self.config["ai"]["learn_from_edits"]:
+            old_note = notes.parse_note(note.path)
+            if old_note is not None:
+                learned = notes.extract_learned_words(
+                    f"{old_note.title}\n{old_note.body}",
+                    f"{note.title}\n{note.body}",
+                )
+                if learned:
+                    vocab_path = Path(config.VOCABULARY_PATH)
+                    existing = config.load_file(config.VOCABULARY_PATH) if vocab_path.exists() else ""
+                    merged = notes.parse_vocabulary("\n".join([existing, *learned]))
+                    config.atomic_write(config.VOCABULARY_PATH, "\n".join(merged) + "\n")
         notes.save_note(note)
         self._refresh_window()
 
@@ -312,6 +329,8 @@ class EloquentApp(QObject):
         """Start recording a new note, stop and process, or notify that we are busy."""
         if self.state == IDLE:
             self._append_target = None
+            self._replace_target = None
+            self._voice_edit_context = None
             self._start_recording()
         elif self.state == RECORDING:
             self._stop_and_process()
@@ -322,9 +341,58 @@ class EloquentApp(QObject):
         """Start recording a dictation that will be appended to note, or stop the current one."""
         if self.state == IDLE:
             self._append_target = note
+            self._replace_target = None
+            self._voice_edit_context = None
             self._start_recording()
         else:
             self.toggle_action()
+
+    def voice_edit_into(
+        self,
+        note: notes.Note,
+        selected_text: str,
+        sel_start: int,
+        sel_end: int,
+    ) -> None:
+        """Start recording a spoken editing instruction for note (or selection), or stop the current one."""
+        if self.state == IDLE:
+            if not note.body.strip():
+                return
+            self._append_target = None
+            self._replace_target = (note, sel_start, sel_end)
+            self._voice_edit_context = (note.body, selected_text)
+            self._start_recording()
+        else:
+            self.toggle_action()
+
+    def transform_note(
+        self,
+        note: notes.Note,
+        preset_key: str,
+        selected_text: str,
+        sel_start: int,
+        sel_end: int,
+    ) -> None:
+        """Transform note body (or selected excerpt) in the background using a preset."""
+        if self.state != IDLE:
+            self._notify(APP_NAME, _("System is busy. Please wait."))
+            return
+        if not note.body.strip():
+            return
+
+        instruction = next(inst for key, _label, inst in TRANSFORM_PRESETS if key == preset_key)
+        snapshot = copy.deepcopy(self.config)
+        snapshot["_loaded_files"] = {path: config.load_file(path) for path in config.PROMPT_PATHS}
+
+        self.state = PROCESSING
+        self._replace_target = (note, sel_start, sel_end)
+        self._update_icon("orange", _("Eloquent Notes (Processing...)"))
+        self._processing_thread = threading.Thread(
+            target=self._process_transform,
+            args=(snapshot, note.body, preset_key, instruction, selected_text),
+            daemon=True,
+        )
+        self._processing_thread.start()
 
     def _start_recording(self) -> None:
         logger.info("Starting audio recording...")
@@ -352,6 +420,7 @@ class EloquentApp(QObject):
             if self._hud is None:
                 self._hud = recording_hud.RecordingHUD()
                 self._hud.clicked.connect(self.toggle_action)
+                self._hud.cancelled.connect(self.cancel_recording)
             self._hud.show_recording()
             self._tick_timer.start(100)
 
@@ -382,6 +451,39 @@ class EloquentApp(QObject):
         if self._hud is not None and self._hud.isVisible():
             elapsed = time.monotonic() - self._recording_started_at
             self._hud.update_timer(elapsed)
+            if self._recorder is not None:
+                self._hud.update_level(self._recorder.rms)
+
+    def cancel_recording(self) -> None:
+        """Abort the active recording and discard captured audio without processing."""
+        if self.state != RECORDING:
+            return
+        self._tick_timer.stop()
+        if self._hud is not None:
+            self._hud.hide()
+
+        recorder, snapshot, preload_thread = self._recorder, self._snapshot, self._preload_thread
+        self._recorder = None
+        self._snapshot = None
+        self._append_target = None
+        self._replace_target = None
+        self._voice_edit_context = None
+
+        logger.info("Cancelling recording...")
+        try:
+            recorder.stop()
+        except Exception:
+            logger.exception("Error stopping recorder on cancel")
+
+        self.state = IDLE
+        self._update_icon("gray", _(TRAY_IDLE_TOOLTIP))
+
+        if snapshot is not None and snapshot["ai"]["keep_alive"] != snapshot["ai"]["preload_keep_alive"]:
+            threading.Thread(
+                target=self._reset_keep_alive,
+                args=(snapshot["ai"], preload_thread),
+                daemon=True,
+            ).start()
 
     def _stop_and_process(self) -> None:
         self.state = PROCESSING
@@ -390,8 +492,10 @@ class EloquentApp(QObject):
             self._hud.hide()
 
         recorder, snapshot, preload_thread = self._recorder, self._snapshot, self._preload_thread
+        voice_edit_context = self._voice_edit_context
         self._recorder = None
         self._snapshot = None
+        self._voice_edit_context = None
 
         logger.info("Stopping recording and starting processing...")
         try:
@@ -406,7 +510,7 @@ class EloquentApp(QObject):
 
         self._processing_thread = threading.Thread(
             target=self._process_audio,
-            args=(recorder, snapshot, self._append_target is not None, preload_thread),
+            args=(recorder, snapshot, self._append_target is not None, preload_thread, voice_edit_context),
             daemon=True,
         )
         self._processing_thread.start()
@@ -418,15 +522,30 @@ class EloquentApp(QObject):
         return f"IMPORTANT: You MUST write the {fields} in {target_language}, translating if necessary."
 
     @staticmethod
-    def _transcribe(ai_cfg: dict[str, Any], loaded: dict[str, str], wav_chunks: list[bytes]) -> str:
-        transcriptions = []
+    def _vocabulary_suffix(loaded: dict[str, str]) -> str:
+        words = notes.parse_vocabulary(loaded[config.VOCABULARY_PATH])
+        if not words:
+            return ""
+        return f"\n\nCustom vocabulary (use these exact spellings when relevant): {', '.join(words)}"
+
+    @classmethod
+    def _transcribe(cls, ai_cfg: dict[str, Any], loaded: dict[str, str], wav_chunks: list[bytes]) -> str:
+        transcriptions: list[str] = []
+        base_user_prompt = loaded[config.TRANSCRIPTION_USER_PROMPT_PATH] + cls._vocabulary_suffix(loaded)
         for index, wav_bytes in enumerate(wav_chunks, start=1):
             logger.info("Phase 1: Transcribing audio chunk %d/%d...", index, len(wav_chunks))
+            if transcriptions:
+                prev_context = transcriptions[-1][-200:]
+                user_prompt = (
+                    f'{base_user_prompt}\n\nPrevious segment ending (for context only, do NOT repeat): "{prev_context}"'
+                )
+            else:
+                user_prompt = base_user_prompt
             result = llm.transcribe_audio(
                 ollama_url=ai_cfg["ollama_url"],
                 model=ai_cfg["model"],
                 system_prompt=loaded[config.TRANSCRIPTION_SYSTEM_PROMPT_PATH],
-                user_prompt=loaded[config.TRANSCRIPTION_USER_PROMPT_PATH],
+                user_prompt=user_prompt,
                 retry_prompt=loaded[config.RETRY_PROMPT_PATH],
                 context_length=ai_cfg["context_length"],
                 audio_bytes=wav_bytes,
@@ -472,18 +591,49 @@ class EloquentApp(QObject):
         transcription: str,
         keep_alive: str,
     ) -> dict[str, Any]:
-        return cls._call_text_phase(
-            llm.rewrite_transcription,
-            ai_cfg,
-            loaded,
-            system_path=config.REWRITING_SYSTEM_PROMPT_PATH,
-            user_path=config.REWRITING_USER_PROMPT_PATH,
-            placeholders={
-                "transcription": transcription,
-                "language_instruction": cls._language_instruction("title and content", ai_cfg["output_language"]),
-            },
-            keep_alive=keep_alive,
-        )
+        windows = llm.split_overlapping_windows(transcription)
+        lang_instruction = cls._language_instruction(
+            "title and content", ai_cfg["output_language"]
+        ) + cls._vocabulary_suffix(loaded)
+        if len(windows) == 1:
+            return cls._call_text_phase(
+                llm.rewrite_transcription,
+                ai_cfg,
+                loaded,
+                system_path=config.REWRITING_SYSTEM_PROMPT_PATH,
+                user_path=config.REWRITING_USER_PROMPT_PATH,
+                placeholders={
+                    "transcription": transcription,
+                    "language_instruction": lang_instruction,
+                },
+                keep_alive=keep_alive,
+            )
+
+        first_title = ""
+        contents: list[str] = []
+        for idx, (overlap_ctx, chunk_text) in enumerate(windows):
+            is_last = idx == len(windows) - 1
+            prompt_text = (
+                f"[Preceding context — do NOT repeat:\n{overlap_ctx}]\n\n{chunk_text}" if overlap_ctx else chunk_text
+            )
+            result = cls._call_text_phase(
+                llm.rewrite_transcription,
+                ai_cfg,
+                loaded,
+                system_path=config.REWRITING_SYSTEM_PROMPT_PATH,
+                user_path=config.REWRITING_USER_PROMPT_PATH,
+                placeholders={
+                    "transcription": prompt_text,
+                    "language_instruction": lang_instruction,
+                },
+                keep_alive=keep_alive if is_last else ai_cfg["preload_keep_alive"],
+            )
+            if idx == 0:
+                first_title = result["title"]
+            stripped = result["content"].strip()
+            if stripped:
+                contents.append(stripped)
+        return {"title": first_title, "content": "\n\n".join(contents)}
 
     @classmethod
     def _classify(
@@ -522,6 +672,71 @@ class EloquentApp(QObject):
             keep_alive=ai_cfg["keep_alive"],
         )
 
+    @staticmethod
+    def _format_transform_content(full_body: str, selected_text: str) -> str:
+        if selected_text.strip():
+            return (
+                f"Full note context (for reference only):\n{full_body}\n\n"
+                "Selected excerpt to transform (return ONLY the transformed replacement for this excerpt):\n"
+                f"{selected_text}"
+            )
+        return full_body
+
+    @classmethod
+    def _transform(
+        cls,
+        ai_cfg: dict[str, Any],
+        loaded: dict[str, str],
+        instruction: str,
+        content: str,
+        *,
+        translate_to_output: bool,
+    ) -> dict[str, Any]:
+        lang_instruction = (
+            cls._language_instruction("transformed text", ai_cfg["output_language"])
+            if translate_to_output
+            else "IMPORTANT: Keep the text in its current language unless instructed otherwise."
+        )
+        return cls._call_text_phase(
+            llm.transform_text,
+            ai_cfg,
+            loaded,
+            system_path=config.TRANSFORM_SYSTEM_PROMPT_PATH,
+            user_path=config.TRANSFORM_USER_PROMPT_PATH,
+            placeholders={
+                "instruction": instruction,
+                "content": content + cls._vocabulary_suffix(loaded),
+                "language_instruction": lang_instruction,
+            },
+            keep_alive=ai_cfg["keep_alive"],
+        )
+
+    def _process_transform(
+        self,
+        snapshot: dict[str, Any],
+        full_body: str,
+        preset_key: str,
+        instruction: str,
+        selected_text: str,
+    ) -> None:
+        logger.info("Transforming note with preset '%s'...", preset_key)
+        loaded = snapshot["_loaded_files"]
+        ai_cfg = snapshot["ai"]
+        content = self._format_transform_content(full_body, selected_text)
+        try:
+            result = self._transform(
+                ai_cfg,
+                loaded,
+                instruction,
+                content,
+                translate_to_output=(preset_key == "translate"),
+            )
+            status, detail = "transformed", self._validate_transform(result)
+        except Exception as e:
+            logger.exception("Error during note transformation")
+            status, detail = "error", str(e)
+        self.processing_completed.emit(status, detail)
+
     def _reset_keep_alive(self, ai_cfg: dict[str, Any], preload_thread: threading.Thread | None) -> None:
         if preload_thread is not None and preload_thread.is_alive():
             preload_thread.join(timeout=ai_cfg["preload_timeout"])
@@ -535,12 +750,20 @@ class EloquentApp(QObject):
             raise ValueError(_("Model returned empty note content"))
         return title, content
 
+    @staticmethod
+    def _validate_transform(result: dict[str, Any]) -> str:
+        content: str = result["content"].strip()
+        if not content:
+            raise ValueError(_("Model returned empty note content"))
+        return content
+
     def _process_audio(
         self,
         recorder: audio.AudioRecorder,
         snapshot: dict[str, Any],
         append: bool,  # noqa: FBT001
         preload_thread: threading.Thread | None,
+        voice_edit_context: tuple[str, str] | None = None,
     ) -> None:
         """Run the pipeline over the recorded audio.
 
@@ -562,6 +785,20 @@ class EloquentApp(QObject):
             if not transcription:
                 return
             logger.info("Transcription: %s", transcription)
+
+            if voice_edit_context is not None:
+                full_body, selected_text = voice_edit_context
+                logger.info("Applying voice edit transformation...")
+                result = self._transform(
+                    ai_cfg,
+                    loaded,
+                    transcription,
+                    self._format_transform_content(full_body, selected_text),
+                    translate_to_output=False,
+                )
+                completed_final_phase = True
+                status, detail = "transformed", self._validate_transform(result)
+                return
 
             logger.info("Phase 2: Rewriting transcription...")
             rewrite = self._rewrite(
@@ -607,8 +844,10 @@ class EloquentApp(QObject):
 
     def _on_processing_completed(self, status: str, detail: str) -> None:
         self.state = IDLE
-        self._update_icon("gray", _("Eloquent Notes (Idle)"))
+        self._update_icon("gray", _(TRAY_IDLE_TOOLTIP))
         target, self._append_target = self._append_target, None
+        replace_target, self._replace_target = self._replace_target, None
+        self._voice_edit_context = None
 
         if status == "success":
             logger.info("Note saved: %s", detail)
@@ -616,6 +855,8 @@ class EloquentApp(QObject):
             self._refresh_window()
         elif status == "appended":
             self._append_dictation(target, detail)
+        elif status == "transformed":
+            self._apply_replacement(replace_target, detail)
         elif status == "empty":
             logger.info("Dictation processing finished: Audio was empty")
             self._notify(
@@ -628,6 +869,22 @@ class EloquentApp(QObject):
                 _("Processing Error"),
                 _("Error processing dictation: {detail}").format(detail=detail),
             )
+
+    def _apply_replacement(self, replace_target: tuple[notes.Note, int, int] | None, text: str) -> None:
+        if replace_target is None:
+            return
+        target_note, sel_start, sel_end = replace_target
+        if self.window is not None and self.window.apply_note_replacement(target_note.path, text, sel_start, sel_end):
+            self._notify(_("Note Transformed"), target_note.title)
+            self._refresh_window()
+            return
+        note = notes.parse_note(target_note.path)
+        if note is None:
+            return
+        note.body = note.body[:sel_start] + text + note.body[sel_end:]
+        notes.save_note(note)
+        self._notify(_("Note Transformed"), note.title)
+        self._refresh_window()
 
     def _append_dictation(self, target: notes.Note | None, text: str) -> None:
         """Append dictated text to target, keeping any edits pending in the reader."""

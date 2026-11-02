@@ -55,6 +55,9 @@ msgstr "آڈیو کیپچر ترتیبات"
 msgid "Audio Channels:"
 msgstr "آڈیو چینلز:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "نوٹ ایڈیٹر میں درست کیے گئے الفاظ کو خودکار طور پر مخصوص الفاظ کے ذخیرے میں شامل کریں۔"
+
 msgid "Backup Count:"
 msgstr "بیک اپ تعداد:"
 
@@ -66,6 +69,9 @@ msgstr "بیپ فریکوئنسی:"
 
 msgid "Browse..."
 msgstr "براؤز کریں..."
+
+msgid "Bullet list"
+msgstr "بلٹ لسٹ"
 
 msgid "Cancel"
 msgstr "منسوخ کریں"
@@ -114,6 +120,9 @@ msgstr "ریکارڈنگ بند نہیں ہو سکی: {error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "XDG آٹوسٹارٹ ڈائریکٹری میں ڈیسک ٹاپ آٹوسٹارٹ انٹری بناتا ہے"
+
+msgid "Custom Vocabulary"
+msgstr "مخصوص ذخیرہ الفاظ"
 
 msgid "Decision"
 msgstr "فیصلہ"
@@ -211,6 +220,9 @@ msgstr "'{key}' کے لیے غلط کنفیگریشن قدر"
 msgid "Keep Alive Time:"
 msgstr "Keep Alive وقت:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "نوٹس کی دستی ترمیم سے مخصوص ذخیرہ الفاظ سیکھیں"
+
 msgid "Log File"
 msgstr "لاگ فائل"
 
@@ -222,6 +234,15 @@ msgstr "لاگنگ کی سطح:"
 
 msgid "Logging Settings"
 msgstr "لاگنگ ترتیبات"
+
+msgid "Make casual"
+msgstr "غیر رسمی بنائیں"
+
+msgid "Make concise"
+msgstr "مختصر بنائیں"
+
+msgid "Make formal"
+msgstr "رسمی بنائیں"
 
 msgid "Max Log File Size:"
 msgstr "لاگ فائل کا زیادہ سے زیادہ سائز:"
@@ -270,6 +291,9 @@ msgstr "نوٹ"
 
 msgid "Note Saved"
 msgstr "نوٹ محفوظ ہو گیا"
+
+msgid "Note Transformed"
+msgstr "نوٹ تبدیل ہو گیا"
 
 msgid "Note Type Colors"
 msgstr "نوٹ کی اقسام کے رنگ"
@@ -351,6 +375,9 @@ msgstr "پرامپٹس"
 
 msgid "Prompts:"
 msgstr "پرامپٹس:"
+
+msgid "Proofread"
+msgstr "پروف ریڈ کریں"
 
 msgid "Question"
 msgstr "سوال"
@@ -445,6 +472,9 @@ msgstr "اسٹیریو (2 چینلز)"
 msgid "Stop dictation"
 msgstr "املا روکیں"
 
+msgid "Stop voice edit"
+msgstr "آواز سے ترمیم روکیں"
+
 msgid "System is busy. Please wait."
 msgstr "سسٹم مصروف ہے۔ براہ کرم انتظار کریں۔"
 
@@ -493,6 +523,18 @@ msgstr "ٹرانسکرپشن - سسٹم پرامپٹ"
 msgid "Transcription - User Prompt"
 msgstr "ٹرانسکرپشن - صارف پرامپٹ"
 
+msgid "Transform"
+msgstr "تبدیل کریں"
+
+msgid "Transformation - System Prompt"
+msgstr "تبدیلی - سسٹم پرامپٹ"
+
+msgid "Transformation - User Prompt"
+msgstr "تبدیلی - صارف پرامپٹ"
+
+msgid "Translate to output language"
+msgstr "آؤٹ پٹ زبان میں ترجمہ کریں"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "آپ کے مقامی یا ریموٹ Ollama سرور کا URL۔"
 
@@ -513,6 +555,9 @@ msgstr "لاگ فائل دیکھیں"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "صوتی املا کو منظم نوٹس میں بدل دیا گیا"
+
+msgid "Voice edit"
+msgstr "آواز سے ترمیم"
 
 msgid "Yesterday"
 msgstr "کل"

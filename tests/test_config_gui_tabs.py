@@ -38,6 +38,7 @@ def test_ai_tab_load_and_save_valid(qapp: QApplication) -> None:
             "max_retries": 4,
             "preload_timeout": 50,
             "request_timeout": 100,
+            "learn_from_edits": True,
         },
         "search": {
             "embedding_model": "embeddinggemma-2:latest",
@@ -56,12 +57,16 @@ def test_ai_tab_load_and_save_valid(qapp: QApplication) -> None:
     assert not tab.chk_context_default.isChecked()
     assert tab.spn_preload_timeout.value() == 50
     assert tab.spn_request_timeout.value() == 100
+    assert tab.chk_learn_from_edits.isChecked() is True
 
+    tab.chk_learn_from_edits.setChecked(False)
     config_data["ai"]["output_language"] = "Esperanto"
     with patch.object(AITab, "_fetch_models"):
         tab.load_settings(config_data)
     assert tab.cmb_language.currentText() == "Esperanto"
+    assert tab.chk_learn_from_edits.isChecked() is True
     tab.cmb_language.setCurrentText("Japanese")
+    tab.chk_learn_from_edits.setChecked(False)
 
     assert tab.cmb_embedding_model.currentText() == "embeddinggemma-2:latest"
     assert tab.txt_search_keep_alive.text() == "5m"
@@ -75,6 +80,7 @@ def test_ai_tab_load_and_save_valid(qapp: QApplication) -> None:
     assert config_data["ai"]["ollama_url"] == "http://localhost:11434"
     assert config_data["ai"]["keep_alive"] == "10m"
     assert config_data["ai"]["output_language"] == "Japanese"
+    assert config_data["ai"]["learn_from_edits"] is False
     assert config_data["search"] == {
         "embedding_model": "other-embed",
         "keep_alive": "15m",
@@ -98,6 +104,7 @@ def test_ai_tab_context_default_toggle(qapp: QApplication) -> None:
             "max_retries": 3,
             "preload_timeout": 60,
             "request_timeout": 120,
+            "learn_from_edits": True,
         },
         "search": {
             "embedding_model": "embeddinggemma-2:latest",
@@ -135,6 +142,7 @@ def test_ai_tab_save_validation_failures(qapp: QApplication) -> None:
             "max_retries": 3,
             "preload_timeout": 60,
             "request_timeout": 120,
+            "learn_from_edits": True,
         },
         "search": {
             "embedding_model": "embeddinggemma-2:latest",
@@ -555,6 +563,9 @@ def test_prompts_list_covers_every_prompt_path_in_pipeline_order() -> None:
         config.CLASSIFICATION_USER_PROMPT_PATH,
         config.TAGGING_SYSTEM_PROMPT_PATH,
         config.TAGGING_USER_PROMPT_PATH,
+        config.TRANSFORM_SYSTEM_PROMPT_PATH,
+        config.TRANSFORM_USER_PROMPT_PATH,
         config.RETRY_PROMPT_PATH,
+        config.VOCABULARY_PATH,
     ]
     assert set(paths) == set(config.PROMPT_PATHS)

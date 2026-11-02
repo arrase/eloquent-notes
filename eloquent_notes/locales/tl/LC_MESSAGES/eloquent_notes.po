@@ -55,6 +55,9 @@ msgstr "Mga Setting sa Pag-record ng Audio"
 msgid "Audio Channels:"
 msgstr "Mga Channel ng Audio:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "Awtomatikong idagdag sa custom na bokabularyo ang mga salitang itinama sa editor ng tala."
+
 msgid "Backup Count:"
 msgstr "Bilang ng Backup:"
 
@@ -66,6 +69,9 @@ msgstr "Dalas ng Beep:"
 
 msgid "Browse..."
 msgstr "Mag-browse..."
+
+msgid "Bullet list"
+msgstr "Listahang naka-bullet"
 
 msgid "Cancel"
 msgstr "Kanselahin"
@@ -114,6 +120,9 @@ msgstr "Hindi maihinto ang pag-record: {error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "Gumagawa ng desktop autostart entry sa XDG autostart directory"
+
+msgid "Custom Vocabulary"
+msgstr "Custom na Bokabularyo"
 
 msgid "Decision"
 msgstr "Desisyon"
@@ -211,6 +220,9 @@ msgstr "Di-wastong halaga ng configuration para sa '{key}'"
 msgid "Keep Alive Time:"
 msgstr "Oras ng Keep Alive:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "Matuto ng custom na bokabularyo mula sa manu-manong pag-edit ng tala"
+
 msgid "Log File"
 msgstr "Log File"
 
@@ -222,6 +234,15 @@ msgstr "Antas ng Pag-log:"
 
 msgid "Logging Settings"
 msgstr "Mga Setting ng Pag-log"
+
+msgid "Make casual"
+msgstr "Gawing kaswal"
+
+msgid "Make concise"
+msgstr "Gawing maikli"
+
+msgid "Make formal"
+msgstr "Gawing pormal"
 
 msgid "Max Log File Size:"
 msgstr "Max na Laki ng Log File:"
@@ -270,6 +291,9 @@ msgstr "Tala"
 
 msgid "Note Saved"
 msgstr "Na-save ang Tala"
+
+msgid "Note Transformed"
+msgstr "Nabago ang Tala"
 
 msgid "Note Type Colors"
 msgstr "Mga Kulay ng Uri ng Tala"
@@ -351,6 +375,9 @@ msgstr "Mga Prompt"
 
 msgid "Prompts:"
 msgstr "Mga Prompt:"
+
+msgid "Proofread"
+msgstr "Iwasto ang teksto"
 
 msgid "Question"
 msgstr "Tanong"
@@ -445,6 +472,9 @@ msgstr "Stereo (2 channel)"
 msgid "Stop dictation"
 msgstr "Ihinto ang diktasyon"
 
+msgid "Stop voice edit"
+msgstr "Itigil ang pag-edit gamit ang boses"
+
 msgid "System is busy. Please wait."
 msgstr "Abala ang system. Mangyaring maghintay."
 
@@ -493,6 +523,18 @@ msgstr "Transkripsyon - System Prompt"
 msgid "Transcription - User Prompt"
 msgstr "Transkripsyon - User Prompt"
 
+msgid "Transform"
+msgstr "Baguhin"
+
+msgid "Transformation - System Prompt"
+msgstr "Pagbabago - System Prompt"
+
+msgid "Transformation - User Prompt"
+msgstr "Pagbabago - User Prompt"
+
+msgid "Translate to output language"
+msgstr "Isalin sa wika ng output"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "URL ng iyong lokal o remote na Ollama server."
 
@@ -513,6 +555,9 @@ msgstr "Tingnan ang Log File"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "Mga diktasyon ng boses na ginawang organisadong mga tala"
+
+msgid "Voice edit"
+msgstr "I-edit gamit ang boses"
 
 msgid "Yesterday"
 msgstr "Kahapon"

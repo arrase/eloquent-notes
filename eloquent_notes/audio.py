@@ -165,6 +165,7 @@ class AudioRecorder:
 
     def __init__(self, channels: int) -> None:
         self.channels = channels
+        self.rms: float = 0.0
         self._chunks: list[np.ndarray] = []
         self._cached_chunks = 0
         self._speech_chunks: list[np.ndarray] = []
@@ -178,6 +179,7 @@ class AudioRecorder:
         _status: sd.CallbackFlags,
     ) -> None:
         """sounddevice callback — enqueue an immutable copy of each chunk."""
+        self.rms = float(np.sqrt(np.mean(indata * indata))) if indata.size else 0.0
         self._chunks.append(indata.copy())
 
     def start(self) -> None:

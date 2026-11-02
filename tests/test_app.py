@@ -31,6 +31,7 @@ def mock_config(tmp_path: Path) -> dict[str, Any]:
             "request_timeout": 10,
             "keep_alive": "0",
             "output_language": "English",
+            "learn_from_edits": True,
         },
         "audio": {
             "channels": 1,
@@ -276,7 +277,7 @@ def test_toggle_from_recording_stops_and_processes(qapp: QApplication) -> None:
     recorder.stop.assert_called_once()
     assert eloquent_app._processing_thread is mock_thread_cls.return_value
     assert mock_thread_cls.call_args.kwargs["target"] == eloquent_app._process_audio
-    assert mock_thread_cls.call_args.kwargs["args"] == (recorder, snapshot, False, preload_thread)
+    assert mock_thread_cls.call_args.kwargs["args"] == (recorder, snapshot, False, preload_thread, None)
 
 
 def test_stop_recording_failure_resets_to_idle(qapp: QApplication) -> None:
@@ -312,9 +313,10 @@ def test_toggle_while_processing_notifies_busy(qapp: QApplication) -> None:
     )
 
 
-def test_recording_tick_updates_hud_timer(qapp: QApplication) -> None:
+def test_recording_tick_updates_hud_timer_and_level(qapp: QApplication) -> None:
     eloquent_app = make_app(qapp)
     recorder = MagicMock()
+    recorder.rms = 0.25
     eloquent_app.state = "RECORDING"
     eloquent_app._recorder = recorder
     assert eloquent_app._hud is not None
@@ -325,8 +327,72 @@ def test_recording_tick_updates_hud_timer(qapp: QApplication) -> None:
         eloquent_app._on_recording_tick()
 
     eloquent_app._hud.update_timer.assert_called_once_with(40.0)  # type: ignore[attr-defined]
+    eloquent_app._hud.update_level.assert_called_once_with(0.25)  # type: ignore[attr-defined]
     assert eloquent_app.state == "RECORDING"
     recorder.stop.assert_not_called()
+
+
+def test_cancel_recording_aborts_and_resets_keep_alive(qapp: QApplication, tmp_path: Path) -> None:
+    eloquent_app = make_app(qapp)
+
+    # Calling cancel_recording while IDLE is a no-op
+    eloquent_app.cancel_recording()
+    eloquent_app._update_icon.assert_not_called()  # type: ignore[attr-defined]
+
+    recorder: Any = MagicMock()
+    preload_thread = MagicMock()
+    snapshot: Any = _pipeline_snapshot()
+    note: Any = _write_note(tmp_path / "notes")
+    eloquent_app.state = "RECORDING"
+    eloquent_app._recorder = recorder
+    eloquent_app._snapshot = snapshot
+    eloquent_app._preload_thread = preload_thread
+    eloquent_app._append_target = note
+    eloquent_app._replace_target = (note, 0, 5)
+    eloquent_app._voice_edit_context = (note.body, "")
+    eloquent_app._tick_timer.start(100)
+
+    with patch("eloquent_notes.app.threading.Thread") as mock_thread_cls:
+        eloquent_app.cancel_recording()
+
+    assert eloquent_app.state == "IDLE"
+    assert not eloquent_app._tick_timer.isActive()
+    assert eloquent_app._hud is not None
+    eloquent_app._hud.hide.assert_called_once()  # type: ignore[attr-defined]
+    recorder.stop.assert_called_once()
+    assert eloquent_app._recorder is None
+    assert eloquent_app._snapshot is None
+    assert eloquent_app._append_target is None
+    assert vars(eloquent_app)["_replace_target"] is None
+    assert vars(eloquent_app)["_voice_edit_context"] is None
+    assert eloquent_app._processing_thread is None
+    eloquent_app._update_icon.assert_called_once_with("gray", "Eloquent Notes (Idle)")  # type: ignore[attr-defined]
+    mock_thread_cls.assert_called_once_with(
+        target=eloquent_app._reset_keep_alive,
+        args=(snapshot["ai"], preload_thread),
+        daemon=True,
+    )
+    mock_thread_cls.return_value.start.assert_called_once()
+
+
+def test_cancel_recording_logs_stop_exception_and_resets_state(qapp: QApplication) -> None:
+    eloquent_app = make_app(qapp)
+    recorder: Any = MagicMock()
+    recorder.stop.side_effect = RuntimeError("PortAudio cancel error")
+    snapshot: Any = _pipeline_snapshot()
+    snapshot["ai"]["keep_alive"] = snapshot["ai"]["preload_keep_alive"]
+    eloquent_app.state = "RECORDING"
+    eloquent_app._recorder = recorder
+    eloquent_app._snapshot = snapshot
+
+    with patch("eloquent_notes.app.threading.Thread") as mock_thread_cls:
+        eloquent_app.cancel_recording()
+
+    assert eloquent_app.state == "IDLE"
+    assert eloquent_app._recorder is None
+    assert eloquent_app._snapshot is None
+    mock_thread_cls.assert_not_called()
+    eloquent_app._update_icon.assert_called_once_with("gray", "Eloquent Notes (Idle)")  # type: ignore[attr-defined]
 
 
 def test_start_recording_creates_hud_lazily(qapp: QApplication) -> None:
@@ -458,6 +524,7 @@ def _pipeline_snapshot() -> dict[str, Any]:
             "request_timeout": 10,
             "keep_alive": "0",
             "output_language": "English",
+            "learn_from_edits": True,
         },
         "notes": {
             "folder": "/var/empty/notes",
@@ -470,8 +537,11 @@ def _pipeline_snapshot() -> dict[str, Any]:
             config.CLASSIFICATION_USER_PROMPT_PATH: "{content}",
             config.TAGGING_SYSTEM_PROMPT_PATH: "sys tag",
             config.TAGGING_USER_PROMPT_PATH: "{content}\n{language_instruction}",
+            config.TRANSFORM_SYSTEM_PROMPT_PATH: "sys transform",
+            config.TRANSFORM_USER_PROMPT_PATH: "Instruction: {instruction}\n{content}\n{language_instruction}",
             config.TRANSCRIPTION_SYSTEM_PROMPT_PATH: "sys trans",
             config.TRANSCRIPTION_USER_PROMPT_PATH: "usr trans",
+            config.VOCABULARY_PATH: "",
         },
     }
 
@@ -726,8 +796,42 @@ def test_process_audio_multi_chunk_transcription(qapp: QApplication, tmp_path: P
         b"chunk2",
         b"chunk3",
     ]
+    assert mock_transcribe.call_args_list[0].kwargs["user_prompt"] == "usr trans"
+    assert '"First part."' in mock_transcribe.call_args_list[2].kwargs["user_prompt"]
     assert "First part. Second part." in mock_rewrite.call_args.kwargs["user_prompt"]
     eloquent_app.processing_completed.emit.assert_called_once_with("success", "Multi-chunk Note")
+
+
+def test_rewrite_long_transcription_uses_overlapping_windows() -> None:
+    snapshot = _pipeline_snapshot()
+    ai_cfg = snapshot["ai"]
+    loaded = snapshot["_loaded_files"]
+
+    long_transcription = " ".join(f"word{i:04d}" for i in range(600))
+    assert len(long_transcription) > 3000
+
+    with patch(
+        "eloquent_notes.app.llm.rewrite_transcription",
+        side_effect=[
+            {"title": "First Window Title", "content": "  First rewritten paragraph.  "},
+            {"title": "Ignored Second Title", "content": "  Second rewritten paragraph.  "},
+        ],
+    ) as mock_rewrite:
+        result = EloquentApp._rewrite(ai_cfg, loaded, long_transcription, "0")
+
+    assert mock_rewrite.call_count == 2
+    first_call, second_call = mock_rewrite.call_args_list
+
+    assert first_call.kwargs["keep_alive"] == "5m"
+    assert "[Preceding context" not in first_call.kwargs["user_prompt"]
+
+    assert second_call.kwargs["keep_alive"] == "0"
+    assert "[Preceding context — do NOT repeat:" in second_call.kwargs["user_prompt"]
+
+    assert result == {
+        "title": "First Window Title",
+        "content": "First rewritten paragraph.\n\nSecond rewritten paragraph.",
+    }
 
 
 def test_process_audio_append_stops_after_rewriting(qapp: QApplication) -> None:
@@ -889,6 +993,19 @@ def test_packaged_default_prompts_render_cleanly() -> None:
         assert "Clean note body" in tag_prompt
         assert "write the tags in Spanish" in tag_prompt
         assert "{" not in tag_prompt
+
+    with patch("eloquent_notes.app.llm.transform_text") as mock_transform:
+        EloquentApp._transform(ai_cfg, loaded, "Make formal", "Clean note body", translate_to_output=False)
+        transform_prompt = mock_transform.call_args.kwargs["user_prompt"]
+        assert "Make formal" in transform_prompt
+        assert "Clean note body" in transform_prompt
+        assert "Keep the text in its current language" in transform_prompt
+        assert "{" not in transform_prompt
+
+        EloquentApp._transform(ai_cfg, loaded, "Translate", "Clean note body", translate_to_output=True)
+        translate_prompt = mock_transform.call_args.kwargs["user_prompt"]
+        assert "write the transformed text in Spanish" in translate_prompt
+        assert "{" not in translate_prompt
 
 
 def test_on_processing_completed_branches(qapp: QApplication) -> None:
@@ -1231,6 +1348,67 @@ def test_note_edited_is_saved_and_listed(qapp: QApplication, tmp_path: Path) -> 
     eloquent_app.window.close()
 
 
+def test_vocabulary_injected_into_transcription_and_rewriting() -> None:
+    snapshot = _pipeline_snapshot()
+    ai_cfg = snapshot["ai"]
+    loaded = snapshot["_loaded_files"]
+    loaded[config.VOCABULARY_PATH] = "Kubernetes\nPyQt6, kubernetes"
+
+    with patch(
+        "eloquent_notes.app.llm.transcribe_audio",
+        return_value={"empty": False, "transcription": "Deploy Kubernetes"},
+    ) as mock_transcribe:
+        EloquentApp._transcribe(ai_cfg, loaded, [b"chunk1"])
+
+    trans_prompt = mock_transcribe.call_args.kwargs["user_prompt"]
+    assert "Custom vocabulary (use these exact spellings when relevant): Kubernetes, PyQt6" in trans_prompt
+
+    with patch(
+        "eloquent_notes.app.llm.rewrite_transcription",
+        return_value={"title": "Deploy", "content": "Deploy Kubernetes"},
+    ) as mock_rewrite:
+        EloquentApp._rewrite(ai_cfg, loaded, "Deploy Kubernetes", "0")
+
+    rewrite_prompt = mock_rewrite.call_args.kwargs["user_prompt"]
+    assert "Custom vocabulary (use these exact spellings when relevant): Kubernetes, PyQt6" in rewrite_prompt
+
+
+def test_note_edited_learns_custom_vocabulary(
+    qapp: QApplication,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    vocab_file = tmp_path / "vocabulary.md"
+    monkeypatch.setattr(config, "VOCABULARY_PATH", str(vocab_file))
+
+    note = _write_note(tmp_path / "notes", title="Deploy Cubernetis", body="Use pyqt6 and Olama.")
+    eloquent_app = make_app(qapp)
+
+    # First edit: vocabulary file does not exist yet
+    note.title = "Deploy Kubernetes"
+    note.body = "Use PyQt6 and Olama."
+    eloquent_app._on_note_edited(note)
+    assert vocab_file.read_text(encoding="utf-8") == "Kubernetes\nPyQt6\n"
+
+    # Second edit: merges with existing vocabulary and deduplicates case-insensitively
+    note.body = "Use pyqt6 and Ollama."
+    eloquent_app._on_note_edited(note)
+    assert vocab_file.read_text(encoding="utf-8") == "Kubernetes\nPyQt6\nOllama\n"
+
+    # When learn_from_edits is disabled, vocabulary is not updated
+    eloquent_app.config["ai"]["learn_from_edits"] = False
+    note.body = "Use pyqt6 and Fastapi."
+    eloquent_app._on_note_edited(note)
+    assert vocab_file.read_text(encoding="utf-8") == "Kubernetes\nPyQt6\nOllama\n"
+
+    # When note file on disk is missing/unparseable before save, learning is skipped cleanly
+    eloquent_app.config["ai"]["learn_from_edits"] = True
+    note.path.unlink()
+    note.body = "Use pyqt6 and FastAPI."
+    eloquent_app._on_note_edited(note)
+    assert vocab_file.read_text(encoding="utf-8") == "Kubernetes\nPyQt6\nOllama\n"
+
+
 def test_delete_requested_moves_note_to_trash(qapp: QApplication, tmp_path: Path) -> None:
     note = _write_note(tmp_path / "notes")
     eloquent_app = make_app(qapp)
@@ -1441,3 +1619,227 @@ def test_run_schedules_window_when_requested(qapp: QApplication) -> None:
             eloquent_app.run()
 
         mock_single_shot.assert_called_once_with(100, eloquent_app.show_window)
+
+
+def test_transform_note_full_and_partial_in_open_reader_with_undo(
+    qapp: QApplication,
+    tmp_path: Path,
+) -> None:
+    note = _write_note(tmp_path / "notes", title="Draft", body="Buy milk and eggs.")
+    eloquent_app = make_app(qapp)
+    eloquent_app.show_window()
+    window = eloquent_app.window
+    assert window is not None
+    window.show_note(note)
+
+    snapshot = _pipeline_snapshot()
+    snapshot["_loaded_files"][config.VOCABULARY_PATH] = "OatMilk"
+
+    with (
+        patch("eloquent_notes.app.config.load_file", side_effect=lambda p: snapshot["_loaded_files"][p]),
+        patch("eloquent_notes.app.threading.Thread") as mock_thread_cls,
+    ):
+        eloquent_app.transform_note(note, "concise", "", 0, len(note.body))
+
+    assert eloquent_app.state == "PROCESSING"
+    assert vars(eloquent_app)["_replace_target"] == (note, 0, len("Buy milk and eggs."))
+    eloquent_app._update_icon.assert_called_with("orange", "Eloquent Notes (Processing...)")  # type: ignore[attr-defined]
+
+    t_snapshot, full_body, preset_key, instruction, selected_text = mock_thread_cls.call_args.kwargs["args"]
+    with patch(
+        "eloquent_notes.app.llm.transform_text",
+        return_value={"content": "  Buy OatMilk and eggs.  "},
+    ) as mock_llm:
+        eloquent_app._process_transform(t_snapshot, full_body, preset_key, instruction, selected_text)
+
+    assert "OatMilk" in mock_llm.call_args.kwargs["user_prompt"]
+    assert "Keep the text in its current language" in mock_llm.call_args.kwargs["user_prompt"]
+    assert eloquent_app.state == "IDLE"
+    assert vars(eloquent_app)["_replace_target"] is None
+    assert window.reader.body_edit.toPlainText() == "Buy OatMilk and eggs."
+    assert notes.load_notes(tmp_path / "notes")[0].body == "Buy OatMilk and eggs."
+    eloquent_app._notify.assert_called_with("Note Transformed", "Draft")  # type: ignore[attr-defined]
+
+    doc = window.reader.body_edit.document()
+    assert doc is not None
+    assert doc.isUndoAvailable()
+    window.reader.body_edit.undo()
+    assert window.reader.body_edit.toPlainText() == "Buy milk and eggs."
+
+    # Partial-selection transformation with translate preset
+    window.reader.body_edit.redo()
+    current_note = window.reader.note
+    with (
+        patch("eloquent_notes.app.config.load_file", side_effect=lambda p: snapshot["_loaded_files"][p]),
+        patch("eloquent_notes.app.threading.Thread") as mock_thread_cls,
+    ):
+        eloquent_app.transform_note(current_note, "translate", "eggs", 16, 20)
+
+    t_snapshot, full_body, preset_key, instruction, selected_text = mock_thread_cls.call_args.kwargs["args"]
+    with patch(
+        "eloquent_notes.app.llm.transform_text",
+        return_value={"content": "huevos"},
+    ) as mock_llm:
+        eloquent_app._process_transform(t_snapshot, full_body, preset_key, instruction, selected_text)
+
+    prompt = mock_llm.call_args.kwargs["user_prompt"]
+    assert "Full note context (for reference only):\nBuy OatMilk and eggs." in prompt
+    assert "Selected excerpt to transform" in prompt
+    assert "\neggs\n" in prompt
+    assert "write the transformed text in English" in prompt
+    assert window.reader.body_edit.toPlainText() == "Buy OatMilk and huevos."
+    assert notes.load_notes(tmp_path / "notes")[0].body == "Buy OatMilk and huevos."
+
+    window.reader.body_edit.undo()
+    assert window.reader.body_edit.toPlainText() == "Buy OatMilk and eggs."
+    window.close()
+
+
+def test_transform_note_when_reader_closed_and_guard_clauses(
+    qapp: QApplication,
+    tmp_path: Path,
+) -> None:
+    note = _write_note(tmp_path / "notes", title="Memo", body="Hello world.")
+    eloquent_app = make_app(qapp)
+
+    # Busy guard clause
+    eloquent_app.state = "RECORDING"
+    eloquent_app.transform_note(note, "formal", "", 0, len(note.body))
+    eloquent_app._notify.assert_called_once_with("Eloquent Notes", "System is busy. Please wait.")  # type: ignore[attr-defined]
+
+    # Empty body guard clause
+    eloquent_app._notify.reset_mock()  # type: ignore[attr-defined]
+    eloquent_app.state = "IDLE"
+    empty_note = notes.Note(note.path, "Empty", note.created, "note", [], "   ")
+    eloquent_app.transform_note(empty_note, "formal", "", 0, 0)
+    assert eloquent_app.state == "IDLE"
+    eloquent_app._notify.assert_not_called()  # type: ignore[attr-defined]
+
+    # Fallback splice on disk when window is not open on the note
+    eloquent_app._replace_target = (note, 6, 11)
+    eloquent_app.state = "PROCESSING"
+    eloquent_app._on_processing_completed("transformed", "there")
+    assert eloquent_app.state == "IDLE"
+    assert notes.load_notes(tmp_path / "notes")[0].body == "Hello there."
+    eloquent_app._notify.assert_called_once_with("Note Transformed", "Memo")  # type: ignore[attr-defined]
+
+    # Error in _process_transform emits error
+    snapshot = _pipeline_snapshot()
+    with patch("eloquent_notes.app.llm.transform_text", side_effect=RuntimeError("Transform failed")):
+        eloquent_app._process_transform(snapshot, "Hello", "formal", "Rewrite formal", "")
+    assert eloquent_app.state == "IDLE"
+    eloquent_app._notify.assert_called_with("Processing Error", "Error processing dictation: Transform failed")  # type: ignore[attr-defined]
+
+    # Missing replace_target or deleted note on disk is handled cleanly
+    eloquent_app._apply_replacement(None, "ignored")
+    note.path.unlink()
+    eloquent_app._apply_replacement((note, 0, 5), "ignored")
+
+
+def test_voice_edit_into_full_and_partial_with_undo(
+    qapp: QApplication,
+    tmp_path: Path,
+) -> None:
+    note = _write_note(tmp_path / "notes", title="Plan", body="Ship on Friday.")
+    eloquent_app = make_app(qapp)
+    eloquent_app.show_window()
+    window = eloquent_app.window
+    assert window is not None
+    window.show_note(note)
+
+    # Empty body is ignored
+    empty_note = notes.Note(note.path, "Empty", note.created, "note", [], "   ")
+    eloquent_app.voice_edit_into(empty_note, "", 0, 0)
+    assert eloquent_app.state == "IDLE"
+    assert vars(eloquent_app)["_voice_edit_context"] is None
+
+    recorder = MagicMock()
+    recorder.wav_chunks = [b"RIFF" + b"\x00" * 100]
+    recorder.is_silent = False
+    snapshot = _pipeline_snapshot()
+
+    # Start voice edit on selected excerpt ("Friday")
+    with (
+        patch("eloquent_notes.app.audio.AudioRecorder", return_value=recorder),
+        patch("eloquent_notes.app.config.load_file", side_effect=lambda p: snapshot["_loaded_files"][p]),
+        patch("eloquent_notes.app.threading.Thread"),
+    ):
+        eloquent_app.voice_edit_into(note, "Friday", 8, 14)
+
+    assert eloquent_app.state == "RECORDING"
+    assert vars(eloquent_app)["_replace_target"] == (note, 8, 14)
+    assert vars(eloquent_app)["_voice_edit_context"] == ("Ship on Friday.", "Friday")
+
+    # Second click while RECORDING stops and launches _process_audio with voice_edit_context
+    with patch("eloquent_notes.app.threading.Thread") as mock_thread_cls:
+        eloquent_app.voice_edit_into(note, "Friday", 8, 14)
+
+    assert eloquent_app.state == "PROCESSING"
+    assert vars(eloquent_app)["_voice_edit_context"] is None
+    p_recorder, p_snapshot, p_append, p_preload, p_ve_ctx = mock_thread_cls.call_args.kwargs["args"]
+    assert p_append is False
+    assert p_ve_ctx == ("Ship on Friday.", "Friday")
+
+    with (
+        patch(
+            "eloquent_notes.app.llm.transcribe_audio",
+            return_value={"empty": False, "transcription": "Change it to Monday"},
+        ) as mock_transcribe,
+        patch(
+            "eloquent_notes.app.llm.transform_text",
+            return_value={"content": "  Monday  "},
+        ) as mock_transform,
+        patch("eloquent_notes.app.llm.rewrite_transcription") as mock_rewrite,
+        patch("eloquent_notes.app.llm.classify_note") as mock_classify,
+        patch("eloquent_notes.app.llm.tag_note") as mock_tag,
+        patch("eloquent_notes.app.llm.preload_model") as mock_preload,
+    ):
+        eloquent_app._process_audio(p_recorder, p_snapshot, p_append, p_preload, p_ve_ctx)
+
+    mock_transcribe.assert_called_once()
+    mock_transform.assert_called_once()
+    mock_rewrite.assert_not_called()
+    mock_classify.assert_not_called()
+    mock_tag.assert_not_called()
+    mock_preload.assert_not_called()
+    assert "Instruction: Change it to Monday" in mock_transform.call_args.kwargs["user_prompt"]
+    assert "Full note context (for reference only):\nShip on Friday." in mock_transform.call_args.kwargs["user_prompt"]
+    assert "Selected excerpt to transform" in mock_transform.call_args.kwargs["user_prompt"]
+
+    assert eloquent_app.state == "IDLE"
+    assert window.reader.body_edit.toPlainText() == "Ship on Monday."
+    assert notes.load_notes(tmp_path / "notes")[0].body == "Ship on Monday."
+    eloquent_app._notify.assert_called_with("Note Transformed", "Plan")  # type: ignore[attr-defined]
+
+    # Undo (Ctrl+Z) restores original text
+    doc = window.reader.body_edit.document()
+    assert doc is not None
+    assert doc.isUndoAvailable()
+    window.reader.body_edit.undo()
+    assert window.reader.body_edit.toPlainText() == "Ship on Friday."
+
+    # Empty transform output raises error
+    with (
+        patch(
+            "eloquent_notes.app.llm.transcribe_audio",
+            return_value={"empty": False, "transcription": "Clear everything"},
+        ),
+        patch(
+            "eloquent_notes.app.llm.transform_text",
+            return_value={"content": "   "},
+        ),
+        patch("eloquent_notes.app.llm.preload_model"),
+    ):
+        eloquent_app._process_audio(
+            recorder,
+            snapshot,
+            append=False,
+            preload_thread=None,
+            voice_edit_context=("Ship on Friday.", ""),
+        )
+
+    eloquent_app._notify.assert_called_with(  # type: ignore[attr-defined]
+        "Processing Error",
+        "Error processing dictation: Model returned empty note content",
+    )
+    window.close()

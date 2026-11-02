@@ -55,6 +55,9 @@ msgstr "音频采集设置"
 msgid "Audio Channels:"
 msgstr "音频声道："
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "自动将在笔记编辑器中更正的词语添加到自定义词汇表。"
+
 msgid "Backup Count:"
 msgstr "备份数量："
 
@@ -66,6 +69,9 @@ msgstr "提示音频率："
 
 msgid "Browse..."
 msgstr "浏览..."
+
+msgid "Bullet list"
+msgstr "项目符号列表"
 
 msgid "Cancel"
 msgstr "取消"
@@ -114,6 +120,9 @@ msgstr "无法停止录音：{error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "在 XDG 自动启动目录中创建桌面自动启动项"
+
+msgid "Custom Vocabulary"
+msgstr "自定义词汇表"
 
 msgid "Decision"
 msgstr "决定"
@@ -211,6 +220,9 @@ msgstr "'{key}' 的配置值无效"
 msgid "Keep Alive Time:"
 msgstr "保持活动时间："
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "从手动笔记编辑中学习自定义词汇"
+
 msgid "Log File"
 msgstr "日志文件"
 
@@ -222,6 +234,15 @@ msgstr "日志级别："
 
 msgid "Logging Settings"
 msgstr "日志设置"
+
+msgid "Make casual"
+msgstr "转为口语化"
+
+msgid "Make concise"
+msgstr "精简内容"
+
+msgid "Make formal"
+msgstr "转为正式语气"
 
 msgid "Max Log File Size:"
 msgstr "最大日志文件大小："
@@ -270,6 +291,9 @@ msgstr "笔记"
 
 msgid "Note Saved"
 msgstr "笔记已保存"
+
+msgid "Note Transformed"
+msgstr "笔记已转换"
 
 msgid "Note Type Colors"
 msgstr "笔记类型颜色"
@@ -351,6 +375,9 @@ msgstr "提示词"
 
 msgid "Prompts:"
 msgstr "提示词："
+
+msgid "Proofread"
+msgstr "校对润色"
 
 msgid "Question"
 msgstr "问题"
@@ -445,6 +472,9 @@ msgstr "立体声（2 声道）"
 msgid "Stop dictation"
 msgstr "停止听写"
 
+msgid "Stop voice edit"
+msgstr "停止语音编辑"
+
 msgid "System is busy. Please wait."
 msgstr "系统繁忙，请稍候。"
 
@@ -493,6 +523,18 @@ msgstr "转录 - 系统提示词"
 msgid "Transcription - User Prompt"
 msgstr "转录 - 用户提示词"
 
+msgid "Transform"
+msgstr "转换"
+
+msgid "Transformation - System Prompt"
+msgstr "转换 - 系统提示词"
+
+msgid "Transformation - User Prompt"
+msgstr "转换 - 用户提示词"
+
+msgid "Translate to output language"
+msgstr "翻译为输出语言"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "本地或远程 Ollama 服务器的 URL。"
 
@@ -513,6 +555,9 @@ msgstr "查看日志文件"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "将语音听写转化为井然有序的笔记"
+
+msgid "Voice edit"
+msgstr "语音编辑"
 
 msgid "Yesterday"
 msgstr "昨天"

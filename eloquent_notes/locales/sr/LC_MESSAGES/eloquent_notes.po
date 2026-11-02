@@ -55,6 +55,9 @@ msgstr "Подешавања снимања звука"
 msgid "Audio Channels:"
 msgstr "Аудио канали:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "Аутоматски додај речи исправљене у уређивачу белешки у прилагођени речник."
+
 msgid "Backup Count:"
 msgstr "Број резервних копија:"
 
@@ -66,6 +69,9 @@ msgstr "Фреквенција звучног сигнала:"
 
 msgid "Browse..."
 msgstr "Прегледај..."
+
+msgid "Bullet list"
+msgstr "Листа са знаковима за набрајање"
 
 msgid "Cancel"
 msgstr "Откажи"
@@ -114,6 +120,9 @@ msgstr "Није могуће зауставити снимање: {error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "Креира ставку аутоматског покретања у XDG autostart директоријуму"
+
+msgid "Custom Vocabulary"
+msgstr "Прилагођени речник"
 
 msgid "Decision"
 msgstr "Одлука"
@@ -211,6 +220,9 @@ msgstr "Неисправна вредност конфигурације за '{
 msgid "Keep Alive Time:"
 msgstr "Keep Alive време:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "Учи прилагођени речник из ручних измена белешки"
+
 msgid "Log File"
 msgstr "Датотека дневника"
 
@@ -222,6 +234,15 @@ msgstr "Ниво бележења:"
 
 msgid "Logging Settings"
 msgstr "Подешавања бележења"
+
+msgid "Make casual"
+msgstr "Учини неформалним"
+
+msgid "Make concise"
+msgstr "Учини сажетим"
+
+msgid "Make formal"
+msgstr "Учини формалним"
 
 msgid "Max Log File Size:"
 msgstr "Макс. величина дневника:"
@@ -270,6 +291,9 @@ msgstr "Белешка"
 
 msgid "Note Saved"
 msgstr "Белешка је сачувана"
+
+msgid "Note Transformed"
+msgstr "Белешка трансформисана"
 
 msgid "Note Type Colors"
 msgstr "Боје врста белешки"
@@ -351,6 +375,9 @@ msgstr "Упити"
 
 msgid "Prompts:"
 msgstr "Упити:"
+
+msgid "Proofread"
+msgstr "Лекториши"
 
 msgid "Question"
 msgstr "Питање"
@@ -445,6 +472,9 @@ msgstr "Стерео (2 канала)"
 msgid "Stop dictation"
 msgstr "Заустави диктирање"
 
+msgid "Stop voice edit"
+msgstr "Заустави гласовно уређивање"
+
 msgid "System is busy. Please wait."
 msgstr "Систем је заузет. Молимо сачекајте."
 
@@ -493,6 +523,18 @@ msgstr "Транскрипција – Системски упит"
 msgid "Transcription - User Prompt"
 msgstr "Транскрипција – Кориснички упит"
 
+msgid "Transform"
+msgstr "Трансформиши"
+
+msgid "Transformation - System Prompt"
+msgstr "Трансформација - Системски упит"
+
+msgid "Transformation - User Prompt"
+msgstr "Трансформација - Кориснички упит"
+
+msgid "Translate to output language"
+msgstr "Преведи на излазни језик"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "URL вашег локалног или удаљеног Ollama сервера."
 
@@ -513,6 +555,9 @@ msgstr "Прикажи датотеку дневника"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "Гласовни диктати претворени у организоване белешке"
+
+msgid "Voice edit"
+msgstr "Гласовно уређивање"
 
 msgid "Yesterday"
 msgstr "Јуче"

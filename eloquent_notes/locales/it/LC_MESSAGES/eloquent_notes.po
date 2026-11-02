@@ -55,6 +55,9 @@ msgstr "Impostazioni di acquisizione audio"
 msgid "Audio Channels:"
 msgstr "Canali audio:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "Aggiungi automaticamente le parole corrette nell'editor delle note al vocabolario personalizzato."
+
 msgid "Backup Count:"
 msgstr "Numero di backup:"
 
@@ -66,6 +69,9 @@ msgstr "Frequenza segnale acustico:"
 
 msgid "Browse..."
 msgstr "Sfoglia..."
+
+msgid "Bullet list"
+msgstr "Elenco puntato"
 
 msgid "Cancel"
 msgstr "Annulla"
@@ -114,6 +120,9 @@ msgstr "Impossibile interrompere la registrazione: {error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "Crea una voce di avvio automatico nella directory XDG autostart"
+
+msgid "Custom Vocabulary"
+msgstr "Vocabolario personalizzato"
 
 msgid "Decision"
 msgstr "Decisione"
@@ -211,6 +220,9 @@ msgstr "Valore di configurazione non valido per '{key}'"
 msgid "Keep Alive Time:"
 msgstr "Tempo di Keep Alive:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "Impara il vocabolario personalizzato dalle modifiche manuali delle note"
+
 msgid "Log File"
 msgstr "File di registro"
 
@@ -222,6 +234,15 @@ msgstr "Livello di registro:"
 
 msgid "Logging Settings"
 msgstr "Impostazioni di registro"
+
+msgid "Make casual"
+msgstr "Rendi informale"
+
+msgid "Make concise"
+msgstr "Rendi conciso"
+
+msgid "Make formal"
+msgstr "Rendi formale"
 
 msgid "Max Log File Size:"
 msgstr "Dimensione max file di registro:"
@@ -270,6 +291,9 @@ msgstr "Nota"
 
 msgid "Note Saved"
 msgstr "Nota salvata"
+
+msgid "Note Transformed"
+msgstr "Nota trasformata"
 
 msgid "Note Type Colors"
 msgstr "Colori dei tipi di nota"
@@ -351,6 +375,9 @@ msgstr "Prompt"
 
 msgid "Prompts:"
 msgstr "Prompt:"
+
+msgid "Proofread"
+msgstr "Correggi bozza"
 
 msgid "Question"
 msgstr "Domanda"
@@ -445,6 +472,9 @@ msgstr "Stereo (2 canali)"
 msgid "Stop dictation"
 msgstr "Ferma dettatura"
 
+msgid "Stop voice edit"
+msgstr "Interrompi modifica vocale"
+
 msgid "System is busy. Please wait."
 msgstr "Il sistema è occupato. Attendere."
 
@@ -493,6 +523,18 @@ msgstr "Trascrizione - Prompt di sistema"
 msgid "Transcription - User Prompt"
 msgstr "Trascrizione - Prompt utente"
 
+msgid "Transform"
+msgstr "Trasforma"
+
+msgid "Transformation - System Prompt"
+msgstr "Trasformazione - Prompt di sistema"
+
+msgid "Transformation - User Prompt"
+msgstr "Trasformazione - Prompt utente"
+
+msgid "Translate to output language"
+msgstr "Traduci nella lingua di output"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "URL del server Ollama locale o remoto."
 
@@ -513,6 +555,9 @@ msgstr "Visualizza file di registro"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "Dettature vocali trasformate in note organizzate"
+
+msgid "Voice edit"
+msgstr "Modifica vocale"
 
 msgid "Yesterday"
 msgstr "Ieri"

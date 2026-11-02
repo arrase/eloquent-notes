@@ -53,6 +53,9 @@ msgstr ""
 msgid "Audio Channels:"
 msgstr ""
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr ""
+
 msgid "Backup Count:"
 msgstr ""
 
@@ -111,6 +114,9 @@ msgid "Could not stop recording: {error}"
 msgstr ""
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
+msgstr ""
+
+msgid "Custom Vocabulary"
 msgstr ""
 
 msgid "Decision"
@@ -207,6 +213,9 @@ msgid "Invalid configuration value for '{key}'"
 msgstr ""
 
 msgid "Keep Alive Time:"
+msgstr ""
+
+msgid "Learn custom vocabulary from manual note edits"
 msgstr ""
 
 msgid "Log File"

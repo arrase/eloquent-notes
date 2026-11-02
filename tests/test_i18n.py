@@ -13,6 +13,7 @@ from PyQt6.QtCore import QLocale
 from PyQt6.QtWidgets import QApplication
 
 from eloquent_notes import i18n
+from eloquent_notes.app import TRAY_IDLE_TOOLTIP
 from eloquent_notes.config_gui.dialog import RESTORE_DEFAULTS_TITLE, ConfigurationDialog
 from eloquent_notes.config_gui.tabs import text_files
 from eloquent_notes.config_gui.tabs.ai import VALIDATION_ERROR_TITLE, AITab
@@ -20,7 +21,9 @@ from eloquent_notes.recording_hud import RecordingHUD
 from eloquent_notes.window import (
     _TYPE_FILTER_LABELS,
     DICTATE_STATES,
+    TRANSFORM_PRESETS,
     TYPE_LABELS,
+    VOICE_EDIT_STATES,
     MainWindow,
     day_label,
     format_time,
@@ -104,8 +107,11 @@ def _extract_codebase_msgids() -> tuple[set[str], set[tuple[str, str]]]:
             _collect_call_msgids(node, strings, plurals)
 
     strings.update(label for _color, label in DICTATE_STATES.values())
+    strings.update(label for _color, label in VOICE_EDIT_STATES.values())
+    strings.update(label for _key, label, _inst in TRANSFORM_PRESETS)
     strings.update(TYPE_LABELS.values())
     strings.update(label for _note_type, label in _TYPE_FILTER_LABELS)
+    strings.add(TRAY_IDLE_TOOLTIP)
     strings.add(RESTORE_DEFAULTS_TITLE)
     strings.add(VALIDATION_ERROR_TITLE)
     strings.update(label for label, _path, _default in text_files.PROMPTS)
@@ -213,7 +219,7 @@ def test_load_translations_stops_at_english_before_later_languages(monkeypatch: 
 
 def test_all_40_catalogs_cover_every_codebase_string() -> None:
     msgids, plurals = _extract_codebase_msgids()
-    assert len(msgids) == 171
+    assert len(msgids) == 186
     assert plurals == {("{count} result", "{count} results")}
 
     installed_locales = sorted(entry.name for entry in Path(i18n.LOCALES_DIR).iterdir() if entry.is_dir())

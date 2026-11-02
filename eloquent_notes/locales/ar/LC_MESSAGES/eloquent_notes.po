@@ -55,6 +55,9 @@ msgstr "إعدادات التقاط الصوت"
 msgid "Audio Channels:"
 msgstr "قنوات الصوت:"
 
+msgid "Automatically add words corrected in the note editor to the custom vocabulary."
+msgstr "إضافة الكلمات المصححة في محرر الملاحظات تلقائياً إلى المفردات المخصصة."
+
 msgid "Backup Count:"
 msgstr "عدد النسخ الاحتياطية:"
 
@@ -66,6 +69,9 @@ msgstr "تردد التنبيه الصوتي:"
 
 msgid "Browse..."
 msgstr "استعراض..."
+
+msgid "Bullet list"
+msgstr "قائمة نقطية"
 
 msgid "Cancel"
 msgstr "إلغاء"
@@ -114,6 +120,9 @@ msgstr "تعذر إيقاف التسجيل: {error}"
 
 msgid "Creates a desktop autostart entry in the XDG autostart directory"
 msgstr "ينشئ إدخال بدء تشغيل تلقائي لسطح المكتب في دليل بدء التشغيل التلقائي XDG"
+
+msgid "Custom Vocabulary"
+msgstr "المفردات المخصصة"
 
 msgid "Decision"
 msgstr "قرار"
@@ -211,6 +220,9 @@ msgstr "قيمة إعداد غير صالحة للمفتاح '{key}'"
 msgid "Keep Alive Time:"
 msgstr "وقت البقاء في الذاكرة:"
 
+msgid "Learn custom vocabulary from manual note edits"
+msgstr "تعلّم المفردات المخصصة من التعديلات اليدوية للملاحظات"
+
 msgid "Log File"
 msgstr "ملف السجل"
 
@@ -222,6 +234,15 @@ msgstr "مستوى التسجيل:"
 
 msgid "Logging Settings"
 msgstr "إعدادات السجل"
+
+msgid "Make casual"
+msgstr "جعله غير رسمي"
+
+msgid "Make concise"
+msgstr "جعله موجزًا"
+
+msgid "Make formal"
+msgstr "جعله رسميًا"
 
 msgid "Max Log File Size:"
 msgstr "الحد الأقصى لحجم ملف السجل:"
@@ -270,6 +291,9 @@ msgstr "ملاحظة"
 
 msgid "Note Saved"
 msgstr "تم حفظ الملاحظة"
+
+msgid "Note Transformed"
+msgstr "تم تحويل الملاحظة"
 
 msgid "Note Type Colors"
 msgstr "ألوان أنواع الملاحظات"
@@ -351,6 +375,9 @@ msgstr "الموجهات"
 
 msgid "Prompts:"
 msgstr "الموجهات:"
+
+msgid "Proofread"
+msgstr "تدقيق لغوي"
 
 msgid "Question"
 msgstr "سؤال"
@@ -445,6 +472,9 @@ msgstr "ستيريو (قناتان)"
 msgid "Stop dictation"
 msgstr "إيقاف الإملاء"
 
+msgid "Stop voice edit"
+msgstr "إيقاف التعديل الصوتي"
+
 msgid "System is busy. Please wait."
 msgstr "النظام مشغول. يرجى الانتظار."
 
@@ -493,6 +523,18 @@ msgstr "النسخ الصوتي - موجه النظام"
 msgid "Transcription - User Prompt"
 msgstr "النسخ الصوتي - موجه المستخدم"
 
+msgid "Transform"
+msgstr "تحويل"
+
+msgid "Transformation - System Prompt"
+msgstr "التحويل - موجه النظام"
+
+msgid "Transformation - User Prompt"
+msgstr "التحويل - موجه المستخدم"
+
+msgid "Translate to output language"
+msgstr "الترجمة إلى لغة الإخراج"
+
 msgid "URL of your local or remote Ollama server."
 msgstr "عنوان URL لخادم Ollama المحلي أو البعيد."
 
@@ -513,6 +555,9 @@ msgstr "عرض ملف السجل"
 
 msgid "Voice dictations turned into organized notes"
 msgstr "إملاءات صوتية تتحول إلى ملاحظات منظمة"
+
+msgid "Voice edit"
+msgstr "تعديل صوتي"
 
 msgid "Yesterday"
 msgstr "أمس"

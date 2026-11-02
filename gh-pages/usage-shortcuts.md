@@ -1,6 +1,6 @@
 # System Tray & Shortcuts
 
-Eloquent Notes runs in your desktop panel. New recordings are started and stopped from the tray icon, the floating HUD, or a global keyboard shortcut, while the note reader in the notes window provides **Add dictation** to append to an existing note.
+Eloquent Notes runs in your desktop panel. New recordings are started and stopped from the tray icon, the floating HUD, or a global keyboard shortcut, while the note reader in the notes window provides **Add dictation**, **Voice edit** and **Transform** to extend or refine an existing note.
 
 ---
 
@@ -20,7 +20,7 @@ Eloquent Notes runs in your desktop panel. New recordings are started and stoppe
   * **Reload Configuration**: Reloads `config.yaml` and prompts without restarting the daemon.
   * **Quit**: Stops any recording, waits briefly for processing, closes the IPC server and exits.
 
-Clicking a desktop notification (e.g. **Note Saved**) opens the notes window. While recording, clicking the floating HUD also stops the recording.
+Clicking a desktop notification (e.g. **Note Saved**) opens the notes window. While recording, left-clicking the floating HUD stops and processes the recording, while clicking `×` or right-clicking cancels and discards it.
 
 ![Floating Recording HUD](screenshots/recording-hud.png)
 
@@ -30,6 +30,7 @@ Clicking a desktop notification (e.g. **Note Saved**) opens the notes window. Wh
 | :--- | :--- |
 | **Note Saved** | A new note was written (shows its title). |
 | **Dictation Added** | An add-dictation was appended to a note. |
+| **Note Transformed** | A voice edit or style transformation replaced text in a note. |
 | **Dictation Empty** | The recording was silent or the transcription empty; nothing was saved. |
 | **Processing Error** / **Delete Failed** / **Configuration Error** | Something failed; the message contains the reason. |
 
@@ -44,7 +45,7 @@ The window uses a two-page layout — a day-grouped multi-column timeline grid (
 * **Filters**: type chips (All, Notes, Tasks, Ideas, Reminders, Questions, Decisions) and a tag selector.
 * **Timeline**: note cards arranged in a multi-column grid grouped by day (Today, Yesterday, "Monday, 19 October"). When no notes exist yet, it displays `"No notes yet. Click the tray icon to record your first one."` Click a card to open it in the reader; click a `#tag` to filter by it.
 
-In the **reader**, title, type, tags and body are editable. The toolbar offers **← Back** (<kbd>Esc</kbd>), **Add dictation** (becomes *Stop dictation* while recording), **Copy** and **Delete**. See [Notes & Search](notes.md) for details.
+In the **reader**, title, type, tags and body are editable. The toolbar offers **← Back** (<kbd>Esc</kbd>), **Add dictation** (becomes *Stop dictation* while recording), **Voice edit** (becomes *Stop voice edit* while recording), **Transform**, **Copy** and **Delete**. See [Notes & Search](notes.md) for details.
 
 ---
 
@@ -58,7 +59,7 @@ The tray icon changes color and symbol to indicate the active state:
 | **Recording** | Red Circle + White Recording Dot | `Eloquent Notes (Recording...)` | Microphone audio is recorded into memory; the model is preloaded in the background. |
 | **Processing** | Orange Circle + White Hourglass | `Eloquent Notes (Processing...)` | The Ollama pipeline is writing the note (transcription, rewriting, classification, tagging). |
 
-The same icons appear on the **Add dictation** button in the notes window.
+The same icons appear on the **Add dictation** and **Voice edit** buttons in the notes window.
 
 ---
 

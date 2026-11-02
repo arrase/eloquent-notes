@@ -28,11 +28,12 @@ Everything runs offline on your machine.
 
 ## ✨ Features
 
-- **One-gesture capture:** left-click the tray icon or bind `eloquent-notes toggle` to a global shortcut. A floating HUD shows the elapsed recording time while you speak.
+- **One-gesture capture:** left-click the tray icon or bind `eloquent-notes toggle` to a global shortcut. A floating HUD shows a live audio level meter, elapsed recording time, and a cancel button while you speak.
 - **Clean notes, not transcripts:** a four-phase pipeline (transcription → rewriting → classification → tagging) removes filler words, writes a concise title, classifies the note type (`note`, `task`, `idea`, `reminder`, `question`, `decision`) and generates 2–5 tags.
 - **Plain Markdown files:** one file per note with YAML frontmatter, in a folder you choose. No database, no lock-in.
 - **Notes window:** a timeline grouped by day, type and tag filters, and a reader where title, type, tags and body are editable.
-- **Add dictation:** dictate more text into an existing note; it is rewritten and appended as a new paragraph.
+- **Add dictation, Voice edit & Transform:** append a new dictation to an open note, record a spoken editing instruction, or apply one-click style presets (concise, formal, casual, bullet list, proofread, translate) to the full note or a selected excerpt with <kbd>Ctrl</kbd>+<kbd>Z</kbd> undo.
+- **Custom vocabulary:** maintain domain-specific terms and proper nouns in `vocabulary.md`, with optional automatic learning when you fix spelling or casing in the note editor.
 - **Semantic search:** search notes by meaning with a local embedding model (`embeddinggemma-2:latest`). Embeddings are computed on demand and cached.
 - **Light & dark themes:** sober, native-feeling palettes that follow your desktop's light or dark color scheme and switch live.
 - **Multilingual:** dictate in any language and pick the output language for titles, prose and tags.
@@ -91,7 +92,7 @@ eloquent-notes install-autostart    # start it automatically on login
 ### Record a note
 1. Start recording: left-click the tray icon or run `eloquent-notes toggle`. A beep plays, the icon turns **red**, and a floating recording HUD appears at the top of the screen.
 2. Speak for as long as you need. The model is preloaded in the background while you talk.
-3. Stop recording the same way (or click the floating HUD). The icon turns **orange** while the note is written.
+3. Stop recording the same way (or left-click the floating HUD; click `×` or right-click the HUD to cancel). The icon turns **orange** while the note is written.
 4. A **Note Saved** notification appears and the icon returns to **gray**. Click the notification to open the notes window. Silent recordings produce a **Dictation Empty** notification and no note.
 
 <p align="center">
@@ -114,6 +115,8 @@ Open it with a middle click on the tray icon, **Open Notes** in the menu, or `el
 - **Search:** type a query and press <kbd>Enter</kbd> to search by meaning. Clearing the box returns to the timeline.
 - **Reader:** click a card to open it. Title, type, tags (comma separated) and body are editable and saved when you leave the reader or close the window. <kbd>Esc</kbd> goes back.
   - **Add dictation** records a new dictation and appends its rewritten text to the note, keeping its type and tags.
+  - **Voice edit** records a spoken instruction to edit the note body (or selected excerpt) in-place.
+  - **Transform** rewrites the note body (or selected excerpt) using presets (**Make concise**, **Make formal**, **Make casual**, **Bullet list**, **Proofread**, **Translate to output language**).
   - **Copy** copies the note as Markdown (`# Title` + body) to the clipboard.
   - **Delete** asks for confirmation and moves the file to the system trash.
 
@@ -173,9 +176,9 @@ Open it from the tray menu (**Configuration**), the **Settings** button in the n
 - **General:** autostart on login, logging level, log rotation, view the log file.
 - **Notes:** the notes folder.
 - **Appearance:** timeline grid columns and custom badge colors for each note type.
-- **AI Settings:** Ollama URL, audio model, output language, context length, keep-alive, retries and timeouts; **Semantic Search** group with the embedding model and minimum similarity. **Refresh** lists the audio-capable and embedding models installed in Ollama.
+- **AI Settings:** Ollama URL, audio model, output language, automatic vocabulary learning from manual edits, context length, keep-alive, retries and timeouts; **Semantic Search** group with the embedding model and minimum similarity. **Refresh** lists the audio-capable and embedding models installed in Ollama.
 - **Audio:** channels, recording HUD, beeps.
-- **Prompts:** edit the transcription, rewriting, classification, tagging and retry prompts.
+- **Prompts:** edit the transcription, rewriting, classification, tagging, transformation and retry prompts, plus custom vocabulary.
 
 <p align="center">
   <picture>
@@ -217,6 +220,7 @@ ai:
   max_retries: 3        # Number of times to retry LLM execution if the output is not valid JSON.
   preload_timeout: 180  # Timeout in seconds for preloading the model weights.
   request_timeout: 300  # Timeout in seconds for note generation requests.
+  learn_from_edits: true # Automatically add words corrected in the note editor to the custom vocabulary.
 
 search:
   embedding_model: "embeddinggemma-2:latest"
@@ -243,7 +247,9 @@ Prompts live in `~/.config/eloquent-notes/prompts/`:
 - `rewriting_system.md`, `rewriting_user.md` — Phase 2: title and note prose.
 - `classification_system.md`, `classification_user.md` — Phase 3: note type.
 - `tagging_system.md`, `tagging_user.md` — Phase 4: topic tags.
+- `transform_system.md`, `transform_user.md` — Voice edit and style transformations.
 - `retry_prompt.md` — correction sent when a response is not valid JSON.
+- `vocabulary.md` — custom vocabulary terms injected into transcription, rewriting and transformation prompts.
 
 ---
 

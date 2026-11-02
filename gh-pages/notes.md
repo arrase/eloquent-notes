@@ -74,16 +74,20 @@ The window follows the desktop's light and dark color scheme (`ui.LIGHT_THEME` a
 Click a card to open it in the reader:
 
 - **Title**, **type**, **tags** (comma separated) and **body** are editable.
-- Changes are saved when you leave the reader (**← Back** or <kbd>Esc</kbd>), open another note, start a dictation, copy, or close the window. Unchanged notes are not rewritten.
+- Changes are saved when you leave the reader (**← Back** or <kbd>Esc</kbd>), open another note, start a dictation, run a voice edit or transformation, copy, or close the window. Unchanged notes are not rewritten.
+- When `ai.learn_from_edits` is enabled (default `true`), words whose spelling or casing you correct in the title or body are automatically added to `~/.config/eloquent-notes/prompts/vocabulary.md` so future dictations use your preferred spelling.
 - **Copy** puts the note on the clipboard as Markdown: `# Title`, a blank line, then the body.
 - **Delete** asks for confirmation and moves the file to the system trash.
 
 ![Note Reader (Dark)](screenshots/reader-dark.png#only-dark)
 ![Note Reader (Light)](screenshots/reader-light.png#only-light)
 
-### Add Dictation
+### Add Dictation, Voice Edit & Transform
 
-**Add dictation** records a new dictation for the open note. It runs only Phase 1 (transcription) and Phase 2 (rewriting); the rewritten content is appended to the body as a new paragraph. The note keeps its title, type and tags. Pending edits in the reader are saved first, and the reader refreshes when the text arrives.
+- **Add dictation** records a new dictation for the open note. It runs only Phase 1 (transcription) and Phase 2 (rewriting); the rewritten content is appended to the body as a new paragraph. The note keeps its title, type and tags.
+- **Voice edit** records a spoken editing instruction for the open note (or for the currently selected text in the body editor). It transcribes the instruction in Phase 1 and applies it via the transformation prompt, replacing the full body or selected excerpt in-place.
+- **Transform** offers one-click style presets (**Make concise**, **Make formal**, **Make casual**, **Bullet list**, **Proofread**, **Translate to output language**) that rewrite either the selected excerpt or the entire note body.
+- Both **Voice edit** and **Transform** apply their replacement through the editor's `QTextCursor`, so you can press <kbd>Ctrl</kbd>+<kbd>Z</kbd> to undo the change immediately.
 
 ---
 

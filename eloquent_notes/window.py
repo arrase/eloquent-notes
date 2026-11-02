@@ -7,6 +7,7 @@ model work happens in EloquentApp.
 
 import html
 from datetime import date, datetime, timedelta
+from pathlib import Path
 
 from PyQt6.QtCore import QDateTime, QEvent, Qt, pyqtSignal
 from PyQt6.QtGui import QCloseEvent, QGuiApplication, QKeySequence, QMouseEvent, QResizeEvent, QShortcut
@@ -19,6 +20,7 @@ from PyQt6.QtWidgets import (
     QLabel,
     QLineEdit,
     QMainWindow,
+    QMenu,
     QMessageBox,
     QPlainTextEdit,
     QPushButton,
@@ -41,6 +43,25 @@ DICTATE_STATES = {
     RECORDING: ("red", "Stop dictation"),
     PROCESSING: ("orange", "Processing…"),
 }
+
+VOICE_EDIT_STATES = {
+    IDLE: ("gray", "Voice edit"),
+    RECORDING: ("red", "Stop voice edit"),
+    PROCESSING: ("orange", "Processing…"),
+}
+
+TRANSFORM_PRESETS: tuple[tuple[str, str, str], ...] = (
+    ("concise", "Make concise", "Rewrite the text to be more concise and direct while keeping all key details."),
+    ("formal", "Make formal", "Rewrite the text in a clear, professional, formal tone."),
+    ("casual", "Make casual", "Rewrite the text in a natural, conversational, casual tone."),
+    ("bullets", "Bullet list", "Convert the text into a clean bulleted list (- item)."),
+    (
+        "proofread",
+        "Proofread",
+        "Fix grammar, spelling, and awkward phrasing while preserving the original style and language.",
+    ),
+    ("translate", "Translate to output language", "Translate the text accurately into the requested output language."),
+)
 
 TYPE_LABELS = {
     "note": "Note",
@@ -411,6 +432,8 @@ class ReaderPage(QWidget):
 
     back_clicked = pyqtSignal()
     dictate_clicked = pyqtSignal()
+    voice_edit_clicked = pyqtSignal(str, int, int)
+    transform_requested = pyqtSignal(str, str, int, int)
     copy_clicked = pyqtSignal()
     delete_clicked = pyqtSignal()
 
@@ -442,6 +465,18 @@ class ReaderPage(QWidget):
         self.btn_dictate.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_dictate.clicked.connect(self.dictate_clicked)
         toolbar.addWidget(self.btn_dictate)
+        self.btn_voice_edit = QPushButton()
+        self.btn_voice_edit.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_voice_edit.clicked.connect(self._on_voice_edit_clicked)
+        toolbar.addWidget(self.btn_voice_edit)
+        self.btn_transform = QPushButton(_("Transform"))
+        self.btn_transform.setCursor(Qt.CursorShape.PointingHandCursor)
+        transform_menu = QMenu(self.btn_transform)
+        for key, label, _instruction in TRANSFORM_PRESETS:
+            action = transform_menu.addAction(_(label))
+            action.triggered.connect(lambda _checked=False, k=key: self._request_transform(k))
+        self.btn_transform.setMenu(transform_menu)
+        toolbar.addWidget(self.btn_transform)
         btn_copy = QPushButton(_("Copy"))
         btn_copy.setCursor(Qt.CursorShape.PointingHandCursor)
         btn_copy.clicked.connect(self.copy_clicked)
@@ -537,11 +572,38 @@ class ReaderPage(QWidget):
         note.title, note.type, note.tags, note.body = edited
         return True
 
+    def _selection_info(self) -> tuple[str, int, int]:
+        cursor = self.body_edit.textCursor()
+        full_text = self.body_edit.toPlainText()
+        if cursor.hasSelection():
+            sel_start = cursor.selectionStart()
+            sel_end = cursor.selectionEnd()
+            return full_text[sel_start:sel_end], sel_start, sel_end
+        return "", 0, len(full_text)
+
+    def _on_voice_edit_clicked(self) -> None:
+        self.voice_edit_clicked.emit(*self._selection_info())
+
+    def _request_transform(self, preset_key: str) -> None:
+        self.transform_requested.emit(preset_key, *self._selection_info())
+
+    def apply_text_replacement(self, new_text: str, sel_start: int, sel_end: int) -> None:
+        cursor = self.body_edit.textCursor()
+        cursor.setPosition(sel_start)
+        cursor.setPosition(sel_end, cursor.MoveMode.KeepAnchor)
+        cursor.insertText(new_text)
+        self.body_edit.setTextCursor(cursor)
+
     def set_state(self, state: str) -> None:
         color, label = DICTATE_STATES[state]
         self.btn_dictate.setText(_(label))
         self.btn_dictate.setIcon(ui.get_qicon(color))
         self.btn_dictate.setEnabled(state != PROCESSING)
+        ve_color, ve_label = VOICE_EDIT_STATES[state]
+        self.btn_voice_edit.setText(_(ve_label))
+        self.btn_voice_edit.setIcon(ui.get_qicon(ve_color))
+        self.btn_voice_edit.setEnabled(state != PROCESSING)
+        self.btn_transform.setEnabled(state == IDLE)
         self.btn_delete.setEnabled(state == IDLE)
 
 
@@ -549,6 +611,8 @@ class MainWindow(QMainWindow):
     """Two-page window: the notes timeline and the note reader."""
 
     dictate_clicked = pyqtSignal(object)
+    voice_edit_clicked = pyqtSignal(object, str, int, int)
+    transform_requested = pyqtSignal(object, str, str, int, int)
     note_edited = pyqtSignal(object)
     delete_requested = pyqtSignal(object)
     search_requested = pyqtSignal(str)
@@ -579,6 +643,8 @@ class MainWindow(QMainWindow):
         self.timeline.note_opened.connect(self.show_note)
         self.reader.back_clicked.connect(self.show_timeline)
         self.reader.dictate_clicked.connect(self._on_dictate)
+        self.reader.voice_edit_clicked.connect(self._on_voice_edit)
+        self.reader.transform_requested.connect(self._on_transform)
         self.reader.copy_clicked.connect(self._on_copy)
         self.reader.delete_clicked.connect(self._on_delete)
 
@@ -632,6 +698,21 @@ class MainWindow(QMainWindow):
     def _on_dictate(self) -> None:
         self.save_open_note()
         self.dictate_clicked.emit(self.reader.note)
+
+    def _on_voice_edit(self, selected_text: str, sel_start: int, sel_end: int) -> None:
+        self.save_open_note()
+        self.voice_edit_clicked.emit(self.reader.note, selected_text, sel_start, sel_end)
+
+    def _on_transform(self, preset_key: str, selected_text: str, sel_start: int, sel_end: int) -> None:
+        self.save_open_note()
+        self.transform_requested.emit(self.reader.note, preset_key, selected_text, sel_start, sel_end)
+
+    def apply_note_replacement(self, note_path: Path, new_text: str, sel_start: int, sel_end: int) -> bool:
+        if self.stack.currentWidget() is self.reader and self.reader.note.path == note_path:
+            self.reader.apply_text_replacement(new_text, sel_start, sel_end)
+            self.save_open_note()
+            return True
+        return False
 
     def _on_copy(self) -> None:
         self.save_open_note()
