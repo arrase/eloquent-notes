@@ -48,6 +48,7 @@ from eloquent_notes.window import TRANSFORM_PRESETS, MainWindow
 logger = logging.getLogger("eloquent_notes.app")
 
 APP_NAME = "Eloquent Notes"
+TRAY_IDLE_TOOLTIP = "Eloquent Notes (Idle)"
 
 
 def _configure_logging(cfg: dict[str, Any]) -> None:
@@ -142,7 +143,7 @@ class EloquentApp(QObject):
         self.tray.setContextMenu(self.menu)
         self.tray.activated.connect(self._on_tray_activated)
         self.tray.messageClicked.connect(self.show_window)
-        self._update_icon("gray", _("Eloquent Notes (Idle)"))
+        self._update_icon("gray", _(TRAY_IDLE_TOOLTIP))
         self.tray.show()
 
     def _create_tray_menu(self) -> QMenu:
@@ -475,7 +476,7 @@ class EloquentApp(QObject):
             logger.exception("Error stopping recorder on cancel")
 
         self.state = IDLE
-        self._update_icon("gray", _("Eloquent Notes (Idle)"))
+        self._update_icon("gray", _(TRAY_IDLE_TOOLTIP))
 
         if snapshot is not None and snapshot["ai"]["keep_alive"] != snapshot["ai"]["preload_keep_alive"]:
             threading.Thread(
@@ -843,7 +844,7 @@ class EloquentApp(QObject):
 
     def _on_processing_completed(self, status: str, detail: str) -> None:
         self.state = IDLE
-        self._update_icon("gray", _("Eloquent Notes (Idle)"))
+        self._update_icon("gray", _(TRAY_IDLE_TOOLTIP))
         target, self._append_target = self._append_target, None
         replace_target, self._replace_target = self._replace_target, None
         self._voice_edit_context = None

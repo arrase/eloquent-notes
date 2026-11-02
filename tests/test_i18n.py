@@ -13,6 +13,7 @@ from PyQt6.QtCore import QLocale
 from PyQt6.QtWidgets import QApplication
 
 from eloquent_notes import i18n
+from eloquent_notes.app import TRAY_IDLE_TOOLTIP
 from eloquent_notes.config_gui.dialog import RESTORE_DEFAULTS_TITLE, ConfigurationDialog
 from eloquent_notes.config_gui.tabs import text_files
 from eloquent_notes.config_gui.tabs.ai import VALIDATION_ERROR_TITLE, AITab
@@ -110,6 +111,7 @@ def _extract_codebase_msgids() -> tuple[set[str], set[tuple[str, str]]]:
     strings.update(label for _key, label, _inst in TRANSFORM_PRESETS)
     strings.update(TYPE_LABELS.values())
     strings.update(label for _note_type, label in _TYPE_FILTER_LABELS)
+    strings.add(TRAY_IDLE_TOOLTIP)
     strings.add(RESTORE_DEFAULTS_TITLE)
     strings.add(VALIDATION_ERROR_TITLE)
     strings.update(label for label, _path, _default in text_files.PROMPTS)
