@@ -29,7 +29,7 @@ eloquent-notes [command] [options]
 
 ### 1. `eloquent-notes` (Daemon Launch / Single-Instance Check)
 
-Launching `eloquent-notes` without a command connects to the local IPC socket `eloquent_notes_ipc`.
+Launching `eloquent-notes` without a command connects to the per-user local IPC socket (`$XDG_RUNTIME_DIR/eloquent_notes_ipc`, or `eloquent_notes_ipc_<uid>` if `$XDG_RUNTIME_DIR` is unset).
 * If the daemon is **already running**, it sends `open`, which shows the notes window, and exits.
 * If **no daemon is running**, it executes `eloquent_notes.app` to start the tray icon and the IPC server. The window is not opened; the app starts quietly in the tray.
 
@@ -49,7 +49,7 @@ Shows the notes window (timeline, search and reader).
 
 Opens the graphical configuration management dialog.
 * Runs in its own process, independent of the daemon.
-* Upon clicking **Save**, if an active daemon is detected on `eloquent_notes_ipc`, it sends a `reload` IPC signal to reload configuration in-memory without restarting the daemon process.
+* Upon clicking **Save**, if an active daemon is detected on the user's IPC socket, it sends a `reload` IPC signal to reload configuration in-memory without restarting the daemon process.
 
 ### 5. `eloquent-notes install-autostart`
 
@@ -87,7 +87,7 @@ The daemon accepts three IPC messages:
                                   |
                      QCoreApplication (Headless)
                                   |
-                       QLocalSocket ("eloquent_notes_ipc")
+                       QLocalSocket ($XDG_RUNTIME_DIR/eloquent_notes_ipc)
                                   |
              +--------------------+--------------------+
              | (Socket Connected)                      | (Connection Failed)
@@ -101,7 +101,7 @@ The daemon accepts three IPC messages:
 ### Key Architectural Benefits
 
 1. **Headless Core App (`QCoreApplication`)**: When executing `eloquent-notes`, `toggle` or `open`, `run_cli()` instantiates a headless `QCoreApplication` rather than `QApplication` or any GUI dialogs, avoiding display server window initialization and keeping the IPC client fast.
-2. **Unix Domain Socket (`QLocalSocket`)**: Communication between the CLI process and daemon occurs over named Unix local sockets (`eloquent_notes_ipc`). The IPC handshake, message transfer (`"toggle"`), and socket disconnection complete in under 5 milliseconds.
+2. **Unix Domain Socket (`QLocalSocket`)**: Communication between the CLI process and daemon occurs over a per-user Unix local socket (`$XDG_RUNTIME_DIR/eloquent_notes_ipc`, falling back to `eloquent_notes_ipc_<uid>` when `$XDG_RUNTIME_DIR` is unset, restricted to the owning user). The IPC handshake, message transfer (`"toggle"`), and socket disconnection complete in under 5 milliseconds.
 3. **Automatic Daemon Spawning (`os.execv`)**: If `QLocalSocket.connectToServer()` fails or times out after 500 ms, `main.py` detects that the background daemon is inactive. It replaces the current process image using `os.execv(sys.executable, daemon_args)` to start `eloquent_notes.app` directly — with no argument to start quietly in the tray, or passing `toggle` / `open` so the new daemon starts recording or opens the window immediately once its event loop starts.
 
 ---

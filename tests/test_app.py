@@ -1,6 +1,7 @@
 """Unit tests for eloquent_notes.app module."""
 
 import copy
+import stat
 import sys
 import threading
 from collections.abc import Iterator
@@ -11,9 +12,10 @@ from unittest.mock import MagicMock, PropertyMock, patch
 import pytest
 import requests
 from PyQt6.QtCore import QByteArray
+from PyQt6.QtNetwork import QLocalServer
 from PyQt6.QtWidgets import QApplication, QSystemTrayIcon
 
-from eloquent_notes import config, notes, ui
+from eloquent_notes import config, get_ipc_server_name, main, notes, ui
 from eloquent_notes.app import EloquentApp
 from eloquent_notes.app import main as app_main
 
@@ -1158,20 +1160,30 @@ def test_tray_menu_creation_and_activation(qapp: QApplication) -> None:
 
 def test_init_ipc_server_and_tray_ui(qapp: QApplication) -> None:
     eloquent_app = make_app(qapp)
+    expected_name = get_ipc_server_name()
 
     mock_server = MagicMock()
     mock_server.listen.return_value = True
-    with patch("eloquent_notes.app.QLocalServer", return_value=mock_server) as mock_server_cls:
+    with patch(
+        "eloquent_notes.app.QLocalServer",
+        return_value=mock_server,
+        SocketOption=QLocalServer.SocketOption,
+    ) as mock_server_cls:
         eloquent_app._init_ipc_server()
-        mock_server_cls.removeServer.assert_called_once()
-        mock_server.listen.assert_called_once()
+        mock_server.setSocketOptions.assert_called_once_with(QLocalServer.SocketOption.UserAccessOption)
+        mock_server_cls.removeServer.assert_called_once_with(expected_name)
+        mock_server.listen.assert_called_once_with(expected_name)
         mock_server.newConnection.connect.assert_called_once_with(eloquent_app._handle_ipc_connection)
 
     failing_server = MagicMock()
     failing_server.listen.return_value = False
     failing_server.errorString.return_value = "Address in use"
     with (
-        patch("eloquent_notes.app.QLocalServer", return_value=failing_server),
+        patch(
+            "eloquent_notes.app.QLocalServer",
+            return_value=failing_server,
+            SocketOption=QLocalServer.SocketOption,
+        ),
         pytest.raises(RuntimeError, match="Address in use"),
     ):
         eloquent_app._init_ipc_server()
@@ -1181,6 +1193,39 @@ def test_init_ipc_server_and_tray_ui(qapp: QApplication) -> None:
     eloquent_app.tray.setContextMenu.assert_called_once_with(eloquent_app.menu)
     eloquent_app.tray.show.assert_called_once()
     eloquent_app._update_icon.assert_called_with("gray", "Eloquent Notes (Idle)")  # type: ignore[attr-defined]
+
+
+def test_ipc_server_isolated_per_runtime_dir(
+    qapp: QApplication,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    user_a_dir = tmp_path / "user_a"
+    user_b_dir = tmp_path / "user_b"
+    user_a_dir.mkdir(mode=0o700)
+    user_b_dir.mkdir(mode=0o700)
+
+    monkeypatch.setenv("XDG_RUNTIME_DIR", str(user_a_dir))
+    app_a = make_app(qapp)
+    app_a._init_ipc_server()
+
+    monkeypatch.setenv("XDG_RUNTIME_DIR", str(user_b_dir))
+    app_b = make_app(qapp)
+    app_b._init_ipc_server()
+
+    try:
+        sock_a = user_a_dir / "eloquent_notes_ipc"
+        sock_b = user_b_dir / "eloquent_notes_ipc"
+        assert sock_a.exists()
+        assert sock_b.exists()
+        assert stat.S_IMODE(sock_a.stat().st_mode) == 0o700
+        assert stat.S_IMODE(sock_b.stat().st_mode) == 0o700
+        assert main.send_ipc_command("open") is True
+    finally:
+        assert app_a.server is not None
+        assert app_b.server is not None
+        app_a.server.close()
+        app_b.server.close()
 
 
 def test_exit_app_cleanup(qapp: QApplication) -> None:
@@ -1195,13 +1240,14 @@ def test_exit_app_cleanup(qapp: QApplication) -> None:
     eloquent_app.tray = MagicMock()
     eloquent_app.app = MagicMock()
 
-    with pytest.raises(SystemExit):
+    with patch("eloquent_notes.app.QLocalServer.removeServer") as mock_remove, pytest.raises(SystemExit):
         eloquent_app.exit_app()
 
     mock_recorder.stop.assert_called_once()
     eloquent_app.window.close.assert_called_once()
     eloquent_app._config_dialog.close.assert_called_once()
     eloquent_app.server.close.assert_called_once()
+    mock_remove.assert_called_once_with(get_ipc_server_name())
     eloquent_app.tray.hide.assert_called_once()
     eloquent_app.app.quit.assert_called_once()
 
