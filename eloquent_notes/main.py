@@ -13,7 +13,7 @@ from PyQt6.QtCore import QCoreApplication
 from PyQt6.QtNetwork import QLocalSocket
 from PyQt6.QtWidgets import QApplication, QDialog
 
-from eloquent_notes import IPC_SERVER_NAME, __version__
+from eloquent_notes import __version__, get_ipc_server_name
 from eloquent_notes.autostart import install_autostart
 from eloquent_notes.config_gui import ConfigurationDialog
 from eloquent_notes.i18n import _
@@ -58,7 +58,7 @@ def send_ipc_command(command: str, timeout_ms: int = 500) -> bool:
         bool: True if connection and write succeeded, False otherwise.
     """
     socket = QLocalSocket()
-    socket.connectToServer(IPC_SERVER_NAME)
+    socket.connectToServer(get_ipc_server_name())
     if socket.waitForConnected(timeout_ms):
         try:
             socket.write(command.encode("utf-8"))

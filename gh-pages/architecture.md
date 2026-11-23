@@ -76,7 +76,7 @@ The daemon runs on a `QApplication` event loop with `setQuitOnLastWindowClosed(F
 The CLI entry point (`eloquent_notes.main`) works as a lightweight client:
 
 1. It creates a headless `QCoreApplication` (no display connection, no windows).
-2. It connects to the named local socket `eloquent_notes_ipc` with `QLocalSocket`.
+2. It connects to the per-user local socket (`$XDG_RUNTIME_DIR/eloquent_notes_ipc`, or `eloquent_notes_ipc_<uid>` if `$XDG_RUNTIME_DIR` is unset) with `QLocalSocket`.
 3. **If the daemon is running**, it writes `toggle` (for `toggle`/`-t`) or `open` (no command, or `open`) and exits. The daemon's `QLocalServer` dispatches `toggle` → `toggle_action()`, `open` → `show_window()`, `reload` → `reload_config()`.
 4. **If no daemon is running**, it replaces its process with `python -m eloquent_notes.app` via `os.execv` (passing `toggle` or `open` if requested, or no argument to start quietly in the system tray).
 

@@ -1,12 +1,14 @@
 """Unit tests for eloquent_notes.main."""
 
+import os
 import sys
+from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
 from PyQt6.QtWidgets import QApplication, QDialog
 
-from eloquent_notes import __version__, main
+from eloquent_notes import __version__, get_ipc_server_name, main
 
 
 def test_version_flag_prints_installed_version(capsys: pytest.CaptureFixture[str]) -> None:
@@ -41,6 +43,21 @@ def test_parse_args() -> None:
     assert args.command == "config"
 
 
+def test_get_ipc_server_name_uses_xdg_runtime_dir(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """IPC socket lives inside XDG_RUNTIME_DIR when set."""
+    monkeypatch.setenv("XDG_RUNTIME_DIR", str(tmp_path))
+    assert get_ipc_server_name() == str(tmp_path / "eloquent_notes_ipc")
+
+
+def test_get_ipc_server_name_falls_back_to_uid(monkeypatch: pytest.MonkeyPatch) -> None:
+    """IPC socket name includes the user UID when XDG_RUNTIME_DIR is unset or empty."""
+    monkeypatch.delenv("XDG_RUNTIME_DIR", raising=False)
+    assert get_ipc_server_name() == f"eloquent_notes_ipc_{os.getuid()}"
+
+    monkeypatch.setenv("XDG_RUNTIME_DIR", "")
+    assert get_ipc_server_name() == f"eloquent_notes_ipc_{os.getuid()}"
+
+
 def test_send_ipc_command_success(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test send_ipc_command returns True when connection succeeds."""
     mock_socket = MagicMock()
@@ -50,7 +67,7 @@ def test_send_ipc_command_success(monkeypatch: pytest.MonkeyPatch) -> None:
 
     result = main.send_ipc_command("test_cmd", timeout_ms=300)
     assert result is True
-    mock_socket.connectToServer.assert_called_once_with("eloquent_notes_ipc")
+    mock_socket.connectToServer.assert_called_once_with(get_ipc_server_name())
     mock_socket.write.assert_called_once_with(b"test_cmd")
     mock_socket.waitForBytesWritten.assert_called_once_with(300)
     mock_socket.disconnectFromServer.assert_called_once()

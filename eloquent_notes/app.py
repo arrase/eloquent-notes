@@ -28,13 +28,13 @@ from PyQt6.QtWidgets import QApplication, QMenu, QMessageBox, QSystemTrayIcon
 
 from eloquent_notes import (
     IDLE,
-    IPC_SERVER_NAME,
     PROCESSING,
     RECORDING,
     audio,
     autostart,
     config,
     config_gui,
+    get_ipc_server_name,
     llm,
     notes,
     recording_hud,
@@ -130,9 +130,11 @@ class EloquentApp(QObject):
         sys.exit(self.app.exec())
 
     def _init_ipc_server(self) -> None:
+        server_name = get_ipc_server_name()
         self.server = QLocalServer(self)
-        QLocalServer.removeServer(IPC_SERVER_NAME)
-        if not self.server.listen(IPC_SERVER_NAME):
+        self.server.setSocketOptions(QLocalServer.SocketOption.UserAccessOption)
+        QLocalServer.removeServer(server_name)
+        if not self.server.listen(server_name):
             error_msg = f"Failed to start local IPC server: {self.server.errorString()}"
             logger.error(error_msg)
             raise RuntimeError(error_msg)
@@ -963,7 +965,7 @@ class EloquentApp(QObject):
             self._config_dialog.close()
         if self.server is not None:
             self.server.close()
-            QLocalServer.removeServer(IPC_SERVER_NAME)
+            QLocalServer.removeServer(get_ipc_server_name())
         if self.tray is not None:
             self.tray.hide()
         self.app.quit()
