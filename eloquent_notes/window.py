@@ -85,7 +85,7 @@ _TYPE_FILTER_LABELS = (
 
 def format_time(moment: datetime, pattern: str) -> str:
     """Format a datetime with a Qt date-time pattern in the UI locale."""
-    return ui_locale().toString(QDateTime.fromSecsSinceEpoch(int(moment.timestamp())), pattern)
+    return str(ui_locale().toString(QDateTime.fromSecsSinceEpoch(int(moment.timestamp())), pattern))
 
 
 def day_label(day: date, today: date) -> str:
@@ -94,7 +94,7 @@ def day_label(day: date, today: date) -> str:
         return _("Today")
     if day == today - timedelta(days=1):
         return _("Yesterday")
-    return ui_locale().toString(day, "dddd, d MMMM" if day.year == today.year else "dddd, d MMMM yyyy")
+    return str(ui_locale().toString(day, "dddd, d MMMM" if day.year == today.year else "dddd, d MMMM yyyy"))
 
 
 def _plain(text: str, object_name: str) -> QLabel:
